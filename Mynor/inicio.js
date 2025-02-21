@@ -1,25 +1,55 @@
-// Funcionalidad del menú hamburguesa
-const hamburger = document.querySelector('.hamburger');
-const nav = document.querySelector('.main-nav');
+const botonMenu = document.querySelector('.boton-menu');
+const navegacion = document.querySelector('.navegacion-principal');
+const encuesta = document.querySelector('.encuesta');
+const miniJuego = document.querySelector('.mini-juego');
+const feedLogros = document.querySelector('.feed-logros');
+const reacciones = document.querySelectorAll('.reacciones-personalizadas');
 
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    nav.classList.toggle('active');
+botonMenu.addEventListener('click', () => {
+    navegacion.classList.toggle('activo');
 });
 
+// Funcionalidad de encuesta
+function mostrarEncuesta() {
+    // Lógica para mostrar la encuesta del día/semana
+    encuesta.innerHTML = '<p>¿Cuál es tu mascota favorita?</p><button>Perro</button><button>Gato</button>';
+}
+
+
+
+// Funcionalidad para el feed de logros
+function actualizarFeedLogros() {
+    // Lógica para actualizar el feed de logros
+    feedLogros.innerHTML = '<p>¡Felicidades! Has alcanzado un nuevo nivel.</p>';
+}
+
+// Funcionalidad de reacciones
+reacciones.forEach(reaccion => {
+    reaccion.addEventListener('click', () => {
+        // Lógica para manejar reacciones
+        alert('¡Reaccionaste a este comentario!');
+    });
+});
+
+// Inicializar funcionalidades
+mostrarEncuesta();
+iniciarMiniJuego();
+actualizarFeedLogros();
+
+
 // Cerrar menú al hacer clic fuera
-document.addEventListener('click', (event) => {
-    if (!event.target.closest('.hamburger') && !event.target.closest('.main-nav')) {
-        hamburger.classList.remove('active');
-        nav.classList.remove('active');
+document.addEventListener('click', (evento) => {
+    if (!evento.target.closest('.boton-menu') && !evento.target.closest('.navegacion-principal')) {
+        botonMenu.classList.remove('activo');
+        navegacion.classList.remove('activo');
     }
 });
 
-// Funcionalidad del menú de perfil
-const profileIcon = document.querySelector('.profile-icon');
-const profileMenu = document.createElement('div');
-profileMenu.className = 'profile-menu';
-profileMenu.innerHTML = `
+// Funcionalidad del menú de usuario
+const iconoPerfil = document.querySelector('.icono-perfil');
+const menuUsuario = document.createElement('div');
+menuUsuario.className = 'menu-usuario';
+menuUsuario.innerHTML = `
     <ul>
         <li><a href="#">Mi Perfil</a></li>
         <li><a href="#">Configuración</a></li>
@@ -27,27 +57,27 @@ profileMenu.innerHTML = `
     </ul>
 `;
 
-// Insertar el menú de perfil en el DOM
-profileIcon.appendChild(profileMenu);
+// Insertar el menú de usuario en el DOM
+iconoPerfil.appendChild(menuUsuario);
 
 // Manejar clics en el ícono de perfil
-profileIcon.addEventListener('click', (e) => {
-    e.stopPropagation();
+iconoPerfil.addEventListener('click', (evento) => {
+    evento.stopPropagation();
     // Cerrar otros menús abiertos
-    document.querySelectorAll('.profile-menu.show').forEach(menu => {
-        if (menu !== profileMenu) menu.classList.remove('show');
+    document.querySelectorAll('.menu-usuario.mostrar').forEach(menu => {
+        if (menu !== menuUsuario) menu.classList.remove('mostrar');
     });
-    profileMenu.classList.toggle('show');
+    menuUsuario.classList.toggle('mostrar');
 });
 
 // Cerrar menú al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (!profileIcon.contains(e.target) && !profileMenu.contains(e.target)) {
-        profileMenu.classList.remove('show');
+document.addEventListener('click', (evento) => {
+    if (!iconoPerfil.contains(evento.target) && !menuUsuario.contains(evento.target)) {
+        menuUsuario.classList.remove('mostrar');
     }
 });
 
 // Cerrar menú al hacer scroll
 window.addEventListener('scroll', () => {
-    profileMenu.classList.remove('show');
+    menuUsuario.classList.remove('mostrar');
 });
