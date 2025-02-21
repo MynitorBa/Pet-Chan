@@ -79,231 +79,110 @@
                         <span class="etiqueta">End Game</span>
                     </div>
                     <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
+                        <button class="btn-accion">💬 Comentar</button>
                         <button class="btn-accion"><i>🔖</i> Guardar</button>
                         <button class="btn-accion"><i>📤</i> Compartir</button>
                     </div>
+                    <div class="comentarios-seccion">
+                        <h4>Comentarios (3)</h4>
+                        <div class="comentario">
+                            <p class="autor-mensaje">
+                                <span class="indicador-actividad actividad-alta"></span>
+                                <span>TerrariaMaster</span>
+                            </p>
+                            <p>¡Increíble construcción! Me encanta el uso de las antorchas para la iluminación.</p>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpzhxPL77eBQSHGMYFZkFI2mB3XI2ihBQs5Q&s" alt="Detalle de iluminación" class="comentario-imagen"/>
+                        </div>
+                        <div class="comentario">
+                            <p class="autor-mensaje">
+                                <span class="indicador-actividad actividad-media"></span>
+                                <span>Builder123</span>
+                            </p>
+                            <p>¿Qué bloques usaste para las torres? ¡Se ve genial!</p>
+                        </div>
+                        <div class="comentario">
+                            <p class="autor-mensaje">
+                                <span class="indicador-actividad actividad-alta"></span>
+                                <span>BuildMaster2024</span>
+                                <span class="autor-badge">OP</span>
+                            </p>
+                            <p>Gracias a todos! Usé principalmente Stone Slabs y Gray Bricks. Aquí hay un detalle de la estructura:</p>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0nj0aRiDY2USKYqs10fH95VdA0o7D8JosWw&s" class="comentario-imagen"/>
+                        </div>
+                    </div>
+                    <form id="formComentario" enctype="multipart/form-data">
+                        <div class="subir-imagen">
+                            <input type="file" id="archivo" name="archivo" accept="image/*" hidden>
+                            <label for="archivo" class="subir-imagen-texto">
+                                Arrastra una imagen o haz clic para subir
+                            </label>
+                        </div>
+                        <textarea class="input-comentario" placeholder="Escribe un comentario..."></textarea>
+                        <button type="submit" class="btn-comentar">Enviar comentario</button>
+                    </form>
                 </div>
-        
-                <!-- 145 votos -->
-                <div class="mensaje-foro mensaje-destacado">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">145</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">Guía de pesca definitiva 2024</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-alta"></span>
-                        <span>FishingMaster</span>
-                        <span class="autor-badge">Experto</span>
-                    </p>
-                    
-                    <p class="contenido-mensaje">Todo lo que necesitas saber sobre pesca: mejores cebos, potenciadores, clima, tiempo, biomas y recompensas. Incluye tablas de probabilidad actualizadas y estrategias para las misiones del pescador.</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Guía</span>
-                        <span class="etiqueta">Pesca</span>
-                        <span class="etiqueta">Actualizado</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-        
-                <!-- 132 votos -->
-                <div class="mensaje-foro mensaje-destacado">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">132</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">La mejor granja de Soul of Light</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-media"></span>
-                        <span>FarmKing99</span>
-                        <span class="autor-badge">Veterano</span>
-                    </p>
-                    <p class="contenido-mensaje">He optimizado la granja definitiva para Soul of Light. Usando hoiks y trampas de lava, consigo 300 almas por hora. El diseño requiere 400 bloques de eco y un sistema de...</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Farming</span>
-                        <span class="etiqueta">Tutorial</span>
-                        <span class="etiqueta">Hardmode</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-        
-                <!-- 92 votos -->
-                <div class="mensaje-foro">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">92</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">Secretos del Jungle Temple</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-media"></span>
-                        <span>ExplorerPro</span>
-                        <span class="autor-badge">Cazador</span>
-                    </p>
-                    <p class="contenido-mensaje">Encontré una forma de entrar al Jungle Temple antes de Plantera usando un bug con los hoiks y las plataformas de madera. ¡Cuidado con las trampas!</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Exploración</span>
-                        <span class="etiqueta">Secretos</span>
-                        <span class="etiqueta">Glitch</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-        
-                <!-- 87 votos - Mensaje tuyo -->
-                <div class="mensaje-foro mensaje-tuyo">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">87</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">Mi castillo medieval (WIP)</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-alta"></span>
-                        <span>BuildMaster2024</span>
-                        <span class="autor-badge">Constructor</span>
-                        <span class="autor-badge" style="background: rgba(255, 215, 0, 0.2); color: #ffd700;">Tú</span>
-                    </p>
-                    <p class="contenido-mensaje">Llevo 2 semanas trabajando en este castillo. Utilicé piedra gris, piedra de dungeon y dynasty wood para los detalles. Aún falta decorar el interior pero quería compartir el progreso.</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Construcción</span>
-                        <span class="etiqueta">Medieval</span>
-                        <span class="etiqueta">WIP</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>✏️</i> Editar</button>
-                        <button class="btn-accion"><i>💬</i> Ver comentarios (12)</button>
-                        <button class="btn-accion"><i>📊</i> Estadísticas</button>
-                    </div>
-                </div>
-        
-                <!-- 67 votos -->
-                <div class="mensaje-foro">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">67</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">Creé un pixel art de todos los jefes</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-baja"></span>
-                        <span>PixelArtist</span>
-                        <span class="autor-badge">Artista</span>
-                    </p>
-                    <p class="contenido-mensaje">Me tomó un mes, pero finalmente terminé mi colección de pixel art de todos los jefes del juego. Construido bloque por bloque en modo supervivencia.</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Arte</span>
-                        <span class="etiqueta">Construcción</span>
-                        <span class="etiqueta">Creatividad</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-        
-                <!-- 45 votos -->
-                <div class="mensaje-foro mensaje-nuevo">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">45</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <span class="badge-nuevo">Nuevo</span>
-                    <h3 class="titulo-mensaje">Tips rápidos para principiantes</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-media"></span>
-                        <span>NewbHelper</span>
-                        <span class="autor-badge">Ayudante</span>
-                    </p>
-                    <p class="contenido-mensaje">No olviden explorar las nubes al inicio del juego. Pueden encontrar islas flotantes con tesoros valiosos y recursos únicos.</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Consejos</span>
-                        <span class="etiqueta">Principiante</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-        
-                <!-- 34 votos -->
-                <div class="mensaje-foro">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">34</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">¿Cuál es el mejor set pre-hardmode?</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-baja"></span>
-                        <span>ArmorCollector</span>
-                        <span class="autor-badge">Novato</span>
-                    </p>
-                    <p class="contenido-mensaje">No puedo decidir entre la armadura de meteorito o la de abeja. ¿Cuál recomiendan para un mago principiante?</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Pregunta</span>
-                        <span class="etiqueta">Pre-Hardmode</span>
-                        <span class="etiqueta">Equipo</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-        
-                <!-- 23 votos -->
-                <div class="mensaje-foro">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">23</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">Buscando equipo para eventos</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-alta"></span>
-                        <span>TeamPlayer1</span>
-                        <span class="autor-badge">Social</span>
-                    </p>
-                    <p class="contenido-mensaje">¿Alguien quiere unirse para hacer eventos de luna? Tengo servidor y Discord. Horario: 8PM GMT.</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Multiplayer</span>
-                        <span class="etiqueta">Eventos</span>
-                        <span class="etiqueta">Social</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion"><i>💬</i> Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="paginacion">
-                <button class="btn-pagina">◀</button>
-                <button class="btn-pagina activo">1</button>
-                <button class="btn-pagina">2</button>
-                <button class="btn-pagina">3</button>
-                <button class="btn-pagina">▶</button>
-            </div>
+
+                 <!-- Mensaje 2 -->
+    <div class="mensaje-foro mensaje-destacado">
+        <div class="votos">
+            <button title="Votar positivo">&#8593;</button>
+            <span class="contador-votos">145</span>
+            <button title="Votar negativo">&#8595;</button>
         </div>
+        <h3 class="titulo-mensaje">Guía de pesca definitiva 2024</h3>
+        <p class="autor-mensaje">
+            <span class="indicador-actividad actividad-alta"></span>
+            <span>FishingMaster</span>
+            <span class="autor-badge">Experto</span>
+        </p>
+        <p class="contenido-mensaje">Todo lo que necesitas saber sobre pesca: mejores cebos, potenciadores, clima, tiempo, biomas y recompensas...</p>
+        <div class="etiquetas">
+            <span class="etiqueta">Guía</span>
+            <span class="etiqueta">Pesca</span>
+            <span class="etiqueta">Actualizado</span>
+        </div>
+        <div class="acciones-mensaje">
+            <button class="btn-accion">💬 Comentar</button>
+            <button class="btn-accion">🔖 Guardar</button>
+            <button class="btn-accion">📤 Compartir</button>
+        </div>
+    </div>
+
+    <!-- Mensaje 3 -->
+    <div class="mensaje-foro">
+        <div class="votos">
+            <button title="Votar positivo">↑</button>
+            <span class="contador-votos">92</span>
+            <button title="Votar negativo">↓</button>
+        </div>
+        <h3 class="titulo-mensaje">La mejor granja de Soul of Light</h3>
+        <p class="autor-mensaje">
+            <span class="indicador-actividad actividad-media"></span>
+            <span>FarmKing99</span>
+            <span class="autor-badge">Veterano</span>
+        </p>
+        <p class="contenido-mensaje">
+            He optimizado la granja definitiva para Soul of Light. Usando hoiks y trampas de lava...
+        </p>
+        
+        <!-- La imagen debe estar bien cerrada y separada -->
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUOL9umLPrnFDzpuDusgiA6e2qe7cC6XvuaQ&s" alt="Terraria">
+    
+        <!-- Aquí deben ir las etiquetas, en un div aparte -->
+        <div class="etiquetas">
+            <span class="etiqueta">Farming</span>
+            <span class="etiqueta">Tutorial</span>
+            <span class="etiqueta">Hardmode</span>
+        </div>
+    
+        <div class="acciones-mensaje">
+            <button class="btn-accion">💬 Comentar</button>
+            <button class="btn-accion">🔖 Guardar</button>
+            <button class="btn-accion">📤 Compartir</button>
+        </div>
+    </div>
+    
+    
             </div>
         </div>
     </main>
