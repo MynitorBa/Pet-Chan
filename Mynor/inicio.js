@@ -1,11 +1,41 @@
-// Funcionalidad del menú
 const botonMenu = document.querySelector('.boton-menu');
 const navegacion = document.querySelector('.navegacion-principal');
+const encuesta = document.querySelector('.encuesta');
+const miniJuego = document.querySelector('.mini-juego');
+const feedLogros = document.querySelector('.feed-logros');
+const reacciones = document.querySelectorAll('.reacciones-personalizadas');
 
 botonMenu.addEventListener('click', () => {
-    botonMenu.classList.toggle('activo');
     navegacion.classList.toggle('activo');
 });
+
+// Funcionalidad de encuesta
+function mostrarEncuesta() {
+    // Lógica para mostrar la encuesta del día/semana
+    encuesta.innerHTML = '<p>¿Cuál es tu mascota favorita?</p><button>Perro</button><button>Gato</button>';
+}
+
+
+
+// Funcionalidad para el feed de logros
+function actualizarFeedLogros() {
+    // Lógica para actualizar el feed de logros
+    feedLogros.innerHTML = '<p>¡Felicidades! Has alcanzado un nuevo nivel.</p>';
+}
+
+// Funcionalidad de reacciones
+reacciones.forEach(reaccion => {
+    reaccion.addEventListener('click', () => {
+        // Lógica para manejar reacciones
+        alert('¡Reaccionaste a este comentario!');
+    });
+});
+
+// Inicializar funcionalidades
+mostrarEncuesta();
+iniciarMiniJuego();
+actualizarFeedLogros();
+
 
 // Cerrar menú al hacer clic fuera
 document.addEventListener('click', (evento) => {

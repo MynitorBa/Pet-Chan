@@ -1,6 +1,8 @@
 body {
     font-family: 'Press Start 2P', cursive;    
     background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+
     color: #fff;
     margin: 0;
     padding: 0;
@@ -591,6 +593,126 @@ h1, h2, h3 {
     animation: animacionCaminar 10s linear infinite;
 }
 
+
+/*fin de css del footer*/
+
+.foros-populares {
+    color: #fff;
+    background-color: rgba(163, 4, 250, 0.1);
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.foros-populares h2 {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+.titulo-mensaje {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.grid-mensajes {
+    margin-top: 20px;
+    color: #fff;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.mensaje-foro {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mensaje-foro:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(207, 124, 252, 0.4);
+}
+
+.mensaje-destacado {
+    border: 2px solid #ffd700;
+    background-color: rgba(56, 56, 53, 0.1);
+
+}
+
+.votos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.votos button {
+    background: none;
+    border: none;
+    color: #cf7cfc;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+.votos button:hover {
+    color: #fff;
+}
+
+.contador-votos {
+    font-weight: bold;
+    color: #fff;
+}
+
+.titulo-mensaje {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.autor-mensaje {
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.contenido-mensaje {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.etiquetas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.etiqueta {
+    background: rgba(207, 124, 252, 0.2);
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+.acciones-mensaje {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-accion {
+    background: rgba(207, 124, 252, 0.1);
+    border: 1px solid #cf7cfc;
+    color: #cf7cfc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-accion:hover {
+    background: rgba(207, 124, 252, 0.3);
+}
+
 /* Animación de caminata con giro en los extremos */
 @keyframes animacionCaminar {
     0% {
@@ -623,3 +745,113 @@ h1, h2, h3 {
     }
 }
 /*fin de css footer*/
+
+/* Estilos para foros populares */
+.foros-populares {
+    background-color: rgba(163, 4, 250, 0.1);
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.foros-populares h2 {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+
+.grid-mensajes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.mensaje-foro {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mensaje-foro:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(207, 124, 252, 0.4);
+}
+
+.mensaje-destacado {
+    border: 2px solid #ffd700;
+}
+
+.votos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.votos button {
+    background: none;
+    border: none;
+    color: #cf7cfc;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+.votos button:hover {
+    color: #fff;
+}
+
+.contador-votos {
+    font-weight: bold;
+    color: #fff;
+}
+
+.titulo-mensaje {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+
+.autor-mensaje {
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.contenido-mensaje {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.etiquetas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.etiqueta {
+    background: rgba(207, 124, 252, 0.2);
+    color: #cf7cfc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+.acciones-mensaje {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-accion {
+    background: rgba(207, 124, 252, 0.1);
+    border: 1px solid #cf7cfc;
+    color: #cf7cfc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-accion:hover {
+    background: rgba(207, 124, 252, 0.3);
+}
