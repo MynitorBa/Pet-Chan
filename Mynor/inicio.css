@@ -329,9 +329,10 @@ main {
     background: rgba(163, 4, 250, 0.1);
     padding: 20px;
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 40px;
     border: 2px solid #cf7cfc;
 }
+
 
 .lista-comentarios {
     margin-top: 15px;
@@ -596,14 +597,24 @@ h1, h2, h3 {
 
 /*fin de css del footer*/
 
+
+
+
+
+
+
+/*foros*/
+
 .foros-populares {
     color: #fff;
-    background-color: rgba(163, 4, 250, 0.1);
+    background-color: rgba(13, 13, 14, 0.1);
     border: 2px solid #cf7cfc;
     border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 40px;
+    margin-top: 40px;
+    margin-bottom: 40px; /* Increased margin for spacing */
 }
+
 
 .foros-populares h2 {
     color: #ffffff;
@@ -623,7 +634,7 @@ h1, h2, h3 {
 }
 
 .mensaje-foro {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(15, 14, 14, 0.1);
     border: 1px solid #cf7cfc;
     border-radius: 10px;
     padding: 15px;
