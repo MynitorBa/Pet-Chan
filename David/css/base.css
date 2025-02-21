@@ -225,6 +225,7 @@ body {
 
 main{
     padding: 70px;
+    padding-bottom: 4px;
 }
 
 .profile-container {
@@ -391,6 +392,7 @@ h1, h2, h3 {
     border: 3px solid #cf7cfc;
     border-radius: 15px;
     transition: transform 0.3s ease;
+    height: 150px;
 }
 
 .pet-image:hover {
@@ -434,4 +436,62 @@ h1, h2, h3 {
 /*fin de css del cuerpo*/
 
 /*css de footer*/
+
+.main-footer {
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    position: relative;
+}
+
+
+/* Mascota */
+
+.pixeleado{
+    image-rendering: pixelated;
+    image-rendering: crisp-edges; /* Para compatibilidad con más navegadores */
+}
+
+
+.micro_mascota {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    width: 150px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: walkAnimation 10s linear infinite;
+}
+
+/* Animación de caminata con giro en los extremos */
+@keyframes walkAnimation {
+    0% {
+        left: 0;
+        transform: translateY(0) scaleX(1);
+    }
+    15% {
+        left: 0;
+        transform: translateY(-5px) scaleX(1);
+    }
+    45% {
+        left: calc(100% - 150px);
+        transform: translateY(-5px) scaleX(1);
+    }
+    50% {
+        left: calc(100% - 150px);
+        transform: translateY(0) scaleX(-1);
+    }
+    65% {
+        left: calc(100% - 150px);
+        transform: translateY(-5px) scaleX(-1);
+    }
+    95% {
+        left: 0;
+        transform: translateY(-5px) scaleX(-1);
+    }
+    100% {
+        left: 0;
+        transform: translateY(0) scaleX(1);
+    }
+}
 /*fin de css footer*/
