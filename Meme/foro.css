@@ -1,23 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+ body {
+            font-family: 'Press Start 2P', cursive;    
+            background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            font-size: 18px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100vh;
+            overflow-y: auto;
+            padding-top: 60px;
+        }
 
-body {
-    font-family: 'VT323', monospace;
-    background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    color: #fff;
-    margin: 0;
-    padding: 0;
-    font-size: 18px;
-    line-height: 1.6;
-    overflow-x: hidden;
-    height: 100vh;
-    overflow-y: auto;
-    padding-top: 60px; /* Ajuste para evitar que el header fije sobre el contenido */
-}
-
-.main-header {
+/* Estilos del encabezado */
+.encabezado-principal {
     background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
     padding: 15px 20px;
     border-bottom: 3px solid #cf7cfc;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
     position: fixed;
     top: 0;
     z-index: 1000;
@@ -25,33 +25,29 @@ body {
     box-sizing: border-box;
 }
 
-.header-content {
+.contenido-encabezado {
     max-width: 1400px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 0 20px;
-    box-sizing: border-box;
+    justify-content: space-between;
+    gap: 15px;
 }
 
-.main-nav {
+.navegacion-principal {
     justify-self: center;
     width: 100%;
 }
 
-.main-nav ul {
+.navegacion-principal ul {
     display: flex;
     gap: 20px;
     list-style: none;
     margin: 0;
     padding: 0;
-    justify-content: center;
-    flex-wrap: wrap;
 }
 
-.main-nav a {
+.navegacion-principal a {
     color: #fff;
     text-decoration: none;
     padding: 5px 10px;
@@ -59,19 +55,19 @@ body {
     transition: background 0.3s ease;
 }
 
-.main-nav a:hover {
+.navegacion-principal a:hover {
     background: rgba(207, 124, 252, 0.3);
 }
 
-.search-bar {
+.barra-busqueda {
     justify-self: center;
-    max-width: 600px;
-    width: 100%;
+    max-width: 700px;
+    width: 200%;
     display: flex;
     align-items: center;
 }
 
-.search-bar input {
+.barra-busqueda input {
     width: 100%;
     padding: 8px 12px;
     border: 2px solid #cf7cfc;
@@ -81,7 +77,7 @@ body {
     font-family: inherit;
 }
 
-.search-bar button {
+.barra-busqueda button {
     background: #cf7cfc;
     border: none;
     padding: 8px 12px;
@@ -91,16 +87,16 @@ body {
     transition: background 0.3s ease;
 }
 
-.search-bar button:hover {
+.barra-busqueda button:hover {
     background: #a304fa;
 }
 
-.profile-icon {
+.icono-perfil {
     justify-self: end;
     margin-left: auto;
 }
 
-.profile-icon img {
+.icono-perfil img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -108,11 +104,11 @@ body {
     transition: transform 0.3s ease;
 }
 
-.profile-icon img:hover {
+.icono-perfil img:hover {
     transform: scale(1.1);
 }
 
-.profile-menu {
+.menu-usuario {
     position: absolute;
     top: 50px;
     right: 0;
@@ -126,21 +122,21 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.profile-menu.show {
+.menu-usuario.mostrar {
     display: block;
 }
 
-.profile-menu ul {
+.menu-usuario ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.profile-menu li {
+.menu-usuario li {
     padding: 8px 12px;
 }
 
-.profile-menu a {
+.menu-usuario a {
     color: #fff;
     text-decoration: none;
     display: block;
@@ -148,11 +144,11 @@ body {
     transition: background 0.3s ease;
 }
 
-.profile-menu a:hover {
+.menu-usuario a:hover {
     background: rgba(207, 124, 252, 0.3);
 }
 
-.hamburger {
+.boton-menu {
     display: none;
     flex-direction: column;
     justify-content: space-between;
@@ -164,7 +160,7 @@ body {
     padding: 0;
 }
 
-.hamburger span {
+.boton-menu span {
     display: block;
     width: 100%;
     height: 3px;
@@ -173,24 +169,20 @@ body {
     transition: all 0.3s ease;
 }
 
-.hamburger.active span:nth-child(1) {
+.boton-menu.activo span:nth-child(1) {
     transform: rotate(45deg) translate(5px, 5px);
 }
 
-.hamburger.active span:nth-child(2) {
+.boton-menu.activo span:nth-child(2) {
     opacity: 0;
 }
 
-.hamburger.active span:nth-child(3) {
+.boton-menu.activo span:nth-child(3) {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
 @media (max-width: 768px) {
-    .header-content {
-        grid-template-columns: 1fr auto;
-        gap: 15px;
-    }
-    .main-nav {
+    .navegacion-principal {
         position: absolute;
         top: 100%;
         left: 0;
@@ -200,24 +192,524 @@ body {
         padding: 10px 0;
         border-bottom: 3px solid #cf7cfc;
     }
-    .main-nav.active {
+    .navegacion-principal.activo {
         display: block;
     }
-    .main-nav ul {
+    .navegacion-principal ul {
         flex-direction: column;
         gap: 10px;
     }
-    .search-bar {
+    .barra-busqueda {
         max-width: 100%;
     }
-    .hamburger {
+    .boton-menu {
         display: flex;
     }
 }
 
 @media (min-width: 1200px) {
-    .header-content {
+    .contenido-encabezado {
         max-width: 1400px;
         margin: 0 auto;
+    }
+}
+
+/* Estilos del cuerpo */
+main {
+    padding: 70px;
+}
+
+h1, h2, h3 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin: 10px 0;
+    font-size: xx-large;
+}
+
+/* Contenedor principal ajustado */
+.contenedor-foro {
+    width: 90%;
+    max-width: 1200px;
+    padding: 30px;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    border: 2px solid #cf7cfc;
+    box-shadow: 0px 0px 10px #cf7cfc;
+    margin: 40px auto 0;
+    position: relative;
+}
+
+/* Controles de ordenamiento mejorados */
+.controles-foro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(207, 124, 252, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(207, 124, 252, 0.3);
+}
+
+.ordenar-por {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ordenar-por label {
+    font-weight: 500;
+    color: #cf7cfc;
+}
+
+.ordenar-por select {
+    background: #252525;
+    color: #fff;
+    border: 1px solid #cf7cfc;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ordenar-por select:hover {
+    border-color: #fff;
+    box-shadow: 0 0 5px rgba(207, 124, 252, 0.5);
+}
+
+.ordenar-por select:focus {
+    outline: none;
+    border-color: #ffd700;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+/* Botones de filtro rápido */
+.filtros-rapidos {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.btn-filtro {
+    background: rgba(207, 124, 252, 0.15);
+    color: #cf7cfc;
+    border: 1px solid rgba(207, 124, 252, 0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+}
+
+.btn-filtro:hover {
+    background: rgba(207, 124, 252, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-filtro.activo {
+    background: rgba(207, 124, 252, 0.5);
+    color: #fff;
+    border-color: #cf7cfc;
+}
+
+/* Botón 'Mis Mensajes' destacado */
+.btn-filtro.mis-mensajes {
+    background: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.btn-filtro.mis-mensajes:hover {
+    background: rgba(255, 215, 0, 0.3);
+}
+
+.btn-filtro.mis-mensajes.activo {
+    background: rgba(255, 215, 0, 0.5);
+}
+
+/* Contador de resultados */
+.contador-resultados {
+    margin-top: 10px;
+    color: #aaa;
+    font-size: 0.9em;
+    text-align: right;
+}
+
+/* Grid de mensajes mejorado */
+.grid-mensajes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
+}
+
+/* Estilos mejorados para mensajes */
+.mensaje-foro {
+    background-color: #252525;
+    border: 1px solid #cf7cfc;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    break-inside: avoid;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.mensaje-foro:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(207, 124, 252, 0.4);
+}
+
+.mensaje-foro::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #cf7cfc, transparent);
+    transform: scaleX(0);
+    transition: transform 0.3s ease-out;
+}
+
+.mensaje-foro:hover::after {
+    transform: scaleX(1);
+}
+
+/* Ajuste para el sistema de votos */
+.votos {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(207, 124, 252, 0.3);
+    z-index: 5; /* Asegurar que esté por encima de otros elementos */
+}
+
+.votos button {
+    background: none;
+    border: none;
+    color: #cf7cfc;
+    cursor: pointer;
+    padding: 3px;
+    transition: all 0.2s;
+    font-size: 1.1em;
+}
+
+.votos button:hover {
+    color: #fff;
+    transform: scale(1.2);
+}
+
+.contador-votos {
+    color: #fff;
+    font-size: 0.95em;
+    margin: 3px 0;
+    font-weight: bold;
+}
+
+/* Tu mensaje */
+.mensaje-tuyo {
+    border: 2px solid #ffd700;
+    background-color: rgba(255, 215, 0, 0.05);
+}
+
+.mensaje-tuyo::before {
+    content: "🏆";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    background: #252525;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    z-index: 2;
+}
+
+/* Insignias y etiquetas mejoradas */
+.etiquetas {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.etiqueta {
+    background: rgba(207, 124, 252, 0.2);
+    color: #cf7cfc;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.etiqueta:hover {
+    background: rgba(207, 124, 252, 0.4);
+    transform: translateY(-2px);
+}
+
+.mensaje-destacado {
+    border: 2px solid #ffd700;
+    position: relative;
+}
+
+.mensaje-destacado::before {
+    content: "⭐";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    background: #252525;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* Ajuste para el título con espacio suficiente */
+.titulo-mensaje {
+    color: #cf7cfc;
+    margin: 0 0 12px 0;
+    font-size: 1.2em;
+    padding-right: 65px; /* Incrementado ligeramente */
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    position: relative; /* Para establecer un contexto de posicionamiento */
+}
+
+
+.autor-mensaje {
+    font-size: 0.9em;
+    color: #aaa;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea */
+    padding-right: 60px; /* Espacio para el contador de votos */
+}
+
+.autor-badge {
+    background: rgba(207, 124, 252, 0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    margin-top: 2px; /* Añade un pequeño espacio vertical */
+}
+
+.autor-mensaje:hover .autor-badge {
+    background: rgba(207, 124, 252, 0.4);
+}
+
+.contenido-mensaje {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Añadir botones de acción al hover */
+.acciones-mensaje {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.mensaje-foro:hover .acciones-mensaje {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.btn-accion {
+    background: rgba(207, 124, 252, 0.1);
+    border: 1px solid rgba(207, 124, 252, 0.2);
+    color: #aaa;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-accion:hover {
+    background: rgba(207, 124, 252, 0.3);
+    color: #fff;
+}
+
+.btn-accion i {
+    font-size: 0.9em;
+}
+
+/* Paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn-pagina {
+    background: rgba(207, 124, 252, 0.1);
+    border: 1px solid rgba(207, 124, 252, 0.3);
+    color: #cf7cfc;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-pagina:hover {
+    background: rgba(207, 124, 252, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-pagina.activo {
+    background: rgba(207, 124, 252, 0.5);
+    color: #fff;
+}
+
+/* Indicador de actividad */
+.indicador-actividad {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.actividad-alta {
+    background-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+}
+
+.actividad-media {
+    background-color: #FFC107;
+    box-shadow: 0 0 5px #FFC107;
+}
+
+.actividad-baja {
+    background-color: #888;
+}
+
+/* Responsive mejorado */
+@media (max-width: 992px) {
+    .grid-mensajes {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-mensajes {
+        grid-template-columns: 1fr;
+    }
+    
+    .contenedor-foro {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .controles-foro {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .filtros-rapidos {
+        margin-left: 0;
+        flex-wrap: wrap;
+    }
+    
+    .btn-filtro {
+        font-size: 0.85em;
+        padding: 5px 10px;
+    }
+}
+
+/* Animaciones y efectos visuales */
+@keyframes pulso {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.mensaje-nuevo {
+    animation: pulso 2s infinite;
+}
+
+/* Modo oscuro intensificado */
+@media (prefers-color-scheme: dark) {
+    .contenedor-foro {
+        background-color: #121212;
+        box-shadow: 0px 0px 15px rgba(207, 124, 252, 0.3);
+    }
+    
+    .mensaje-foro {
+        background-color: #1a1a1a;
+    }
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple 1s linear;
+    pointer-events: none;
+}
+
+.particula-voto {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.brillo-destacado {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+    animation: brilloDestacado 1s linear;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@keyframes brilloDestacado {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(100%);
     }
 }
