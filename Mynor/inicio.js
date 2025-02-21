@@ -1,25 +1,25 @@
-// Funcionalidad del menú hamburguesa
-const hamburger = document.querySelector('.hamburger');
-const nav = document.querySelector('.main-nav');
+// Funcionalidad del menú
+const botonMenu = document.querySelector('.boton-menu');
+const navegacion = document.querySelector('.navegacion-principal');
 
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    nav.classList.toggle('active');
+botonMenu.addEventListener('click', () => {
+    botonMenu.classList.toggle('activo');
+    navegacion.classList.toggle('activo');
 });
 
 // Cerrar menú al hacer clic fuera
-document.addEventListener('click', (event) => {
-    if (!event.target.closest('.hamburger') && !event.target.closest('.main-nav')) {
-        hamburger.classList.remove('active');
-        nav.classList.remove('active');
+document.addEventListener('click', (evento) => {
+    if (!evento.target.closest('.boton-menu') && !evento.target.closest('.navegacion-principal')) {
+        botonMenu.classList.remove('activo');
+        navegacion.classList.remove('activo');
     }
 });
 
-// Funcionalidad del menú de perfil
-const profileIcon = document.querySelector('.profile-icon');
-const profileMenu = document.createElement('div');
-profileMenu.className = 'profile-menu';
-profileMenu.innerHTML = `
+// Funcionalidad del menú de usuario
+const iconoPerfil = document.querySelector('.icono-perfil');
+const menuUsuario = document.createElement('div');
+menuUsuario.className = 'menu-usuario';
+menuUsuario.innerHTML = `
     <ul>
         <li><a href="#">Mi Perfil</a></li>
         <li><a href="#">Configuración</a></li>
@@ -27,27 +27,27 @@ profileMenu.innerHTML = `
     </ul>
 `;
 
-// Insertar el menú de perfil en el DOM
-profileIcon.appendChild(profileMenu);
+// Insertar el menú de usuario en el DOM
+iconoPerfil.appendChild(menuUsuario);
 
 // Manejar clics en el ícono de perfil
-profileIcon.addEventListener('click', (e) => {
-    e.stopPropagation();
+iconoPerfil.addEventListener('click', (evento) => {
+    evento.stopPropagation();
     // Cerrar otros menús abiertos
-    document.querySelectorAll('.profile-menu.show').forEach(menu => {
-        if (menu !== profileMenu) menu.classList.remove('show');
+    document.querySelectorAll('.menu-usuario.mostrar').forEach(menu => {
+        if (menu !== menuUsuario) menu.classList.remove('mostrar');
     });
-    profileMenu.classList.toggle('show');
+    menuUsuario.classList.toggle('mostrar');
 });
 
 // Cerrar menú al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (!profileIcon.contains(e.target) && !profileMenu.contains(e.target)) {
-        profileMenu.classList.remove('show');
+document.addEventListener('click', (evento) => {
+    if (!iconoPerfil.contains(evento.target) && !menuUsuario.contains(evento.target)) {
+        menuUsuario.classList.remove('mostrar');
     }
 });
 
 // Cerrar menú al hacer scroll
 window.addEventListener('scroll', () => {
-    profileMenu.classList.remove('show');
+    menuUsuario.classList.remove('mostrar');
 });
