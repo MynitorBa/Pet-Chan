@@ -1,20 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PetChan</title>
-    <link rel="stylesheet" type="text/css" href="inicio.css">
-    <script src="inicio.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="./inicio.css">
 </head>
-
 <body>
+   
     <header class="main-header">
         <div class="header-content">
-            <button class="hamburger" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            
             <nav class="main-nav">
                 <ul>
                     <li><a href="#">Inicio</a></li>
@@ -22,76 +17,69 @@
                     <li><a href="#">Notificaciones</a></li>
                 </ul>
             </nav>
-            
+            <button class="hamburger" aria-label="Menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="search-bar">
                 <input type="text" placeholder="Buscar...">
                 <button aria-label="Buscar">🔍</button>
             </div>
-            
             <div class="profile-icon">
                 <img src="https://w7.pngwing.com/pngs/1/478/png-transparent-cat-dog-paw-claw-paw-prints-animals-pet-paw-thumbnail.png" alt="Perfil">
             </div>
         </div>
     </header>
+    
 
-    <div class="profile-container">
 
-        <div class="header">
-            <div class="user-info">
-                <img src="/api/placeholder/120/120" alt="User Avatar" class="avatar">
-                <div>
-                    <h1>★·.·´¯`·.·★ MagicDreamer92 ★·.·´¯`·.·★</h1>
-                    <p>⊱ Member since: 2024 ⊰</p>
-                    <p>✧ Posts: 1,337 | Reputation: ⭐⭐⭐⭐⭐</p>
-                </div>
+
+    <main>
+        <div class="home-container">
+            <div class="hero-section">
+                <h1>Bienvenido a Pet-Chan</h1>
             </div>
-        </div>
-
-        <div class="stats">
-            <h2>○•○ User Achievements ○•○</h2>
-            <div class="badges">
-                <div class="badge" title="Master Collector">🏆</div>
-                <div class="badge" title="Creative Spirit">🎨</div>
-                <div class="badge" title="Pet Master">🐾</div>
-                <div class="badge" title="Forum Star">⭐</div>
-                <div class="badge" title="Game Champion">🎮</div>
-                <div class="badge" title="Friendly User">💝</div>
-            </div>
-        </div>
-
-        <div class="pet-section">
-            <div class="pixel-corner pixel-corner-tl"></div>
-            <div class="pixel-corner pixel-corner-tr"></div>
-            <div class="pixel-corner pixel-corner-bl"></div>
-            <div class="pixel-corner pixel-corner-br"></div>
             
-            <h2>·.★·.·´¯`·.·★ Luna the Stardragon ★·.·´¯`·.·★</h2>
-            <div class="pet-container">
-                <img src="/api/placeholder/150/150" alt="Virtual Pet" class="pet-image">
-                <div class="pet-stats">
-                    <h3>✧ Pet Stats ✧</h3>
-                    <div class="stat-label">
-                        <span>Happiness</span>
-                        <span>85%</span>
+            <div class="post-section">
+                <textarea placeholder="¿Qué estás pensando?" class="post-input"></textarea>
+                <button class="post-button">Publicar</button>
+            </div>
+            
+            
+           
+            
+            <div class="recent-comments">
+                <h2>Comentarios Recientes</h2>
+                <div class="comment-list">
+                    <div class="comment">
+                        <img src="https://i.pinimg.com/474x/c3/b9/c6/c3b9c65ed0c48f8a6b9a88b1e4ade9d3.jpg" alt="User Avatar" class="comment-avatar">
+                        <div class="comment-content">
+                            <p class="comment-author">Lillie</p>
+                            <p class="comment-text">¡Me encanta esta comunidad!</p>
+                        </div>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 85%"></div>
+                    <div class="comment">
+                        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/43dba124-ff52-44cb-a1fd-a3153496d005/dh7hkn0-ecfab03e-b77b-487a-a349-68f1ee214409.png/v1/fill/w_894,h_894/miku_nakano___the_quintessential_quintuplets_by_danpixelart_dh7hkn0-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTAwMCIsInBhdGgiOiJcL2ZcLzQzZGJhMTI0LWZmNTItNDRjYi1hMWZkLWEzMTUzNDk2ZDAwNVwvZGg3aGtuMC1lY2ZhYjAzZS1iNzdiLTQ4N2EtYTM0OS02OGYxZWUyMTQ0MDkucG5nIiwid2lkdGgiOiI8PTEwMDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ._p5b5hc0KoEba6wCsMpll8JHcRGjpNn24aOtW_Dy62A" alt="User Avatar" class="comment-avatar">
+                        <div class="comment-content">
+                            <p class="comment-author">Miku</p>
+                            <p class="comment-text">¿Alguien quiere jugar con mi mascota virtual?</p>
+                        </div>
                     </div>
-                    
-                    <div class="stat-label">
-                        <span>Energy</span>
-                        <span>70%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 70%"></div>
-                    </div>
-                    
-                    <p>✧ Level: 42</p>
-                    <p>✧ Special Ability: .*･｡ﾟ Stardust Magic .*･｡ﾟ</p>
-                    <p>✧ Favorite Food: ⊱ Moon Cookies ⊰</p>
                 </div>
             </div>
         </div>
+    </main>
+
+    <div class="contenedor-micro-mascota">
+        <img class="micro-mascota pixeleado" src="../imagenes_de_mascotas/6.gif" alt="">
     </div>
+
+    <footer class="pie-principal">
+        <hr>
+        <p>&copy; 2025 Pet-Chan. Todos los derechos reservados.</p>
+        <br>
+    </footer>
+
 </body>
 </html>
