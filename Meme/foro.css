@@ -1,82 +1,70 @@
- body {
-            font-family: 'Press Start 2P', cursive;    
-            background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            font-size: 18px;
-            line-height: 1.6;
-            overflow-x: hidden;
-            height: 100vh;
-            overflow-y: auto;
-            padding-top: 60px;
-            text-align: justify; /* Justifica el texto */
+body {
+    font-family: 'Press Start 2P', cursive;    
+    background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    height: 100vh;
+    overflow-y: auto;
+    padding-top: 60px;
+    text-align: justify;
+}
 
-        }
-
-/* Estilos del encabezado */
+/* Header styles */
 .encabezado-principal {
-    background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
-    padding: 15px 20px;
-    border-bottom: 3px solid #cf7cfc;
-    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    background: #1a1a1b;
+    padding: 8px 20px;
     position: fixed;
     top: 0;
-    z-index: 1000;
     width: 100%;
     box-sizing: border-box;
+    z-index: 1000;
+    background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
+    border-bottom: 1px solid #343536;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
 }
 
 .contenido-encabezado {
+    display: flex;
+    align-items: center;
     max-width: 1400px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
 }
 
-.navegacion-principal {
-    justify-self: center;
-    width: 100%;
+/* Logo */
+.logo-container {
+    height: 60px;
+    margin-right: 20px;
+    flex-shrink: 0;
 }
 
-.navegacion-principal ul {
-    display: flex;
-    gap: 20px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.logo-container img {
+    height: 100%;
+    width: auto;
 }
 
-.navegacion-principal a {
-    color: #fff;
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background 0.3s ease;
-}
 
-.navegacion-principal a:hover {
-    background: rgba(207, 124, 252, 0.3);
-}
 
+/* Search bar */
 .barra-busqueda {
-    justify-self: center;
-    max-width: 700px;
-    width: 200%;
+    flex-grow: 1;
+    max-width: 500px;
     display: flex;
     align-items: center;
+    margin: 0 20px;
 }
 
 .barra-busqueda input {
     width: 100%;
-    padding: 8px 12px;
-    border: 2px solid #cf7cfc;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-family: inherit;
+    padding: 10px 40px 10px 16px;
+    background: #272729;
+    border: 1px solid #343536;
+    border-radius: 4px;
+    color: #d7dadc;
+    font-size: 14px;
 }
 
 .barra-busqueda button {
@@ -93,8 +81,37 @@
     background: #a304fa;
 }
 
+/* Action buttons */
+.botones-accion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-right: 20px;
+}
+
+.boton {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.boton-traducir {
+    background: transparent;
+    color: #d7dadc;
+    padding: 8px;
+}
+
+.boton-sesion {
+    background: #984eb6;
+    color: white;
+    font-family: 'Press Start 2P', cursive;    
+}
+
+/* Profile icon */
 .icono-perfil {
-    justify-self: end;
     margin-left: auto;
 }
 
@@ -104,25 +121,31 @@
     border-radius: 50%;
     border: 2px solid #cf7cfc;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .icono-perfil img:hover {
     transform: scale(1.1);
 }
 
+
 .menu-usuario {
     position: absolute;
-    top: 50px;
-    right: 0;
-    background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
-    border: 2px solid #cf7cfc;
-    border-radius: 5px;
+    top: 70px; /* Ajusta según el diseño */
+    right: 20px;
+    background: #a284be;
+    border: 1px solid #343536;
+    box-shadow: 0 0 15px rgba(180, 103, 221, 0.5);
     padding: 10px;
+    border-radius: 8px;
     display: none;
     z-index: 1000;
-    min-width: 150px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+.menu-usuario.mostrar {
+    display: block;
+}
+
 
 .menu-usuario.mostrar {
     display: block;
@@ -150,6 +173,7 @@
     background: rgba(207, 124, 252, 0.3);
 }
 
+/* Mobile menu button */
 .boton-menu {
     display: none;
     flex-direction: column;
@@ -160,18 +184,11 @@
     border: none;
     cursor: pointer;
     padding: 0;
+    margin-right: 15px;
 }
 
-.boton-menu span {
-    display: block;
-    width: 100%;
-    height: 3px;
-    background: #fff;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
 
-.boton-menu.activo span:nth-child(1) {
+.boton-menu.activo :nth-child(1) {
     transform: rotate(45deg) translate(5px, 5px);
 }
 
@@ -183,38 +200,305 @@
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-@media (max-width: 768px) {
+/* Overlay for mobile menu */
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+}
+
+.menu-overlay.activo {
+    display: block;
+}
+
+
+ /* Mostrar menú cuando esté activo */
+ .navegacion-principal {
+    display: none; /* Oculto por defecto */
+    flex-direction: column;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
+    padding: 20px;
+    z-index: 1001;
+}
+
+.navegacion-principal ul {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Menú lateral */
+.navegacion-principal {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    top: 76px;
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    padding: 20px;
+    z-index: 1001;
+}
+.navegacion-principal a:hover {
+    background: rgba(207, 124, 252, 0.3);
+}
+
+
+
+
+
+
+/* Estilos para los enlaces dentro de la navegación principal */
+.navegacion-principal ul li a {
+    display: block;
+    padding: 8px 15px;
+    margin: 5px 0;
+    background-color: #a304fa; /* Color de fondo morado */
+    color: white; /* Color del texto */
+    border-radius: 5px; /* Bordes redondeados */
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+/* Cambiar el color de fondo al pasar el mouse */
+.navegacion-principal ul li a:hover {
+    background: #620296; /* Color de fondo morado más oscuro al pasar el mouse */
+}
+
+
+
+
+
+
+
+
+
+/* Ocultar menú en pantallas grandes */
+@media (min-width: 1280px) {
     .navegacion-principal {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
-        display: none;
-        padding: 10px 0;
-        border-bottom: 3px solid #cf7cfc;
-    }
-    .navegacion-principal.activo {
-        display: block;
-    }
-    .navegacion-principal ul {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .barra-busqueda {
-        max-width: 100%;
+        display: none !important;
     }
     .boton-menu {
-        display: flex;
+        display: none !important; /* Oculta el icono en pantallas grandes */
     }
 }
 
-@media (min-width: 1200px) {
-    .contenido-encabezado {
-        max-width: 1400px;
-        margin: 0 auto;
+/* Mostrar icono de menú en pantallas pequeñas */
+@media (max-width: 1279px) {
+    .boton-menu {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 24px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin-right: 15px;
+    }
+    
+    .boton-menu span {
+        display: block;
+        width: 100%;
+        height: 3px;
+        background: white;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Animación al activar */
+    .boton-menu.activo span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .boton-menu.activo span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .boton-menu.activo span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+    }
+    
+
+
+
+    .navegacion-principal ul {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 20px;
+    }
+
+    .navegacion-principal a {
+        display: block;
+        padding: 10px 15px;
+        color: white;
+        text-decoration: none;
     }
 }
+
+
+
+  
+    
+    
+  .navegacion-principal.activo {
+        display: flex; /* Mostrar cuando se active el botón */
+    }
+    
+    
+    .barra-busqueda {
+        max-width: none;
+        flex: 1;
+    }
+
+/* Menu.css */
+
+/* Rotar 45 grados */
+.rotar-imagen {
+    transform: rotate(270deg);
+}
+
+.menu-container {
+    position: fixed;
+    left: 0;
+    top: 90px; /* Mantiene la flecha debajo del header */
+    z-index: 1000;
+}
+
+/* Solo mostrar en pantallas grandes */
+@media screen and (max-width: 1024px) {
+    .menu-container {
+        display: none;
+    }
+}
+
+.menu-icon {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    transform: rotate(270deg);
+    transition: opacity 0.3s ease;
+    margin-left: 10px;
+    padding: 5px;
+    background: rgba(149, 137, 184, 0.8);
+    border-radius: 4px;
+}
+
+.menu-icon.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 998;
+}
+
+.slide-menu {
+    position: fixed;
+    top: 0; /* Cambiado a 0 para cubrir desde el inicio */
+    left: -300px;
+    width: 300px;
+    height: 100%; /* Altura completa */
+    background: #401d66;
+    z-index: 999;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.slide-menu.active {
+    left: 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.menu-items {
+    padding: 30px 20px;
+    padding-top: 60px; /* Espacio extra arriba para no chocar con el botón de cerrar */
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.menu-items a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease;
+    padding: 8px 15px;
+    border-radius: 4px;
+    background: #a304fa; /* Color de fondo morado */
+}
+
+.menu-items a:hover {
+    color: white;
+    background: #620296; /* Color de fondo morado más oscuro al pasar el mouse */
+}
+
+@media (max-width: 768px) {
+    .boton-traducir {
+        display: none;
+    }
+    
+    .contenido-encabezado {
+        justify-content: space-between;
+    }
+    
+    .icono-perfil {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .barra-busqueda {
+        display: none;
+    }
+    
+    .boton-sesion {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .icono-perfil img {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+
+
 
 /* Estilos del cuerpo */
 main {
@@ -236,7 +520,6 @@ h1, h2, h3 {
     border-radius: 10px;
     border: 2px solid #cf7cfc;
     box-shadow: 0px 0px 10px #cf7cfc;
-    margin: 40px auto 0;
     position: relative;
 }
 
@@ -830,3 +1113,63 @@ h1, h2, h3 {
     max-width: 100%; /* Asegura que la imagen no se desborde */
 }
 
+/*css de footer*/
+
+.pie-principal {
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    position: relative;
+}
+
+
+/* Mascota */
+
+.pixeleado{
+    image-rendering: pixelated;
+    image-rendering: crisp-edges; /* Para compatibilidad con más navegadores */
+}
+
+
+.micro-mascota {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    width: 150px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: animacionCaminar 10s linear infinite;
+}
+
+/* Animación de caminata con giro en los extremos */
+@keyframes animacionCaminar {
+    0% {
+        left: 0;
+        transform: translateY(0) scaleX(1);
+    }
+    15% {
+        left: 0;
+        transform: translateY(-5px) scaleX(1);
+    }
+    45% {
+        left: calc(100% - 150px);
+        transform: translateY(-5px) scaleX(1);
+    }
+    50% {
+        left: calc(100% - 150px);
+        transform: translateY(0) scaleX(-1);
+    }
+    65% {
+        left: calc(100% - 150px);
+        transform: translateY(-5px) scaleX(-1);
+    }
+    95% {
+        left: 0;
+        transform: translateY(-5px) scaleX(-1);
+    }
+    100% {
+        left: 0;
+        transform: translateY(0) scaleX(1);
+    }
+}
+/*fin de css footer*/

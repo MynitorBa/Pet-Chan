@@ -1,56 +1,137 @@
-// Funcionalidad del menú
-const botonMenu = document.querySelector('.boton-menu');
-const navegacion = document.querySelector('.navegacion-principal');
+//menu
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const slideMenu = document.getElementById('slideMenu');
+    const overlay = document.getElementById('overlay');
 
-botonMenu.addEventListener('click', () => {
-    botonMenu.classList.toggle('activo');
-    navegacion.classList.toggle('activo');
+    // Función para abrir el menú
+    menuBtn.addEventListener('click', function() {
+        slideMenu.classList.add('active');
+        overlay.style.display = 'block';
+        menuBtn.classList.add('hidden');
+    });
+
+    // Función para cerrar el menú
+    function closeMenu() {
+        slideMenu.classList.remove('active');
+        overlay.style.display = 'none';
+        menuBtn.classList.remove('hidden');
+    }
+
+    // Cerrar al hacer click en el botón X
+    closeBtn.addEventListener('click', closeMenu);
+
+    // Cerrar al hacer click en el overlay
+    overlay.addEventListener('click', closeMenu);
 });
 
-// Cerrar menú al hacer clic fuera
-document.addEventListener('click', (evento) => {
-    if (!evento.target.closest('.boton-menu') && !evento.target.closest('.navegacion-principal')) {
+
+document.addEventListener("DOMContentLoaded", function () {
+    const botonMenu = document.querySelector('.boton-menu');
+    const navegacion = document.querySelector('.navegacion-principal');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const iconoPerfil = document.querySelector('.icono-perfil');
+    const botonTraducir = document.querySelector(".boton-traducir");
+    const botonSesion = document.querySelector(".boton-sesion");
+
+    const menuUsuario = document.createElement('div');
+    menuUsuario.className = 'menu-usuario';
+    menuUsuario.innerHTML = `
+        <ul>
+            <li><a href="#">Mi Perfil</a></li>
+            <li><a href="#">Configuración</a></li>
+            <li><a href="#">Cerrar Sesión</a></li>
+        </ul>
+    `;
+    document.body.appendChild(menuUsuario);
+
+    // Función de rebote al hacer clic (sin animaciones extra)
+    function efectoRebote(boton) {
+        boton.style.transition = "transform 0.2s ease";
+        boton.style.transform = "scale(1.2)";
+
+        setTimeout(() => {
+            boton.style.transform = "scale(1)";
+        }, 150);
+    }
+
+    // Agregar animación de rebote a los botones indicados
+    function agregarAnimacionRebote(boton, callback = null) {
+        if (boton) {
+            boton.addEventListener('click', function (evento) {
+                efectoRebote(boton);
+                if (callback) callback(evento);
+            });
+        }
+    }
+
+    // Asignar animación y funcionalidad
+    agregarAnimacionRebote(botonMenu, () => {
+        botonMenu.classList.toggle('activo');
+        navegacion.classList.toggle('activo');
+
+        if (menuOverlay.classList.contains('activo')) {
+            menuOverlay.classList.remove('activo');
+            document.body.style.overflow = '';
+        } else {
+            menuOverlay.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+        }
+    });
+
+    // Aplicar rebote al ícono de perfil pero SIN efecto extra de agrandamiento
+    agregarAnimacionRebote(iconoPerfil, (evento) => {
+        evento.stopPropagation();
+        menuUsuario.classList.toggle('mostrar');
+    });
+
+    agregarAnimacionRebote(botonTraducir);
+    agregarAnimacionRebote(botonSesion);
+
+    // Cerrar menú al hacer clic en el overlay
+    menuOverlay.addEventListener('click', () => {
         botonMenu.classList.remove('activo');
         navegacion.classList.remove('activo');
-    }
-});
-
-// Funcionalidad del menú de usuario
-const iconoPerfil = document.querySelector('.icono-perfil');
-const menuUsuario = document.createElement('div');
-menuUsuario.className = 'menu-usuario';
-menuUsuario.innerHTML = `
-    <ul>
-        <li><a href="#">Mi Perfil</a></li>
-        <li><a href="#">Configuración</a></li>
-        <li><a href="#">Cerrar Sesión</a></li>
-    </ul>
-`;
-
-// Insertar el menú de usuario en el DOM
-iconoPerfil.appendChild(menuUsuario);
-
-// Manejar clics en el ícono de perfil
-iconoPerfil.addEventListener('click', (evento) => {
-    evento.stopPropagation();
-    // Cerrar otros menús abiertos
-    document.querySelectorAll('.menu-usuario.mostrar').forEach(menu => {
-        if (menu !== menuUsuario) menu.classList.remove('mostrar');
+        menuOverlay.classList.remove('activo');
+        document.body.style.overflow = '';
     });
-    menuUsuario.classList.toggle('mostrar');
-});
 
-// Cerrar menú al hacer clic fuera
-document.addEventListener('click', (evento) => {
-    if (!iconoPerfil.contains(evento.target) && !menuUsuario.contains(evento.target)) {
+    // Cerrar menú de usuario al hacer clic afuera
+    document.addEventListener('click', (evento) => {
+        if (!iconoPerfil.contains(evento.target) && !menuUsuario.contains(evento.target)) {
+            menuUsuario.classList.remove('mostrar');
+        }
+    });
+
+    // Cerrar menús al hacer scroll
+    window.addEventListener('scroll', () => {
         menuUsuario.classList.remove('mostrar');
-    }
+
+        if (window.innerWidth > 980) {
+            botonMenu.classList.remove('activo');
+            navegacion.classList.remove('activo');
+            menuOverlay.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Manejo responsivo
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 980 && navegacion.classList.contains('activo')) {
+            botonMenu.classList.remove('activo');
+            navegacion.classList.remove('activo');
+            menuOverlay.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+    });
 });
 
-// Cerrar menú al hacer scroll
-window.addEventListener('scroll', () => {
-    menuUsuario.classList.remove('mostrar');
-});
+
+
+
+
+
 
 
 // Animaciones para mensajes del foro cuando aparecen en viewport
@@ -86,6 +167,8 @@ document.querySelectorAll('.etiqueta').forEach(etiqueta => {
         setTimeout(() => ripple.remove(), 1000);
     });
 });
+
+
 
 // Animación para los votos
 document.querySelectorAll('.votos button').forEach(boton => {

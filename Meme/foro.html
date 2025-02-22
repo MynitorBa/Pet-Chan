@@ -8,8 +8,24 @@
     <script src="foro.js" defer></script>
 </head>
 <body>
+
+
+
     <header class="encabezado-principal">
         <div class="contenido-encabezado">
+            <!-- Logo section -->
+            <div class="logo-container">
+                <img src="./logo.png" alt="Logo del sitio">
+            </div>
+    
+            <!-- Hamburger menu button for mobile -->
+            <button class="boton-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+    
+            <!-- Left side navigation -->
             <nav class="navegacion-principal">
                 <ul>
                     <li><a href="#">Inicio</a></li>
@@ -17,21 +33,52 @@
                     <li><a href="#">Notificaciones</a></li>
                 </ul>
             </nav>
-            <button class="boton-menu" aria-label="Menú"> 
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+    
+            <!-- Search bar -->
             <div class="barra-busqueda">
                 <input type="text" placeholder="Buscar...">
                 <button aria-label="Buscar">🔍</button>
             </div>
+    
+            <!-- Action buttons -->
+            <div class="botones-accion">
+                <button class="boton boton-traducir" title="Traducir">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                    </svg>
+                </button>
+                <button class="boton boton-sesion">Iniciar sesión</button>
+            </div>
+    
+            <!-- Profile section -->
             <div class="icono-perfil">
                 <img src="https://w7.pngwing.com/pngs/1/478/png-transparent-cat-dog-paw-claw-paw-prints-animals-pet-paw-thumbnail.png" alt="Perfil">
             </div>
         </div>
     </header>
+    
+    <!-- Overlay for mobile menu -->
+    <div id="menu-overlay" class="menu-overlay"></div>
+
+    
+    
     <main>
+
+        <div class="menu-container">
+            <img src="./flecha.png" id="menuBtn" class="menu-icon" alt="Menú">
+            
+            <div id="overlay" class="overlay"></div>
+        
+            <div id="slideMenu" class="slide-menu">
+                <button id="closeBtn" class="close-btn">×</button>
+                <div class="menu-items">
+                    <a href="#">Inicio</a>
+                    <a href="#">Foros</a>
+                    <a href="#">Notificaciones</a>
+                </div>
+            </div>
+        </div>
+        
         <div class="contenedor-foro">
             <h2>Foro de Terraria</h2>
             
@@ -186,5 +233,16 @@
             </div>
         </div>
     </main>
+    <div class="contenedor-micro-mascota">
+        <img class="micro-mascota pixeleado" src="../imagenes_de_mascotas/6.gif" alt="">
+    </div>
+    
+  <footer class="pie-principal">
+        <hr>
+        <p>&copy; 2025 Pet-Chan. Todos los derechos reservados.</p>
+        <br>
+    </footer>
+
+    
 </body>
 </html>
