@@ -866,3 +866,8 @@ h1, h2, h3 {
 .btn-accion:hover {
     background: rgba(207, 124, 252, 0.3);
 }
+
+.imagen-foroZelda {
+    max-width: 100%;
+    height: auto;
+}

@@ -1,56 +1,186 @@
-// Funcionalidad del menú
-const botonMenu = document.querySelector('.boton-menu');
-const navegacion = document.querySelector('.navegacion-principal');
+//menu
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const slideMenu = document.getElementById('slideMenu');
+    const overlay = document.getElementById('overlay');
 
-botonMenu.addEventListener('click', () => {
-    botonMenu.classList.toggle('activo');
-    navegacion.classList.toggle('activo');
+    // Función para abrir el menú
+    menuBtn.addEventListener('click', function() {
+        slideMenu.classList.add('active');
+        overlay.style.display = 'block';
+        menuBtn.classList.add('hidden');
+    });
+
+    // Función para cerrar el menú
+    function closeMenu() {
+        slideMenu.classList.remove('active');
+        overlay.style.display = 'none';
+        menuBtn.classList.remove('hidden');
+    }
+
+    // Cerrar al hacer click en el botón X
+    closeBtn.addEventListener('click', closeMenu);
+
+    // Cerrar al hacer click en el overlay
+    overlay.addEventListener('click', closeMenu);
 });
 
-// Cerrar menú al hacer clic fuera
-document.addEventListener('click', (evento) => {
-    if (!evento.target.closest('.boton-menu') && !evento.target.closest('.navegacion-principal')) {
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Elementos del menú principal
+    const botonMenu = document.querySelector('.boton-menu');
+    const navegacion = document.querySelector('.navegacion-principal');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    const menuItems = document.querySelectorAll('.navegacion-principal ul li a');
+
+    // Elementos del perfil
+    const iconoPerfil = document.querySelector('.icono-perfil img');
+    const perfilDropdown = document.querySelector('.perfil-dropdown');
+
+    // Función para cerrar el menú de navegación
+    function cerrarMenuNavegacion() {
         botonMenu.classList.remove('activo');
         navegacion.classList.remove('activo');
+        menuOverlay.classList.remove('activo');
+        document.body.style.overflow = '';
     }
-});
 
-// Funcionalidad del menú de usuario
-const iconoPerfil = document.querySelector('.icono-perfil');
-const menuUsuario = document.createElement('div');
-menuUsuario.className = 'menu-usuario';
-menuUsuario.innerHTML = `
-    <ul>
-        <li><a href="#">Mi Perfil</a></li>
-        <li><a href="#">Configuración</a></li>
-        <li><a href="#">Cerrar Sesión</a></li>
-    </ul>
-`;
+    // Función para cerrar el dropdown del perfil
+    function cerrarPerfilDropdown() {
+        if (perfilDropdown) {
+            perfilDropdown.classList.remove('activo');
+        }
+    }
 
-// Insertar el menú de usuario en el DOM
-iconoPerfil.appendChild(menuUsuario);
+    // Función para toggle del menú con animación mejorada
+    function toggleMenu() {
+        cerrarPerfilDropdown(); // Cerrar perfil si está abierto
+        
+        const estaActivo = !navegacion.classList.contains('activo');
+        
+        botonMenu.classList.toggle('activo');
+        navegacion.classList.toggle('activo');
+        menuOverlay.classList.toggle('activo');
+        document.body.style.overflow = estaActivo ? 'hidden' : '';
 
-// Manejar clics en el ícono de perfil
-iconoPerfil.addEventListener('click', (evento) => {
-    evento.stopPropagation();
-    // Cerrar otros menús abiertos
-    document.querySelectorAll('.menu-usuario.mostrar').forEach(menu => {
-        if (menu !== menuUsuario) menu.classList.remove('mostrar');
+        // Removemos las animaciones individuales para que aparezcan todos los items juntos
+        menuItems.forEach(item => {
+            item.style.opacity = estaActivo ? "1" : "0";
+            item.style.transform = estaActivo ? "translateX(0)" : "translateX(-20px)";
+            // Eliminamos el setTimeout para que no haya retraso
+        });
+    }
+
+    // Toggle del perfil
+    if (iconoPerfil) {
+        iconoPerfil.addEventListener('click', function(e) {
+            e.stopPropagation();
+            cerrarMenuNavegacion(); // Cerrar menú si está abierto
+            perfilDropdown.classList.toggle('activo');
+        });
+    }
+
+    // Event listeners del menú
+    botonMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMenu();
     });
-    menuUsuario.classList.toggle('mostrar');
+    
+    menuOverlay.addEventListener('click', toggleMenu);
+
+    // Manejar click en items del menú
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            menuItems.forEach(i => i.classList.remove('activo'));
+            this.classList.add('activo');
+            
+            if (window.innerWidth < 1280) {
+                setTimeout(cerrarMenuNavegacion, 300);
+            }
+        });
+    });
+
+    // Cerrar todo al hacer click fuera
+    document.addEventListener('click', function(e) {
+        const clickFueraMenu = !navegacion.contains(e.target) && 
+                              !botonMenu.contains(e.target);
+        const clickFueraPerfil = !perfilDropdown?.contains(e.target) && 
+                                !iconoPerfil?.contains(e.target);
+
+        if (clickFueraMenu && clickFueraPerfil) {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
+        }
+    });
+
+    // Cerrar menú al hacer scroll con debounce
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        
+        scrollTimeout = setTimeout(() => {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
+        }, 150);
+    }, { passive: true });
+
+    // Cerrar menú al redimensionar con debounce
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        
+        resizeTimeout = setTimeout(() => {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
+        }, 150);
+    }, { passive: true });
+
+    // Cerrar menú al presionar ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
+        }
+    });
+
+    // Detectar gestos de swipe en móviles
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 50;
+
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        const delta = touchEndX - touchStartX;
+
+        if (Math.abs(delta) > swipeThreshold) {
+            if (delta > 0 && !navegacion.classList.contains('activo')) {
+                toggleMenu(); // Abrir menú
+            } else if (delta < 0 && navegacion.classList.contains('activo')) {
+                toggleMenu(); // Cerrar menú
+            }
+        }
+    }, { passive: true });
 });
 
-// Cerrar menú al hacer clic fuera
-document.addEventListener('click', (evento) => {
-    if (!iconoPerfil.contains(evento.target) && !menuUsuario.contains(evento.target)) {
-        menuUsuario.classList.remove('mostrar');
-    }
-});
 
-// Cerrar menú al hacer scroll
-window.addEventListener('scroll', () => {
-    menuUsuario.classList.remove('mostrar');
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Animaciones para mensajes del foro cuando aparecen en viewport
@@ -86,6 +216,8 @@ document.querySelectorAll('.etiqueta').forEach(etiqueta => {
         setTimeout(() => ripple.remove(), 1000);
     });
 });
+
+
 
 // Animación para los votos
 document.querySelectorAll('.votos button').forEach(boton => {
