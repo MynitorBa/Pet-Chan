@@ -28,104 +28,153 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Elementos del menú principal
     const botonMenu = document.querySelector('.boton-menu');
     const navegacion = document.querySelector('.navegacion-principal');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const iconoPerfil = document.querySelector('.icono-perfil');
-    const botonTraducir = document.querySelector(".boton-traducir");
-    const botonSesion = document.querySelector(".boton-sesion");
+    const menuOverlay = document.querySelector('.menu-overlay');
+    const menuItems = document.querySelectorAll('.navegacion-principal ul li a');
 
-    const menuUsuario = document.createElement('div');
-    menuUsuario.className = 'menu-usuario';
-    menuUsuario.innerHTML = `
-        <ul>
-            <li><a href="#">Mi Perfil</a></li>
-            <li><a href="#">Configuración</a></li>
-            <li><a href="#">Cerrar Sesión</a></li>
-        </ul>
-    `;
-    document.body.appendChild(menuUsuario);
+    // Elementos del perfil
+    const iconoPerfil = document.querySelector('.icono-perfil img');
+    const perfilDropdown = document.querySelector('.perfil-dropdown');
 
-    // Función de rebote al hacer clic (sin animaciones extra)
-    function efectoRebote(boton) {
-        boton.style.transition = "transform 0.2s ease";
-        boton.style.transform = "scale(1.2)";
-
-        setTimeout(() => {
-            boton.style.transform = "scale(1)";
-        }, 150);
-    }
-
-    // Agregar animación de rebote a los botones indicados
-    function agregarAnimacionRebote(boton, callback = null) {
-        if (boton) {
-            boton.addEventListener('click', function (evento) {
-                efectoRebote(boton);
-                if (callback) callback(evento);
-            });
-        }
-    }
-
-    // Asignar animación y funcionalidad
-    agregarAnimacionRebote(botonMenu, () => {
-        botonMenu.classList.toggle('activo');
-        navegacion.classList.toggle('activo');
-
-        if (menuOverlay.classList.contains('activo')) {
-            menuOverlay.classList.remove('activo');
-            document.body.style.overflow = '';
-        } else {
-            menuOverlay.classList.add('activo');
-            document.body.style.overflow = 'hidden';
-        }
-    });
-
-    // Aplicar rebote al ícono de perfil pero SIN efecto extra de agrandamiento
-    agregarAnimacionRebote(iconoPerfil, (evento) => {
-        evento.stopPropagation();
-        menuUsuario.classList.toggle('mostrar');
-    });
-
-    agregarAnimacionRebote(botonTraducir);
-    agregarAnimacionRebote(botonSesion);
-
-    // Cerrar menú al hacer clic en el overlay
-    menuOverlay.addEventListener('click', () => {
+    // Función para cerrar el menú de navegación
+    function cerrarMenuNavegacion() {
         botonMenu.classList.remove('activo');
         navegacion.classList.remove('activo');
         menuOverlay.classList.remove('activo');
         document.body.style.overflow = '';
+    }
+
+    // Función para cerrar el dropdown del perfil
+    function cerrarPerfilDropdown() {
+        if (perfilDropdown) {
+            perfilDropdown.classList.remove('activo');
+        }
+    }
+
+    // Función para toggle del menú con animación mejorada
+    function toggleMenu() {
+        cerrarPerfilDropdown(); // Cerrar perfil si está abierto
+        
+        const estaActivo = !navegacion.classList.contains('activo');
+        
+        botonMenu.classList.toggle('activo');
+        navegacion.classList.toggle('activo');
+        menuOverlay.classList.toggle('activo');
+        document.body.style.overflow = estaActivo ? 'hidden' : '';
+
+        // Removemos las animaciones individuales para que aparezcan todos los items juntos
+        menuItems.forEach(item => {
+            item.style.opacity = estaActivo ? "1" : "0";
+            item.style.transform = estaActivo ? "translateX(0)" : "translateX(-20px)";
+            // Eliminamos el setTimeout para que no haya retraso
+        });
+    }
+
+    // Toggle del perfil
+    if (iconoPerfil) {
+        iconoPerfil.addEventListener('click', function(e) {
+            e.stopPropagation();
+            cerrarMenuNavegacion(); // Cerrar menú si está abierto
+            perfilDropdown.classList.toggle('activo');
+        });
+    }
+
+    // Event listeners del menú
+    botonMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMenu();
+    });
+    
+    menuOverlay.addEventListener('click', toggleMenu);
+
+    // Manejar click en items del menú
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            menuItems.forEach(i => i.classList.remove('activo'));
+            this.classList.add('activo');
+            
+            if (window.innerWidth < 1280) {
+                setTimeout(cerrarMenuNavegacion, 300);
+            }
+        });
     });
 
-    // Cerrar menú de usuario al hacer clic afuera
-    document.addEventListener('click', (evento) => {
-        if (!iconoPerfil.contains(evento.target) && !menuUsuario.contains(evento.target)) {
-            menuUsuario.classList.remove('mostrar');
+    // Cerrar todo al hacer click fuera
+    document.addEventListener('click', function(e) {
+        const clickFueraMenu = !navegacion.contains(e.target) && 
+                              !botonMenu.contains(e.target);
+        const clickFueraPerfil = !perfilDropdown?.contains(e.target) && 
+                                !iconoPerfil?.contains(e.target);
+
+        if (clickFueraMenu && clickFueraPerfil) {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
         }
     });
 
-    // Cerrar menús al hacer scroll
+    // Cerrar menú al hacer scroll con debounce
+    let scrollTimeout;
     window.addEventListener('scroll', () => {
-        menuUsuario.classList.remove('mostrar');
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        
+        scrollTimeout = setTimeout(() => {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
+        }, 150);
+    }, { passive: true });
 
-        if (window.innerWidth > 980) {
-            botonMenu.classList.remove('activo');
-            navegacion.classList.remove('activo');
-            menuOverlay.classList.remove('activo');
-            document.body.style.overflow = '';
-        }
-    });
-
-    // Manejo responsivo
+    // Cerrar menú al redimensionar con debounce
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 980 && navegacion.classList.contains('activo')) {
-            botonMenu.classList.remove('activo');
-            navegacion.classList.remove('activo');
-            menuOverlay.classList.remove('activo');
-            document.body.style.overflow = '';
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        
+        resizeTimeout = setTimeout(() => {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
+        }, 150);
+    }, { passive: true });
+
+    // Cerrar menú al presionar ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            cerrarMenuNavegacion();
+            cerrarPerfilDropdown();
         }
     });
+
+    // Detectar gestos de swipe en móviles
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 50;
+
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        const delta = touchEndX - touchStartX;
+
+        if (Math.abs(delta) > swipeThreshold) {
+            if (delta > 0 && !navegacion.classList.contains('activo')) {
+                toggleMenu(); // Abrir menú
+            } else if (delta < 0 && navegacion.classList.contains('activo')) {
+                toggleMenu(); // Cerrar menú
+            }
+        }
+    }, { passive: true });
 });
+
+
+
+
+
+
+
+
+
 
 
 
