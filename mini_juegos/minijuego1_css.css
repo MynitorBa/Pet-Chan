@@ -258,6 +258,171 @@ main{
 }
 
 
+/*----------------------------------------------------------*/
+/*seccion de tienda*/
+.contenedor-tienda {
+    background-color: #d304c5;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px dashed #cf7cfc;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.contenedor-tienda::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #a304fa, #d304c5, #a304fa);
+    animation: gradientMove 3s linear infinite;
+}
+
+.header-tienda{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.gato-tiendero {
+    position: absolute;
+    transform: translateY(-50%);
+    animation: paseoGato 15s linear infinite;
+}
+
+@keyframes paseoGato {
+    0% {
+        left: -200px; /* Empieza fuera de la vista */
+        transform: translateY(-50%) scaleX(1);
+    }
+    45% {
+        left: 100%;
+        transform: translateY(-50%) scaleX(1);
+    }
+    50% {
+        left: 100%;
+        transform: translateY(-50%) scaleX(-1); /* Gira el gato */
+    }
+    95% {
+        left: -200px;
+        transform: translateY(-50%) scaleX(-1);
+    }
+    100% {
+        left: -200px;
+        transform: translateY(-50%) scaleX(1); /* Vuelve a la posición original */
+    }
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+#puntos-disponibles {
+    text-align: right;
+    color: #19001799;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+h1 {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(163, 4, 250, 0.5);
+}
+
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.producto {
+    background-color: #a304fa;
+    border: 5px solid rgba(8, 0, 11, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.producto::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: 0.5s;
+    transform: rotate(45deg);
+}
+
+.producto:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(163, 4, 250, 0.3);
+    border-color: #cf7cfc;
+}
+
+.producto:hover::before {
+    top: 100%;
+    left: 100%;
+}
+
+.producto img {
+    width: 100%;
+    height: auto;
+    max-width: 150px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+
+.producto:hover img {
+    transform: scale(1.1);
+}
+
+.producto h3 {
+    margin: 0.5rem 0;
+    color: #fff;
+    transition: color 0.3s;
+}
+
+.precio {
+    color: #b3e9c0;
+    font-weight: bold;
+    margin: 0.5rem 0;
+    font-size: 1.2em;
+}
+
+.boton-comprar {
+    background: linear-gradient(45deg, #a304fa, #d304c5);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.boton-comprar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(163, 4, 250, 0.5);
+}
+
+.boton-comprar:active {
+    transform: scale(0.95);
+}
+
+
 /* Mascota */
 
 .pixeleado{
@@ -274,6 +439,13 @@ main{
     z-index: 9999;
     pointer-events: none;
     animation: animacionCaminar 10s linear infinite;
+}
+
+.puntos-disponibles {
+    text-align: right;
+    color: #6c757d;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
 }
 
 /* Animación de caminata con giro en los extremos */
