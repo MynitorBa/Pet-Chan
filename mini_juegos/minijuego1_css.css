@@ -289,35 +289,6 @@ main{
     margin-bottom: 20px;
 }
 
-.gato-tiendero {
-    position: absolute;
-    transform: translateY(-50%);
-    animation: paseoGato 15s linear infinite;
-}
-
-@keyframes paseoGato {
-    0% {
-        left: -200px; /* Empieza fuera de la vista */
-        transform: translateY(-50%) scaleX(1);
-    }
-    45% {
-        left: 100%;
-        transform: translateY(-50%) scaleX(1);
-    }
-    50% {
-        left: 100%;
-        transform: translateY(-50%) scaleX(-1); /* Gira el gato */
-    }
-    95% {
-        left: -200px;
-        transform: translateY(-50%) scaleX(-1);
-    }
-    100% {
-        left: -200px;
-        transform: translateY(-50%) scaleX(1); /* Vuelve a la posición original */
-    }
-}
-
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }

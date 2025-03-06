@@ -1,5 +1,5 @@
 
-fetch("minijuego_base/j1.html") 
+fetch("./minijuego_base/j1.html") 
 .then(response => response.text()) 
 .then(data => {
     let contenedor = document.querySelector(".seccion-del_juego");
