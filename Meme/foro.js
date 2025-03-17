@@ -170,6 +170,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Notification Bell Setup
+    const notificationBell = document.createElement('div');
+    notificationBell.classList.add('notificacion-campana');
+    notificationBell.innerHTML = `
+        <i class="fas fa-bell"></i>
+        <span class="badge-notificacion">5</span>
+    `;
+
+    // Insert the notification bell before the profile icon
+    const profileIcon = document.querySelector('.icono-perfil');
+    profileIcon.parentNode.insertBefore(notificationBell, profileIcon);
+
+    // Notification Bell Click Animation
+    notificationBell.addEventListener('click', () => {
+        notificationBell.classList.add('animating');
+        
+        // Remove animation class after it completes
+        setTimeout(() => {
+            notificationBell.classList.remove('animating');
+        }, 500);
+    });
+});
 
 
 
@@ -177,6 +200,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Ensure only one notification bell exists
+    const existingBells = document.querySelectorAll('.notificacion-campana');
+    if (existingBells.length > 1) {
+        // Remove extra bells
+        for (let i = 1; i < existingBells.length; i++) {
+            existingBells[i].remove();
+        }
+    }
+
+    const notificationBell = document.querySelector('.notificacion-campana');
+
+    if (notificationBell) {
+        notificationBell.addEventListener('click', () => {
+            notificationBell.classList.add('animating');
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+                notificationBell.classList.remove('animating');
+            }, 500);
+        });
+    }
+});
 
 
 

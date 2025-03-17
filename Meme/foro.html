@@ -14,6 +14,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
     <header class="encabezado-principal">
         <div class="contenido-encabezado">
             <!-- Logo section -->
@@ -21,7 +32,6 @@
                 <img src="./logo.png" alt="Logo del sitio">
             </div>
     
-
             <button class="boton-menu">
                 <span></span>
                 <span></span>
@@ -30,23 +40,19 @@
             
             <div class="menu-overlay"></div>
             
-<!-- Navegación Principal -->
-<nav class="navegacion-principal">
-    <ul>
-        <li><a href="#" class="activo"><i class="fas fa-home"></i>Inicio</a></li>
-        <li><a href="#"><i class="fas fa-comments"></i>Foros</a></li>
-        <li><a href="#"><i class="fas fa-bell"></i>Notificaciones<span class="badge">3</span></a></li>
-        <li><a href="#"><i class="fas fa-calendar"></i>Eventos</a></li>
-        <li><a href="#"><i class="fas fa-book"></i>Biblioteca</a></li>
-        <li><a href="#"><i class="fas fa-users"></i>Comunidad</a></li>
-        <li><a href="#"><i class="fas fa-cog"></i>Configuración</a></li>
-        <li><a href="#"><i class="fas fa-question-circle"></i>Ayuda</a></li>
-        <li><a href="#"><i class="fas fa-sign-out-alt"></i>Cerrar Sesión</a></li>
-    </ul>
-</nav>
-
-            
-
+            <!-- Navegación Principal -->
+            <nav class="navegacion-principal">
+                <ul>
+                    <li><a href="#" class="activo"><i class="fas fa-home"></i>Inicio</a></li>
+                    <li><a href="#"><i class="fas fa-comments"></i>Foros</a></li>
+                    <li><a href="#"><i class="fas fa-calendar"></i>Eventos</a></li>
+                    <li><a href="#"><i class="fas fa-book"></i>Biblioteca</a></li>
+                    <li><a href="#"><i class="fas fa-users"></i>Comunidad</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i>Configuración</a></li>
+                    <li><a href="#"><i class="fas fa-question-circle"></i>Ayuda</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i>Cerrar Sesión</a></li>
+                </ul>
+            </nav>
     
             <!-- Search bar -->
             <div class="barra-busqueda">
@@ -54,25 +60,27 @@
                 <button aria-label="Buscar">🔍</button>
             </div>
     
-            <!-- Action buttons -->
+            <!-- Action buttons and Notification Bell -->
             <div class="botones-accion">
                 <button class="boton boton-traducir" title="Traducir">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
                     </svg>
                 </button>
-                <button class="boton boton-sesion">Iniciar sesión</button>
+                
+                <!-- Notification Bell -->
+                <div class="notificacion-campana">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge-notificacion">5</span>
+                </div>
             </div>
     
-     
-
-
             <div class="icono-perfil">
                 <img src="https://w7.pngwing.com/pngs/1/478/png-transparent-cat-dog-paw-claw-paw-prints-animals-pet-paw-thumbnail.png" alt="Perfil">
                 <div class="perfil-dropdown">
                     <ul>
                         <li><a href="#"><i class="fas fa-user"></i>Mi Perfil</a></li>
-                        <li><a href="#"><i class="fas fa-gem"></i>Conseguir Avatares<span class="badge-nuevo">Nuevo</span></a></li>
+                        <li><a href="#"><i class="fas fa-gem"></i>Tienda<span class="badge-nuevo">Nuevo</span></a></li>
                         <li><a href="#"><i class="fas fa-palette"></i>Personalizar Perfil</a></li>
                         <div class="divisor"></div>
                         <li><a href="#"><i class="fas fa-shield-alt"></i>Seguridad</a></li>
@@ -80,11 +88,8 @@
                     </ul>
                 </div>
             </div>
-
-
-
+        </div>
     </header>
-
 
 
     
