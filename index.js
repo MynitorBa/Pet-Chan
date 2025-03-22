@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
         imagenesUrl: [] // Empty array or populate with actual image URLs
     };
     
-    res.render('inicio.ejs', { mensaje });
+    res.render('eventos.ejs', { mensaje });
 });
 
 

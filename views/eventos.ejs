@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos en Pet-Chan</title>
+    <link rel="stylesheet" href="styles/eventos.css">
+</head>
+<%- include("partials/header.ejs") %>
+<body>
+    <div class="contenedor-inicio">
+        <!-- Sección Hero con Carrusel -->
+        <div class="seccion-hero">
+            <div class="carrusel">
+                <div class="carrusel-imagen activa" style="background-image: url('https://i.gifer.com/GdG.gif');"></div>
+                <div class="carrusel-imagen" style="background-image: url('https://66.media.tumblr.com/ee5169a677d71323105a5210404f474d/tumblr_ptp22tbWHk1tgo74ho1_1280.gif');"></div>
+                <div class="carrusel-imagen" style="background-image: url('https://i.gifer.com/xK.gif');"></div>
+            </div>
+            <h1>Eventos en Pet-Chan</h1>
+        </div>
+
+        <!-- Sección de Eventos -->
+        <div class="seccion-eventos">
+            <h2>Próximos Eventos</h2>
+            <div class="lista-eventos">
+                <!-- Evento 1 -->
+                <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif');">
+                    <div class="fecha-evento">
+                        <span class="dia">25</span>
+                        <span class="mes">Oct</span>
+                        <span class="año">2024</span>
+                    </div>
+                    <div class="info-evento">
+                        <h3 class="titulo-evento">Torneo de Mascotas Virtuales</h3>
+                        <p class="descripcion-evento">Participa en el torneo más grande de mascotas virtuales. ¡Gana premios exclusivos!</p>
+                        <div class="etiquetas-evento">
+                            <span class="etiqueta">Competitivo</span>
+                            <span class="etiqueta">Premios</span>
+                            <span class="etiqueta">Mascotas</span>
+                        </div>
+                        <button class="boton-inscribirse">Inscribirse</button>
+                    </div>
+                    <div class="brillo-evento"></div>
+                    <div class="reflejo"></div>
+                </div>
+
+                <!-- Evento 2 -->
+                <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif');">
+                    <div class="fecha-evento">
+                        <span class="dia">15</span>
+                        <span class="mes">Nov</span>
+                        <span class="año">2024</span>
+                    </div>
+                    <div class="info-evento">
+                        <h3 class="titulo-evento">Concurso de Diseño de Mascotas</h3>
+                        <p class="descripcion-evento">Diseña la mascota más creativa y gana reconocimiento en la comunidad.</p>
+                        <div class="etiquetas-evento">
+                            <span class="etiqueta">Creatividad</span>
+                            <span class="etiqueta">Diseño</span>
+                            <span class="etiqueta">Reconocimiento</span>
+                        </div>
+                        <button class="boton-inscribirse">Inscribirse</button>
+                    </div>
+                    <div class="brillo-evento"></div>
+                    <div class="reflejo"></div>
+                </div>
+
+                <!-- Evento 3 -->
+                <div class="evento evento-destacado" style="background-image: url('https://favim.com/pd/p/orig/2019/02/11/8bit-city-8-bit-Favim.com-6875655.gif');">
+                    <div class="fecha-evento">
+                        <span class="dia">30</span>
+                        <span class="mes">Dic</span>
+                        <span class="año">2024</span>
+                    </div>
+                    <div class="info-evento">
+                        <h3 class="titulo-evento">Fiesta de Fin de Año</h3>
+                        <p class="descripcion-evento">Celebra el fin de año con una gran fiesta virtual y sorpresas especiales.</p>
+                        <div class="etiquetas-evento">
+                            <span class="etiqueta">Fiesta</span>
+                            <span class="etiqueta">Sorpresas</span>
+                            <span class="etiqueta">Celebración</span>
+                        </div>
+                        <button class="boton-inscribirse">Inscribirse</button>
+                    </div>
+                    <div class="brillo-evento"></div>
+                    <div class="reflejo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/eventos.js"></script>
+</body>
+</html>
+
+
+<%- include("partials/footer.ejs") %>
