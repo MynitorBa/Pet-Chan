@@ -10,8 +10,14 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    res.render('inicio.ejs');
+    // Create a mensaje object with the data you need
+    const mensaje = {
+        imagenesUrl: [] // Empty array or populate with actual image URLs
+    };
+    
+    res.render('inicio.ejs', { mensaje });
 });
+
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');

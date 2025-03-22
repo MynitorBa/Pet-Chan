@@ -1,408 +1,484 @@
-//menu
 document.addEventListener('DOMContentLoaded', function() {
-    const menuBtn = document.getElementById('menuBtn');
-    const closeBtn = document.getElementById('closeBtn');
-    const slideMenu = document.getElementById('slideMenu');
-    const overlay = document.getElementById('overlay');
+  // DOM Elements
+  const form = document.getElementById('mensaje-form');
+  const formTitle = document.getElementById('form-title');
+  const submitBtn = document.getElementById('submit-btn');
+  const cancelBtn = document.getElementById('cancel-btn');
+  const autorInput = document.getElementById('autor');
+  const mensajeInput = document.getElementById('mensaje');
+  const mensajeIdInput = document.getElementById('mensaje-id');
+  const imagenesInput = document.getElementById('imagenes-input');
+  const imagenesContainer = document.getElementById('imagenes-preview-container');
+  const contador = document.getElementById('contador');
+  const modal = document.getElementById('modal-confirmacion');
+  const btnConfirmarEliminar = document.getElementById('btn-confirmar-eliminar');
+  const btnCancelarEliminar = document.getElementById('btn-cancelar-eliminar');
+  const modalImagen = document.getElementById('modal-imagen');
+  const modalImagenContenido = document.getElementById('modal-imagen-contenido');
+  const cerrarModalImagen = document.getElementById('cerrar-modal-imagen');
+  
+  let mensajeIdAEliminar = null;
+  let isSubmitting = false;
+  let imagenesActuales = []; // Almacena las imágenes actuales
+  let imagenesEliminadas = []; // Almacena los IDs de imágenes eliminadas (para edición)
+  const MAX_IMAGENES = 9; // Límite de 9 imágenes
 
-    // Función para abrir el menú
-    menuBtn.addEventListener('click', function() {
-        slideMenu.classList.add('active');
-        overlay.style.display = 'block';
-        menuBtn.classList.add('hidden');
-    });
+  // Default author name
+  autorInput.value = "meme";
 
-    // Función para cerrar el menú
-    function closeMenu() {
-        slideMenu.classList.remove('active');
-        overlay.style.display = 'none';
-        menuBtn.classList.remove('hidden');
+  // Console debug
+  console.log('Script foro.js cargado');
+
+  // Función para resetear el formulario
+  function resetForm() {
+    form.action = '/publicar';
+    form.method = 'POST';
+    formTitle.textContent = 'Nuevo Mensaje';
+    submitBtn.textContent = 'Publicar';
+    cancelBtn.style.display = 'none';
+    autorInput.value = 'meme';
+    mensajeInput.value = '';
+    mensajeIdInput.value = '';
+    imagenesContainer.innerHTML = '';
+    imagenesInput.value = '';
+    imagenesActuales = [];
+    imagenesEliminadas = [];
+    // Eliminar todos los campos ocultos para imágenes eliminadas
+    document.querySelectorAll('input[name="imagenes_eliminar"]').forEach(el => el.remove());
+    isSubmitting = false;
+  }
+
+  // Actualizar contador de mensajes
+  function actualizarContadorMensajes() {
+    const cantidadMensajes = document.querySelectorAll('.mensaje').length;
+    if (contador) {
+      contador.textContent = cantidadMensajes;
     }
+  }
 
-    // Cerrar al hacer click en el botón X
-    closeBtn.addEventListener('click', closeMenu);
-
-    // Cerrar al hacer click en el overlay
-    overlay.addEventListener('click', closeMenu);
-});
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Elementos del menú principal
-    const botonMenu = document.querySelector('.boton-menu');
-    const navegacion = document.querySelector('.navegacion-principal');
-    const menuOverlay = document.querySelector('.menu-overlay');
-    const menuItems = document.querySelectorAll('.navegacion-principal ul li a');
-
-    // Elementos del perfil
-    const iconoPerfil = document.querySelector('.icono-perfil img');
-    const perfilDropdown = document.querySelector('.perfil-dropdown');
-
-    // Función para cerrar el menú de navegación
-    function cerrarMenuNavegacion() {
-        botonMenu.classList.remove('activo');
-        navegacion.classList.remove('activo');
-        menuOverlay.classList.remove('activo');
-        document.body.style.overflow = '';
-    }
-
-    // Función para cerrar el dropdown del perfil
-    function cerrarPerfilDropdown() {
-        if (perfilDropdown) {
-            perfilDropdown.classList.remove('activo');
-        }
-    }
-
-    // Función para toggle del menú con animación mejorada
-    function toggleMenu() {
-        cerrarPerfilDropdown(); // Cerrar perfil si está abierto
-        
-        const estaActivo = !navegacion.classList.contains('activo');
-        
-        botonMenu.classList.toggle('activo');
-        navegacion.classList.toggle('activo');
-        menuOverlay.classList.toggle('activo');
-        document.body.style.overflow = estaActivo ? 'hidden' : '';
-
-        // Removemos las animaciones individuales para que aparezcan todos los items juntos
-        menuItems.forEach(item => {
-            item.style.opacity = estaActivo ? "1" : "0";
-            item.style.transform = estaActivo ? "translateX(0)" : "translateX(-20px)";
-            // Eliminamos el setTimeout para que no haya retraso
-        });
-    }
-
-    // Toggle del perfil
-    if (iconoPerfil) {
-        iconoPerfil.addEventListener('click', function(e) {
-            e.stopPropagation();
-            cerrarMenuNavegacion(); // Cerrar menú si está abierto
-            perfilDropdown.classList.toggle('activo');
-        });
-    }
-
-    // Event listeners del menú
-    botonMenu.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleMenu();
-    });
-    
-    menuOverlay.addEventListener('click', toggleMenu);
-
-    // Manejar click en items del menú
-    menuItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            menuItems.forEach(i => i.classList.remove('activo'));
-            this.classList.add('activo');
-            
-            if (window.innerWidth < 1280) {
-                setTimeout(cerrarMenuNavegacion, 300);
-            }
-        });
-    });
-
-    // Cerrar todo al hacer click fuera
-    document.addEventListener('click', function(e) {
-        const clickFueraMenu = !navegacion.contains(e.target) && 
-                              !botonMenu.contains(e.target);
-        const clickFueraPerfil = !perfilDropdown?.contains(e.target) && 
-                                !iconoPerfil?.contains(e.target);
-
-        if (clickFueraMenu && clickFueraPerfil) {
-            cerrarMenuNavegacion();
-            cerrarPerfilDropdown();
-        }
-    });
-
-    // Cerrar menú al hacer scroll con debounce
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        
-        scrollTimeout = setTimeout(() => {
-            cerrarMenuNavegacion();
-            cerrarPerfilDropdown();
-        }, 150);
-    }, { passive: true });
-
-    // Cerrar menú al redimensionar con debounce
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        if (resizeTimeout) clearTimeout(resizeTimeout);
-        
-        resizeTimeout = setTimeout(() => {
-            cerrarMenuNavegacion();
-            cerrarPerfilDropdown();
-        }, 150);
-    }, { passive: true });
-
-    // Cerrar menú al presionar ESC
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            cerrarMenuNavegacion();
-            cerrarPerfilDropdown();
-        }
-    });
-
-    // Detectar gestos de swipe en móviles
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const swipeThreshold = 50;
-
-    document.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
-    document.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        const delta = touchEndX - touchStartX;
-
-        if (Math.abs(delta) > swipeThreshold) {
-            if (delta > 0 && !navegacion.classList.contains('activo')) {
-                toggleMenu(); // Abrir menú
-            } else if (delta < 0 && navegacion.classList.contains('activo')) {
-                toggleMenu(); // Cerrar menú
-            }
-        }
-    }, { passive: true });
-});
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Notification Bell Setup
-    const notificationBell = document.createElement('div');
-    notificationBell.classList.add('notificacion-campana');
-    notificationBell.innerHTML = `
-        <i class="fas fa-bell"></i>
-        <span class="badge-notificacion">5</span>
-    `;
-
-    // Insert the notification bell before the profile icon
-    const profileIcon = document.querySelector('.icono-perfil');
-    profileIcon.parentNode.insertBefore(notificationBell, profileIcon);
-
-    // Notification Bell Click Animation
-    notificationBell.addEventListener('click', () => {
-        notificationBell.classList.add('animating');
-        
-        // Remove animation class after it completes
-        setTimeout(() => {
-            notificationBell.classList.remove('animating');
-        }, 500);
-    });
-});
-
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Ensure only one notification bell exists
-    const existingBells = document.querySelectorAll('.notificacion-campana');
-    if (existingBells.length > 1) {
-        // Remove extra bells
-        for (let i = 1; i < existingBells.length; i++) {
-            existingBells[i].remove();
-        }
-    }
-
-    const notificationBell = document.querySelector('.notificacion-campana');
-
-    if (notificationBell) {
-        notificationBell.addEventListener('click', () => {
-            notificationBell.classList.add('animating');
-            
-            // Remove animation class after it completes
-            setTimeout(() => {
-                notificationBell.classList.remove('animating');
-            }, 500);
-        });
-    }
-});
-
-
-
-
-
-
-// Animaciones para mensajes del foro cuando aparecen en viewport
-const observador = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, { threshold: 0.1 });
-
-// Aplicar observador a todos los mensajes
-document.querySelectorAll('.mensaje-foro').forEach(mensaje => {
+  // Efecto fade-in para mensajes
+  document.querySelectorAll('.mensaje').forEach(mensaje => {
     mensaje.style.opacity = '0';
-    mensaje.style.transform = 'translateY(20px)';
-    mensaje.style.transition = 'all 0.5s ease-out';
-    observador.observe(mensaje);
-});
+    setTimeout(() => {
+      mensaje.style.transition = 'opacity 0.5s ease-in';
+      mensaje.style.opacity = '1';
+    }, 100);
+  });
 
-// Efecto hover mejorado para las etiquetas
-document.querySelectorAll('.etiqueta').forEach(etiqueta => {
-    etiqueta.addEventListener('mouseenter', (e) => {
-        const x = e.clientX - e.target.offsetLeft;
-        const y = e.clientY - e.target.offsetTop;
+  // Función para actualizar la vista previa de imágenes
+  function actualizarVistaPrevia() {
+    imagenesContainer.innerHTML = '';
+    
+    if (imagenesActuales.length > 0) {
+      const gridContainer = document.createElement('div');
+      gridContainer.className = 'imagenes-grid-container';
+      
+      imagenesActuales.forEach((imagen, index) => {
+        const celda = document.createElement('div');
+        celda.className = 'imagen-preview-celda';
         
-        const ripple = document.createElement('div');
-        ripple.style.left = `${x}px`;
-        ripple.style.top = `${y}px`;
-        ripple.className = 'ripple';
-        e.target.appendChild(ripple);
+        const img = document.createElement('img');
+        // Si es un objeto con url, o simplemente una string
+        img.src = typeof imagen === 'object' ? imagen.url : imagen;
+        img.alt = `Imagen ${index + 1}`;
         
-        setTimeout(() => ripple.remove(), 1000);
-    });
-});
-
-
-
-// Animación para los votos
-document.querySelectorAll('.votos button').forEach(boton => {
-    boton.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const contador = this.parentElement.querySelector('.contador-votos');
-        const valor = parseInt(contador.textContent);
-        const esIncremento = this.classList.contains('incrementar');
-        
-        // Animación del contador
-        contador.style.transform = 'scale(1.2)';
-        contador.style.color = esIncremento ? '#4CAF50' : '#f44336';
-        
-        setTimeout(() => {
-            contador.style.transform = 'scale(1)';
-            contador.style.color = '#fff';
-        }, 200);
-        
-        // Efecto de partículas
-        crearParticulasVoto(e.clientX, e.clientY, esIncremento);
-    });
-});
-
-// Función para crear partículas en los votos
-function crearParticulasVoto(x, y, esPositivo) {
-    for (let i = 0; i < 8; i++) {
-        const particula = document.createElement('div');
-        particula.className = 'particula-voto';
-        particula.style.backgroundColor = esPositivo ? '#4CAF50' : '#f44336';
-        particula.style.left = `${x}px`;
-        particula.style.top = `${y}px`;
-        
-        const angulo = (i * 45) * Math.PI / 180;
-        const velocidad = 8;
-        const vx = Math.cos(angulo) * velocidad;
-        const vy = Math.sin(angulo) * velocidad;
-        
-        document.body.appendChild(particula);
-        
-        let posX = x;
-        let posY = y;
-        let opacidad = 1;
-        
-        const animar = () => {
-            if (opacidad <= 0) {
-                particula.remove();
-                return;
-            }
-            
-            posX += vx;
-            posY += vy;
-            opacidad -= 0.05;
-            
-            particula.style.left = `${posX}px`;
-            particula.style.top = `${posY}px`;
-            particula.style.opacity = opacidad;
-            
-            requestAnimationFrame(animar);
+        const btnEliminar = document.createElement('button');
+        btnEliminar.className = 'btn-eliminar-imagen';
+        btnEliminar.innerHTML = '<i class="fas fa-times"></i>';
+        btnEliminar.setAttribute('data-index', index);
+        btnEliminar.onclick = function(e) {
+          e.stopPropagation();
+          eliminarImagen(index);
         };
         
-        requestAnimationFrame(animar);
+        celda.appendChild(img);
+        celda.appendChild(btnEliminar);
+        gridContainer.appendChild(celda);
+        
+        // Añadir event listener para expandir
+        celda.addEventListener('click', function() {
+          expandirImagen(typeof imagen === 'object' ? imagen.url : imagen);
+        });
+      });
+      
+      imagenesContainer.appendChild(gridContainer);
+      
+      // Añadir contador de imágenes
+      const contadorImagenes = document.createElement('div');
+      contadorImagenes.className = 'contador-imagenes';
+      contadorImagenes.textContent = `${imagenesActuales.length}/${MAX_IMAGENES} imágenes`;
+      imagenesContainer.appendChild(contadorImagenes);
     }
-}
+  }
 
-// Animación para mensajes destacados
-document.querySelectorAll('.mensaje-destacado').forEach(mensaje => {
-    let anguloRotacion = 0;
+  // Función para expandir imagen
+  function expandirImagen(src) {
+    const imgElement = document.createElement('img');
+    imgElement.src = src;
+    modalImagenContenido.innerHTML = '';
+    modalImagenContenido.appendChild(imgElement);
+    modalImagen.classList.add('activo');
+  }
+
+  // Función para eliminar una imagen
+  function eliminarImagen(index) {
+    const imagen = imagenesActuales[index];
     
-    function animarEstrella() {
-        const estrella = mensaje.querySelector('::before');
-        if (estrella) {
-            anguloRotacion += 1;
-            estrella.style.transform = `rotate(${anguloRotacion}deg)`;
+    // Si estamos en modo edición y la imagen tiene ID, guardarla para eliminarla en el servidor
+    if (mensajeIdInput.value && typeof imagen === 'object' && imagen.id) {
+      imagenesEliminadas.push(imagen.id);
+    }
+    
+    // Eliminar del array de imágenes actuales
+    imagenesActuales.splice(index, 1);
+    
+    // Actualizar la vista previa
+    actualizarVistaPrevia();
+    
+    // Para nuevas imágenes, necesitamos reconstruir el input file
+    if (!mensajeIdInput.value || (typeof imagen === 'object' && !imagen.id)) {
+      // Si tenemos soporte para DataTransfer, recreamos el input de archivos
+      if (typeof DataTransfer !== 'undefined') {
+        const dataTransfer = new DataTransfer();
+        
+        // Obtenemos los archivos actuales
+        const files = Array.from(imagenesInput.files || []);
+        
+        // Convertimos el array de imágenes actuales a un array de Files
+        // Solo añadimos archivos que estén todavía en imagenesActuales
+        const imagenesNuevas = imagenesActuales.filter(img => typeof img === 'object' && img.file);
+        
+        // Añadimos al DataTransfer todos los archivos que debemos mantener
+        imagenesNuevas.forEach(img => {
+          if (img.file) {
+            dataTransfer.items.add(img.file);
+          }
+        });
+        
+        // Actualizamos el input file
+        imagenesInput.value = ''; // Limpiamos primero
+        imagenesInput.files = dataTransfer.files;
+      }
+    }
+  }
+
+  // Crear la estructura para el modal de imagen ampliada si no existe
+  if (!modalImagen) {
+    const modalHTML = `
+      <div id="modal-imagen" class="modal-imagen">
+        <div id="modal-imagen-contenido" class="modal-imagen-contenido">
+          <button id="cerrar-modal-imagen" class="cerrar-modal-imagen"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    modalImagen = document.getElementById('modal-imagen');
+    modalImagenContenido = document.getElementById('modal-imagen-contenido');
+    cerrarModalImagen = document.getElementById('cerrar-modal-imagen');
+    
+    cerrarModalImagen.addEventListener('click', function() {
+      modalImagen.classList.remove('activo');
+    });
+  }
+
+  // Manejar selección de imágenes
+  imagenesInput.addEventListener('change', function(e) {
+    if (!this.files || this.files.length === 0) return;
+    
+    const nuevasImagenes = Array.from(this.files);
+    
+    // Verificar si se excede el límite
+    if (imagenesActuales.length + nuevasImagenes.length > MAX_IMAGENES) {
+      alert(`No puedes subir más de ${MAX_IMAGENES} imágenes en total`);
+      this.value = ''; // Reseteamos el input para evitar inconsistencias
+      return;
+    }
+    
+    // Verificar cada archivo y añadirlo
+    nuevasImagenes.forEach(file => {
+      if (!file.type.match('image.*')) {
+        alert('Por favor, selecciona solo imágenes válidas');
+        return;
+      }
+      
+      // Añadir a vista previa
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // Añadir la imagen al array con toda la información necesaria
+        imagenesActuales.push({
+          url: e.target.result,
+          file: file,
+          name: file.name
+        });
+        actualizarVistaPrevia();
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // Cerrar modal de imagen al hacer clic fuera
+  modalImagen.addEventListener('click', function(e) {
+    if (e.target === modalImagen) {
+      modalImagen.classList.remove('activo');
+    }
+  });
+
+  // Validación y envío del formulario
+  form.addEventListener('submit', function(event) {
+    // Prevenir múltiples envíos
+    if (isSubmitting) {
+      event.preventDefault();
+      return false;
+    }
+    
+    const autor = autorInput.value.trim();
+    const mensaje = mensajeInput.value.trim();
+    
+    if (!autor || !mensaje) {
+      event.preventDefault();
+      alert('Por favor, completa todos los campos obligatorios');
+      return false;
+    }
+    
+    // Modo edición
+    if (mensajeIdInput.value) {
+      event.preventDefault();
+      
+      // Marcar como enviando
+      isSubmitting = true;
+      
+      const formData = new FormData();
+      formData.append('autor', autor);
+      formData.append('mensaje', mensaje);
+      
+      // Añadir imágenes nuevas (las que tienen propiedad 'file')
+      imagenesActuales.forEach(img => {
+        if (typeof img === 'object' && img.file) {
+          formData.append('imagenes', img.file);
         }
-        requestAnimationFrame(animarEstrella);
+      });
+      
+      // Añadir IDs de imágenes existentes a mantener
+      imagenesActuales.forEach(img => {
+        if (typeof img === 'object' && img.id) {
+          formData.append('mantener_imagenes[]', img.id);
+        }
+      });
+      
+      // Añadir IDs de imágenes a eliminar
+      imagenesEliminadas.forEach(id => {
+        formData.append('imagenes_eliminar[]', id);
+      });
+      
+      submitBtn.textContent = 'Actualizando...';
+      submitBtn.disabled = true;
+      
+      fetch(`/actualizar/${mensajeIdInput.value}`, {
+        method: 'PUT',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Error: ' + response.status);
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert('Error al actualizar: ' + (data.error || 'Error desconocido'));
+          isSubmitting = false;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar: ' + error.message);
+        isSubmitting = false;
+      })
+      .finally(() => {
+        submitBtn.textContent = 'Actualizar';
+        submitBtn.disabled = false;
+      });
+    } else {
+      // Nuevo mensaje - usar el form action normal
+      isSubmitting = true;
+      submitBtn.textContent = 'Enviando...';
+      submitBtn.disabled = true;
+      
+      // Para asegurarnos de que se envíen las imágenes correctas en el formulario
+      // no necesitamos hacer nada aquí, ya que las imágenes seleccionadas ya están en el input de archivo
+    }
+  });
+
+  // Botón cancelar
+  cancelBtn.addEventListener('click', resetForm);
+
+  // Delegación de eventos para interacciones con mensajes
+  document.addEventListener('click', function(event) {
+    // Botón editar mensaje
+    if (event.target.closest('.btn-editar')) {
+      const button = event.target.closest('.btn-editar');
+      const mensajeId = button.dataset.id;
+      
+      fetch(`/mensaje/${mensajeId}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Error: ' + response.status);
+          return response.json();
+        })
+        .then(data => {
+          // Resetear el formulario primero para limpiar todo
+          resetForm();
+          
+          // Configurar el formulario para edición
+          formTitle.textContent = 'Editar Mensaje';
+          submitBtn.textContent = 'Actualizar';
+          cancelBtn.style.display = 'block';
+          autorInput.value = data.autor;
+          mensajeInput.value = data.mensaje;
+          mensajeIdInput.value = data.id;
+          
+          // Limpiar array de imágenes eliminadas
+          imagenesEliminadas = [];
+          
+          // Mostrar imágenes existentes
+          if (data.imagenes && data.imagenes.length > 0) {
+            imagenesActuales = data.imagenes;
+            actualizarVistaPrevia();
+          }
+          
+          form.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error al cargar el mensaje: ' + error.message);
+        });
     }
     
-    animarEstrella();
+    // Botón eliminar mensaje
+    if (event.target.closest('.btn-eliminar')) {
+      mensajeIdAEliminar = event.target.closest('.btn-eliminar').dataset.id;
+      modal.classList.add('active');
+    }
+
+    // Expandir imagen de mensajes
+    if (event.target.closest('.imagen-mensaje-celda')) {
+      const img = event.target.closest('.imagen-mensaje-celda').querySelector('img');
+      if (img) {
+        expandirImagen(img.src);
+      }
+    }
+  });
+
+  // Confirmación de eliminación de mensaje
+  btnConfirmarEliminar.addEventListener('click', function() {
+    if (mensajeIdAEliminar) {
+      btnConfirmarEliminar.textContent = 'Eliminando...';
+      btnConfirmarEliminar.disabled = true;
+      
+      fetch(`/eliminar/${mensajeIdAEliminar}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.querySelector(`.mensaje[data-id="${mensajeIdAEliminar}"]`)?.remove();
+          actualizarContadorMensajes();
+          
+          const mensajesContainer = document.querySelector('.lista-mensajes');
+          if (document.querySelectorAll('.mensaje').length === 0 && mensajesContainer) {
+            mensajesContainer.innerHTML = '<p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>';
+          }
+        }
+        modal.classList.remove('active');
+      })
+      .catch(error => alert('Error al eliminar: ' + error.message))
+      .finally(() => {
+        btnConfirmarEliminar.textContent = 'Eliminar';
+        btnConfirmarEliminar.disabled = false;
+      });
+    }
+  });
+  
+  // Botón cancelar del modal
+  btnCancelarEliminar.addEventListener('click', () => modal.classList.remove('active'));
+
+  // Drag and drop para imágenes
+  const dropZone = document.getElementById('drop-zone');
+  if (dropZone) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
     
-    // Efecto de brillo al hover
-    mensaje.addEventListener('mouseenter', () => {
-        const brilloEfecto = document.createElement('div');
-        brilloEfecto.className = 'brillo-destacado';
-        mensaje.appendChild(brilloEfecto);
-        
-        setTimeout(() => brilloEfecto.remove(), 1000);
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, highlight, false);
     });
-});
-
-
-// Efecto de desplazamiento suave para la paginación
-document.querySelectorAll('.btn-pagina').forEach(boton => {
-    boton.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const contenedorForo = document.querySelector('.contenedor-foro');
-        contenedorForo.style.opacity = '0';
-        contenedorForo.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            contenedorForo.style.opacity = '1';
-            contenedorForo.style.transform = 'translateY(0)';
-        }, 300);
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, unhighlight, false);
     });
-});
-
-// Animación para el indicador de actividad
-document.querySelectorAll('.indicador-actividad').forEach(indicador => {
-    setInterval(() => {
-        indicador.style.transform = 'scale(1.2)';
-        setTimeout(() => {
-            indicador.style.transform = 'scale(1)';
-        }, 500);
-    }, 2000);
-});
-
-
-        document.querySelectorAll('[data-comentarios]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const mensajeId = btn.getAttribute('data-comentarios');
-                const comentariosSeccion = document.querySelector(`#${mensajeId} .comentarios-seccion`);
-                if (comentariosSeccion) {
-                    comentariosSeccion.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Preview de imagen antes de subir
-        document.getElementById('subir-imagen').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'comentario-imagen';
-                    document.querySelector('.subir-imagen').appendChild(img);
-                }
-                reader.readAsDataURL(file);
+    
+    function highlight() {
+      dropZone.classList.add('active');
+    }
+    
+    function unhighlight() {
+      dropZone.classList.remove('active');
+    }
+    
+    dropZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files.length > 0) {
+        // Verificar el límite
+        if (imagenesActuales.length + files.length > MAX_IMAGENES) {
+          alert(`No puedes subir más de ${MAX_IMAGENES} imágenes en total`);
+          return;
+        }
+        
+        // Verificar archivos y añadirlos al input y a la vista previa
+        Array.from(files).forEach(file => {
+          if (file.type.match('image.*')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              // Añadir al array de imágenes
+              imagenesActuales.push({
+                url: e.target.result,
+                file: file,
+                name: file.name
+              });
+              actualizarVistaPrevia();
+            };
+            reader.readAsDataURL(file);
+            
+            // Añadir al input de archivos
+            if (typeof DataTransfer !== 'undefined') {
+              const dataTransfer = new DataTransfer();
+              
+              // Obtener archivos actuales
+              if (imagenesInput.files) {
+                Array.from(imagenesInput.files).forEach(f => {
+                  dataTransfer.items.add(f);
+                });
+              }
+              
+              // Añadir nuevo archivo
+              dataTransfer.items.add(file);
+              
+              // Actualizar input
+              imagenesInput.files = dataTransfer.files;
             }
+          }
         });
+      }
+    }
+  }
+});

@@ -147,7 +147,11 @@
                         
                        
                      
-            
+                    <div class="mensaje-imagenes">
+                        <% mensaje.imagenesUrl.forEach((imagenUrl, index) => { %>
+                            <div class="imagen-collage" style="background-image: url('<%= imagenUrl %>');" onclick="expandirImagen('<%= imagenUrl %>')"></div>
+                        <% }); %>
+                    </div>
         
         
             

@@ -1,157 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foro Simple</title>
+    <link rel="stylesheet" href="/styles/foro.css">
+    <script src="foro.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
 <%- include("partials/header.ejs") %>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Foro Simple</h1>
+        </header>
         
-        <div class="contenedor-foro">
-            <h2>Foro de Terraria</h2>
-            
-            <div class="controles-foro">
-                <div class="ordenar-por">
-                    <label>Ordenar por:</label>
-                    <select>
-                        <option value="votados" selected>Más votados</option>
-                        <option value="reciente">Más recientes</option>
-                        <option value="antiguos">Más antiguos</option>
-                        <option value="mios">Los tuyos</option>
-                    </select>
+        <section class="formulario">
+            <h2 id="form-title">Nuevo Mensaje</h2>
+            <form action="/publicar" method="POST" id="mensaje-form" enctype="multipart/form-data">
+                <input type="hidden" id="mensaje-id" name="id" value="">
+                <div class="form-group">
+                    <label for="autor">Tu nombre:</label>
+                    <input type="text" id="autor" name="autor" value="meme" required>
+                </div>
+                <div class="form-group">
+                    <label for="mensaje">Mensaje:</label>
+                    <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
                 </div>
                 
-                <div class="filtros-rapidos">
-                    <button class="btn-filtro activo">Todos</button>
-                    <button class="btn-filtro">Guías</button>
-                    <button class="btn-filtro">Construcción</button>
-                    <button class="btn-filtro mis-mensajes">Mis mensajes</button>
+                <div class="form-group imagenes-input-container">
+                    <div id="drop-zone" class="drop-zone">
+                        <p>Arrastra y suelta imágenes aquí o</p>
+                        <label for="imagenes-input" class="imagenes-input-label">
+                            <i class="fas fa-images"></i> Seleccionar imágenes
+                        </label>
+                    </div>
+                    <input type="file" id="imagenes-input" name="imagenes" class="imagenes-input" accept="image/*" multiple>
+                    <div id="imagenes-preview-container"></div>
+                    <p class="hint-text">Máximo 9 imágenes por mensaje</p>
                 </div>
-            </div>
-            
-            <div class="contador-resultados">
-                Mostrando 9 resultados
-            </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" id="submit-btn">Publicar</button>
+                    <button type="button" id="cancel-btn" style="display: none;">Cancelar</button>
+                </div>
+            </form>
+        </section>
         
-            <div class="grid-mensajes">
-                <!-- 156 votos -->
-                <div class="mensaje-foro mensaje-destacado">
-                    <div class="votos">
-                        <button title="Votar positivo">↑</button>
-                        <span class="contador-votos">156</span>
-                        <button title="Votar negativo">↓</button>
-                    </div>
-                    <h3 class="titulo-mensaje">Guía completa: Cómo derrotar a Moon Lord</h3>
-                    <p class="autor-mensaje">
-                        <span class="indicador-actividad actividad-alta"></span>
-                        <span>MoonLordSlayer</span>
-                        <span class="autor-badge">Experto</span>
-                    </p>
-                    <p class="contenido-mensaje">Después de más de 500 horas de juego, he desarrollado la estrategia perfecta para derrotar al Moon Lord. Primero, necesitarás la siguiente preparación: arena especial con honey pools, heart lanterns, y campfires. La clave está en mantener el movimiento constante usando el mount Soaring Insignia...</p>
-                    <div class="etiquetas">
-                        <span class="etiqueta">Guía</span>
-                        <span class="etiqueta">Boss Fight</span>
-                        <span class="etiqueta">End Game</span>
-                    </div>
-                    <div class="acciones-mensaje">
-                        <button class="btn-accion">💬 Comentar</button>
-                        <button class="btn-accion"><i>🔖</i> Guardar</button>
-                        <button class="btn-accion"><i>📤</i> Compartir</button>
-                    </div>
-                    <div class="comentarios-seccion">
-                        <h4>Comentarios (3)</h4>
-                        <div class="comentario">
-                            <p class="autor-mensaje">
-                                <span class="indicador-actividad actividad-alta"></span>
-                                <span>TerrariaMaster</span>
-                            </p>
-                            <p>¡Increíble construcción! Me encanta el uso de las antorchas para la iluminación.</p>
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpzhxPL77eBQSHGMYFZkFI2mB3XI2ihBQs5Q&s" alt="Detalle de iluminación" class="comentario-imagen"/>
+        <section class="mensajes">
+            <h2>Mensajes (<span id="contador"><%= mensajes.length %></span>)</h2>
+            <div class="lista-mensajes">
+                <% if (mensajes.length === 0) { %>
+                    <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
+                <% } else { %>
+                    <% mensajes.forEach(mensaje => { %>
+                        <div class="mensaje" data-id="<%= mensaje.id %>">
+                            <div class="mensaje-cabecera">
+                                <span class="autor"><%= mensaje.autor %></span>
+                                <span class="fecha"><%= mensaje.fecha %></span>
+                                <div class="mensaje-acciones">
+                                    <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
+                            
+                            <% if (mensaje.imagenes && mensaje.imagenes.length > 0) { %>
+                                <div class="mensaje-imagenes">
+                                    <div class="mensaje-imagenes-grid grid-<%= mensaje.imagenes.length %>">
+                                        <% mensaje.imagenes.forEach(imagen => { %>
+                                            <div class="imagen-mensaje-celda" data-imagen-id="<%= imagen.id %>">
+                                                <img src="<%= imagen.url %>" alt="Imagen adjunta">
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            <% } %>
                         </div>
-                        <div class="comentario">
-                            <p class="autor-mensaje">
-                                <span class="indicador-actividad actividad-media"></span>
-                                <span>Builder123</span>
-                            </p>
-                            <p>¿Qué bloques usaste para las torres? ¡Se ve genial!</p>
-                        </div>
-                        <div class="comentario">
-                            <p class="autor-mensaje">
-                                <span class="indicador-actividad actividad-alta"></span>
-                                <span>BuildMaster2024</span>
-                                <span class="autor-badge">OP</span>
-                            </p>
-                            <p>Gracias a todos! Usé principalmente Stone Slabs y Gray Bricks. Aquí hay un detalle de la estructura:</p>
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0nj0aRiDY2USKYqs10fH95VdA0o7D8JosWw&s" class="comentario-imagen"/>
-                        </div>
-                    </div>
-                    <form id="formComentario" enctype="multipart/form-data">
-                        <div class="subir-imagen">
-                            <input type="file" id="archivo" name="archivo" accept="image/*" hidden>
-                            <label for="archivo" class="subir-imagen-texto">
-                                Arrastra una imagen o haz clic para subir
-                            </label>
-                        </div>
-                        <textarea class="input-comentario" placeholder="Escribe un comentario..."></textarea>
-                        <button type="submit" class="btn-comentar">Enviar comentario</button>
-                    </form>
-                </div>
-
-                 <!-- Mensaje 2 -->
-    <div class="mensaje-foro mensaje-destacado">
-        <div class="votos">
-            <button title="Votar positivo">&#8593;</button>
-            <span class="contador-votos">145</span>
-            <button title="Votar negativo">&#8595;</button>
-        </div>
-        <h3 class="titulo-mensaje">Guía de pesca definitiva 2024</h3>
-        <p class="autor-mensaje">
-            <span class="indicador-actividad actividad-alta"></span>
-            <span>FishingMaster</span>
-            <span class="autor-badge">Experto</span>
-        </p>
-        <p class="contenido-mensaje">Todo lo que necesitas saber sobre pesca: mejores cebos, potenciadores, clima, tiempo, biomas y recompensas...</p>
-        <div class="etiquetas">
-            <span class="etiqueta">Guía</span>
-            <span class="etiqueta">Pesca</span>
-            <span class="etiqueta">Actualizado</span>
-        </div>
-        <div class="acciones-mensaje">
-            <button class="btn-accion">💬 Comentar</button>
-            <button class="btn-accion">🔖 Guardar</button>
-            <button class="btn-accion">📤 Compartir</button>
-        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </section>
     </div>
-
-    <!-- Mensaje 3 -->
-    <div class="mensaje-foro">
-        <div class="votos">
-            <button title="Votar positivo">↑</button>
-            <span class="contador-votos">92</span>
-            <button title="Votar negativo">↓</button>
-        </div>
-        <h3 class="titulo-mensaje">La mejor granja de Soul of Light</h3>
-        <p class="autor-mensaje">
-            <span class="indicador-actividad actividad-media"></span>
-            <span>FarmKing99</span>
-            <span class="autor-badge">Veterano</span>
-        </p>
-        <p class="contenido-mensaje">
-            He optimizado la granja definitiva para Soul of Light. Usando hoiks y trampas de lava...
-        </p>
-        
-        <!-- La imagen debe estar bien cerrada y separada -->
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUOL9umLPrnFDzpuDusgiA6e2qe7cC6XvuaQ&s" alt="Terraria">
     
-        <!-- Aquí deben ir las etiquetas, en un div aparte -->
-        <div class="etiquetas">
-            <span class="etiqueta">Farming</span>
-            <span class="etiqueta">Tutorial</span>
-            <span class="etiqueta">Hardmode</span>
-        </div>
-    
-        <div class="acciones-mensaje">
-            <button class="btn-accion">💬 Comentar</button>
-            <button class="btn-accion">🔖 Guardar</button>
-            <button class="btn-accion">📤 Compartir</button>
+    <!-- Modal para confirmar eliminación de mensaje -->
+    <div id="modal-confirmacion" class="modal">
+        <div class="modal-contenido">
+            <p>¿Estás seguro de que deseas eliminar este mensaje?</p>
+            <div class="modal-botones">
+                <button id="btn-confirmar-eliminar">Eliminar</button>
+                <button id="btn-cancelar-eliminar">Cancelar</button>
+            </div>
         </div>
     </div>
     
-    
-            </div>
+    <!-- Modal para imagen ampliada -->
+    <div id="modal-imagen" class="modal-imagen">
+        <div id="modal-imagen-contenido" class="modal-imagen-contenido">
+            <button id="cerrar-modal-imagen" class="cerrar-modal-imagen"><i class="fas fa-times"></i></button>
         </div>
-   
-<%- include("partials/footer.ejs") %>  
+    </div>
+    
+    <script src="/scripts/foro.js"></script>
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>
