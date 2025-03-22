@@ -1,0 +1,636 @@
+
+
+body {
+    font-family: 'Press Start 2P', cursive;    
+    background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.encabezado-principal {
+    background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
+    padding: 8px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+    border-bottom: 1px solid #343536;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    height: 60px;
+}
+
+.contenido-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 16px;
+}
+
+.botones-accion {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notificacion-campana {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.notificacion-campana i {
+    font-size: 20px;
+    color: #d7dadc;
+    transition: all 0.3s ease;
+}
+
+.notificacion-campana .badge-notificacion {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff3366;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+@keyframes bell-shake {
+    0%, 100% { transform: rotate(0); }
+    10%, 90% { transform: rotate(-10deg); }
+    20%, 80% { transform: rotate(10deg); }
+    30%, 50%, 70% { transform: rotate(-10deg); }
+    40%, 60% { transform: rotate(10deg); }
+}
+
+.notificacion-campana.animating i {
+    animation: bell-shake 0.5s ease-in-out;
+}
+
+.logo-container {
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.logo-container img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
+
+
+
+
+
+
+
+
+
+/* Search bar styles */
+.barra-busqueda {
+    flex: 1;
+    min-width: 120px;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.barra-busqueda input {
+    width: 100%;
+    padding: 10px 16px;
+    background: #272729;
+    border: 1px solid #343536;
+    border-radius: 4px;
+    color: #d7dadc;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.barra-busqueda input:focus {
+    border-color: #a304fa;
+    box-shadow: 0 0 5px rgba(163, 4, 250, 0.3);
+    outline: none;
+}
+
+.barra-busqueda button {
+    background: #cf7cfc;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.barra-busqueda button:hover {
+    background: #a304fa;
+    transform: scale(1.05);
+}
+
+
+.boton {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.boton-traducir {
+    background: transparent;
+    color: #d7dadc;
+    padding: 8px;
+}
+
+.boton-traducir:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.boton-sesion {
+    background: #984eb6;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.boton-sesion:hover {
+    background: #7a3d93;
+    transform: scale(1.05);
+}
+
+/* Profile icon styles */
+.icono-perfil {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+}
+
+.icono-perfil img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .contenido-encabezado {
+        gap: 8px;
+    }
+    
+    .barra-busqueda {
+        max-width: 200px;
+    }
+    
+    .boton-tradu    cir span {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .encabezado-principal {
+        padding: 8px 12px;
+    }
+    
+    .barra-busqueda {
+        max-width: 150px;
+    }
+    
+    .botones-accion {
+        gap: 8px;
+    }
+    
+    .boton {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.encabezado-principal {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.3s ease-in-out;
+}
+
+
+
+
+
+
+/* Contenedor del perfil */
+.icono-perfil {
+    position: relative;
+    margin-left: 15px;
+    
+}
+
+/* Estilos de la imagen de perfil */
+.icono-perfil img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #cf7cfc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    
+}
+
+.icono-perfil img:hover {
+    transform: scale(1.1);
+    border-color: #a304fa;
+    box-shadow: 0 0 15px rgba(163, 4, 250, 0.3);
+    
+}
+
+/* Menú desplegable */
+.perfil-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 250px;
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    border-radius: 12px;
+    padding: 15px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    margin-top: 12px; /* Ajusta el valor según necesites */
+
+}
+
+
+/* Clase activa para el menú desplegable */
+.perfil-dropdown.activo {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    
+}
+
+/* Lista de opciones */
+.perfil-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+}
+
+.perfil-dropdown ul li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: white;
+    text-decoration: none;
+    background-color: rgba(163, 4, 250, 0.8);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
+    position: relative;
+    overflow: hidden;
+    
+}
+
+/* Efecto hover en las opciones */
+.perfil-dropdown ul li a:hover {
+    background-color: #620296;
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(163, 4, 250, 0.3);
+    
+}
+
+/* Efecto de brillo al hover */
+.perfil-dropdown ul li a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: 0.5s;
+    
+}
+
+.perfil-dropdown ul li a:hover::before {
+    left: 100%;
+    
+}
+
+/* Iconos en las opciones */
+.perfil-dropdown ul li a i {
+    margin-right: 10px;
+    font-size: 1.1em;
+    opacity: 0.9;
+    
+}
+
+/* Divisor entre secciones */
+.perfil-dropdown .divisor {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 0;
+    
+}
+
+/* Ajustamos el elemento del menú para que no se rompa en dos líneas */
+.perfil-dropdown ul li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: white;
+    text-decoration: none;
+    background-color: rgba(163, 4, 250, 0.8);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap; /* Evita que el texto se rompa en múltiples líneas */
+}
+
+/* Reposicionamos el badge nuevo */
+.badge-nuevo {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ff3366;
+    color: white;
+    padding: 1px 4px;
+    border-radius: 6px;
+    font-size: 0.6em;
+    letter-spacing: -0.3px;
+    text-transform: lowercase;
+    line-height: 1.2;
+    
+}
+
+/* Aseguramos que los iconos mantengan su espacio correcto */
+.perfil-dropdown ul li a i {
+    margin-right: 10px;
+    font-size: 1.1em;
+    opacity: 0.9;
+    flex-shrink: 0; /* Evita que el icono se encoja */
+    
+}
+
+
+
+
+
+
+/* Estilos base del botón del menú */
+.boton-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 25px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 10px;
+    z-index: 1002;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.boton-menu:hover {
+    transform: scale(1.05);
+}
+
+.boton-menu span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 3px;
+    transition: all 0.4s ease;
+}
+
+.boton-menu.activo span:nth-child(1) {
+    transform: rotate(45deg) translate(4px, 4px);
+}
+
+.boton-menu.activo span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-12px);
+}
+
+.boton-menu.activo span:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+}
+
+/* Overlay del menú */
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 55px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.menu-overlay.activo {
+    display: block;
+    opacity: 1;
+}
+
+/* Navegación principal */
+.navegacion-principal {
+    position: fixed;
+    top: 70px;
+    left: -100%;
+    border-radius: 0 20px 20px 0;
+    width: 280px;
+    height: calc(100vh - 80px);
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    padding: 12px;
+    z-index: 1000;
+    transition: all 0.4s ease;
+    overflow-y: auto;
+    opacity: 0;
+}
+
+.navegacion-principal.activo {
+    left: 0;
+    opacity: 1;
+}
+
+.navegacion-principal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 1;
+}
+
+.navegacion-principal ul li a {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: white;
+    text-decoration: none;
+    background-color: rgba(163, 4, 250, 0.9);
+    border-radius: 6px;
+    transition: background 0.3s ease;
+    font-size: 0.85em;
+}
+
+.navegacion-principal ul li a:hover {
+    background-color: #620296;
+}
+
+.navegacion-principal ul li a i {
+    margin-right: 6px;
+    font-size: 0.95em;
+}
+
+/* Badges */
+.badge {
+    position: absolute;
+    right: 6px;
+    background: #ff3366;
+    color: white;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-size: 0.7em;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .navegacion-principal {
+        background: linear-gradient(135deg, #2a1f31 0%, #4a0173 100%);
+    }
+}
+
+/* Ajuste para móviles */
+@media (max-width: 768px) {
+    .navegacion-principal {
+        width: 240px;
+    }
+    
+    .navegacion-principal ul li a {
+        padding: 8px;
+        font-size: 0.8em;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+    /*css de footer*/
+
+    .pie-principal {
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        position: relative;
+    }
+    
+    
+    /* Mascota */
+    
+    .pixeleado{
+        image-rendering: pixelated;
+        image-rendering: crisp-edges; /* Para compatibilidad con más navegadores */
+    }
+    
+    
+    .micro-mascota {
+        position: fixed;
+        bottom: 0px;
+        left: 0;
+        width: 150px;
+        z-index: 9999;
+        pointer-events: none;
+        animation: animacionCaminar 10s linear infinite;
+    }
+    
+    /* Animación de caminata con giro en los extremos */
+    @keyframes animacionCaminar {
+        0% {
+            left: 0;
+            transform: translateY(0) scaleX(1);
+        }
+        15% {
+            left: 0;
+            transform: translateY(-5px) scaleX(1);
+        }
+        45% {
+            left: calc(100% - 150px);
+            transform: translateY(-5px) scaleX(1);
+        }
+        50% {
+            left: calc(100% - 150px);
+            transform: translateY(0) scaleX(-1);
+        }
+        65% {
+            left: calc(100% - 150px);
+            transform: translateY(-5px) scaleX(-1);
+        }
+        95% {
+            left: 0;
+            transform: translateY(-5px) scaleX(-1);
+        }
+        100% {
+            left: 0;
+            transform: translateY(0) scaleX(1);
+        }
+    }
+    /*fin de css footer*/
