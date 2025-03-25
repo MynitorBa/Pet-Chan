@@ -1,0 +1,132 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.corral-container {
+    background-color: rgba(98, 2, 150, 0.95);
+    border: 4px solid #d304c5;
+    border-radius: 15px;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.corral-header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.corral-escenario {
+    background: linear-gradient(to bottom, #620296, #3d0064);
+    border: 3px solid #cf7cfc;
+    border-radius: 10px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.mascota {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.inventario-secciones {
+    display: flex;
+    gap: 15px;
+}
+
+.seccion-inventario {
+    flex: 1;
+    background: rgba(163, 4, 250, 0.2);
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.inventario-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+.item-inventario {
+    background: rgba(98, 2, 150, 0.8);
+    border: 1px solid #cf7cfc;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: grab;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.item-inventario.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+}
+
+.item-inventario:hover {
+    background: rgba(163, 4, 250, 0.8);
+}
+
+.item-inventario img {
+    width: 50px;
+    height: 50px;
+    image-rendering: pixelated;
+    margin-bottom: 5px;
+}
+
+.cantidad-item {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #d304c5;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .inventario-secciones {
+        flex-direction: column;
+    }
+
+    .inventario-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/*css extra*/
+
+.micro-mascota {
+    display: none;
+}

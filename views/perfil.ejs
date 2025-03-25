@@ -1,0 +1,65 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/perfil.css">
+
+<div class="contenedor-perfil">
+    <div class="cabecera">
+        <div class="info-usuario">
+            <img src="./perfil de prueba.png" alt="Avatar de Usuario" class="avatar">
+            <div>
+                <h1>★★ Usuario ejemplo ★★</h1>
+                <p>⊱ Membrecía desde: <span> 2024 </span> ⊰</p>
+                <p>✧ Numero de publicaciones: <span>1,337</span> | Reputación: <span> Veterano </span> ✧</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="estadisticas">
+        <h2>○•○ Inventario de Usuario ○•○</h2>
+        <div class="insignias">
+            <div class="insignia" title="Coleccionista Maestro">🏆</div>
+            <div class="insignia" title="Espíritu Creativo">🎨</div>
+            <div class="insignia" title="Maestro de Mascotas">🐾</div>
+            <div class="insignia" title="Estrella del Foro">⭐</div>
+            <div class="insignia" title="Campeón de Juegos">🎮</div>
+            <div class="insignia" title="Usuario Amistoso">💝</div>
+        </div>
+    </div>
+
+    <div class="seccion-mascota">
+        <div class="esquina-pixel esquina-pixel-si"></div>
+        <div class="esquina-pixel esquina-pixel-sd"></div>
+        <div class="esquina-pixel esquina-pixel-ii"></div>
+        <div class="esquina-pixel esquina-pixel-id"></div>
+        
+        <h2>★★ <span>Luna</span> <span>la</span> <span>DragonStrella</span> ★★</h2>
+        <div class="contenedor-mascota">
+            <img src="<%= rutaImagen %>" alt="Mascota Virtual" class="pixeleado imagen-mascota">
+            <div class="estadisticas-mascota">
+                <h3>✧ Estadística de tu Mascota ✧</h3>
+                <div class="etiqueta-estadistica">
+                    <span>Felicidad</span>
+                    <span>85%</span>
+                </div>
+                <div class="barra-progreso">
+                    <div class="progreso" style="width: 85%"></div>
+                </div>
+                
+                <div class="etiqueta-estadistica">
+                    <span>Energía</span>
+                    <span>70%</span>
+                </div>
+                <div class="barra-progreso">
+                    <div class="progreso" style="width: 70%"></div>
+                </div>
+                
+                <p>✧ Nivel de Amor: <span>42</span></p>
+                <p>✧ Habilidad Especial: * <span>Tiro de Estrellas</span> *</p>
+                <p>✧ Comida Favorita: ⊱ <span>Galletas Cósmicas</span> ⊰</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("partials/footer.ejs") %>

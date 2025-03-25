@@ -1,0 +1,57 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/corral.css">
+
+
+<div class="corral-container">
+    <h1 class="corral-header">★ Corral de Luna ★</h1>
+    
+    <div class="corral-escenario" id="corral-escenario">
+        <img src="<%= rutaImagen %>" alt="Mascota Luna" class="mascota" id="mascota">
+    </div>
+    
+    <div class="inventario-secciones">
+        <div class="seccion-inventario">
+            <h3 style="text-align: center; margin-bottom: 10px;">✧ Comida ✧</h3>
+            <div class="inventario-grid" id="inventario-comida">
+                <div class="item-inventario" draggable="true" data-tipo="comida">
+                    <img src="./comida.gif" alt="Comida">
+                    <div>Comida</div>
+                    <div class="cantidad-item">3</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="seccion-inventario">
+            <h3 style="text-align: center; margin-bottom: 10px;">✧ Juguetes ✧</h3>
+            <div class="inventario-grid" id="inventario-juguetes">
+                <div class="item-inventario" draggable="true" data-tipo="juguete1">
+                    <img src="./juguete1.gif" alt="Pelota">
+                    <div>Pelota</div>
+                </div>
+                <div class="item-inventario" draggable="true" data-tipo="juguete2">
+                    <img src="./juguete2.gif" alt="Peluche">
+                    <div>Peluche</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="seccion-inventario">
+            <h3 style="text-align: center; margin-bottom: 10px;">✧ Fondos ✧</h3>
+            <div class="inventario-grid" id="inventario-fondos">
+                <div class="item-inventario" draggable="true" data-tipo="1">
+                    <img src="imagenes_de_corrales/1.jpg" alt="Bosque">
+                    <div>Bosque</div>
+                </div>
+                <div class="item-inventario" draggable="true" data-tipo="2">
+                    <img src="imagenes_de_corrales/2.jpg" alt="Playa">
+                    <div>Playa</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="scripts/corral.js"></script>
+
+<%- include("partials/footer.ejs") %>
