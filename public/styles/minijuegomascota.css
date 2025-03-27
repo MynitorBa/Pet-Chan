@@ -1,0 +1,440 @@
+/* Estilos base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'VT323', monospace;
+    background-color: #2a0042;
+    color: #fff;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(163, 4, 250, 0.3) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(211, 4, 197, 0.3) 0%, transparent 25%);
+}
+
+/* Contenedor del juego */
+.game-container {
+    width: 90%;
+    max-width: 600px;
+    height: 500px;
+    background-color: rgba(98, 2, 150, 0.95);
+    border: 4px solid #d304c5;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 0 30px rgba(163, 4, 250, 0.7);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Título y encabezado */
+.game-header {
+    text-align: center;
+    margin-bottom: 20px;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    transition: opacity 0.5s ease;
+}
+
+.game-title {
+    font-size: 2rem;
+    color: #fff;
+    text-shadow: 0 0 10px #a304fa, 0 0 20px #a304fa;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.game-subtitle {
+    font-size: 1.1rem;
+    color: #cf7cfc;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Área de juego */
+.game-area {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Regalo */
+.gift-box {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    transform-origin: center;
+    z-index: 5;
+    background-image: url('https://png.pngtree.com/png-clipart/20220908/ourmid/pngtree-christmas-gift-icon-pixel-png-image_6142466.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+}
+
+/* Partículas */
+.particle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 4;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Mascota */
+.pet {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.5s ease;
+    z-index: 3;
+    image-rendering: pixelated;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+}
+
+/* Instrucciones */
+.instructions {
+    position: absolute;
+    bottom: 80px;
+    text-align: center;
+    color: #cf7cfc;
+    font-size: 1.2rem;
+    z-index: 10;
+    width: 100%;
+    padding: 0 20px;
+    transition: opacity 0.5s ease;
+}
+
+/* Contador de vueltas */
+.spin-counter {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1.5rem;
+    color: gold;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.8);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Barra de progreso */
+.progress-container {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 15px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff9ff3, #feca57, #ff6b6b, #48dbfb);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* Botones */
+.game-button {
+    padding: 10px 20px;
+    border: 2px solid #cf7cfc;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #a304fa 0%, #d304c5 100%);
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'VT323', monospace;
+    display: none;
+    margin-top: 20px;
+    z-index: 10;
+    position: absolute;
+    bottom: 20px;
+}
+
+.game-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(211, 4, 197, 0.7);
+}
+
+/* Efecto de brillo */
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(211, 4, 197, 0.7); }
+    50% { box-shadow: 0 0 25px rgba(211, 4, 197, 1); }
+}
+
+/* Animación de caída - actualizada para centrar verticalmente */
+@keyframes fallDown {
+    0% { top: -150px; transform: translateX(-50%) rotate(0deg); }
+    85% { top: 50%; transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+    90% { top: 50%; transform: translateX(-50%) translateY(-50%) rotate(5deg); }
+    95% { top: 50%; transform: translateX(-50%) translateY(-50%) rotate(-5deg); }
+    100% { top: 50%; transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+}
+
+/* Animación de apertura - actualizada para mantener el centrado */
+@keyframes openGift {
+    0% { transform: translateX(-50%) translateY(-50%) scale(1) rotate(0deg); }
+    50% { transform: translateX(-50%) translateY(-50%) scale(1.5) rotate(180deg); }
+    75% { opacity: 0.5; }
+    100% { transform: translateX(-50%) translateY(-50%) scale(0) rotate(360deg); opacity: 0; }
+}
+
+/* Animación de aparición de mascota */
+/* Animación de aparición de mascota */
+@keyframes petAppear {
+0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.2); }
+100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Animación de partículas */
+@keyframes particleMove {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) scale(0.2); opacity: 0; }
+}
+
+/* Animación de explosión */
+@keyframes explosion {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+/* Estrellas flotantes */
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #cf7cfc;
+    border-radius: 50%;
+    opacity: 0.6;
+    z-index: 1;
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Estado del nombre */
+.pet-name-container {
+    position: absolute;
+    bottom: 60px;
+    text-align: center;
+    width: 100%;
+    display: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.pet-name-input {
+    padding: 10px;
+    width: 200px;
+    background-color: rgba(20, 12, 12, 0.7);
+    border: 2px solid #cf7cfc;
+    border-radius: 5px;
+    color: #fff;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.pet-name-input:focus {
+    outline: none;
+    border-color: #a304fa;
+    box-shadow: 0 0 10px rgba(163, 4, 250, 0.5);
+}
+
+/* Indicador de tecla espacio */
+.space-key-indicator {
+    position: absolute;
+    bottom: 120px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1rem;
+    color: #a304fa;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.space-key {
+    display: inline-block;
+    padding: 5px 15px;
+    background-color: rgba(163, 4, 250, 0.3);
+    border: 1px solid #a304fa;
+    border-radius: 5px;
+    margin-left: 5px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Efecto de explosión */
+.explosion {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 15px;
+        height: 450px;
+        width: 95%;
+    }
+
+    .game-title {
+        font-size: 1.5rem;
+    }
+
+    .game-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .instructions {
+        font-size: 1rem;
+        bottom: 70px;
+    }
+    
+    .pet-name-container {
+        bottom: 50px;
+    }
+    
+    .pet-name-input {
+        width: 180px;
+        padding: 8px;
+    }
+    
+    .game-button {
+        padding: 8px 16px;
+        font-size: 1rem;
+        bottom: 15px;
+    }
+    
+    .pet {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .spin-counter {
+        top: 15px;
+        font-size: 1.3rem;
+    }
+    
+    .progress-container {
+        top: 50px;
+    }
+
+    .space-key-indicator {
+        bottom: 100px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .game-container {
+        height: 400px;
+    }
+    
+    .game-title {
+        font-size: 1.3rem;
+    }
+    
+    .game-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .instructions {
+        font-size: 0.9rem;
+        bottom: 60px;
+    }
+    
+    .pet-name-container {
+        bottom: 40px;
+    }
+    
+    .pet {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .spin-counter {
+        top: 10px;
+        font-size: 1.1rem;
+    }
+    
+    .progress-container {
+        top: 40px;
+        height: 12px;
+    }
+
+    .space-key-indicator {
+        bottom: 90px;
+        font-size: 0.8rem;
+    }
+}
+
+.pet-nombre-formulario{
+    display: flex !important; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}

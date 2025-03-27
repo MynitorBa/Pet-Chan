@@ -169,11 +169,3 @@ document.querySelectorAll('.boton.cancelar').forEach(boton => {
     });
 });
 
-// Agregar listeners de formulario simplificados (sin funcionalidad de actualización)
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        // La funcionalidad de actualización ha sido eliminada
-        // Solo se mantiene la prevención del envío del formulario
-    });
-});
