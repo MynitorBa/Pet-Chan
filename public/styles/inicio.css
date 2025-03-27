@@ -1,15 +1,22 @@
-/* Estilos generales */
+body {
+    font-family: 'Press Start 2P', cursive;    
+    background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    height: 100vh;
+    overflow-y: auto;
+    padding-top: 60px;
+    text-align: justify;
+}
+
 main {
     padding: 70px;
 }
 
-h1, h2, h3 {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    margin: 10px 0;
-    font-size: xx-large;
-}
-
-/* CSS del cuerpo */
 .contenedor-inicio {
     max-width: 800px;
     margin: 0 auto;
@@ -64,6 +71,14 @@ h1, h2, h3 {
     border: 2px dashed #cf7cfc;
 }
 
+.editor-publicacion {
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 15px;
+}
+
 .entrada-publicacion {
     width: calc(100% - 24px);
     min-height: 100px;
@@ -88,107 +103,471 @@ h1, h2, h3 {
     font-family: inherit;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .boton-publicar:hover {
     background: #a304fa;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(163, 4, 250, 0.4);
 }
 
+.preview-imagen {
+    margin-top: 15px;
+    display: none;
+    position: relative;
+}
+
+.preview-imagen .marco-dorado {
+    padding: 3px;
+    margin: 0 auto;
+}
+
+.preview-imagen img {
+    max-width: 100%;
+    max-height: 300px;
+    display: block;
+    margin: 0 auto;
+    border-radius: 4px;
+}
+
+.eliminar-imagen {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.herramientas-publicacion {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-herramienta {
+    background: rgba(207, 124, 252, 0.2);
+    border: none;
+    color: #cf7cfc;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-herramienta:hover {
+    background: rgba(207, 124, 252, 0.4);
+    transform: scale(1.1);
+}
+
+/* ---------------------------- */
+/* SECCIÓN DE COMENTARIOS - BRILLO CIBERNÉTICO */
+/* ---------------------------- */
+
+/* ---------------------------- */
+/* SECCIÓN DE COMENTARIOS - BRILLO BLANCO Y MORADO */
+/* ---------------------------- */
+
 .comentarios-recientes {
-    background: rgba(163, 4, 250, 0.1);
-    padding: 20px;
+    background: rgba(25, 15, 35, 0.9);
+    border: 2px solid #cf7cfc;
     border-radius: 10px;
     margin-top: 40px;
-    border: 2px solid #cf7cfc;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(163, 4, 250, 0.4);
+    z-index: 1;
+}
+
+/* Fondo de líneas digitales blancas */
+.comentarios-recientes::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            transparent 100%);
+    background-size: 30px 30px;
+    opacity: 0.6;
+    z-index: -1;
+    animation: circuit-move 60s linear infinite;
+}
+
+@keyframes circuit-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 1000px; }
+}
+
+/* Efecto de borde brillante */
+.comentarios-recientes::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 12px;
+    background: linear-gradient(45deg, 
+        transparent 40%, 
+        rgba(255, 255, 255, 0.7) 50%, 
+        transparent 60%);
+    background-size: 300% 300%;
+    z-index: -1;
+    animation: cyber-border 6s linear infinite;
+    filter: blur(1px);
+    opacity: 0.5;
+}
+
+@keyframes cyber-border {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 200%; }
+}
+
+.comentarios-recientes h2 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Subtítulo blanco */
+.comentarios-recientes h2::after {
+    content: 'COMENTARIOS RECIENTES';
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
 }
 
 .lista-comentarios {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     margin-top: 15px;
+    position: relative;
+}
+
+/* Línea conectadora blanca */
+.lista-comentarios::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 35px;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 10%,
+        rgba(255, 255, 255, 0.3) 90%,
+        transparent 100%);
+    z-index: 0;
 }
 
 .comentario {
     display: flex;
     gap: 15px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    background: rgba(40, 25, 60, 0.7);
     border-radius: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #cf7cfc;
+    border: 1px solid rgba(207, 124, 252, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    z-index: 1;
+}
+
+/* Punto de conexión blanco */
+.comentario::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -35px;
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    z-index: 2;
+}
+
+/* Efecto de holograma blanco */
+.comentario::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    background: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0) 40%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0) 60%);
+    transform: rotate(45deg);
+    animation: hologram-effect 4s linear infinite;
+    opacity: 0.3;
+    z-index: -1;
+}
+
+@keyframes hologram-effect {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.comentario:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(207, 124, 252, 0.6);
+    border-color: rgba(207, 124, 252, 0.6);
+}
+
+.comentario:hover::after {
+    opacity: 0.5;
 }
 
 .avatar-comentario {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: 2px solid #cf7cfc;
+    object-fit: cover;
+    transition: all 0.4s ease;
+    position: relative;
+    box-shadow: 0 0 15px rgba(207, 124, 252, 0.5);
+    filter: drop-shadow(0 0 5px rgba(207, 124, 252, 0.7));
 }
 
-.contenido-comentario {
-    flex: 1;
+/* Efecto de escaneo blanco en avatar */
+.avatar-comentario::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.8) 50%, 
+        transparent 100%);
+    animation: avatar-scan 3s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes avatar-scan {
+    0% { top: -10px; }
+    100% { top: 70px; }
+}
+
+.comentario:hover .avatar-comentario {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(207, 124, 252, 0.8);
 }
 
 .autor-comentario {
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: #cf7cfc;
+    font-size: 1.1rem;
+    text-shadow: 0 0 8px rgba(207, 124, 252, 0.5);
+    letter-spacing: 0.5px;
+}
+
+.fecha-comentario {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: 10px;
+    font-weight: normal;
+    position: relative;
 }
 
 .texto-comentario {
-    margin: 0;
+    margin: 10px 0;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    position: relative;
 }
 
-/* Estilos para los foros populares */
+/* Efecto de líneas blancas en fondo de comentario */
+.texto-comentario::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(transparent 95%, rgba(255, 255, 255, 0.03) 100%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.acciones-comentario {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+/* Acciones en blanco */
+.accion-comentario {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    position: relative;
+    padding: 5px 10px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    letter-spacing: 1px;
+}
+
+.accion-comentario i {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: #cf7cfc;
+}
+
+.accion-comentario:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.accion-comentario:hover i {
+    transform: scale(1.2);
+    color: #ffffff;
+}
+
+.accion-comentario.activo {
+    color: #ffffff;
+    background: rgba(207, 124, 252, 0.3);
+    text-shadow: 0 0 10px rgba(207, 124, 252, 0.5);
+}
+
+
+/* ---------------------------- */
+/* SECCIÓN DE FOROS (COLORES ORIGINALES) */
+/* ---------------------------- */
+
 .foros-populares {
-    margin-top: 20px;
+    background-color: rgba(163, 4, 250, 0.1);
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+.foros-populares h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .grid-mensajes {
     display: grid;
-    gap: 20px;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .mensaje-foro {
-    background: rgba(163, 4, 250, 0.2);
-    padding: 15px;
-    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid #cf7cfc;
-    position: relative;
+    border-radius: 10px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.mensaje-foro:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(207, 124, 252, 0.4);
 }
 
 .mensaje-destacado {
-    border: 2px solid #d304c5;
-    background: rgba(163, 4, 250, 0.3);
+    border: 2px solid #ffd700;
+    background-color: rgba(56, 56, 53, 0.1);
 }
 
 .votos {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-voto {
+    background: none;
+    border: none;
+    color: #cf7cfc;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+}
+
+.btn-voto:hover {
+    color: #fff;
+}
+
+.btn-voto.activo {
+    color: #ffd700;
 }
 
 .contador-votos {
-    margin: 5px 0;
+    font-weight: bold;
+    color: #fff;
+    min-width: 30px;
+    text-align: center;
 }
 
 .titulo-mensaje {
-    margin-top: 0;
+    color: #ffffff;
     margin-bottom: 10px;
-    padding-right: 50px;
+    font-size: 1.1rem;
 }
 
 .autor-mensaje {
     display: flex;
     align-items: center;
     gap: 8px;
+    color: #aaa;
     margin-bottom: 10px;
+    font-size: 0.9rem;
 }
 
 .indicador-actividad {
+    display: inline-block;
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -196,65 +575,537 @@ h1, h2, h3 {
 
 .actividad-alta {
     background-color: #00ff00;
+    box-shadow: 0 0 5px #00ff00;
 }
 
 .actividad-media {
-    background-color: #ffff00;
+    background-color: #ffcc00;
+    box-shadow: 0 0 5px #ffcc00;
 }
 
 .autor-badge {
-    background: #d304c5;
+    background: rgba(207, 124, 252, 0.3);
     padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    color: #cf7cfc;
 }
 
 .contenido-mensaje {
+    color: #fff;
     margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.imagen-foro-container {
+    margin: 10px 0;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.imagen-foro {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 8px;
+    border: 1px solid #cf7cfc;
+    transition: all 0.3s ease;
+    cursor: zoom-in;
+}
+
+.imagen-foro:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(207, 124, 252, 0.5);
 }
 
 .etiquetas {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 10px;
     flex-wrap: wrap;
 }
 
 .etiqueta {
-    background: #620296;
-    padding: 3px 8px;
-    border-radius: 4px;
+    background: rgba(207, 124, 252, 0.2);
+    color: #cf7cfc;
+    padding: 5px 10px;
+    border-radius: 5px;
     font-size: 0.8rem;
 }
 
 .acciones-mensaje {
     display: flex;
     gap: 10px;
+    margin-top: 15px;
 }
 
 .btn-accion {
-    background: transparent;
+    background: rgba(207, 124, 252, 0.1);
     border: 1px solid #cf7cfc;
+    color: #cf7cfc;
     padding: 5px 10px;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s;
-    color: #fff;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .btn-accion:hover {
     background: rgba(207, 124, 252, 0.3);
 }
 
-.mensaje-foro img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-bottom: 10px;
+/* ---------------------------- */
+/* MODAL IMAGEN */
+/* ---------------------------- */
+
+.modal-imagen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.97);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Estilos responsive */
-@media (max-width: 600px) {
+.modal-contenido {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 3px;
+    box-shadow: 0 0 30px rgba(207, 124, 252, 0.6);
+}
+
+.marco-modal {
+    padding: 5px;
+    position: relative;
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cerrar-modal:hover {
+    color: #cf7cfc;
+    transform: scale(1.1);
+}
+
+/* ---------------------------- */
+/* MARCOS DORADOS AJUSTADOS */
+/* ---------------------------- */
+
+.marco-dorado {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+    padding: 3px;
+    background: linear-gradient(135deg, #ffd700, #ffec80, #ffd700);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    overflow: hidden; /* Asegura que el contenido no sobresalga */
+    line-height: 0; /* Elimina espacio extra en la parte inferior */
+}
+
+.marco-dorado img {
+    display: block; /* Elimina espacio inferior en imágenes */
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    background: #000;
+}
+
+/* Marco para imágenes de comentarios */
+.imagen-comentario-container .marco-dorado {
+    max-width: 100%;
+    margin: 10px auto;
+}
+
+.imagen-comentario-container .marco-dorado img {
+    max-height: 350px;
+    object-fit: contain;
+}
+
+/* Marco para imágenes de foros */
+.imagen-foro-container .marco-dorado {
+    max-width: 100%;
+    margin: 10px auto;
+}
+
+.imagen-foro-container .marco-dorado img {
+    max-height: 220px;
+    object-fit: contain;
+}
+
+/* Marco para preview de imágenes */
+.preview-imagen .marco-dorado {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.preview-imagen .marco-dorado img {
+    max-height: 300px;
+    object-fit: contain;
+}
+
+/* Efecto de carga para imágenes */
+.marco-dorado:not(.cargado)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(30, 15, 45, 0) 0%, 
+        rgba(207, 124, 252, 0.3) 50%, 
+        rgba(30, 15, 45, 0) 100%);
+    animation: carga-brillo 1.5s infinite;
+}
+
+/* ---------------------------- */
+/* AJUSTES ESPECÍFICOS PARA IMÁGENES */
+/* ---------------------------- */
+
+.imagen-comentario, 
+.imagen-foro,
+.preview-imagen img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Contenedores de imagen ajustados */
+.imagen-comentario-container,
+.imagen-foro-container {
+    width: 100%;
+    margin: 12px 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* ---------------------------- */
+/* ANIMACIONES */
+/* ---------------------------- */
+
+@keyframes carga-brillo {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ---------------------------- */
+/* EFECTOS HOVER */
+/* ---------------------------- */
+
+.marco-dorado:hover {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.marco-dorado:hover img {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(207, 124, 252, 0.5);
+}
+
+/* ---------------------------- */
+/* ANIMACIONES */
+/* ---------------------------- */
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lista-comentarios .comentario,
+.grid-mensajes .mensaje-foro {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.lista-comentarios .comentario:nth-child(1),
+.grid-mensajes .mensaje-foro:nth-child(1) { animation-delay: 0.1s; }
+.lista-comentarios .comentario:nth-child(2),
+.grid-mensajes .mensaje-foro:nth-child(2) { animation-delay: 0.2s; }
+.lista-comentarios .comentario:nth-child(3),
+.grid-mensajes .mensaje-foro:nth-child(3) { animation-delay: 0.3s; }
+.lista-comentarios .comentario:nth-child(4),
+.grid-mensajes .mensaje-foro:nth-child(4) { animation-delay: 0.4s; }
+
+/* ---------------------------- */
+/* RESPONSIVE */
+/* ---------------------------- */
+
+@media (max-width: 768px) {
+    main {
+        padding: 20px;
+    }
+    
+    .contenedor-inicio {
+        padding: 15px;
+    }
+    
+    .seccion-hero {
+        min-height: 200px;
+    }
+    
+    .seccion-hero h1 {
+        font-size: 1.8rem;
+    }
+    
     .grid-mensajes {
         grid-template-columns: 1fr;
     }
+    
+    .comentario {
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    .avatar-comentario {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+    }
+    
+    .acciones-comentario {
+        gap: 10px;
+        justify-content: space-between;
+    }
+    
+    .accion-comentario {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .btn-accion {
+        font-size: 0.7rem;
+        padding: 6px 8px;
+    }
+}
+
+/* ---------------------------- */
+/* SECCIÓN DE FOROS CON BRILLO ESPECTACULAR */
+/* ---------------------------- */
+
+.foros-populares {
+    background-color: rgba(163, 4, 250, 0.15); /* Más claro */
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(207, 124, 252, 0.4);
+}
+
+.foros-populares::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #ff00ff 20%,
+        #cf7cfc 50%, 
+        #ff00ff 80%,
+        transparent 100%);
+    animation: laser-scan 3s linear infinite;
+}
+
+@keyframes laser-scan {
+    0% { top: 0; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.foros-populares h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(207, 124, 252, 0.7);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.foros-populares h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #cf7cfc 20%,
+        #ff00ff 50%,
+        #cf7cfc 80%,
+        transparent 100%);
+    animation: neon-pulse 2s infinite;
+}
+
+@keyframes neon-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+.grid-mensajes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.mensaje-foro {
+    background-color: rgba(255, 255, 255, 0.1); /* Más claro */
+    border: 1px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 5px 15px rgba(207, 124, 252, 0.2);
+}
+
+.mensaje-foro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(135deg, rgba(207, 124, 252, 0.1) 0%, transparent 50%, rgba(207, 124, 252, 0.1) 100%),
+        repeating-linear-gradient(
+            45deg,
+            rgba(207, 124, 252, 0.05) 0px,
+            rgba(207, 124, 252, 0.05) 1px,
+            transparent 1px,
+            transparent 10px
+        );
+    z-index: -1;
+}
+
+.mensaje-foro::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 45%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0) 55%
+    );
+    transform: rotate(30deg);
+    opacity: 0;
+    transition: opacity 0.5s;
+    animation: brillo-deslizante 6s linear infinite;
+}
+
+.mensaje-foro:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(207, 124, 252, 0.5);
+}
+
+.mensaje-foro:hover::after {
+    opacity: 0.5;
+}
+
+@keyframes brillo-deslizante {
+    0% { transform: translateX(-100%) rotate(30deg); }
+    100% { transform: translateX(100%) rotate(30deg); }
+}
+
+.mensaje-destacado {
+    border: 2px solid #ffd700;
+    background-color: rgba(255, 215, 0, 0.05);
+    animation: destello-dorado 3s infinite alternate;
+}
+
+@keyframes destello-dorado {
+    0% { 
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        border-color: rgba(255, 215, 0, 0.8);
+    }
+    100% { 
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+        border-color: #ffd700;
+    }
+}
+
+/* ---------------------------- */
+/* COMENTARIOS MÁS CLAROS */
+/* ---------------------------- */
+
+.comentarios-recientes {
+    background: rgba(163, 4, 250, 0.15); /* Más claro */
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    margin-top: 40px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(207, 124, 252, 0.3);
+}
+
+.comentario {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1); /* Más claro */
+    border-radius: 10px;
+    border: 1px solid rgba(207, 124, 252, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(3px);
+}
+
+.comentario::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+        transparent 0%,
+        #cf7cfc 50%,
+        transparent 100%);
+    opacity: 0.5;
+}
+
+.comentario:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(207, 124, 252, 0.4);
+}
+
+.comentario:hover::before {
+    opacity: 1;
+    animation: rayo-lateral 1.5s infinite;
+}
+
+@keyframes rayo-lateral {
+    0% { top: -50%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 150%; opacity: 0; }
 }
