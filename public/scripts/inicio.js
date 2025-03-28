@@ -456,7 +456,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const nuevoComentario = {
             id: Date.now(),
             avatar: 'https://th.bing.com/th/id/OIP.rIsI3TvodysyTi_2VOGK3gHaHa?rs=1&pid=ImgDetMain',
-            autor: 'Usuario',
+            autor: sessionStorage.getItem('username') || 'Usuario',
+
             texto: texto || '',
             fecha: 'Hace unos momentos',
             likes: 0,
