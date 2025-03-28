@@ -123,6 +123,27 @@ body {
     margin: 20px 0;
 }
 
+.evento-destacado {
+    border: 2px solid #ffd700;
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.evento-destacado::before {
+    content: "⭐";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    background: #252525;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
 .control-btn {
     background: rgba(207, 124, 252, 0.2);
     border: 1px solid #cf7cfc;
@@ -178,16 +199,7 @@ body {
     background-position: center;
 }
 
-.evento::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 1;
-}
+
 
 .evento:hover {
     transform: translateY(-5px);
@@ -563,6 +575,213 @@ body {
     }
     
     .acciones-evento {
+        flex-direction: column;
+    }
+}
+
+
+/* Estilos para el formulario de inscripción */
+.formulario-inscripcion {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    color: #ffb8ff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group input, 
+.form-group textarea {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #cf7cfc;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-family: inherit;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.boton-enviar {
+    background: #cf7cfc;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.boton-enviar:hover {
+    background: #a304fa;
+}
+
+/* Estilos para las opciones de compartir */
+.redes-sociales {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.boton-red-social {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+}
+
+.boton-red-social:hover {
+    transform: translateY(-2px);
+}
+
+.boton-red-social.facebook {
+    background: #3b5998;
+}
+
+.boton-red-social.twitter {
+    background: #1da1f2;
+}
+
+.boton-red-social.whatsapp {
+    background: #25d366;
+}
+
+.boton-red-social.copiar {
+    background: #620296;
+}
+
+/* Estilos para iconos */
+i {
+    font-size: 1rem;
+}
+
+/* Estilos para el modal de detalles */
+.modal-info-adicional {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-info-adicional p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+}
+
+.modal-acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-acciones button {
+    flex: 1;
+}
+
+
+
+/* Marco dorado */
+.marco-dorado {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 3px solid #ffd700;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Efecto de brillo mejorado */
+.brillo-evento {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 215, 0, 0.4), 
+        transparent
+    );
+    animation: brillo 3s infinite;
+    z-index: 1;
+}
+
+@keyframes brillo {
+    0% { left: -100%; opacity: 0.5; }
+    100% { left: 100%; opacity: 1; }
+}
+
+/* Reflejo mejorado */
+.reflejo {
+    position: absolute;
+    bottom: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle, 
+        rgba(255, 215, 0, 0.2), 
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    z-index: 1;
+}
+
+/* Animación de título */
+@keyframes tituloBrillo {
+    0% {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+    }
+    100% {
+        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8), 0 0 30px #ff00ff, 0 0 60px #ff00ff;
+    }
+}
+
+.seccion-hero h1 {
+    animation: tituloBrillo 3s infinite alternate;
+}
+/* Responsividad para el modal */
+@media (max-width: 768px) {
+    .modal-contenido {
+        width: 95% !important;
+    }
+    
+    .modal-acciones {
         flex-direction: column;
     }
 }

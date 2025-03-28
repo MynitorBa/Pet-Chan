@@ -1,3 +1,5 @@
+
+<%- include("partials/header.ejs") %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos en Pet-Chan</title>
     <link rel="stylesheet" href="styles/eventos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<%- include("partials/header.ejs") %>
 <body>
     <div class="contenedor-inicio">
         <!-- Sección Hero con Carrusel -->
@@ -25,6 +27,7 @@
             <div class="lista-eventos">
                 <!-- Evento 1 -->
                 <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif');">
+                    <div class="marco-dorado"></div>
                     <div class="fecha-evento">
                         <span class="dia">25</span>
                         <span class="mes">Oct</span>
@@ -38,7 +41,7 @@
                             <span class="etiqueta">Premios</span>
                             <span class="etiqueta">Mascotas</span>
                         </div>
-                        <button class="boton-inscribirse">Inscribirse</button>
+                        <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
                     </div>
                     <div class="brillo-evento"></div>
                     <div class="reflejo"></div>
@@ -46,6 +49,7 @@
 
                 <!-- Evento 2 -->
                 <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif');">
+                    <div class="marco-dorado"></div>
                     <div class="fecha-evento">
                         <span class="dia">15</span>
                         <span class="mes">Nov</span>
@@ -59,7 +63,7 @@
                             <span class="etiqueta">Diseño</span>
                             <span class="etiqueta">Reconocimiento</span>
                         </div>
-                        <button class="boton-inscribirse">Inscribirse</button>
+                        <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
                     </div>
                     <div class="brillo-evento"></div>
                     <div class="reflejo"></div>
@@ -67,6 +71,7 @@
 
                 <!-- Evento 3 -->
                 <div class="evento evento-destacado" style="background-image: url('https://favim.com/pd/p/orig/2019/02/11/8bit-city-8-bit-Favim.com-6875655.gif');">
+                    <div class="marco-dorado"></div>
                     <div class="fecha-evento">
                         <span class="dia">30</span>
                         <span class="mes">Dic</span>
@@ -80,7 +85,7 @@
                             <span class="etiqueta">Sorpresas</span>
                             <span class="etiqueta">Celebración</span>
                         </div>
-                        <button class="boton-inscribirse">Inscribirse</button>
+                        <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
                     </div>
                     <div class="brillo-evento"></div>
                     <div class="reflejo"></div>
@@ -92,6 +97,5 @@
     <script src="scripts/eventos.js"></script>
 </body>
 </html>
-
 
 <%- include("partials/footer.ejs") %>
