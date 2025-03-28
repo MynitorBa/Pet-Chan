@@ -20,8 +20,8 @@ app.set('view engine', 'ejs');
 /*---------------------------variable para ayudarnos en las mascotas------------------------------------------------ */
 
 const rutaBase = "imagenes_de_mascotas/";
-const totalMascotas = 37; // Número total de índices de mascotas
-let indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1; // Genera un índice entre 1 y 37
+const totalMascotas = 38; // Número total de índices de mascotas
+let indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1; // Genera un índice entre 1 y 38
 let rutaImagen = `${rutaBase}${indiceAleatorio}.gif`;
 
 
@@ -51,7 +51,7 @@ app.get('/', (req, res) => {
 app.get('/minijuegomascota', (req, res) => {
 
     /*---------------------------borrar esta lineas despues ------------------------------------------------ */
-indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1; // Genera un índice entre 1 y 37
+indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1; // Genera un índice entre 1 y 38
 rutaImagen = `${rutaBase}${indiceAleatorio}.gif`;
 
 /*---------------------------borrar esta lineas despues ------------------------------------------------ */

@@ -390,7 +390,7 @@
         height: 400px;
     }
     
-    .botones-accion {
+    .Botones-accion {
         justify-content: center; /* Centra los botones en pantallas pequeñas */
     }
 }
@@ -406,12 +406,12 @@
         margin-bottom: 15px;
     }
     
-    .botones-accion {
+    .Botones-accion {
         flex-direction: column;
         gap: 10px;
     }
     
-    .boton {
+    .Boton {
         width: 100%;
         max-width: none; /* Restaurar a ancho completo en móviles */
         min-width: 0; /* Eliminar ancho mínimo en móviles */
