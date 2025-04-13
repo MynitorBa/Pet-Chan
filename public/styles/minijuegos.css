@@ -1,0 +1,222 @@
+/* Estilos para la página de minijuegos - mantiene la estética ciberpunk/neón */
+
+/* Contenedor principal */
+#contenedor-juego {
+    font-family: 'Press Start 2P', cursive;
+    max-width: 900px;
+    margin: 40px auto;
+    background-color: rgba(98, 2, 150, 0.95);
+    border: 4px solid #d304c5;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 30px rgba(163, 4, 250, 0.7);
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+}
+
+/* Efecto de brillo en el borde */
+#contenedor-juego::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 15px;
+    background: linear-gradient(45deg, 
+        transparent 40%, 
+        rgba(255, 255, 255, 0.7) 50%, 
+        transparent 60%);
+    background-size: 300% 300%;
+    z-index: -1;
+    animation: cyber-border 6s linear infinite;
+    filter: blur(1px);
+    opacity: 0.5;
+}
+
+@keyframes cyber-border {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 200%; }
+}
+
+/* Título del juego */
+#contenedor-juego h1 {
+    color: #ffffff;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px rgba(163, 4, 250, 0.7);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+#contenedor-juego h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #cf7cfc 20%,
+        #ff00ff 50%,
+        #cf7cfc 80%,
+        transparent 100%);
+    animation: neon-pulse 2s infinite;
+}
+
+@keyframes neon-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Sección donde se mostrará el juego */
+.seccion-del_juego {
+    min-height: 450px;
+    background: rgba(25, 15, 35, 0.9);
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.4);
+    cursor: pointer; /* Indicador para clickear */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* Efecto de líneas para el área del juego */
+.seccion-del_juego::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            transparent 100%);
+    background-size: 30px 30px;
+    opacity: 0.5;
+    z-index: 0;
+    animation: grid-move 60s linear infinite;
+}
+
+@keyframes grid-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 1000px; }
+}
+
+/* Al hacer hover sobre la sección del juego */
+.seccion-del_juego:hover {
+    box-shadow: 0 0 30px rgba(207, 124, 252, 0.7);
+    transform: scale(1.01);
+}
+
+/* Efecto de "haz clic para jugar" */
+.seccion-del_juego::after {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(207, 124, 252, 0.9);
+    z-index: 1;
+    animation: flicker 1.5s infinite alternate;
+}
+
+@keyframes flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        opacity: 1;
+    }
+    20%, 24%, 55% {
+        opacity: 0;
+    }
+}
+
+/* Puntos ganados */
+#contenedor-juego p {
+    font-size: 1.2rem;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+#contenedor-juego p span {
+    color: #ffd700; /* Dorado para los puntos */
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    animation: puntos-brillantes 2s infinite;
+}
+
+@keyframes puntos-brillantes {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(255, 215, 0, 1);
+    }
+}
+
+/* Efecto de escáner para la sección del juego */
+.seccion-del_juego::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    width: 200%;
+    height: 10px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(207, 124, 252, 0.5) 50%, 
+        transparent 100%);
+    opacity: 0.7;
+    z-index: 2;
+    animation: escaneo 4s linear infinite;
+}
+
+@keyframes escaneo {
+    0% { top: -5%; }
+    100% { top: 105%; }
+}
+
+/* Borde brillante para puntos ganados */
+#contenedor-juego > p {
+    position: relative;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background: rgba(163, 4, 250, 0.2);
+    display: inline-block;
+    border: 1px solid rgba(207, 124, 252, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #contenedor-juego {
+        margin: 20px auto;
+        padding: 20px;
+    }
+    
+    .seccion-del_juego {
+        min-height: 350px;
+    }
+    
+    #contenedor-juego h1 {
+        font-size: 1.4rem;
+    }
+    
+    #contenedor-juego p {
+        font-size: 1rem;
+    }
+    
+    .seccion-del_juego::after {
+        font-size: 1rem;
+    }
+}

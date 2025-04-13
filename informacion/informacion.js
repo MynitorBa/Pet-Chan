@@ -1,0 +1,68 @@
+ const especieMascotas = [
+    "Orquibella",
+    "Blaniflor", 
+    "Mongiwhite", 
+    "Plumero",
+    "Chirexal",
+    "Quetzairo",
+    "Lumini",
+    "Lumitil",
+    "Lumitizl",
+    "Renireni",
+    "Manchitas",
+    "Manchotas",
+    "Llorigota",
+    "Sagrimunis",
+    "Lalloraguna",
+    "Tapir",
+    "Tapigo",
+    "Casemi",
+    "Gemicao",
+    "Arbolicao",
+    "Hilicur",
+    "Lanicuer",
+    "Lobica",
+    "Semibica",
+    "Plantibinca",
+    "Neblibinca",
+    "Pocquic",
+    "Pocpatic",
+    "Cocrivito",
+    "Caimivito",
+    "Protivito",
+    "Grili",
+    "Blanolibi",
+    "Pomoblitas",
+    "Tortipalmas",
+    "Cachergutas",
+    "armivueltas",
+    "Chorcrital",
+  ];
+  
+ const comidasFavoritas = [
+    'Caldo de magma con albóndigas flotantes',
+    'Sushi de rayos cósmicos',
+    'Helado de neón con chispas de plutonio',
+    'Croquetas de aire comprimido',
+    'Pizza de estrellas fugaces con queso galáctico',
+    'Puré de meteorito dulce',
+    'Galletas de carbón lunar',
+    'Jugo de auroras boreales',
+    'Ensalada de hojas invisibles',
+    'Tacos de polvo estelar con salsa interdimensional'
+  ];
+
+  const habilidadesEspeciales = [
+    'Invisibilidad intermitente',
+    'Salto cuántico entre dimensiones',
+    'Lectura de pensamientos por vibración',
+    'Hipnosis con mirada kawaii',
+    'Teletransportación a través de portales de gelatina',
+    'Cambio de forma en arcoíris',
+    'Control del clima local (solo para días soleados)',
+    'Canto ultrasónico que flota objetos',
+    'Generación de burbujas protectoras',
+    'Domador de robots rebeldes'
+  ];
+
+  export { especieMascotas, comidasFavoritas, habilidadesEspeciales };

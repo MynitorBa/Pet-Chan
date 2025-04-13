@@ -88,29 +88,45 @@
       });
   }
 
-  // Validación de formulario
   function validateForm() {
-      if (!usernameInput.value.trim()) {
-          loginMessage.textContent = 'Por favor, ingresa un nombre de usuario';
-          loginMessage.style.display = 'block';
-          return false;
-      }
-      
-      if (!passwordInput.value) {
-          loginMessage.textContent = 'Por favor, ingresa una contraseña';
-          loginMessage.style.display = 'block';
-          return false;
-      }
-      
-      if (passwordInput.value !== confirmPasswordInput.value) {
-          loginMessage.textContent = 'Las contraseñas no coinciden';
-          loginMessage.style.display = 'block';
-          return false;
-      }
-      
-      loginMessage.style.display = 'none';
-      return true;
-  }
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    if (!username) {
+        loginMessage.textContent = 'Por favor, ingresa un nombre de usuario';
+        loginMessage.style.display = 'block';
+        return false;
+    }
+
+    if (username.length < 5) {
+        loginMessage.textContent = 'El nombre de usuario debe tener al menos 5 caracteres';
+        loginMessage.style.display = 'block';
+        return false;
+    }
+
+    if (!password) {
+        loginMessage.textContent = 'Por favor, ingresa una contraseña';
+        loginMessage.style.display = 'block';
+        return false;
+    }
+
+    if (password.length < 8) {
+        loginMessage.textContent = 'La contraseña debe tener al menos 8 caracteres';
+        loginMessage.style.display = 'block';
+        return false;
+    }
+
+    if (password !== confirmPassword) {
+        loginMessage.textContent = 'Las contraseñas no coinciden';
+        loginMessage.style.display = 'block';
+        return false;
+    }
+
+    loginMessage.style.display = 'none';
+    return true;
+}
+
 
   // Activar el portal mejorado y redirigir
   function activateEnhancedPortal() {
@@ -153,3 +169,4 @@
   document.addEventListener('DOMContentLoaded', function() {
       createStars();
   });
+

@@ -1,0 +1,170 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/tienda.css">
+
+        <div class="tienda-contenedor">
+            <!-- Banner de la tienda -->
+            <div class="tienda-banner">
+                <h1>✧ Tienda Pet-Chan ✧</h1>
+                <p>¡Encuentra los mejores accesorios, comida y juguetes para tu mascota virtual!</p>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-1"></div>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-2"></div>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-3"></div>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-4"></div>
+            </div>
+            
+            <!-- Navegación de categorías -->
+            <div class="tienda-categorias">
+                <div class="tienda-categoria activo" data-categoria="todos">★ Todos ★</div>
+                <div class="tienda-categoria" data-categoria="accesorios">Accesorios</div>
+                <div class="tienda-categoria" data-categoria="comida">Comida</div>
+                <div class="tienda-categoria" data-categoria="juguetes">Juguetes</div>
+                <div class="tienda-categoria" data-categoria="collares">Collares</div>
+            </div>
+            
+            <!-- Sección de productos -->
+            <div class="tienda-productos">
+                <div class="tienda-titulo-seccion">
+                    <h2>★★ Productos Destacados ★★</h2>
+                </div>
+                
+                <div class="tienda-grid-productos">
+                    <!-- Producto 1: Accesorio -->
+                    <div class="tienda-producto" data-categoria="accesorios">
+                        <div class="tienda-oferta-banner">Oferta</div>
+                        <div class="tienda-producto-imagen">
+                            <img src="./sombrero1.gif" alt="Sombrero Mágico">
+                            <div class="tienda-producto-etiqueta">Popular</div>
+                        </div>
+                        <div class="tienda-producto-detalles">
+                            <h3 class="tienda-producto-titulo">Sombrero Mágico</h3>
+                            <p class="tienda-producto-descripcion">Este sombrero mágico brilla en la oscuridad y otorga +5 de inteligencia a tu mascota.</p>
+                            <div class="tienda-producto-precios">
+                                <span class="tienda-producto-precio">150 ⭐</span>
+                                <span class="tienda-producto-precio-anterior">200 ⭐</span>
+                            </div>
+                            <div class="tienda-producto-footer">
+                                <span class="tienda-producto-stock">Stock: 5</span>
+                                <button class="tienda-producto-boton">Comprar</button>
+                            </div>
+                        </div>
+                        <div class="tienda-efecto-brillo"></div>
+                    </div>
+                    
+                    <!-- Producto 2: Comida -->
+                    <div class="tienda-producto" data-categoria="comida">
+                        <div class="tienda-producto-imagen">
+                            <img src="./sombrero1.gif" alt="Galletas Pixeladas">
+                        </div>
+                        <div class="tienda-producto-detalles">
+                            <h3 class="tienda-producto-titulo">Galletas Pixeladas</h3>
+                            <p class="tienda-producto-descripcion">Deliciosas galletas que recuperan 20 puntos de energía y aumentan la felicidad.</p>
+                            <div class="tienda-producto-precios">
+                                <span class="tienda-producto-precio">80 ⭐</span>
+                            </div>
+                            <div class="tienda-producto-footer">
+                                <span class="tienda-producto-stock">Stock: 12</span>
+                                <button class="tienda-producto-boton">Comprar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Producto 3: Juguete -->
+                    <div class="tienda-producto" data-categoria="juguetes">
+                        <div class="tienda-producto-imagen">
+                            <img src="./sombrero1.gif" alt="Pelota Rebotadora">
+                            <div class="tienda-producto-etiqueta">Nuevo</div>
+                        </div>
+                        <div class="tienda-producto-detalles">
+                            <h3 class="tienda-producto-titulo">Pelota Rebotadora</h3>
+                            <p class="tienda-producto-descripcion">Esta pelota especial rebota con efectos arcoíris y aumenta la diversión de tu mascota.</p>
+                            <div class="tienda-producto-precios">
+                                <span class="tienda-producto-precio">120 ⭐</span>
+                            </div>
+                            <div class="tienda-producto-footer">
+                                <span class="tienda-producto-stock">Stock: 7</span>
+                                <button class="tienda-producto-boton">Comprar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Producto 4: Collar -->
+                    <div class="tienda-producto" data-categoria="collares">
+                        <div class="tienda-producto-imagen">
+                            <img src="./sombrero1.gif" alt="Collar Estelar">
+                        </div>
+                        <div class="tienda-producto-detalles">
+                            <h3 class="tienda-producto-titulo">Collar Estelar</h3>
+                            <p class="tienda-producto-descripcion">Collar con estrellas que brillan en la noche. Aumenta el carisma de tu mascota.</p>
+                            <div class="tienda-producto-precios">
+                                <span class="tienda-producto-precio">180 ⭐</span>
+                                <span class="tienda-producto-precio-anterior">220 ⭐</span>
+                            </div>
+                            <div class="tienda-producto-footer">
+                                <span class="tienda-producto-stock">Stock: 3</span>
+                                <button class="tienda-producto-boton">Comprar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Producto 5: Accesorio -->
+                    <div class="tienda-producto" data-categoria="accesorios">
+                        <div class="tienda-producto-imagen">
+                            <img src="./sombrero1.gif" alt="Gafas de Sol Pixeladas">
+                        </div>
+                        <div class="tienda-producto-detalles">
+                            <h3 class="tienda-producto-titulo">Gafas de Sol Pixeladas</h3>
+                            <p class="tienda-producto-descripcion">Estas gafas retro hacen que tu mascota se vea extremadamente cool.</p>
+                            <div class="tienda-producto-precios">
+                                <span class="tienda-producto-precio">95 ⭐</span>
+                            </div>
+                            <div class="tienda-producto-footer">
+                                <span class="tienda-producto-stock">Stock: 8</span>
+                                <button class="tienda-producto-boton">Comprar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Producto 6: Comida -->
+                    <div class="tienda-producto" data-categoria="comida">
+                        <div class="tienda-oferta-banner">Oferta</div>
+                        <div class="tienda-producto-imagen">
+                            <img src="./sombrero1.gif" alt="Poción Energética">
+                            <div class="tienda-producto-etiqueta">Limitado</div>
+                        </div>
+                        <div class="tienda-producto-detalles">
+                            <h3 class="tienda-producto-titulo">Poción Energética</h3>
+                            <p class="tienda-producto-descripcion">Restaura toda la energía de tu mascota instantáneamente y da un bonus de velocidad.</p>
+                            <div class="tienda-producto-precios">
+                                <span class="tienda-producto-precio">200 ⭐</span>
+                                <span class="tienda-producto-precio-anterior">250 ⭐</span>
+                            </div>
+                            <div class="tienda-producto-footer">
+                                <span class="tienda-producto-stock">Stock: 2</span>
+                                <button class="tienda-producto-boton tienda-animacion-pulso">Comprar</button>
+                            </div>
+                        </div>
+                        <div class="tienda-efecto-brillo"></div>
+                    </div>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="tienda-paginacion">
+                    <div class="tienda-pagina activo">1</div>
+                    <div class="tienda-pagina">2</div>
+                    <div class="tienda-pagina">3</div>
+                    <div class="tienda-pagina">→</div>
+                </div>
+            </div>
+            
+            <!-- Carrito flotante -->
+            <div class="tienda-carrito-flotante">
+                <div class="tienda-carrito-contador">0</div>
+                <span class="tienda-carrito-icono">🛒</span>
+            </div>
+        </div>
+
+
+        <script src="scripts/tienda.js"></script>
+
+        <%- include("partials/footer.ejs") %>
