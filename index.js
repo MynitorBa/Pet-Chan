@@ -16,7 +16,9 @@ import { hashPassword, verifyPassword } from "cryptography-password-js";
 
 
 
-import { especieMascotas, comidasFavoritas, habilidadesEspeciales } from './informacion/informacion.js'; //exportamos las especies de mascotas
+import { especieMascotas, comidasFavoritas, habilidadesEspeciales, accesorios, juguetes, corralesDisponibles } from './informacion/informacion.js'; //exportamos las especies de mascotas
+
+import { preciosJuguetes, preciosAccesorios, preciosComidas, preciosCorrales } from './informacion/precios.js';
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -71,17 +73,6 @@ const requireLogin = (req, res, next) => {
 const rutaBase = "imagenes_de_mascotas/";
 const totalMascotas = especieMascotas.length;; // Número total de índices de mascotas
 let indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1; // Genera un índice entre 1 y 38
-let rutaImagen = `${rutaBase}${indiceAleatorio}.gif`;
-let especieDeMascota; // Variable para almacenar la especie de la mascota
-let generoDeMascota; // Variable para almacenar el género de la mascota
-
-
-/*---------------------------creamos el nombre de la mascota y el usuario------------------------------------------------ */
-let mascotaNombre = "nombre";
-let usuario = "usuario";
-let contra = "1";
-
-/*---------------------------variable para ayudarnos en las mascotas------------------------------------------------ */
 
 
 /*---------------------------creamos variables para body parser------------------------------------------------*/
@@ -128,13 +119,15 @@ app.post('/register', async (req, res) => {
         });
 
         const result = await db.query(
-            'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username',
-            [username, hashedPassword]
+            'INSERT INTO users (username, password, description, money) VALUES ($1, $2, $3, $4) RETURNING id, username',
+            [username, hashedPassword, "Descripción del usuario", 0]
         );
         const newUser = result.rows[0];
         req.session.userId = newUser.id;
         req.session.username = newUser.username;
         req.session.descripcion = "Descripción del usuario";
+        req.session.money = 0;
+        req.session.corral = null;
 
         res.redirect("/minijuegomascota");
     } catch (error) {
@@ -164,6 +157,8 @@ app.post("/login", async (req, res) => {
         req.session.userId = user.id;
         req.session.username = user.username;
         req.session.descripcion = user.description;
+        req.session.money = user.money;
+        req.session.corral = user.corral;
 
         // ✅ Buscamos si el usuario ya tiene una mascota
         const petResult = await db.query('SELECT * FROM pets WHERE "id_users" = $1 LIMIT 1', [user.id]);
@@ -350,39 +345,379 @@ app.post('/modificarPerfil', requireLogin, async (req, res) => {
 });
 
 
-app.post('/modificarMascota', (req, res) => {
+app.post('/modificarMascota', requireLogin, async (req, res) => {
+    const nuevoNombre = req.body['nombre-mascota'];
+    const mascota = req.session.mascotaActual;
 
-    mascotaNombre = req.body['nombre-mascota'];
+    if (!mascota) {
+        return res.status(400).send("No tienes una mascota para modificar.");
+    }
 
-    console.log('Mascota modificado:', mascotaNombre);
+    try {
+        await db.query(
+            `UPDATE pets SET petname = $1 WHERE id = $2`,
+            [nuevoNombre, mascota.id]
+        );
 
-    res.redirect('/perfil_personalizado');
+        // ✅ Actualizamos el nombre en la sesión
+        req.session.mascotaActual.nombre = nuevoNombre;
+
+        console.log('Mascota modificada:', nuevoNombre);
+        res.redirect('/perfil_personalizado');
+    } catch (error) {
+        console.error('Error al modificar el nombre de la mascota:', error);
+        res.status(500).send('Error al modificar la mascota');
+    }
+});
+
+
+
+app.post('/cambiarPassword', requireLogin, async (req, res) => {
+    const { passwordActual, nuevaPassword, confirmarPassword } = req.body;
+    const userId = req.session.userId;
+
+    try {
+        // 1. Traer la contraseña actual de la base de datos
+        const userResult = await db.query(`SELECT password FROM users WHERE id = $1`, [userId]);
+        if (userResult.rows.length === 0) {
+            req.session.mensajeDeContra = '⚠️ Usuario no encontrado.';
+            return res.redirect('/perfil_personalizado');
+        }
+
+        const passwordHashActual = userResult.rows[0].password;
+
+        // 2. Verificar contraseña actual
+        const passwordValida = await verifyPassword(passwordActual, passwordHashActual);
+        if (!passwordValida) {
+            req.session.mensajeDeContra = '⚠️ La contraseña actual no es correcta';
+            return res.redirect('/perfil_personalizado');
+        }
+
+        // 3. Verificar que las nuevas contraseñas coincidan
+        if (nuevaPassword !== confirmarPassword) {
+            req.session.mensajeDeContra = '⚠️ Las nuevas contraseñas no coinciden';
+            return res.redirect('/perfil_personalizado');
+        }
+
+        // 4. Hashear y guardar nueva contraseña
+        const nuevaPasswordHash = await hashPassword(nuevaPassword);
+        await db.query(`UPDATE users SET password = $1 WHERE id = $2`, [nuevaPasswordHash, userId]);
+
+        req.session.mensajeDeContra = '✅ Contraseña cambiada exitosamente';
+        res.redirect('/perfil_personalizado');
+    } catch (error) {
+        console.error("Error al cambiar contraseña:", error);
+        req.session.mensajeDeContra = '⚠️ Error al cambiar la contraseña';
+        res.redirect('/perfil_personalizado');
+    }
+});
+
+//post para realizar las compras
+app.post('/comprarItem', requireLogin, async (req, res) => {
+        
+    //obtenemos el indice y la categoria
+    const { index, categoria} = req.body;
+    const userId = req.session.userId;
+
+    let precio = 0;
+
+    //ahora vamos a obtener el precio de los arrays
+    try {
+        if (categoria === 'accesorios' && index >= 0 && index < accesorios.length) {
+            precio = preciosAccesorios[index];
+        } else if (categoria === 'comida' && index >= 0 && index < preciosComidas.length) {
+            precio = preciosComidas[index]; 
+        } else if (categoria === 'juguetes' && index >= 0 && index < juguetes.length) {
+            precio = preciosJuguetes[index];
+        } else if (categoria === 'corrales' && index >= 0 && index < corralesDisponibles.length) {
+            precio = preciosCorrales[index];
+        } else {
+            console.error("Índice o categoría inválido");
+            return res.redirect('/tienda');
+        }
+    } catch (error) {
+        console.error("Error al obtener el precio:", error);
+        return res.redirect('/tienda');
+    }
+
+    console.log(index, precio, categoria);
+
+    try {
+        const userResult = await db.query(`SELECT money FROM users WHERE id = $1`, [userId]);
+
+        const dineroActual = userResult.rows[0].money;
+
+        if (dineroActual < precio) {
+            return res.redirect('/tienda');
+        }
+
+        await db.query(`UPDATE users SET money = $1 WHERE id = $2`, [dineroActual - precio, userId]);
+        req.session.money = dineroActual - precio;
+
+        await db.query(`INSERT INTO items (id_users, indice, categoria) VALUES ($1, $2, $3)`, [userId, index, categoria]);
+
+        res.redirect('/tienda');
+    } catch (error) {
+        console.error("Error al comprar accesorio:", error);
+        res.redirect('/tienda');
+    }
     
 })
 
-let mensajeDeContra = '';
-app.post('/cambiarPassword', (req, res) => {
-    const passwordActual = req.body.passwordActual;
-    const nuevaPassword = req.body.nuevaPassword;
-    const confirmarPassword = req.body.confirmarPassword;
+//vamos a realizar el post para que la mascota pueda comer
+app.post('/mascota/comer', requireLogin, async (req, res) => {
+    //obetenemos el indice de la comida y el indice del usuario
+    const userId = req.session.userId;
+    const {indice} = req.body;
 
-    if (passwordActual !== contra) {
-        mensajeDeContra ='⚠️ La contraseña actual no es correcta';
-        return res.redirect('/perfil_personalizado');
+    try {
+
+        //verificamos si la comida con dicho indice pertenece al usuario
+        const userResult = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'comida'`, [userId, indice]);
+        if (userResult.rows.length === 0) {
+
+            console.log('No tienes esa comida');
+
+            return res.json({ success: false, error: 'No tienes esa comida' });
+        }
+
+       // vamos a crear un porcentaje para el nivel de energía que aumentará a la mascota
+    let porcentaje = 0;
+    // mensaje base para el usuario
+    let mensaje1 = "Mascota comiendo...";
+
+    // obtenemos la comida y la favorita de la mascota
+    const comidaDada = comidasFavoritas[indice];
+    const favorita = req.session.mascotaActual.comidaFavorita;
+
+    // Mensajes posibles
+    const mensajesFavorita = [
+        "¡Ñam ñam! Esta es su favorita, ¡la devoró feliz!",
+        "Mascota comiendo... ¡brilla de felicidad con su platillo favorito!",
+        "¡Le encantó! Ganó +{p}% de energía con su comida favorita 🍖",
+        "Mascota comiendo su favorita... ¡qué delicia! +{p}% de energía"
+    ];
+
+    const mensajesNormal = [
+        "Mascota comiendo... parece que le gustó un poco.",
+        "No es su favorita, pero la aceptó. Energía +{p}%",
+        "Comió sin entusiasmo... pero le dio algo de fuerza. +{p}%",
+        "Mascota comiendo... meh, al menos no se quejó. +{p}%"
+    ];
+
+    const mensajesBaja = [
+        "Mascota comiendo... hizo una mueca. Perdió -{p}% de energía 😟",
+        "¡Oh no! No le cayó bien, energía -{p}%",
+        "Mascota comiendo... parece que no le gustó. -{p}% de energía",
+        "Ups... esa comida no era de su agrado. -{p}%"
+    ];
+
+    if (favorita === comidaDada) {
+        // Si es favorita, generamos un aumento de entre 20% a 40%
+        porcentaje = Math.random() * (0.40 - 0.20) + 0.20;
+        
+        const aumento = Math.round(porcentaje * 100);
+        const mensajeRandom = mensajesFavorita[Math.floor(Math.random() * mensajesFavorita.length)];
+        
+        mensaje1 = mensajeRandom.replace("{p}", aumento);
+    } else {
+        // Rango entre -10% y +15%
+        porcentaje = Math.random() * (0.25) - 0.10;
+
+        const cambio = Math.round(Math.abs(porcentaje * 100)); // positivo para mostrar
+
+        if (porcentaje > 0) {
+            const mensajeRandom = mensajesNormal[Math.floor(Math.random() * mensajesNormal.length)];
+            mensaje1 = mensajeRandom.replace("{p}", cambio);
+        } else {
+            const mensajeRandom = mensajesBaja[Math.floor(Math.random() * mensajesBaja.length)];
+            mensaje1 = mensajeRandom.replace("{p}", cambio);
+        }
     }
 
-    if (nuevaPassword !== confirmarPassword) {
-        mensajeDeContra = '⚠️ Las nuevas contraseñas no coinciden';
-        return res.redirect('/perfil_personalizado');
+        // Actualizamos el nivel de energía de la mascota
+        const energiaActual = req.session.mascotaActual.niveldeEnergia;
+        let energiaNueva = Math.round((porcentaje * 100)) + parseInt(energiaActual);
+
+        console.log('Energía actual de la mascota:', energiaActual);
+        console.log('Porcentaje de aumento:', Math.round(Math.abs(porcentaje * 100)));
+        console.log('Nueva energía de la mascota:', energiaNueva);
+
+        //veremos si la energía queda negativa
+        if (energiaNueva < 0) {
+            energiaNueva = 0;
+        }
+
+        //veremos si el nivel de energía supera el 100
+        if (energiaNueva > 100) {
+            energiaNueva = 100;
+        }
+
+        await db.query(`UPDATE pets SET "nivelEnergia" = $1 WHERE id_users = $2`, [energiaNueva, userId]);
+
+        //actualizamos el nivel de energia en el session
+        req.session.mascotaActual.niveldeEnergia = energiaNueva;
+        console.log('Nueva energía de la mascota:', req.session.mascotaActual.niveldeEnergia);
+
+
+        //eliminamos unicamente una comida con dicho indice
+        await db.query(`
+            WITH fila_a_borrar AS (
+                SELECT ctid
+                FROM items
+                WHERE id_users = $1 AND indice = $2 AND categoria = 'comida'
+                ORDER BY id ASC
+                LIMIT 1
+            )
+            DELETE FROM items
+            WHERE ctid IN (SELECT ctid FROM fila_a_borrar)
+        `, [userId, indice]);
+        
+    
+
+        console.log('Mascota comiendo...');
+
+        return res.json({
+            success: true,
+            mensaje: mensaje1,
+        });
+    } catch (error) {
+        console.error("Error al comer:", error);
+        return res.json({ success: false, error: 'Error al comer' });
     }
+})
 
-    // Simulamos que actualizamos la contraseña
-    contra = nuevaPassword;
+//ahora vamos a hacer la ruta para que la mascota pueda jugar
+app.post('/mascota/jugar', requireLogin, async (req, res) => {
+    //obtenemos el indice del usuario y el indice del item
+    const { indice } = req.body;
+    const userId = req.session.userId;
 
-    mensajeDeContra = '✅ Contraseña cambiada exitosamente';
+    //hacemos nuestro try
+    try {
+        //verificamos si el juguete con dicho indice pertenece al usuario
+        const juguete = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'juguetes'`, [userId, indice]);
 
-    res.redirect('/perfil_personalizado');
+        if (juguete.rows.length === 0) {
+            console.log('No tienes ese juguete');
+            return res.json({ success: false, error: 'No tienes ese juguete' });
+        }
+
+        // Vamos a crear un porcentaje para el nivel de felicidad que aumentará o disminuirá
+        let porcentaje = 0;
+        let mensaje1 = "Mascota jugando...";
+
+        // Mensajes posibles para felicidad positiva
+        const mensajesFelices = [
+            "¡Qué divertido! La mascota se ve feliz. +{p}% de felicidad 🧸",
+            "Mascota jugando... se la pasó increíble. +{p}%",
+            "Corrió, saltó y ladró de alegría. +{p}% de felicidad 🎾",
+            "Jugó como si no hubiera un mañana. +{p}%"
+        ];
+
+        // Mensajes posibles para bajada leve
+        const mensajesAburridos = [
+            "Mascota jugando... parece que se aburrió un poco. -{p}%",
+            "No estaba de humor para ese juguete. -{p}% de felicidad 😐",
+            "Jugó un rato, pero perdió interés. -{p}%",
+            "Mascota jugando... se distrajo, pero no mucho. -{p}%"
+        ];
+
+        // Generar porcentaje aleatorio
+        const chance = Math.random();
+
+        if (chance > 0.2) {
+            // 80% de probabilidad de subir felicidad (10% a 30%)
+            porcentaje = Math.random() * (0.30 - 0.10) + 0.10;
+            const aumento = Math.round(porcentaje * 100);
+            const mensajeRandom = mensajesFelices[Math.floor(Math.random() * mensajesFelices.length)];
+            mensaje1 = mensajeRandom.replace("{p}", aumento);
+        } else {
+            // 20% de probabilidad de bajada leve (-1% a -5%)
+            porcentaje = Math.random() * (-0.05 + 0.01) - 0.01; // negativo
+            const reduccion = Math.round(Math.abs(porcentaje * 100));
+            const mensajeRandom = mensajesAburridos[Math.floor(Math.random() * mensajesAburridos.length)];
+            mensaje1 = mensajeRandom.replace("{p}", reduccion);
+        }
+
+         // Actualizamos el nivel de felicidad de la mascota
+        const nivelFelicidadActual = req.session.mascotaActual.niveldeFelicidad;
+        let nivelFelicidadNuevo = Math.round((porcentaje * 100)) + parseInt(nivelFelicidadActual);
+
+        //vemos si el nivel de feclicidad nuevo queda negativo
+        if (nivelFelicidadNuevo < 0) {
+            nivelFelicidadNuevo = 0;
+        }
+
+        //vemos si el nivel de feclicidad nuevo es mayor a 100
+        if (nivelFelicidadNuevo > 100) {
+            nivelFelicidadNuevo = 100;
+        }
+
+        // Actualizamos el nivel de felicidad en la base de datos
+        await db.query(`UPDATE pets SET "nivelFelicidad" = $1 WHERE id_users = $2`, [nivelFelicidadNuevo, userId]);
+        // Actualizamos el nivel de felicidad en la sesión
+        req.session.mascotaActual.niveldeFelicidad = nivelFelicidadNuevo;
+
+        console.log('Felicidad actual de la mascota:', req.session.mascotaActual.niveldeFelicidad);
+
+        //eliminamos unicamente una comida con dicho indice
+        await db.query(`
+            WITH fila_a_borrar AS (
+                SELECT ctid
+                FROM items
+                WHERE id_users = $1 AND indice = $2 AND categoria = 'juguetes'
+                ORDER BY id ASC
+                LIMIT 1
+            )
+            DELETE FROM items
+            WHERE ctid IN (SELECT ctid FROM fila_a_borrar)
+        `, [userId, indice]);
+
+        return res.json({
+            success: true,
+            mensaje: mensaje1,
+        });
+    } catch (error) {
+        console.error("Error al jugar:", error);
+        return res.json({ success: false, error: 'Error al jugar: ' + error.message });
+    }
 });
+
+//vamos a hacer un post para guardar el fondo del corral
+app.post('/corral/guardar', requireLogin, async (req, res) => {
+    //obtenemos el indice del usuario y el indice del item
+    const { indice } = req.body;
+    const userId = req.session.userId;
+
+    console.log('Guardando fondo del corral:', indice);
+
+    try {
+        //primero veremos si el usuario tiene ese corral en sus items
+        const item = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'corrales'`, [userId, indice]);
+
+        if (item.rows.length === 0) {
+            return res.json({ success: false, error: 'No tienes ese corral en tus items' });
+        }
+
+        //actualizamos el fondo del corral en la tabla de users
+        await db.query(`UPDATE users SET corral = $1 WHERE id = $2`, [indice, userId]);
+
+        //actualizamos el fondo del corral en la sesion
+        req.session.corral = parseInt(indice);
+
+        console.log('Fondo del corral guardado correctamente', req.session.corral);
+
+        return res.json({
+            success: true,
+            mensaje: "Fondo del corral guardado correctamente",
+        });
+    } catch (error) {
+        console.error("Error al guardar el fondo del corral:", error);
+        return res.json({ success: false, error: 'Error al guardar el fondo del corral: ' + error.message });
+    }
+});
+
 /*---------------------------creamos post de prueba necesario------------------------------------------------*/
 
 app.get('/inicio', requireLogin, (req, res) => {
@@ -451,21 +786,29 @@ app.get('/perfil_personalizado', requireLogin, (req, res) => {
 
 
     const mascota = req.session.mascotaActual;
-
+    const mensaje = req.session.mensajeDeContra || '';
+    delete req.session.mensajeDeContra;
 
 
     res.render('perfil_personalizado.ejs', {
         rutaImagen: mascota.rutaImagen,
         mascotaNombre: mascota.nombre,
         usuario: req.session.username,
-        mensajeDeContra,
+        mensajeDeContra: mensaje,
         descripcion: req.session.descripcion
     });
 });
 
-app.get('/corral_mascota', requireLogin, (req, res) => {
+app.get('/corral_mascota', requireLogin, async (req, res) => {
 
     const mascota = req.session.mascotaActual;
+    let items;
+    try{
+        items = await db.query(`SELECT * FROM items WHERE id_users = $1 ORDER BY indice`, [req.session.userId]);
+    } catch (error) {
+        console.error('Error al obtener los items:', error);
+        return res.status(500).send('Error al obtener los items');
+    }
 
 
 
@@ -473,7 +816,12 @@ app.get('/corral_mascota', requireLogin, (req, res) => {
         rutaImagen: mascota.rutaImagen,
         mascotaNombre: mascota.nombre,
         especieDeMascota: mascota.especie,
-        pronombre: mascota.pronombre
+        pronombre: mascota.pronombre,
+        items: items.rows,
+        juguetes: juguetes,
+        comidasFavoritas: comidasFavoritas,
+        corralesDisponibles: corralesDisponibles,
+        fondoCorral: req.session.corral
     });
 });
 
@@ -501,7 +849,16 @@ app.get('/tienda', requireLogin, (req, res) => {
     const mascota = req.session.mascotaActual;
 
     res.render('tienda.ejs', {
-        rutaImagen: mascota.rutaImagen 
+        rutaImagen: mascota.rutaImagen,
+        preciosAccesorios: preciosAccesorios,
+        preciosComidas: preciosComidas,
+        preciosJuguetes: preciosJuguetes,
+        preciosCorrales: preciosCorrales,
+        comidasFavoritas: comidasFavoritas,
+        accesorios: accesorios,
+        juguetes: juguetes,
+        corralesDisponibles: corralesDisponibles,
+        money: req.session.money
     });
 });
 

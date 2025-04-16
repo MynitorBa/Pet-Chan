@@ -69,7 +69,7 @@ main {
 
 .inventario-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     text-align: center;
 }
@@ -130,3 +130,35 @@ main {
 .micro-mascota {
     display: none;
 }
+
+.scrollGrande{
+   
+    width: 300px;
+    height: 200px;
+    overflow-y: scroll; /* Barra de scroll vertical */
+    border: 1px solid #ccc; /* Opcional, para darle un marco visible */
+
+}
+  
+  /* Estilo de la barra de scroll */
+  .scrollGrande::-webkit-scrollbar {
+    width: 12px; /* Ancho de la barra de scroll */
+  }
+  
+  /* Color del fondo de la barra */
+  .scrollGrande::-webkit-scrollbar-track {
+    background: #e0d4f7; /* Tonos morados claros */
+    border-radius: 10px; /* Bordes redondeados */
+  }
+  
+  /* Color y estilo de la barra (scroll itself) */
+  .scrollGrande::-webkit-scrollbar-thumb {
+    background: #a96bff; /* Morado intenso */
+    border-radius: 10px; /* Bordes redondeados */
+    border: 2px solid #e0d4f7; /* Borde para darle contraste */
+  }
+  
+  /* Opcional: Efecto al pasar el mouse */
+  .scrollGrande::-webkit-scrollbar-thumb:hover {
+    background: #873bcc; /* Cambia el color cuando lo toques */
+  }

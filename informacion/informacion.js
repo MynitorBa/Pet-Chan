@@ -65,4 +65,69 @@
     'Domador de robots rebeldes'
   ];
 
-  export { especieMascotas, comidasFavoritas, habilidadesEspeciales };
+  const accesorios = [
+    'Sombrero flotante de burbujas',
+    'Capa de invisibilidad reversible',
+    'Gafas de rayos X sonrientes',
+    'Collar musical que cambia de color',
+    'Varita mágica de chispeo constante',
+    'Botas antigravedad con luces led',
+    'Parche de ojo pirata holográfico',
+    'Pulsera que proyecta estrellas',
+    'Mochila con miniuniverso interno',
+    'Orejas de conejo que hacen sonidos',
+    'Antenas decorativas con radar',
+    'Bufanda de arcoíris infinito',
+    'Reloj que detiene el tiempo (a veces)',
+    'Medalla que brilla con los sentimientos',
+    'Corbatín que flota y gira solo',
+    'Túnica de nebulosa animada',
+    'Cinturón de caramelos intergalácticos',
+    'Guantes que hacen burbujas al tocar',
+    'Zapatillas que dejan huellas brillantes',
+    'Broche en forma de galaxia'
+  ];
+  
+  const juguetes = [
+    'Pelota de energía cuántica',
+    'Muñeco de gelatina que canta',
+    'Trompo de luz hipnótica',
+    'Cubo de slime infinito',
+    'Boing-boing de gravedad alterada',
+    'Robot compañero con voz divertida',
+    'Peluche que cuenta chistes malos',
+    'Cohete de cartón supersónico',
+    'Cometa que vuela en interiores',
+    'Dado que cambia de forma al lanzar',
+    'Puzzle flotante en 4D',
+    'Rayo de burbujas con olor a fruta',
+    'Marioneta que repite lo último que dijiste',
+    'Mini montaña rusa portátil',
+    'Túnel de peluche elástico',
+    'Esfera que proyecta constelaciones',
+    'Laberinto que se reconfigura solo',
+    'Zanahoria robótica de persecución',
+    'Bastón saltarín con música',
+    'Libro animado de cuentos vivos'
+  ];
+
+  const corralesDisponibles = [
+    'Bosque de hongos luminosos',
+    'Desierto de cristal flotante',
+    'Pradera de algodón de azúcar',
+    'Caverna subterránea con cristales cantores',
+    'Isla flotante sobre nubes suaves',
+    'Volcán inactivo con lava burbujeante (segura)',
+    'Pantano encantado con luciérnagas gigantes',
+    'Jardín zen de meteoritos flotantes',
+    'Cascada infinita con arcoíris dobles',
+    'Tundra de peluche polar',
+    'Templo abandonado con runas brillantes',
+    'Bosque otoñal con hojas que susurran secretos',
+    'Globo gigante suspendido con vista panorámica',
+    'Ciudad miniatura dentro de una botella',
+    'Playa interdimensional con olas de neón'
+  ];
+  
+
+  export { especieMascotas, comidasFavoritas, habilidadesEspeciales, accesorios, juguetes, corralesDisponibles };

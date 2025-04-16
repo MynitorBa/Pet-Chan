@@ -2,55 +2,80 @@
 
 <link rel="stylesheet" href="styles/corral.css">
 
-
 <div class="corral-container">
     <h1 class="corral-header">★ Corral de <span><%= mascotaNombre%></span> <span><%= pronombre%></span> <span><%= especieDeMascota%></span> ★</h1>
     
+    <% if (fondoCorral !== null) { %>
+    <div class="corral-escenario" id="corral-escenario"style="background: url(&quot;imagenes_de_corrales/<%= fondoCorral + 1 %>.png&quot;) center center / cover;">
+    <% } else { %>
     <div class="corral-escenario" id="corral-escenario">
+    <% } %>
+       
         <img src="<%= rutaImagen %>" alt="Mascota Luna" class="mascota" id="mascota">
     </div>
     
-    <div class="inventario-secciones">
-        <div class="seccion-inventario">
+    <div class="inventario-secciones ">
+        <div class="seccion-inventario scrollGrande">
             <h3 style="text-align: center; margin-bottom: 10px;">✧ Comida ✧</h3>
             <div class="inventario-grid" id="inventario-comida">
-                <div class="item-inventario" draggable="true" data-tipo="comida">
-                    <img src="./comida.gif" alt="Comida">
-                    <div>Comida</div>
-                    <div class="cantidad-item">3</div>
+                <% items.forEach((item, i) => { %>
+                    <% if (item.categoria === "comida") { %>
+                <div class="item-inventario" draggable="true" data-tipo="comida" data-id="<%= item.indice %>">
+                    <img src="./<%= item.indice %>.gif" alt="<%= item.indice %>">
+                    <div><p style="font-size: 10px;"><%= comidasFavoritas[item.indice] %></p></div>
                 </div>
+                    <% } %>
+                <% }) %>
             </div>
         </div>
         
-        <div class="seccion-inventario">
+        <div class="seccion-inventario scrollGrande">
             <h3 style="text-align: center; margin-bottom: 10px;">✧ Juguetes ✧</h3>
+
             <div class="inventario-grid" id="inventario-juguetes">
-                <div class="item-inventario" draggable="true" data-tipo="juguete1">
-                    <img src="./juguete1.gif" alt="Pelota">
-                    <div>Pelota</div>
-                </div>
-                <div class="item-inventario" draggable="true" data-tipo="juguete2">
-                    <img src="./juguete2.gif" alt="Peluche">
-                    <div>Peluche</div>
-                </div>
+                <% items.forEach((item, i) => { %>
+                    <% if (item.categoria === "juguetes") { %>
+                        <div class="item-inventario" draggable="true" data-tipo="juguete"  data-id="<%= item.indice %>">
+                            <img src="/<%= item.indice %>.gif" alt="<%= item.indice %>">
+                            <div><p style="font-size: 10px;"><%= juguetes[item.indice] %></p></div>
+                        </div>
+                    <% } %>
+                <% }) %>
             </div>
         </div>
         
-        <div class="seccion-inventario">
+        <div class="seccion-inventario scrollGrande">
             <h3 style="text-align: center; margin-bottom: 10px;">✧ Fondos ✧</h3>
             <div class="inventario-grid" id="inventario-fondos">
-                <div class="item-inventario" draggable="true" data-tipo="1">
-                    <img src="imagenes_de_corrales/1.jpg" alt="Bosque">
-                    <div>Bosque</div>
+                <% items.forEach((item, i) => { %>
+                    <% if (item.categoria === "corrales") { %>
+                <div class="item-inventario" draggable="true" data-tipo="<%= item.indice + 1%>"  data-id="<%= item.indice %>">
+                    <img src="imagenes_de_corrales/<%= item.indice + 1 %>.png" alt="<%= item.indice %>">
+                    <div><p style="font-size: 10px;"><%= corralesDisponibles[item.indice] %></p></div>
                 </div>
-                <div class="item-inventario" draggable="true" data-tipo="2">
-                    <img src="imagenes_de_corrales/2.jpg" alt="Playa">
-                    <div>Playa</div>
-                </div>
+                    <% } %>
+                <% }) %>
             </div>
         </div>
     </div>
 </div>
+
+<div id="popup-mensaje" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #222;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  font-size: 14px;
+  display: none;
+  z-index: 1000;
+  max-width: 300px;
+  white-space: pre-wrap;
+"></div>
+
 
 <script src="scripts/corral.js"></script>
 

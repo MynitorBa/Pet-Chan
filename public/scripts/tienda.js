@@ -1,3 +1,12 @@
+
+// ----------------------
+// PAGINACIÓN
+// ----------------------
+// Configuración inicial
+const productosPorPagina = 8;
+let paginaActual = 1;
+let productosVisibles = [];
+
 // Cambiar categorías activas
 document.querySelectorAll('.tienda-categoria').forEach(categoria => {
     categoria.addEventListener('click', function() {
@@ -5,112 +14,158 @@ document.querySelectorAll('.tienda-categoria').forEach(categoria => {
         document.querySelectorAll('.tienda-categoria').forEach(cat => {
             cat.classList.remove('activo');
         });
-        
+
         // Agregar clase activo a la categoría clicada
         this.classList.add('activo');
-        
+
         // Obtener categoría seleccionada
         const categoriaSeleccionada = this.getAttribute('data-categoria');
-        
+
         // Filtrar productos
         filtrarProductos(categoriaSeleccionada);
     });
 });
 
-// Función para filtrar productos
+// Función para filtrar productos por categoría
 function filtrarProductos(categoria) {
-    const productos = document.querySelectorAll('.tienda-producto');
+    const todosProductos = document.querySelectorAll('.tienda-producto');
     
-    productos.forEach(producto => {
-        if (categoria === 'todos' || producto.getAttribute('data-categoria') === categoria) {
-            producto.style.display = 'flex';
-        } else {
-            producto.style.display = 'none';
-        }
+    // Actualizar lista de productos visibles
+    productosVisibles = Array.from(todosProductos).filter(producto => {
+        return categoria === 'todos' || producto.getAttribute('data-categoria') === categoria;
     });
+
+    // Mostrar u ocultar productos según categoría
+    todosProductos.forEach(producto => {
+        producto.style.display = 'none'; // Primero ocultamos todos
+    });
+
+    // Reiniciar a página 1
+    paginaActual = 1;
+    actualizarVistaPagina();
 }
 
-// Gestión del carrito
-let cantidadCarrito = 0;
-const contadorCarrito = document.querySelector('.tienda-carrito-contador');
-
+// Función para comprar producto directamente
 document.querySelectorAll('.tienda-producto-boton').forEach(boton => {
     boton.addEventListener('click', function() {
-        // Incrementar contador
-        cantidadCarrito++;
-        contadorCarrito.textContent = cantidadCarrito;
-        
-        // Obtener información del producto
         const producto = this.closest('.tienda-producto');
         const nombreProducto = producto.querySelector('.tienda-producto-titulo').textContent;
         const precioProducto = producto.querySelector('.tienda-producto-precio').textContent;
+
+        // Obtener cantidad de monedas
+        const monedas = document.getElementById('monedas');
+        const moneyNumber = parseFloat(monedas.textContent);
+
+        if (moneyNumber < parseFloat(precioProducto)) {
+            alert("No tienes suficientes monedas para comprar este producto.");   
+        }else{
+        // Mostrar mensaje de compra
+        alert(`¡Has comprado ${nombreProducto} por ${precioProducto}!`);
         
-        // Crear etiqueta flotante
-        const etiqueta = document.createElement('div');
-        etiqueta.classList.add('tienda-etiqueta-flotante');
-        etiqueta.textContent = `${nombreProducto} añadido`;
-        producto.appendChild(etiqueta);
-        
-        // Mostrar y luego ocultar etiqueta
-        setTimeout(() => {
-            etiqueta.style.opacity = '1';
-            etiqueta.style.top = '-30px';
-        }, 10);
-        
-        setTimeout(() => {
-            etiqueta.style.opacity = '0';
-        }, 1500);
-        
-        setTimeout(() => {
-            etiqueta.remove();
-        }, 1800);
-        
-        // Animar carrito
-        const carrito = document.querySelector('.tienda-carrito-flotante');
-        carrito.classList.add('tienda-animacion-pulso');
-        
-        setTimeout(() => {
-            carrito.classList.remove('tienda-animacion-pulso');
-        }, 1000);
-        
-        // Actualizar stock
+        }
+
+        // Actualizar stock (opcional)
         const stockElement = producto.querySelector('.tienda-producto-stock');
-        let stock = parseInt(stockElement.textContent.match(/\d+/)[0]);
-        stock--;
-        stockElement.textContent = `Stock: ${stock}`;
-        
-        // Deshabilitar botón si stock llega a 0
-if (stock <= 0) {
-this.disabled = true;
-this.textContent = "Agotado";
-stockElement.textContent = "Sin stock";
-this.classList.remove('tienda-animacion-pulso');
-}
-    });
-});
-
-// Funcionalidad del carrito flotante
-document.querySelector('.tienda-carrito-flotante').addEventListener('click', function() {
-    if (cantidadCarrito > 0) {
-        alert(`¡Tienes ${cantidadCarrito} productos en tu carrito! \nPronto podrás completar tu compra.`);
-    } else {
-        alert("Tu carrito está vacío. ¡Añade algunos productos increíbles para tu mascota virtual!");
-    }
-});
-
-// Animación para páginas de paginación
-document.querySelectorAll('.tienda-pagina').forEach(pagina => {
-    pagina.addEventListener('click', function() {
-        document.querySelectorAll('.tienda-pagina').forEach(p => {
-            p.classList.remove('activo');
-        });
-        this.classList.add('activo');
-        
-        // Aquí iría la funcionalidad para cambiar de página
-        if (this.textContent !== '→') {
-            alert(`Has navegado a la página ${this.textContent}`);
-        } else {
-            alert("Navegando a la siguiente página...");
+        if (stockElement) {
+            let stock = parseInt(stockElement.textContent.match(/\d+/)[0]);
+            stock--;
+            stockElement.textContent = `Stock: ${stock}`;
+            if (stock <= 0) {
+                this.disabled = true;
+                this.textContent = "Agotado";
+                stockElement.textContent = "Sin stock";
+            }
         }
     });
+});
+
+// ----------------------
+// PAGINACIÓN MEJORADA
+// ----------------------
+
+function actualizarVistaPagina() {
+    // Ocultar todos los productos primero
+    document.querySelectorAll('.tienda-producto').forEach(p => {
+        p.style.display = 'none';
+    });
+
+    // Calcular rango de productos a mostrar
+    const inicio = (paginaActual - 1) * productosPorPagina;
+    const fin = paginaActual * productosPorPagina;
+
+    // Mostrar solo los productos de la página actual
+    productosVisibles.slice(inicio, fin).forEach(producto => {
+        producto.style.display = 'flex';
+    });
+
+    // Actualizar botones de paginación
+    generarBotonesPaginacion();
+    actualizarPaginacionActiva(paginaActual);
+}
+
+function actualizarPaginacionActiva(pagina) {
+    document.querySelectorAll('.tienda-pagina').forEach(p => {
+        p.classList.remove('activo');
+        if (p.textContent == pagina.toString()) {
+            p.classList.add('activo');
+        }
+    });
+}
+
+function generarBotonesPaginacion() {
+    const contenedor = document.querySelector('.tienda-paginacion');
+    if (!contenedor) return;
+
+    const totalPaginas = Math.ceil(productosVisibles.length / productosPorPagina);
+
+    contenedor.innerHTML = '';
+
+    // Botón de anterior si no estamos en la primera página
+    if (paginaActual > 1) {
+        const anterior = document.createElement('div');
+        anterior.className = 'tienda-pagina';
+        anterior.textContent = '←';
+        anterior.addEventListener('click', () => {
+            paginaActual--;
+            actualizarVistaPagina();
+        });
+        contenedor.appendChild(anterior);
+    }
+
+    // Botones de páginas numeradas
+    for (let i = 1; i <= totalPaginas; i++) {
+        const pagina = document.createElement('div');
+        pagina.className = 'tienda-pagina';
+        pagina.textContent = i;
+        if (i === paginaActual) pagina.classList.add('activo');
+        
+        pagina.addEventListener('click', () => {
+            paginaActual = i;
+            actualizarVistaPagina();
+        });
+        
+        contenedor.appendChild(pagina);
+    }
+
+    // Botón de siguiente si no estamos en la última página
+    if (paginaActual < totalPaginas) {
+        const siguiente = document.createElement('div');
+        siguiente.className = 'tienda-pagina';
+        siguiente.textContent = '→';
+        siguiente.addEventListener('click', () => {
+            paginaActual++;
+            actualizarVistaPagina();
+        });
+        contenedor.appendChild(siguiente);
+    }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+    // Activar categoría "todos" por defecto
+    document.querySelector('.tienda-categoria[data-categoria="todos"]').classList.add('activo');
+    
+    // Inicializar con todos los productos visibles
+    productosVisibles = Array.from(document.querySelectorAll('.tienda-producto'));
+    actualizarVistaPagina();
 });
