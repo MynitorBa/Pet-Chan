@@ -454,6 +454,10 @@
     display: none;
 }
 
+.Accesorio {
+    display: none;
+}
+
 .no-transition {
     transition: none !important;
 }

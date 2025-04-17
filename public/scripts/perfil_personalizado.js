@@ -155,11 +155,24 @@ function animarAccesorios() {
         }
     });
     
+    
     requestAnimationFrame(animarAccesorios);
 }
 
 // Iniciar la animación de los accesorios
 requestAnimationFrame(animarAccesorios);
+
+window.addEventListener('DOMContentLoaded', () => {
+    const indicesActivos = accesoriosActivos.map(acc => acc.indice.toString());
+
+    document.querySelectorAll('.accesorio').forEach(accesorioElem => {
+        const indice = accesorioElem.getAttribute('data-accesorio');
+
+        if (indicesActivos.includes(indice)) {
+            accesorioElem.click(); // Simula el clic para marcarlo como seleccionado y mostrarlo
+        }
+    });
+});
 
 // Botones de cancelar
 document.querySelectorAll('.boton.cancelar').forEach(boton => {

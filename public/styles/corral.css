@@ -131,6 +131,24 @@ main {
     display: none;
 }
 
+.Accesorio {
+    display: none;
+}
+
+/* Accesorios (todos posicionados sobre la mascota) */
+.Accesorio1 {
+    position: absolute;
+    top: 10px; 
+    left: 15px; 
+    width: 175px; 
+    height: auto;
+    
+    z-index: 20;
+}
+
+.ImagenCompletaContendor{
+    position: relative;
+}
 .scrollGrande{
    
     width: 300px;

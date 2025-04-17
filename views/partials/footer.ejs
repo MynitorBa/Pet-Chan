@@ -1,7 +1,17 @@
 </main>
 
 <div class="contenedor-micro-mascota">
-    <img class="micro-mascota pixeleado" src="<%= rutaImagen %>" alt="">
+    <div class="mascota-contenedor">
+        <img class="micro-mascota pixeleado" src="<%= rutaImagen %>" alt="Mascota">
+
+        <% if (accesorios != null) { %>
+
+        <% for (let i = 0; i < accesorios.length; i++) { %>
+            <img class="Accesorio pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
+        <% } %>
+
+        <% } %>
+    </div>
 </div>
 
 <footer class="pie-principal">

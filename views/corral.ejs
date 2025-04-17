@@ -11,7 +11,17 @@
     <div class="corral-escenario" id="corral-escenario">
     <% } %>
        
-        <img src="<%= rutaImagen %>" alt="Mascota Luna" class="mascota" id="mascota">
+        <div class="ImagenCompletaContendor" id="mascota">
+            <img src="<%= rutaImagen %>" alt="Mascota Virtual" class="mascota" id="mascota">
+
+            <% if (accesorios != null) { %>
+
+                <% for (let i = 0; i < accesorios.length; i++) { %>
+                    <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
+                <% } %>
+        
+            <% } %>
+        </div>
     </div>
     
     <div class="inventario-secciones ">

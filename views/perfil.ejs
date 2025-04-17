@@ -36,7 +36,21 @@
         
         <h2>★★ <span><%= mascotaNombre%></span> <span><%= pronombre%></span> <span><%= especieDeMascota%></span> ★★</h2>
         <div class="contenedor-mascota">
-            <img src="<%= rutaImagen %>" alt="Mascota Virtual" class="pixeleado imagen-mascota">
+
+            
+            <div class="ImagenCompletaContendor">
+                <img src="<%= rutaImagen %>" alt="Mascota Virtual" class="pixeleado imagen-mascota">
+
+
+                <% if (accesorios != null) { %>
+    
+                    <% for (let i = 0; i < accesorios.length; i++) { %>
+                        <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
+                    <% } %>
+            
+                <% } %>
+            </div>
+
             <div class="estadisticas-mascota">
                 <h3>✧ Estadística de tu Mascota ✧</h3>
                 <div class="etiqueta-estadistica">

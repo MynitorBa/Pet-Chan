@@ -10,42 +10,21 @@
         <div class="escenario-pasarela" id="escenario">
             <img src="<%= rutaImagen %>" alt="Tu mascota" class="mascota-preview pixeleado" id="mascota-preview">
             <!-- Los accesorios seleccionados se mostrarán aquí superpuestos a la mascota -->
-        </div>
+             
+
+         </div>
         
         <h3 class="titulo-pasarela">✧ Accesorios Disponibles ✧</h3>
         <div class="accesorios-disponibles">
-            <div class="accesorio" data-accesorio="sombrero">
-                <img src="imagenes_de_accesorios/1.gif" alt="Sombrero" class="pixeleado">
-                <span>Sombrero</span>
+            <% if (itemsaccesorios != null) { %>
+            <% for (var i = 0; i < itemsaccesorios.length; i++) { %>
+            <div class="accesorio" data-accesorio="<%= itemsaccesorios[i].indice %>">
+                <img src="imagenes_de_accesorios/<%= itemsaccesorios[i].indice + 1%>.gif" alt="Sombrero" class="pixeleado">
+                <span><%= Nombresaccesorios[itemsaccesorios[i].indice] %></span>
             </div>
-            <div class="accesorio" data-accesorio="gafas">
-                <img src="./sombrero1.gif" alt="Gafas" class="pixeleado">
-                <span>Gafas</span>
-            </div>
-            <div class="accesorio" data-accesorio="collar">
-                <img src="./sombrero1.gif" alt="Collar" class="pixeleado">
-                <span>Collar</span>
-            </div>
-            <div class="accesorio" data-accesorio="alas">
-                <img src="./sombrero1.gif" alt="Alas" class="pixeleado">
-                <span>Alas</span>
-            </div>
-            <div class="accesorio" data-accesorio="arma">
-                <img src="./sombrero1.gif" alt="Arma" class="pixeleado">
-                <span>Arma</span>
-            </div>
-            <div class="accesorio" data-accesorio="capa">
-                <img src="./sombrero1.gif" alt="Capa" class="pixeleado">
-                <span>Capa</span>
-            </div>
-            <div class="accesorio" data-accesorio="varita">
-                <img src="./sombrero1.gif" alt="Varita" class="pixeleado">
-                <span>Varita</span>
-            </div>
-            <div class="accesorio" data-accesorio="bufanda">
-                <img src="./sombrero1.gif" alt="Bufanda" class="pixeleado">
-                <span>Bufanda</span>
-            </div>
+            <% } %>
+            <% } %>
+
         </div>
     </div>
     
@@ -146,6 +125,10 @@
     </div>
 </div>
 
+<script>
+    const accesoriosActivos = <%- JSON.stringify(accesorios || []) %>;
+</script>
 <script src="scripts/perfil_personalizado.js"></script>
+
 
 <%- include("partials/footer.ejs") %>

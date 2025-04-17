@@ -233,3 +233,22 @@ h1, h2, h3 {
 .micro-mascota {
     display: none;
 }
+
+.Accesorio {
+    display: none;
+}
+
+/* Accesorios (todos posicionados sobre la mascota) */
+.Accesorio1 {
+    position: absolute;
+    top: 10px; 
+    left: 15px; 
+    width: 125px; 
+    height: auto;
+
+}
+
+.ImagenCompletaContendor{
+    position: relative;
+
+}

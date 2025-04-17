@@ -35,7 +35,7 @@
                 
                 <div class="tienda-grid-productos">
                     <!-- Productos: Accesorio -->
-                    <% accesorios.forEach((accesorio, i) => { %>
+                    <% accesoriosVarios.forEach((accesorio, i) => { %>
                         
                         <div class="tienda-producto" style="display: flex;"  data-categoria="accesorios" data-index="<%= globalIndex++ %>">
                             <div class="tienda-oferta-banner">Estilo</div>
@@ -48,7 +48,7 @@
                                 <div class="tienda-producto-precios">
                                     <span class="tienda-producto-precio"><%= preciosAccesorios[i] %> ⭐</span>                                </div>
                                 <div class="tienda-producto-footer">
-                                    <form action="/comprarItem" method="post">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="accesorios">
                                         <input type="hidden" name="index" value="<%= i %>">
                                         <input type="hidden" name="categoria" value="accesorios" >
                                         <button type="submit" class="tienda-producto-boton">Comprar</button>
@@ -71,7 +71,7 @@
                                     <span class="tienda-producto-precio"><%= preciosComidas[i] %> ⭐</span>
                                 </div>
                                 <div class="tienda-producto-footer">
-                                    <form action="/comprarItem" method="post">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="comida">
                                         <input type="hidden" name="index" value="<%= i %>">
                                         <input type="hidden" name="precio" value="<%= preciosComidas[i] %>">
                                         <input type="hidden" name="categoria" value="comida" >
@@ -95,7 +95,7 @@
                                     <span class="tienda-producto-precio"><%= preciosJuguetes[i] %> ⭐</span>
                                 </div>
                                 <div class="tienda-producto-footer">
-                                    <form action="/comprarItem" method="post">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="juguetes">
                                         <input type="hidden" name="index" value="<%= i %>">
                                         <input type="hidden" name="precio" value="<%= preciosJuguetes[i] %>">
                                         <input type="hidden" name="categoria" value="juguetes" >
@@ -117,7 +117,7 @@
                                 <div class="tienda-producto-precios">
                                     <span class="tienda-producto-precio"><%= preciosCorrales[i] %> ⭐</span>                                </div>
                                 <div class="tienda-producto-footer">
-                                    <form action="/comprarItem" method="post">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="corrales">
                                         <input type="hidden" name="index" value="<%= i %>">
                                         <input type="hidden" name="precio" value="<%= preciosCorrales[i] %>">
                                         <input type="hidden" name="categoria" value="corrales" >
@@ -144,5 +144,60 @@
 
 
         <script src="scripts/tienda.js"></script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const formularios = document.querySelectorAll('.tienda-producto form');
+        const monedasElemento = document.getElementById('monedas');
+
+        formularios.forEach(formulario => {
+            formulario.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Evita que el form haga submit tradicional
+
+            const formData = new FormData(formulario);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/comprarItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+                }
+
+                const resultado = await response.json();
+
+                if (resultado.success) {
+                alert(resultado.mensaje || 'Compra realizada.');
+
+                // 🔽 Restar monedas visualmente
+                const precio = parseInt(data.precio);
+                const monedasActuales = parseInt(monedasElemento.textContent);
+
+                if (!isNaN(precio) && !isNaN(monedasActuales)) {
+                    const nuevasMonedas = monedasActuales - precio;
+                    monedasElemento.textContent = nuevasMonedas;
+                }
+                } else {
+                    alert(resultado.mensaje || 'No se pudo realizar la compra.');
+                }
+
+            } catch (error) {
+                console.error('Error al realizar la compra:', error);
+                alert('Ocurrió un error al realizar la compra.');
+            }
+            });
+        });
+        });
+
+        </script>
+
+
 
         <%- include("partials/footer.ejs") %>

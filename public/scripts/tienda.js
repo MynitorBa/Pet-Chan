@@ -56,14 +56,6 @@ document.querySelectorAll('.tienda-producto-boton').forEach(boton => {
         const monedas = document.getElementById('monedas');
         const moneyNumber = parseFloat(monedas.textContent);
 
-        if (moneyNumber < parseFloat(precioProducto)) {
-            alert("No tienes suficientes monedas para comprar este producto.");   
-        }else{
-        // Mostrar mensaje de compra
-        alert(`¡Has comprado ${nombreProducto} por ${precioProducto}!`);
-        
-        }
-
         // Actualizar stock (opcional)
         const stockElement = producto.querySelector('.tienda-producto-stock');
         if (stockElement) {

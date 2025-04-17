@@ -129,6 +129,9 @@ app.post('/register', async (req, res) => {
         req.session.money = 0;
         req.session.corral = null;
 
+        // vamos a poner los accesorios en null
+        req.session.accesorios = null;
+
         res.redirect("/minijuegomascota");
     } catch (error) {
         console.error(error);
@@ -189,6 +192,15 @@ app.post("/login", async (req, res) => {
                 habilidad: mascota.habilidad,
                 comidaFavorita: mascota.comidaFavorita
             };
+        }
+
+        //vamos a hacer un array con todos los accesorios del usuario
+        const accesoriosResult = await db.query('SELECT * FROM accesorios WHERE "id_users" = $1', [user.id]);
+
+        if (accesoriosResult.rows.length > 0) {
+            req.session.accesorios = accesoriosResult.rows;
+        }else{
+            req.session.accesorios = null;
         }
 
         res.redirect("/inicio");
@@ -344,13 +356,89 @@ app.post('/modificarPerfil', requireLogin, async (req, res) => {
     }
 });
 
-
+//este post nos ayudara a modificar las mascotas y sus accesorios
 app.post('/modificarMascota', requireLogin, async (req, res) => {
     const nuevoNombre = req.body['nombre-mascota'];
     const mascota = req.session.mascotaActual;
+    const userId = req.session.userId;
+
+    //obtenemos los accesorios
+    const accesoriosTexto = req.body['accesorio-mascota']; // nombres separados por coma
 
     if (!mascota) {
         return res.status(400).send("No tienes una mascota para modificar.");
+    }
+
+    
+
+    try {
+        // Parsear y limpiar los nombres
+        let nombresSeleccionados = accesoriosTexto
+            .split(',')
+            .map(nombre => nombre.trim())
+            .filter(Boolean);
+    
+        // Si no se seleccionó nada útil (solo "Ninguno" o vacío), limpiar accesorios y salir
+        if (
+            nombresSeleccionados.length === 0 ||
+            (nombresSeleccionados.length === 1 && nombresSeleccionados[0].toLowerCase() === 'ninguno')
+        ) {
+            await db.query('DELETE FROM accesorios WHERE id_users = $1', [userId]);
+            // Actualizar accesorios en la sesión
+            req.session.accesorios = null;
+        }else{
+            
+        // Mapear nombres a índices reales
+        const indicesSeleccionados = nombresSeleccionados.map(nombre => {
+            const indice = accesorios.indexOf(nombre);
+            if (indice === -1) {
+                throw new Error(`Accesorio no válido: ${nombre}`);
+            }
+            return indice;
+        });
+    
+        // Verificar que todos estén en la tabla items para el usuario
+        const placeholders = indicesSeleccionados.map((_, i) => `$${i + 1}`).join(', ');
+        const query = `
+            SELECT indice FROM items
+            WHERE categoria = 'accesorios' AND id_users = $${indicesSeleccionados.length + 1}
+              AND indice IN (${placeholders})
+        `;
+    
+        const result = await db.query(query, [...indicesSeleccionados, userId]);
+        const validos = result.rows.map(r => r.indice);
+    
+        const invalidos = indicesSeleccionados.filter(i => !validos.includes(i));
+        if (invalidos.length > 0) {
+            return res.status(400).send('Algunos accesorios no te pertenecen: ' + invalidos.join(', '));
+        }
+    
+        // Reemplazar accesorios actuales
+        await db.query('DELETE FROM accesorios WHERE id_users = $1', [userId]);
+    
+        const insertQuery = `
+            INSERT INTO accesorios (indice, id_users)
+            VALUES ${indicesSeleccionados.map((_, i) => `($${i * 2 + 1}, $${i * 2 + 2})`).join(', ')}
+        `;
+        const insertValues = indicesSeleccionados.flatMap(indice => [indice, userId]);
+    
+        if (insertValues.length > 0) {
+            await db.query(insertQuery, insertValues);
+        }
+
+        // Actualizar accesorios en la sesión
+        //vamos a hacer un array con todos los accesorios del usuario
+        const accesoriosResult1 = await db.query('SELECT * FROM accesorios WHERE "id_users" = $1', [userId]);
+
+        if (accesoriosResult1.rows.length > 0) {
+            req.session.accesorios = accesoriosResult1.rows;
+        }else{
+            req.session.accesorios = null;
+        }
+    }
+    } catch (error) {
+        console.error('Error al modificar los accesorios:', error);
+        res.status(500).send('Error al modificar los accesorios');
     }
 
     try {
@@ -419,6 +507,8 @@ app.post('/comprarItem', requireLogin, async (req, res) => {
     const { index, categoria} = req.body;
     const userId = req.session.userId;
 
+    console.log('Comprando item:', index, categoria);
+
     let precio = 0;
 
     //ahora vamos a obtener el precio de los arrays
@@ -433,22 +523,32 @@ app.post('/comprarItem', requireLogin, async (req, res) => {
             precio = preciosCorrales[index];
         } else {
             console.error("Índice o categoría inválido");
-            return res.redirect('/tienda');
+            return res.json({ success: false, mensaje: 'Índice o categoría inválido' });
         }
     } catch (error) {
         console.error("Error al obtener el precio:", error);
-        return res.redirect('/tienda');
+        return res.json({ success: false, mensaje: 'Error al obtener el precio' });
     }
 
     console.log(index, precio, categoria);
 
     try {
+
         const userResult = await db.query(`SELECT money FROM users WHERE id = $1`, [userId]);
 
         const dineroActual = userResult.rows[0].money;
 
         if (dineroActual < precio) {
-            return res.redirect('/tienda');
+            return res.json({ success: false, mensaje: 'Dinero insuficiente' });    
+        }
+
+        //si el item es accesorios o corrales, veremos que el usuario no lo tenga ya
+        if (categoria === 'accesorios' || categoria === 'corrales') {
+            const userHasItem = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = $3`, [userId, index, categoria]);
+            if (userHasItem.rows.length > 0) {
+                console.log('El usuario ya tiene ese item');
+                return res.json({ success: false, mensaje: 'El usuario ya tiene ese item' });
+            }
         }
 
         await db.query(`UPDATE users SET money = $1 WHERE id = $2`, [dineroActual - precio, userId]);
@@ -456,10 +556,10 @@ app.post('/comprarItem', requireLogin, async (req, res) => {
 
         await db.query(`INSERT INTO items (id_users, indice, categoria) VALUES ($1, $2, $3)`, [userId, index, categoria]);
 
-        res.redirect('/tienda');
+        res.json({ success: true, mensaje: 'Item comprado exitosamente' });
     } catch (error) {
         console.error("Error al comprar accesorio:", error);
-        res.redirect('/tienda');
+        res.json({ success: false, mensaje: 'Error al comprar accesorio' });
     }
     
 })
@@ -733,6 +833,7 @@ app.get('/inicio', requireLogin, (req, res) => {
         res.render('inicio.ejs', {
             mensaje,
             rutaImagen: mascota.rutaImagen,
+            accesorios: req.session.accesorios
         });
     
     });
@@ -749,6 +850,7 @@ app.get('/eventos', requireLogin, (req, res) => {
     res.render('eventos.ejs', {
         mensaje,
         rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios
     });
 });
 
@@ -757,7 +859,8 @@ app.get('/formularioSoporte', requireLogin, (req, res) => {
     const mascota = req.session.mascotaActual;
 
     res.render('formularioSoporte.ejs', {
-        rutaImagen: mascota.rutaImagen
+        rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios
     });
 });
 
@@ -769,6 +872,7 @@ app.get('/perfil',  requireLogin, (req, res) => {
     
     res.render('perfil.ejs', {
         rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios,
         mascotaNombre: mascota.nombre,
         usuario: req.session.username,
         especieDeMascota: mascota.especie,
@@ -782,20 +886,37 @@ app.get('/perfil',  requireLogin, (req, res) => {
     });
 });
 
-app.get('/perfil_personalizado', requireLogin, (req, res) => {
+app.get('/perfil_personalizado', requireLogin, async (req, res) => {
 
 
     const mascota = req.session.mascotaActual;
     const mensaje = req.session.mensajeDeContra || '';
     delete req.session.mensajeDeContra;
 
+    let items;
+    try{
+        items = await db.query(`SELECT * FROM items WHERE id_users = $1 ORDER BY indice`, [req.session.userId]);
+    } catch (error) {
+        console.error('Error al obtener los items:', error);
+        return res.status(500).send('Error al obtener los items');
+    }
+
+    //vamos a hacer un array con todos los accesorios del usuario
+    //veamos que items del usuario tienen el tipo accesorio
+    let accesoriosdiponibles = null;
+    if(items.rows.length > 0){
+     accesoriosdiponibles = items.rows.filter(item => item.categoria === 'accesorios');
+    }
 
     res.render('perfil_personalizado.ejs', {
         rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios,
         mascotaNombre: mascota.nombre,
         usuario: req.session.username,
         mensajeDeContra: mensaje,
-        descripcion: req.session.descripcion
+        descripcion: req.session.descripcion,
+        Nombresaccesorios: accesorios,
+        itemsaccesorios: accesoriosdiponibles
     });
 });
 
@@ -814,6 +935,7 @@ app.get('/corral_mascota', requireLogin, async (req, res) => {
 
     res.render('corral.ejs', {
         rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios,
         mascotaNombre: mascota.nombre,
         especieDeMascota: mascota.especie,
         pronombre: mascota.pronombre,
@@ -831,7 +953,8 @@ app.get('/ayuda',  requireLogin, (req, res) => {
     const mascota = req.session.mascotaActual;
 
     res.render('FAQ.ejs', {
-        rutaImagen: mascota.rutaImagen
+        rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios
     });
 });
 
@@ -840,7 +963,8 @@ app.get('/minijuegos', requireLogin, (req, res) => {
     const mascota = req.session.mascotaActual;
 
     res.render('minijuegos.ejs', {
-        rutaImagen: mascota.rutaImagen
+        rutaImagen: mascota.rutaImagen,
+        accesorios: req.session.accesorios
     });
 });
 
@@ -855,14 +979,15 @@ app.get('/tienda', requireLogin, (req, res) => {
         preciosJuguetes: preciosJuguetes,
         preciosCorrales: preciosCorrales,
         comidasFavoritas: comidasFavoritas,
-        accesorios: accesorios,
+        accesoriosVarios: accesorios,
         juguetes: juguetes,
         corralesDisponibles: corralesDisponibles,
-        money: req.session.money
+        money: req.session.money,
+        accesorios: req.session.accesorios
     });
 });
 
-/*---------------------------creamos rutas generales------------------------------------------------*/
+/*---------------------------creamos rutas generales para los get necesarios-------------------------------------------*/
 
 
 /*---------------------------creamos rutas individuales para los juegos------------------------------------------------*/
