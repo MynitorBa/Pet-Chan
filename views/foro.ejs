@@ -5,105 +5,426 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foro Simple</title>
     <link rel="stylesheet" href="/styles/foro.css">
-    <script src="foro.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
-<%- include("partials/header.ejs") %>
-
 <body>
+    <%- include("partials/header.ejs") %>
+
     <div class="container">
-        <header>
-            <h1>Foro Simple</h1>
-        </header>
-        
-        <section class="formulario">
-            <h2 id="form-title">Nuevo Mensaje</h2>
-            <form action="/publicar" method="POST" id="mensaje-form" enctype="multipart/form-data">
-                <input type="hidden" id="mensaje-id" name="id" value="">
-                <div class="form-group">
-                    <label for="autor">Tu nombre:</label>
-                    <input type="text" id="autor" name="autor" value="meme" required>
-                </div>
-                <div class="form-group">
-                    <label for="mensaje">Mensaje:</label>
-                    <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
-                </div>
-                
-                <div class="form-group imagenes-input-container">
-                    <div id="drop-zone" class="drop-zone">
-                        <p>Arrastra y suelta imágenes aquí o</p>
-                        <label for="imagenes-input" class="imagenes-input-label">
-                            <i class="fas fa-images"></i> Seleccionar imágenes
-                        </label>
+        <div class="top-sections-container">
+            <section class="nuevo-mensaje-section">
+                <h2 id="form-title">Nuevo Mensaje</h2>
+                <div class="formulario-container">
+                <form action="/publicar" method="POST" id="mensaje-form" enctype="multipart/form-data">
+                    <input type="hidden" id="mensaje-id" name="id" value="">
+                    <div class="form-group">
+                        <label for="autor">Tu nombre:</label>
+                        <input type="text" id="autor" name="autor" value="meme" required>
                     </div>
-                    <input type="file" id="imagenes-input" name="imagenes" class="imagenes-input" accept="image/*" multiple>
-                    <div id="imagenes-preview-container"></div>
-                    <p class="hint-text">Máximo 9 imágenes por mensaje</p>
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje:</label>
+                        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+                    </div>
+
+                    <div class="categoria-container">
+                        <div class="form-group">
+                            <select id="etiqueta-comentario" name="etiqueta">
+                                <option value="">Seleccione categoría</option>
+                                <% etiquetasDisponibles.forEach(etiqueta => { %>
+                                    <option value="<%= etiqueta %>"><%= etiqueta %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <select id="subcategoria-comentario" name="subcategoria">
+                                <option value="">Seleccione subcategoría</option>
+                                <% Object.values(subetiquetasDisponibles).flat().forEach(subcategoria => { %>
+                                    <option value="<%= subcategoria %>"><%= subcategoria %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <select id="extrasubcategoria-comentario" name="extrasubcategoria">
+                                <option value="">Seleccione subcategoría extra</option>
+                                <% extrasubetiquetasDisponibles.forEach(extrasubcategoria => { %>
+                                    <option value="<%= extrasubcategoria %>"><%= extrasubcategoria %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group imagenes-input-container">
+                        <div id="drop-zone" class="drop-zone">
+                            <label for="imagenes-input" class="imagenes-input-label">
+                                <i class="fas fa-images"></i> Seleccionar imágenes
+                            </label>
+                        </div>
+                        <input type="file" id="imagenes-input" name="imagenes" class="imagenes-input" accept="image/*" multiple>
+                        <div id="imagenes-preview-container"></div>
+                        <p class="hint-text">Máximo 9 imágenes por mensaje</p>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" id="submit-btn">Publicar</button>
+                        <button type="button" id="cancel-btn" class="cancel-message-btn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            </section>
+            
+            <!-- Nuevo Comentario Section -->
+            <section class="nuevo-comentario-section" style="display: none;">
+                <h2 id="form-comment-title">Nuevo Comentario</h2>
+                <div class="formulario-container">
+                    <form action="/publicar-comentario" method="POST" id="comentario-form" enctype="multipart/form-data">
+                        <input type="hidden" id="mensaje-padre-id" name="mensaje_padre_id" value="">
+                        <div class="form-group">
+                            <label for="autor-comentario">Tu nombre:</label>
+                            <input type="text" id="autor-comentario" name="autor" value="meme" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="comentario">Comentario:</label>
+                            <textarea id="comentario" name="comentario" rows="4" required></textarea>
+                        </div>
+                        
+                        <div class="form-group imagenes-input-container">
+                            <div id="drop-zone-comentario" class="drop-zone">
+                                <label for="imagenes-input-comentario" class="imagenes-input-label">
+                                    <i class="fas fa-images"></i> Seleccionar imágenes
+                                </label>
+                            </div>
+                            <input type="file" id="imagenes-input-comentario" name="imagenes" class="imagenes-input" accept="image/*" multiple>
+                            <div id="imagenes-preview-container-comentario"></div>
+                            <p class="hint-text">Máximo 4 imágenes por comentario</p>
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button type="submit" id="submit-comentario-btn">Publicar Comentario</button>
+                            <button type="button" id="cancel-comentario-btn">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            <section class="filtros-section">
+                <div class="filtros-container">
+                <div class="filtros-header">
+                    <div class="filtros-buttons">
+                        <button id="btn-orden" class="filtro-boton">Orden</button>
+                        <button id="btn-ranking" class="filtro-boton">Ranking</button>
+                        <button id="btn-tipo" class="filtro-boton">Tipo</button>
+                        <button id="btn-etiquetas" class="filtro-boton">Etiquetas</button>
+                        <button id="btn-subetiquetas" class="filtro-boton">Subetiquetas</button>
+                    </div>
+                    <div>
+                        <button id="aplicar-filtros" class="filtro-boton">Aplicar filtros</button>
+                        <button id="limpiar-filtros" class="filtro-boton">Limpiar filtros</button>
+                    </div>
                 </div>
                 
-                <div class="form-buttons">
-                    <button type="submit" id="submit-btn">Publicar</button>
-                    <button type="button" id="cancel-btn" style="display: none;">Cancelar</button>
-                </div>
-            </form>
-        </section>
-        
-        <section class="mensajes">
-            <h2>Mensajes (<span id="contador"><%= mensajes.length %></span>)</h2>
-            <div class="lista-mensajes">
-                <% if (mensajes.length === 0) { %>
-                    <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
-                <% } else { %>
-                    <% mensajes.forEach(mensaje => { %>
-                        <div class="mensaje" data-id="<%= mensaje.id %>">
-                            <div class="mensaje-cabecera">
-                                <span class="autor"><%= mensaje.autor %></span>
-                                <span class="fecha"><%= mensaje.fecha %></span>
-                                <div class="mensaje-acciones">
-                                    <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                <form id="filter-form" action="/filtrar" method="GET">
+                    <!-- Orden Filters -->
+                    <div id="filtros-orden" class="filtros-expanded">
+                        <div class="filtros-grid">
+                            <% const ordenOpciones = [
+                                { id: 'recientes', valor: 'recientes', texto: 'Más recientes' },
+                                { id: 'antiguos', valor: 'antiguos', texto: 'Más antiguos' },
+                                { id: 'nuevos_24h', valor: 'nuevos_24h', texto: 'Nuevos (24h)' },
+                                { id: 'nuevos_semana', valor: 'nuevos_semana', texto: 'Nuevos (semana)' },
+                                { id: 'mas_valorados', valor: 'mas_valorados', texto: 'Mejor valorados' }
+                            ]; %>
+                            <% ordenOpciones.forEach(opcion => { %>
+                                <div class="filtro-item">
+                                    <input type="radio" id="<%= opcion.id %>" name="orden" value="<%= opcion.valor %>">
+                                    <label for="<%= opcion.id %>"><%= opcion.texto %></label>
                                 </div>
-                            </div>
-                            <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
-                            
-                            <% if (mensaje.imagenes && mensaje.imagenes.length > 0) { %>
-                                <div class="mensaje-imagenes">
-                                    <div class="mensaje-imagenes-grid grid-<%= mensaje.imagenes.length %>">
-                                        <% mensaje.imagenes.forEach(imagen => { %>
-                                            <div class="imagen-mensaje-celda" data-imagen-id="<%= imagen.id %>">
-                                                <img src="<%= imagen.url %>" alt="Imagen adjunta">
-                                            </div>
-                                        <% }); %>
+                            <% }); %>
+                        </div>
+                    </div>
+                
+                    <!-- Ranking Filters -->
+                    <div id="filtros-ranking" class="filtros-expanded">
+                        <div class="filtros-grid">
+                            <% const rankingOpciones = [
+                                { id: 'todos_ranking', valor: 'todos', texto: 'Todos' },
+                                { id: 'populares', valor: 'populares', texto: 'Populares (+100 likes)' },
+                                { id: 'medios', valor: 'medios', texto: 'Medios (20-99 likes)' },
+                                { id: 'menos_populares', valor: 'menos_populares', texto: 'Menos populares (0-19)' }
+                            ]; %>
+                            <% rankingOpciones.forEach(opcion => { %>
+                                <div class="filtro-item">
+                                    <input type="radio" id="<%= opcion.id %>" name="ranking" value="<%= opcion.valor %>">
+                                    <label for="<%= opcion.id %>"><%= opcion.texto %></label>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                
+                    <!-- Tipo Filters -->
+                    <div id="filtros-tipo" class="filtros-expanded">
+                        <div class="filtros-grid">
+                            <% const tipoOpciones = [
+                                { id: 'todos_tipo', valor: 'todos', texto: 'Todos los mensajes' },
+                                { id: 'mios', valor: 'mios', texto: 'Mis mensajes' },
+                                { id: 'otros', valor: 'otros', texto: 'Mensajes de otros' }
+                            ]; %>
+                            <% tipoOpciones.forEach(opcion => { %>
+                                <div class="filtro-item">
+                                    <input type="radio" id="<%= opcion.id %>" name="tipo" value="<%= opcion.valor %>">
+                                    <label for="<%= opcion.id %>"><%= opcion.texto %></label>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                
+                    <!-- Etiquetas Filters -->
+                    <div id="filtros-etiquetas" class="filtros-expanded">
+                        <div class="filtros-grid">
+                            <% const etiquetasOpciones = [
+                            'Ninguna',
+                                'Videojuegos', 'Música', 'Cine', 'Tecnología', 
+                                'Literatura', 'Ciencia', 'Deportes', 'Moda', 'Gastronomía'
+                            ]; %>
+                            <% etiquetasOpciones.forEach(etiqueta => { %>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="<%= etiqueta.toLowerCase() %>" name="etiquetas" value="<%= etiqueta %>">
+                                    <label for="<%= etiqueta.toLowerCase() %>"><%= etiqueta %></label>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                
+                    <!-- Subetiquetas Filters -->
+                    <div id="filtros-subetiquetas" class="filtros-expanded">
+                        <div class="filtros-grid">
+                            <% const subetiquetasOpciones = {
+                                'Ninguna': ['Ninguna', 'Ninguna', 'Ninguna'],
+                                'Videojuegos': ['Minecraft', 'Terraria', 'Roblox'],
+                                'Música': ['Rock', 'Pop', 'Electrónica'],
+                                'Cine': ['Terror', 'Comedia', 'Acción'],
+                                'Tecnología': ['Smartphones', 'Laptops', 'Gadgets'],
+                                'Literatura': ['Novela', 'Poesía', 'Ensayo'],
+                                'Ciencia': ['Física', 'Biología', 'Astronomía'],
+                                'Deportes': ['Fútbol', 'Baloncesto', 'Tenis'],
+                                'Moda': ['Casual', 'Formal', 'Vintage'],
+                                'Gastronomía': ['Guatemalteca', 'Estadounidense', 'Japonesa']
+                            }; %>
+                            <% Object.entries(subetiquetasOpciones).forEach(([categoria, subetiquetas]) => { 
+                                subetiquetas.forEach(subetiqueta => { %>
+                                    <div class="filtro-item">
+                                        <input type="checkbox" 
+                                               id="<%= subetiqueta.toLowerCase() %>" 
+                                               name="subetiquetas-<%= categoria.toLowerCase() %>" 
+                                               value="<%= subetiqueta %>">
+                                        <label for="<%= subetiqueta.toLowerCase() %>"><%= subetiqueta %></label>
+                                    </div>
+                                <% }); 
+                            }); %>
+                        </div>
+                    </div>
+                </form>
+                </div>
+                
+                </section>
+
+                <section class="mensajes">
+                    <h2>Mensajes (<span id="contador"><%= mensajes.length %></span>)</h2>
+                    <div class="lista-mensajes">
+                        <% if (mensajes.length === 0) { %>
+                            <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
+                        <% } else { %>
+                            <% mensajes.forEach(mensaje => { %>
+                                <div class="mensaje" data-id="<%= mensaje.id %>">
+                                    <div class="mensaje-cabecera">
+                                        <span class="autor"><%= mensaje.autor %></span>
+                                        <div class="etiquetas-container">
+                                            <% if (mensaje.etiqueta) { %>
+                                                <span class="etiqueta principal" data-categoria="<%= mensaje.etiqueta %>">
+                                                    <%= mensaje.etiqueta %>
+                                                </span>
+                                            <% } %>
+                                            
+                                            <% if (mensaje.subcategoria) { %>
+                                                <span class="subetiqueta" 
+                                                    data-categoria="<%= mensaje.etiqueta %>"
+                                                    data-subcategoria="<%= mensaje.subcategoria %>">
+                                                    <i class="fas fa-tag"></i> 
+                                                    <%= mensaje.subcategoria %>
+                                                </span>
+                                            <% } %>
+                                            
+                                            <% if (mensaje.extrasubcategoria) { %>
+                                                <span class="subetiqueta extra" 
+                                                    data-categoria="<%= mensaje.etiqueta %>"
+                                                    data-extrasubcategoria="<%= mensaje.extrasubcategoria %>">
+                                                    <i class="fas fa-tags"></i> 
+                                                    <%= mensaje.extrasubcategoria %>
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        <div class="mensaje-acciones">
+                                            <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                                            <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
+                                    
+                                    <% if (mensaje.imagenes && mensaje.imagenes.length > 0) { %>
+                                        <div class="mensaje-imagenes">
+                                            <% mensaje.imagenes.forEach(imagen => { %>
+                                                <div class="imagen-mensaje">
+                                                    <img src="<%= imagen.url %>" alt="Imagen adjunta">
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <div class="mensaje-pie">
+                                        <span class="fecha"><%= mensaje.fechaStr %></span>
+                                        <div class="ranking-container" data-mensaje-id="<%= mensaje.id %>">
+                                            <button class="btn-votar upvote" data-valor="1">
+                                                &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
+                                            </button>
+                                            <span class="ranking-valor <%= mensaje.ranking < 0 ? 'negativo' : '' %>">
+                                                <%= mensaje.ranking %>
+                                            </span>
+                                            <button class="btn-votar downvote" data-valor="-1">
+                                                &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
+                                            </button>
+                                        </div>
+                                    </div>                                    
+                        
+                                    <!-- Sección de comentarios -->
+                                    <div class="comentarios-seccion">
+                                        <div class="comentarios-lista">
+                                            <% if (mensaje.comentarios && mensaje.comentarios.length > 0) { %>
+                                                <% mensaje.comentarios.forEach(comentario => { %>
+                                                    <div class="comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                        <div class="comentario-cabecera">
+                                                            <span class="comentario-autor"><%= comentario.autor %></span>
+                                                            <div class="comentario-acciones">
+                                                                <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="comentario-contenido"><%= comentario.comentario %></div>
+
+<!-- Images section remains unchanged -->
+<% if (comentario.imagenes && comentario.imagenes.length > 0) { %>
+    <div class="comentario-imagenes">
+        <% comentario.imagenes.forEach(imagen => { %>
+            <div class="imagen-comentario">
+                <img src="<%= imagen.url %>" alt="Imagen de comentario">
+            </div>
+        <% }); %>
+    </div>
+<% } %>
+
+<!-- New footer layout -->
+<div class="comentario-pie">
+    <span class="comentario-fecha"><%= comentario.fechaStr %></span>
+    <div class="comentario-botones">
+        <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+</div>
+                                                    </div>
+                                                <% }); %>
+                                            <% } %>
+                                        </div>
+                
+                                        <div class="nuevo-comentario-container">
+                                            <form class="nuevo-comentario-form" data-mensaje-id="<%= mensaje.id %>">
+                                                <div class="form-group">
+                                                    <input type="text" 
+                                                           name="autor" 
+                                                           placeholder="Tu nombre" 
+                                                           required 
+                                                           value="meme">
+                                                </div>
+                                                <div class="form-group">
+                                                    <textarea 
+                                                        name="comentario" 
+                                                        placeholder="Escribe tu comentario" 
+                                                        required></textarea>
+                                                </div>
+                                                <div class="form-group imagenes-input-container">
+                                                    <div class="drop-zone-comentario">
+                                                        <label for="imagenes-comentario-<%= mensaje.id %>" class="imagenes-input-label">
+                                                            <i class="fas fa-images"></i> Seleccionar imágenes
+                                                        </label>
+                                                    </div>
+                                                    <input 
+                                                        type="file" 
+                                                        id="imagenes-comentario-<%= mensaje.id %>" 
+                                                        name="imagenes" 
+                                                        class="imagenes-input" 
+                                                        accept="image/*" 
+                                                        multiple>
+                                                    <div class="imagenes-preview-container"></div>
+                                                    <p class="hint-text">Máximo 4 imágenes por comentario</p>
+                                                </div>
+                                                <div class="form-actions">
+                                                    <button type="submit" class="btn-publicar">Publicar comentario</button>
+                                                    <button type="button" class="btn-cancelar">Cancelar</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            <% } %>
-                        </div>
-                    <% }); %>
-                <% } %>
-            </div>
-        </section>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                </section>
+                </div>
+                </div>
+                
+                <!-- Modal para confirmar eliminación de mensaje -->
+<div id="modal-confirmacion" class="modal">
+    <div class="modal-contenido">
+      <i class="fas fa-exclamation-triangle warning-icon"></i>
+      <p>¿Estás seguro de que deseas eliminar este mensaje?</p>
+      <p class="modal-subtitle">Esta acción no se puede deshacer.</p>
+      <div class="modal-botones">
+        <button id="btn-confirmar-eliminar">Eliminar</button>
+        <button id="btn-cancelar-eliminar">Cancelar</button>
+      </div>
     </div>
-    
-    <!-- Modal para confirmar eliminación de mensaje -->
-    <div id="modal-confirmacion" class="modal">
-        <div class="modal-contenido">
-            <p>¿Estás seguro de que deseas eliminar este mensaje?</p>
-            <div class="modal-botones">
-                <button id="btn-confirmar-eliminar">Eliminar</button>
-                <button id="btn-cancelar-eliminar">Cancelar</button>
-            </div>
-        </div>
+  </div>
+  
+  <!-- Modal para confirmar eliminación de comentario -->
+  <div id="modal-confirmacion-comentario" class="modal">
+    <div class="modal-contenido">
+      <i class="fas fa-exclamation-triangle warning-icon"></i>
+      <p>¿Estás seguro de que deseas eliminar este comentario?</p>
+      <p class="modal-subtitle">Esta acción no se puede deshacer.</p>
+      <div class="modal-botones">
+        <button id="btn-confirmar-eliminar-comentario">Eliminar</button>
+        <button id="btn-cancelar-eliminar-comentario">Cancelar</button>
+      </div>
     </div>
-    
-    <!-- Modal para imagen ampliada -->
-    <div id="modal-imagen" class="modal-imagen">
-        <div id="modal-imagen-contenido" class="modal-imagen-contenido">
-            <button id="cerrar-modal-imagen" class="cerrar-modal-imagen"><i class="fas fa-times"></i></button>
-        </div>
-    </div>
-    
-    <script src="/scripts/foro.js"></script>
-    <%- include("partials/footer.ejs") %>
-</body>
-</html>
+  </div>
+                
+                <!-- Modal para imagen ampliada -->
+                <div id="modal-imagen" class="modal-imagen">
+                    <div id="modal-imagen-contenido" class="modal-imagen-contenido">
+                        <button id="cerrar-modal-imagen" class="cerrar-modal-imagen"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                
+                <script src="/scripts/foro.js"></script>
+                <%- include("partials/footer.ejs") %>
+                </body>
+                </html>
