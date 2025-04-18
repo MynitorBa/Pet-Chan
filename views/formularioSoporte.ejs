@@ -1,0 +1,122 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/soporte.css">
+
+<main>
+    <div class="contenedor-principal" id="contenedor-principal">
+        <div class="tarjeta-soporte">
+            <!-- Colocar estrellas decorativas -->
+            <div class="estrella-decoracion" style="top: 20px; left: 30px; font-size: 16px;">✦</div>
+            <div class="estrella-decoracion" style="top: 40px; right: 50px; font-size: 20px;">✧</div>
+            <div class="estrella-decoracion" style="bottom: 70px; left: 60px; font-size: 14px;">✦</div>
+            <div class="estrella-decoracion" style="bottom: 30px; right: 40px; font-size: 18px;">✧</div>
+            
+            <h1 class="titulo-soporte">⊱✧⊰ Centro de Soporte ⊱✧⊰</h1>
+            
+            <br>
+    <br>
+    <br>
+    <br>
+
+            <!-- Mascota ayudante animada encima del formulario -->
+            <div class="contenedor-mascota">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/028/651/799/small/pixel-art-cartoon-fox-character-png.png" alt="Mascota ayudante" class="mascota-ayudante">
+                <div class="burbuja-dialogo">
+                    ¡Hola! Soy tu asistente. Completa el formulario y yo entregaré tu mensaje.
+                </div>
+                <div class="carta"></div>
+            </div>
+            
+            <!-- Formulario de contacto a soporte -->
+            <form id="formulario-contacto" class="formulario-contacto">
+                <!-- Píxeles en las esquinas -->
+                <div class="pixel-esquina pixel-si"></div>
+                <div class="pixel-esquina pixel-sd"></div>
+                <div class="pixel-esquina pixel-ii"></div>
+                <div class="pixel-esquina pixel-id"></div>
+                
+                <div class="campo-form">
+                    <label for="nombre">★★ Tu Nombre de Usuario ★★</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre de usuario">
+                </div>
+                
+                <div class="campo-form">
+                    <label for="email">⊱ Correo Electrónico ⊰</label>
+                    <input type="email" id="email" name="email" placeholder="ejemplo@email.com">
+                </div>
+                
+                <div class="campo-form">
+                    <label for="categoria">✧ Categoría del Problema ✧</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">-- Selecciona una categoría --</option>
+                        <option value="mascota">Problema con mi mascota</option>
+                        <option value="cuenta">Problema con mi cuenta</option>
+                        <option value="compras">Problema con compras</option>
+                        <option value="tecnico">Problema técnico</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="campo-form">
+                    <label>⋆⋆ Prioridad ⋆⋆</label>
+                    <div class="opciones-prioridad">
+                        <label class="opcion-radio">
+                            <input type="radio" name="prioridad" value="baja">
+                            <span class="radio-custom"></span>
+                            Baja
+                        </label>
+                        <label class="opcion-radio">
+                            <input type="radio" name="prioridad" value="media" checked>
+                            <span class="radio-custom"></span>
+                            Media
+                        </label>
+                        <label class="opcion-radio">
+                            <input type="radio" name="prioridad" value="alta">
+                            <span class="radio-custom"></span>
+                            Alta
+                        </label>
+                        <label class="opcion-radio">
+                            <input type="radio" name="prioridad" value="urgente">
+                            <span class="radio-custom"></span>
+                            Urgente
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="campo-form">
+                    <label for="mensaje">○•○ Describe tu problema ○•○</label>
+                    <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos en detalle qué problema estás experimentando..."></textarea>
+                </div>
+                
+                <div class="campo-form">
+                    <label>✧ Imagen o captura de pantalla ✧</label>
+                    <div class="adjuntar-archivo">
+                        <div class="Boton-archivo">
+                            <span>⊱⋆⊰ Adjuntar archivo ⊱⋆⊰</span>
+                        </div>
+                        <input type="file" id="archivo" name="archivo" accept="image/*">
+                    </div>
+                </div>
+                
+                <div class="Botones-accion">
+                    <button type="reset" class="Boton limpiar">
+                        <span>⊱ Limpiar Formulario ⊰</span>
+                    </button>
+                    <button type="submit" class="Boton enviar">
+                        <span>★★ Enviar Mensaje ★★</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Área dedicada para la animación -->
+    <div id="area-animacion" class="area-animacion">
+        <div class="contenedor-animacion" id="contenedor-animacion">
+            <!-- La mascota y la carta se clonarán aquí para la animación final -->
+        </div>
+    </div>
+
+<script src="scripts/soporte.js"></script>
+
+<%- include("partials/footer.ejs") %>

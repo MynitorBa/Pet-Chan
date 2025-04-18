@@ -585,52 +585,71 @@ body {
     
     
     /* Mascota */
-    
-    .pixeleado{
-        image-rendering: pixelated;
-        image-rendering: crisp-edges; /* Para compatibilidad con más navegadores */
-    }
-    
-    
-    .micro-mascota {
-        position: fixed;
-        bottom: 0px;
+    /* Contenedor que se mueve */
+.mascota-contenedor {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 150px;
+    height: auto;
+    z-index: 9999;
+    pointer-events: none;
+    animation: animacionCaminar 10s linear infinite;
+}
+
+/* Mascota */
+.micro-mascota {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 150px;
+}
+
+/* Accesorios (todos posicionados sobre la mascota) */
+.Accesorio {
+    position: absolute;
+    top: -140px;
+    left:   10px;
+    width: 125px;
+    pointer-events: none;
+}
+
+/* Efecto pixelado */
+.pixeleado {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Animación */
+@keyframes animacionCaminar {
+    0% {
         left: 0;
-        width: 150px;
-        z-index: 9999;
-        pointer-events: none;
-        animation: animacionCaminar 10s linear infinite;
+        transform: translateY(0) scaleX(1);
     }
-    
-    /* Animación de caminata con giro en los extremos */
-    @keyframes animacionCaminar {
-        0% {
-            left: 0;
-            transform: translateY(0) scaleX(1);
-        }
-        15% {
-            left: 0;
-            transform: translateY(-5px) scaleX(1);
-        }
-        45% {
-            left: calc(100% - 150px);
-            transform: translateY(-5px) scaleX(1);
-        }
-        50% {
-            left: calc(100% - 150px);
-            transform: translateY(0) scaleX(-1);
-        }
-        65% {
-            left: calc(100% - 150px);
-            transform: translateY(-5px) scaleX(-1);
-        }
-        95% {
-            left: 0;
-            transform: translateY(-5px) scaleX(-1);
-        }
-        100% {
-            left: 0;
-            transform: translateY(0) scaleX(1);
-        }
+    15% {
+        left: 0;
+        transform: translateY(-5px) scaleX(1);
     }
+    45% {
+        left: calc(100% - 150px);
+        transform: translateY(-5px) scaleX(1);
+    }
+    50% {
+        left: calc(100% - 150px);
+        transform: translateY(0) scaleX(-1);
+    }
+    65% {
+        left: calc(100% - 150px);
+        transform: translateY(-5px) scaleX(-1);
+    }
+    95% {
+        left: 0;
+        transform: translateY(-5px) scaleX(-1);
+    }
+    100% {
+        left: 0;
+        transform: translateY(0) scaleX(1);
+    }
+}
+
     /*fin de css footer*/

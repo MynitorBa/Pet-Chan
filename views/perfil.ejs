@@ -1,0 +1,81 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/perfil.css">
+
+<div class="contenedor-perfil">
+    <div class="cabecera">
+        <div class="info-usuario">
+            <img src="./perfil de prueba.png" alt="Avatar de Usuario" class="avatar">
+            <div>
+                <h1>★★ <%= usuario %> ★★</h1>
+                <h2>Bibliografia:</h2>
+                <p><%= descripcion %></p>
+                <p>⊱ Membrecía desde: <span> 2024 </span> ⊰</p>
+                <p>✧ Numero de publicaciones: <span>1,337</span> | Reputación: <span> Veterano </span> ✧</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="estadisticas">
+        <h2>○•○ Inventario de Usuario ○•○</h2>
+        <div class="insignias">
+            <div class="insignia" title="Coleccionista Maestro">🏆</div>
+            <div class="insignia" title="Espíritu Creativo">🎨</div>
+            <div class="insignia" title="Maestro de Mascotas">🐾</div>
+            <div class="insignia" title="Estrella del Foro">⭐</div>
+            <div class="insignia" title="Campeón de Juegos">🎮</div>
+            <div class="insignia" title="Usuario Amistoso">💝</div>
+        </div>
+    </div>
+
+    <div class="seccion-mascota">
+        <div class="esquina-pixel esquina-pixel-si"></div>
+        <div class="esquina-pixel esquina-pixel-sd"></div>
+        <div class="esquina-pixel esquina-pixel-ii"></div>
+        <div class="esquina-pixel esquina-pixel-id"></div>
+        
+        <h2>★★ <span><%= mascotaNombre%></span> <span><%= pronombre%></span> <span><%= especieDeMascota%></span> ★★</h2>
+        <div class="contenedor-mascota">
+
+            
+            <div class="ImagenCompletaContendor">
+                <img src="<%= rutaImagen %>" alt="Mascota Virtual" class="pixeleado imagen-mascota">
+
+
+                <% if (accesorios != null) { %>
+    
+                    <% for (let i = 0; i < accesorios.length; i++) { %>
+                        <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
+                    <% } %>
+            
+                <% } %>
+            </div>
+
+            <div class="estadisticas-mascota">
+                <h3>✧ Estadística de tu Mascota ✧</h3>
+                <div class="etiqueta-estadistica">
+                    <span>Felicidad</span>
+                    <span> <%= nivelFelicidad %>%</span>
+                </div>
+                <div class="barra-progreso">
+                    <div class="progreso" style="width: <%= nivelFelicidad %>%;"></div>
+                </div>
+                
+                <div class="etiqueta-estadistica">
+                    <span>Energía</span>
+                    <span> <%= nivelEnergia %>%</span>
+                </div>
+                <div class="barra-progreso">
+                    <div class="progreso" style="width: <%= nivelEnergia %>%;"></div>
+                </div>
+                
+                <p>✧ Nivel de Amor: <span> <%= nivelAmor %></span></p>
+                <p>✧ Habilidad Especial: * <span><%= habilidadesEspeciales %></span> *</p>
+                <p>✧ Comida Favorita: ⊱ <span><%= comidaFavorita %></span> ⊰</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("partials/footer.ejs") %>

@@ -1,0 +1,49 @@
+<link rel="stylesheet" href="styles/minijuegomascota.css">
+
+<div class="game-container">
+    <div class="game-header" id="game-header">
+        <h1 class="game-title">✧ ADOPCIÓN MÁGICA ✧</h1>
+        <p class="game-subtitle">¡Descubre qué mascota te ha elegido!</p>
+    </div>
+
+    <div class="spin-counter" id="spin-counter">Vueltas: 0/15</div>
+    <div class="progress-container" id="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="game-area" id="game-area">
+        <!-- Caja de regalo -->
+        <div class="gift-box" id="gift-box"></div>
+        
+        <!-- La mascota aparecerá aquí -->
+        <img src="<%= rutaImagen %>" alt="Mascota" class="pet" id="pet">
+        
+        <!-- Efecto de explosión -->
+        <div class="explosion" id="explosion"></div>
+    </div>
+
+    <div class="instructions" id="instructions">
+        El regalo está cayendo del cielo... ¡Prepárate para girarlo!
+    </div>
+
+    <div class="space-key-indicator" id="space-key-indicator">
+        Presiona <span class="space-key">ESPACIO</span> o haz clic para girar
+    </div>
+
+
+    <form action="/NombreMascota" method="post" class="pet-nombre-formulario">
+
+        <div  class="pet-name-container" id="pet-name-container">
+            <label for="nombre">Felicidades has obtenido un <%= especieDeMascota %> <%= generoDeMascota %></label>
+            <br>
+            <input type="text" class="pet-name-input" id="pet-name-input" name="mascota" placeholder="Dale un nombre a tu mascota">
+        </div>
+
+
+        <button class="game-button" id="adopt-button" type="submit">ADOPTAR MASCOTA</button>
+
+    </form>
+</div>
+
+
+<script src="/scripts/minijuegomascota.js"></script>

@@ -21,9 +21,13 @@
   "dependencies": {
     "axios": "^1.8.4",
     "body-parser": "^1.20.3",
+    "cryptography-password-js": "^0.0.2",
+    "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "pg": "^8.14.1"
   }
 }

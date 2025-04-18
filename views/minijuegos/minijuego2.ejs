@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+#level-title {
+    font-size: 3rem;
+    color: #DBEDF3;
+    text-shadow: 10px 0  #620296;
+    font-family: 'VT323', monospace;
+    text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  justify-content: center;
+}
+
+.btn {
+  display: inline-block;
+  height: 100px;
+  width: 100px;
+  border: 10px solid black;
+  border-radius: 20%;
+
+  margin: 5px;
+  transition: none !important;
+}
+
+.game-over {
+  background-color: red;
+  opacity: 0.8;
+}
+
+.red {
+  background-color: red;
+}
+
+.green {
+  background-color: green;
+}
+
+.blue {
+  background-color: blue;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.pressed {
+  box-shadow: 0 0 20px white !important;
+  background-color: grey !important;
+
+  transition: none !important;
+}
+
+    </style>
+</head>
+<body>
+    <h1 id="level-title">Press A Key to Start</h1>
+  <div class="container">
+   
+      <div type="button" id="green" class="btn green">
+
+      </div>
+
+      <div type="button" id="red" class="btn red">
+
+      </div>
+
+      <div type="button" id="yellow" class="btn yellow">
+
+      </div>
+      <div type="button" id="blue" class="btn blue">
+
+      </div>
+
+  </div>
+
+  <script src="scripts/minijuegos/minijuego2.js"></script>
+
+
+
+</body>
+</html>

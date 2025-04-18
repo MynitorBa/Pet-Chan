@@ -1,0 +1,787 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background: #140c0c url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a304fa' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.contenedor-inicio {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(98, 2, 150, 0.95);
+    border: 4px solid #d304c5;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Sección Hero con Carrusel - Fondo oscurecido */
+.seccion-hero {
+    position: relative;
+    padding: 60px 20px; /* Más espacio interno */
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 2px solid #cf7cfc;
+    min-height: 400px; /* Altura más grande */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.6); /* Fondo oscuro para mejorar el contraste */
+}
+
+.carrusel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.carrusel-imagen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    filter: brightness(0.4); /* Oscurecer imágenes del carrusel */
+}
+
+.carrusel-imagen.activa {
+    opacity: 1;
+}
+
+.seccion-hero h1 {
+    position: relative;
+    z-index: 2;
+    color: #ffb8ff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff; /* Sombra más pronunciada */
+    font-size: 4rem; /* Tamaño más grande */
+    margin: 0;
+    padding: 20px 40px; /* Más espacio interno */
+    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente */
+    backdrop-filter: blur(5px); /* Efecto de desenfoque */
+    letter-spacing: 2px; /* Mayor separación entre letras */
+    font-weight: bold; /* Texto en negrita */
+    border: none; /* Eliminamos el borde */
+    animation: tituloBrillo 3s infinite alternate; /* Animación de brillo */
+}
+
+@keyframes tituloBrillo {
+    0% {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+    }
+    100% {
+        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8), 0 0 30px #ff00ff, 0 0 60px #ff00ff;
+    }
+}
+
+/* Sección de Eventos */
+.seccion-eventos {
+    background: rgba(163, 4, 250, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 40px;
+    border: 2px solid #cf7cfc;
+}
+
+.seccion-eventos h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffb8ff;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 8px;
+    letter-spacing: 1px;
+}
+
+.lista-eventos {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Controles de navegación para eventos */
+.controles-eventos {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.evento-destacado {
+    border: 2px solid #ffd700;
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.evento-destacado::before {
+    content: "⭐";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    background: #252525;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.control-btn {
+    background: rgba(207, 124, 252, 0.2);
+    border: 1px solid #cf7cfc;
+    padding: 8px 16px;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: rgba(207, 124, 252, 0.6);
+    transform: translateY(-2px);
+}
+
+.filtros-eventos {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filtro-btn {
+    background: rgba(98, 2, 150, 0.3);
+    border: 1px solid #cf7cfc;
+    padding: 5px 12px;
+    border-radius: 20px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filtro-btn.activo {
+    background: #a304fa;
+}
+
+.filtro-btn:hover {
+    background: rgba(163, 4, 250, 0.5);
+}
+
+/* Estilos para cada evento - Fondo oscurecido */
+.evento {
+    display: flex;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    border: 1px solid #cf7cfc;
+    padding: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+
+
+.evento:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(207, 124, 252, 0.3);
+}
+
+.evento-destacado {
+    border: 2px solid #ffd700;
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.evento-destacado::before {
+    content: "⭐";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    background: #252525;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* Indicador de popularidad */
+.evento-popular::after {
+    content: "🔥 Popular";
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: rgba(255, 69, 0, 0.8);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #fff;
+    z-index: 2;
+}
+
+/* Fecha del evento */
+.fecha-evento {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(163, 4, 250, 0.4);
+    padding: 10px;
+    border-radius: 8px;
+    margin-right: 15px;
+    min-width: 80px;
+    z-index: 2;
+    background-color: rgba(98, 2, 150, 0.7);
+    border: 1px solid #cf7cfc;
+    box-shadow: 0 0 10px rgba(207, 124, 252, 0.5);
+}
+
+.fecha-evento .dia {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffb8ff;
+}
+
+.fecha-evento .mes, .fecha-evento .año {
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+/* Contador regresivo */
+.contador-regresivo {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 0.7rem;
+    color: #ffd700;
+}
+
+/* Información del evento */
+.info-evento {
+    flex: 1;
+    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.titulo-evento {
+    margin: 0;
+    color: #ffb8ff;
+    font-size: 1.25rem;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.7);
+    border-bottom: 1px solid rgba(207, 124, 252, 0.3);
+    padding-bottom: 5px;
+}
+
+.descripcion-evento {
+    margin: 10px 0;
+    color: #fff;
+}
+
+/* Detalles adicionales del evento */
+.detalles-evento {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #cf7cfc;
+}
+
+.detalle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.detalle svg {
+    width: 16px;
+    height: 16px;
+    fill: #cf7cfc;
+}
+
+.etiquetas-evento {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    z-index: 2;
+}
+
+.etiqueta {
+    background: #620296;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.etiqueta:hover {
+    background: #a304fa;
+    transform: translateY(-2px);
+}
+
+/* Botones de acción */
+.acciones-evento {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.boton-inscribirse {
+    background: #cf7cfc;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    z-index: 2;
+}
+
+.boton-inscribirse:hover {
+    background: #a304fa;
+    transform: translateY(-2px);
+}
+
+.boton-compartir {
+    background: rgba(98, 2, 150, 0.5);
+    border: 1px solid #cf7cfc;
+    padding: 8px 16px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.boton-compartir:hover {
+    background: rgba(98, 2, 150, 0.8);
+}
+
+.boton-recordatorio {
+    background: transparent;
+    border: 1px solid #cf7cfc;
+    padding: 8px 16px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.boton-recordatorio:hover {
+    background: rgba(207, 124, 252, 0.2);
+}
+
+/* Contador de participantes */
+.participantes {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.participantes-avatars {
+    display: flex;
+    margin-top: 5px;
+}
+
+.avatar {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #620296;
+    border: 1px solid #cf7cfc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: -8px;
+}
+
+/* Sección de paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.pagina {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(98, 2, 150, 0.3);
+    border: 1px solid #cf7cfc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagina.activa {
+    background: #a304fa;
+}
+
+.pagina:hover:not(.activa) {
+    background: rgba(163, 4, 250, 0.3);
+}
+
+/* Efecto de brillo */
+.brillo-evento {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: brillo 2s infinite;
+    z-index: 1;
+}
+
+@keyframes brillo {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Reflejo */
+.reflejo {
+    position: absolute;
+    bottom: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+    transform: rotate(45deg);
+    z-index: 1;
+}
+
+/* Modo oscuro/claro toggle */
+.modo-toggle {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(98, 2, 150, 0.7);
+    border: 1px solid #cf7cfc;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.modo-toggle:hover {
+    transform: rotate(30deg);
+    background: rgba(163, 4, 250, 0.7);
+}
+
+/* Modal para detalles del evento */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    backdrop-filter: blur(5px);
+}
+
+.modal-contenido {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 800px;
+    background: rgba(98, 2, 150, 0.95);
+    border: 2px solid #cf7cfc;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #cf7cfc;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .evento {
+        flex-direction: column;
+    }
+    
+    .fecha-evento {
+        margin-right: 0;
+        margin-bottom: 10px;
+        flex-direction: row;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    .acciones-evento {
+        flex-direction: column;
+    }
+}
+
+
+/* Estilos para el formulario de inscripción */
+.formulario-inscripcion {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    color: #ffb8ff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group input, 
+.form-group textarea {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #cf7cfc;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-family: inherit;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.boton-enviar {
+    background: #cf7cfc;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.boton-enviar:hover {
+    background: #a304fa;
+}
+
+/* Estilos para las opciones de compartir */
+.redes-sociales {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.boton-red-social {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+}
+
+.boton-red-social:hover {
+    transform: translateY(-2px);
+}
+
+.boton-red-social.facebook {
+    background: #3b5998;
+}
+
+.boton-red-social.twitter {
+    background: #1da1f2;
+}
+
+.boton-red-social.whatsapp {
+    background: #25d366;
+}
+
+.boton-red-social.copiar {
+    background: #620296;
+}
+
+/* Estilos para iconos */
+i {
+    font-size: 1rem;
+}
+
+/* Estilos para el modal de detalles */
+.modal-info-adicional {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-info-adicional p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+}
+
+.modal-acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-acciones button {
+    flex: 1;
+}
+
+
+
+/* Marco dorado */
+.marco-dorado {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 3px solid #ffd700;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Efecto de brillo mejorado */
+.brillo-evento {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 215, 0, 0.4), 
+        transparent
+    );
+    animation: brillo 3s infinite;
+    z-index: 1;
+}
+
+@keyframes brillo {
+    0% { left: -100%; opacity: 0.5; }
+    100% { left: 100%; opacity: 1; }
+}
+
+/* Reflejo mejorado */
+.reflejo {
+    position: absolute;
+    bottom: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle, 
+        rgba(255, 215, 0, 0.2), 
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    z-index: 1;
+}
+
+/* Animación de título */
+@keyframes tituloBrillo {
+    0% {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+    }
+    100% {
+        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8), 0 0 30px #ff00ff, 0 0 60px #ff00ff;
+    }
+}
+
+.seccion-hero h1 {
+    animation: tituloBrillo 3s infinite alternate;
+}
+/* Responsividad para el modal */
+@media (max-width: 768px) {
+    .modal-contenido {
+        width: 95% !important;
+    }
+    
+    .modal-acciones {
+        flex-direction: column;
+    }
+}

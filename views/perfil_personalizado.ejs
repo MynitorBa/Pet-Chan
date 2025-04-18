@@ -1,0 +1,134 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/perfil_personalizado.css">
+
+<div class="contenedor-principal">
+    <!-- Pasarela de mascota (lado izquierdo) -->
+    <div class="pasarela-mascota">
+        <h2 class="titulo-pasarela">★★ Pasarela de Accesorios ★★</h2>
+        
+        <div class="escenario-pasarela" id="escenario">
+            <img src="<%= rutaImagen %>" alt="Tu mascota" class="mascota-preview pixeleado" id="mascota-preview">
+            <!-- Los accesorios seleccionados se mostrarán aquí superpuestos a la mascota -->
+             
+
+         </div>
+        
+        <h3 class="titulo-pasarela">✧ Accesorios Disponibles ✧</h3>
+        <div class="accesorios-disponibles">
+            <% if (itemsaccesorios != null) { %>
+            <% for (var i = 0; i < itemsaccesorios.length; i++) { %>
+            <div class="accesorio" data-accesorio="<%= itemsaccesorios[i].indice %>">
+                <img src="imagenes_de_accesorios/<%= itemsaccesorios[i].indice + 1%>.gif" alt="Sombrero" class="pixeleado">
+                <span><%= Nombresaccesorios[itemsaccesorios[i].indice] %></span>
+            </div>
+            <% } %>
+            <% } %>
+
+        </div>
+    </div>
+    
+    <!-- Formulario (lado derecho) -->
+    <div class="formulario-perfil">
+        <!-- Sección de información personal -->
+        <form action="/modificarPerfil" id="modificar-info-personal" class="seccion-form" method="post">
+            <div class="esquina-pixel esquina-pixel-si"></div>
+            <div class="esquina-pixel esquina-pixel-sd"></div>
+            <div class="esquina-pixel esquina-pixel-ii"></div>
+            <div class="esquina-pixel esquina-pixel-id"></div>
+            
+            <h2>○•○ Editar Perfil de <span><%= usuario %></span> ○•○</h2>
+            
+
+            <div class="previsualizacion-avatar">
+                <img src="https://th.bing.com/th/id/OIP.rIsI3TvodysyTi_2VOGK3gHaHa?rs=1&pid=ImgDetMain" alt="Avatar actual" class="avatar-actual">
+                <div class="info-usuario-container">
+                    <div class="campo-form">
+                        <label for="nombre-usuario">★★ Nombre de Usuario ★★</label>
+                        <input type="text" id="nombre-usuario" name="nombre-usuario" value="<%= usuario %>">
+                    </div>
+                    
+                    <div class="input-archivo">
+                        <div class="Boton-archivo">Cambiar avatar</div>
+                        <input type="file" name="avatar" accept="image/*">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="campo-form">
+                <label for="biografia">⊱ Biografía ⊰</label>
+                <textarea id="biografia" name="biografia" placeholder="<%= descripcion %>"></textarea>
+            </div>
+            
+            <div class="Botones-accion">
+                <button type="button" class="Boton cancelar">⊱ Cancelar ⊰</button>
+                <button type="submit" class="Boton actualizar">★★ Actualizar Perfil ★★</button>
+            </div>
+        </form>
+        
+        <!-- Sección de configuración de mascota -->
+        <form action="/modificarMascota" id="form-mascota" class="seccion-form" method="post">
+            <div class="esquina-pixel esquina-pixel-si"></div>
+            <div class="esquina-pixel esquina-pixel-sd"></div>
+            <div class="esquina-pixel esquina-pixel-ii"></div>
+            <div class="esquina-pixel esquina-pixel-id"></div>
+            
+            <h2>★★ Configuración de Mascota ★★</h2>
+            
+            <div class="campo-form">
+                <label for="nombre-mascota">Nombre de tu mascota</label>
+                <input type="text" id="nombre-mascota" name="nombre-mascota" value="<%= mascotaNombre%>">
+            </div>
+            
+            <div class="campo-form">
+                <label for="accesorio-mascota">Accesorio seleccionado</label>
+                <input type="text" id="accesorio-mascota" name="accesorio-mascota" value="Ninguno" readonly>
+                <p style="color: #cf7cfc; margin-top: 5px; font-size: 14px;">✧ Selecciona accesorios en la pasarela ✧</p>
+            </div>
+            
+            <div class="Botones-accion">
+                <button type="button" class="Boton cancelar">⊱ Cancelar ⊰</button>
+                <button type="submit" class="Boton actualizar">★★ Guardar Mascota ★★</button>
+            </div>
+        </form>
+        
+        <!-- Sección de cambio de contraseña -->
+        <form id="form-password" class="seccion-form" method="post" action="/cambiarPassword">
+            <div class="esquina-pixel esquina-pixel-si"></div>
+            <div class="esquina-pixel esquina-pixel-sd"></div>
+            <div class="esquina-pixel esquina-pixel-ii"></div>
+            <div class="esquina-pixel esquina-pixel-id"></div>
+            
+            <h2>✧ Cambiar Contraseña ✧</h2>
+            <p style="color: #e88cf0; text-align: center;"><%= mensajeDeContra %></p>
+            
+            <div class="campo-form">
+                <label for="password-actual">Contraseña actual</label>
+                <input type="password" id="password-actual" name="passwordActual">
+            </div>
+            
+            <div class="campo-form">
+                <label for="password-nueva">Nueva contraseña</label>
+                <input type="password" id="password-nueva" name="nuevaPassword">
+            </div>
+            
+            <div class="campo-form">
+                <label for="password-confirmar">Confirmar nueva contraseña</label>
+                <input type="password" id="password-confirmar" name="confirmarPassword">
+            </div>
+            
+            <div class="Botones-accion">
+                <button type="button" class="Boton cancelar">⊱ Cancelar ⊰</button>
+                <button type="submit" class="Boton cambiar-password">★★ Cambiar Contraseña ★★</button>
+            </div>
+        </form>        
+    </div>
+</div>
+
+<script>
+    const accesoriosActivos = <%- JSON.stringify(accesorios || []) %>;
+</script>
+<script src="scripts/perfil_personalizado.js"></script>
+
+
+<%- include("partials/footer.ejs") %>

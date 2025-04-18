@@ -1,0 +1,203 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/tienda.css">
+
+        <div class="tienda-contenedor">
+            <!-- Banner de la tienda -->
+            <div class="tienda-banner">
+                <h1>✧ Tienda Pet-Chan ✧</h1>
+                <p>¡Encuentra los mejores accesorios, comida y juguetes para tu mascota virtual!</p>
+                <h2>★★ tu saldo actual es de:★★</h2>
+                <p> <span class="monedas" id="monedas"><%= money %></span> monedas ⭐</p>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-1"></div>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-2"></div>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-3"></div>
+                <div class="tienda-pixel-decoracion tienda-pixel-esquina-4"></div>
+            </div>
+            
+            <!-- Navegación de categorías -->
+            <div class="tienda-categorias">
+                <div class="tienda-categoria activo" data-categoria="todos">★ Todos ★</div>
+                <div class="tienda-categoria" data-categoria="accesorios">Accesorios</div>
+                <div class="tienda-categoria" data-categoria="comida">Comida</div>
+                <div class="tienda-categoria" data-categoria="juguetes">Juguetes</div>
+                <div class="tienda-categoria" data-categoria="corrales">corrales</div>
+            </div>
+            
+            <!-- Sección de productos -->
+            <div class="tienda-productos">
+
+                <% let globalIndex = 0; %>
+
+                <div class="tienda-titulo-seccion">
+                    <h2>★★ Productos Destacados ★★</h2>
+                </div>
+                
+                <div class="tienda-grid-productos">
+                    <!-- Productos: Accesorio -->
+                    <% accesoriosVarios.forEach((accesorio, i) => { %>
+                        
+                        <div class="tienda-producto" style="display: flex;"  data-categoria="accesorios" data-index="<%= globalIndex++ %>">
+                            <div class="tienda-oferta-banner">Estilo</div>
+                            <div class="tienda-producto-imagen">
+                                <img src="imagenes_de_accesorios/<%= i + 1 %>.png" alt="<%= accesorio.nombre %>">
+                                <div class="tienda-producto-etiqueta">Popular</div>
+                            </div>
+                            <div class="tienda-producto-detalles">
+                                <h3 class="tienda-producto-titulo"><%= accesorio %></h3>
+                                <div class="tienda-producto-precios">
+                                    <span class="tienda-producto-precio"><%= preciosAccesorios[i] %> ⭐</span>                                </div>
+                                <div class="tienda-producto-footer">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="accesorios">
+                                        <input type="hidden" name="index" value="<%= i %>">
+                                        <input type="hidden" name="categoria" value="accesorios" >
+                                        <button type="submit" class="tienda-producto-boton">Comprar</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="tienda-efecto-brillo"></div>
+                        </div>
+                    <% }) %>
+                    
+                    <!-- Productos: comida -->
+                    <% comidasFavoritas.forEach((comida, i) => { %>
+                        <div class="tienda-producto"  style="display: flex;"  data-categoria="comida" data-index="<%= globalIndex++ %>">
+                            <div class="tienda-producto-imagen">
+                                <img src="imagenes_de_corrales/<%= i + 1 %>.png" alt="<%= comida.nombre %>">
+                            </div>
+                            <div class="tienda-producto-detalles">
+                                <h3 class="tienda-producto-titulo"><%= comida %></h3>
+                                <div class="tienda-producto-precios">
+                                    <span class="tienda-producto-precio"><%= preciosComidas[i] %> ⭐</span>
+                                </div>
+                                <div class="tienda-producto-footer">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="comida">
+                                        <input type="hidden" name="index" value="<%= i %>">
+                                        <input type="hidden" name="precio" value="<%= preciosComidas[i] %>">
+                                        <input type="hidden" name="categoria" value="comida" >
+                                        <button type="submit" class="tienda-producto-boton">Comprar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                    
+                    <!-- Productos: juguetes -->
+                    <% juguetes.forEach((juguete, i) => { %>
+                        <div class="tienda-producto"  style="display: flex;"  data-categoria="juguetes" data-index="<%= globalIndex++ %>">
+                            <div class="tienda-producto-imagen">
+                                <img src="imagenes_de_corrales/<%= i + 1 %>.png" alt="<%= juguete.nombre %>">
+                                <div class="tienda-producto-etiqueta">Nuevo</div>
+                            </div>
+                            <div class="tienda-producto-detalles">
+                                <h3 class="tienda-producto-titulo"><%= juguete %></h3>
+                                <div class="tienda-producto-precios">
+                                    <span class="tienda-producto-precio"><%= preciosJuguetes[i] %> ⭐</span>
+                                </div>
+                                <div class="tienda-producto-footer">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="juguetes">
+                                        <input type="hidden" name="index" value="<%= i %>">
+                                        <input type="hidden" name="precio" value="<%= preciosJuguetes[i] %>">
+                                        <input type="hidden" name="categoria" value="juguetes" >
+                                        <button type="submit" class="tienda-producto-boton">Comprar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                    
+                    <!-- Productos: corrales -->
+                    <% corralesDisponibles.forEach((corral, i) => { %>
+                        <div class="tienda-producto"  style="display: flex;"  data-categoria="corrales" data-index="<%= globalIndex++ %>">
+                            <div class="tienda-producto-imagen">
+                                <img src="imagenes_de_corrales/<%= i + 1 %>.png" alt="<%= corral.nombre %>">
+                            </div>
+                            <div class="tienda-producto-detalles">
+                                <h3 class="tienda-producto-titulo"><%= corral %></h3>
+                                <div class="tienda-producto-precios">
+                                    <span class="tienda-producto-precio"><%= preciosCorrales[i] %> ⭐</span>                                </div>
+                                <div class="tienda-producto-footer">
+                                    <form action="/comprarItem" method="post" data-id="<%= i %>" data-categoria="corrales">
+                                        <input type="hidden" name="index" value="<%= i %>">
+                                        <input type="hidden" name="precio" value="<%= preciosCorrales[i] %>">
+                                        <input type="hidden" name="categoria" value="corrales" >
+                                        <button type="submit" class="tienda-producto-boton">Comprar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                    
+                    
+                </div>
+                
+                <!-- Paginación -->
+                <div class="tienda-paginacion">
+                    <div class="tienda-pagina activo">1</div>
+                    <div class="tienda-pagina">2</div>
+                    <div class="tienda-pagina">3</div>
+                    <div class="tienda-pagina">→</div>
+                </div>
+            </div>
+            
+        </div>
+
+
+        <script src="scripts/tienda.js"></script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const formularios = document.querySelectorAll('.tienda-producto form');
+        const monedasElemento = document.getElementById('monedas');
+
+        formularios.forEach(formulario => {
+            formulario.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Evita que el form haga submit tradicional
+
+            const formData = new FormData(formulario);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/comprarItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+                }
+
+                const resultado = await response.json();
+
+                if (resultado.success) {
+                alert(resultado.mensaje || 'Compra realizada.');
+
+                // 🔽 Restar monedas visualmente
+                const precio = parseInt(data.precio);
+                const monedasActuales = parseInt(monedasElemento.textContent);
+
+                if (!isNaN(precio) && !isNaN(monedasActuales)) {
+                    const nuevasMonedas = monedasActuales - precio;
+                    monedasElemento.textContent = nuevasMonedas;
+                }
+                } else {
+                    alert(resultado.mensaje || 'No se pudo realizar la compra.');
+                }
+
+            } catch (error) {
+                console.error('Error al realizar la compra:', error);
+                alert('Ocurrió un error al realizar la compra.');
+            }
+            });
+        });
+        });
+
+        </script>
+
+
+
+        <%- include("partials/footer.ejs") %>
