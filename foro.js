@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const port = 3000;
+const port = 4000;
 
 const uploadDir = join(__dirname, 'public', 'uploads');
 
@@ -80,59 +80,162 @@ let nextId = 1;
 let votos = {};
 let comentarioNextId = 1;
 
-// Nueva ruta para votar mensajes
-app.post('/votar/:id', (req, res) => {
+// Ruta para obtener el estado de votos del usuario actual
+app.get('/mis-votos', (req, res) => {
+  try {
+    // Obtener el ID del usuario desde la sesión
+    const userId = req.session.userId || req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Usuario no autenticado'
+      });
+    }
+    
+    // Para una aplicación real, esto vendría de la base de datos
+    // Aquí obtenemos los votos del usuario para mensajes y comentarios
+    
+    // 1. Obtener votos de mensajes
+    db.query(
+      'SELECT mensaje_id, valor FROM mensajes_votos WHERE user_id = ?',
+      [userId]
+    )
+    .then(mensajesVotos => {
+      // Formatear los votos de mensajes como un objeto {mensajeId: valor}
+      const votosFormateados = {};
+      mensajesVotos.forEach(voto => {
+        votosFormateados[voto.mensaje_id] = voto.valor;
+      });
+      
+      // 2. Obtener votos de comentarios
+      return db.query(
+        'SELECT comentario_id, valor FROM comentarios_votos WHERE user_id = ?',
+        [userId]
+      )
+      .then(comentariosVotos => {
+        // Formatear los votos de comentarios como un objeto {comentarioId: valor}
+        const votosComentariosFormateados = {};
+        comentariosVotos.forEach(voto => {
+          votosComentariosFormateados[voto.comentario_id] = voto.valor;
+        });
+        
+        // Devolver ambos conjuntos de votos
+        return res.json({
+          success: true,
+          votos: votosFormateados,
+          votosComentarios: votosComentariosFormateados
+        });
+      });
+    })
+    .catch(error => {
+      console.error('Error al obtener votos:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error al obtener votos: ' + error.message
+      });
+    });
+  } catch (error) {
+    console.error('Error en ruta /mis-votos:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Error del servidor: ' + error.message
+    });
+  }
+});
+
+app.post('/votar/:id', async (req, res) => {
   try {
     const mensajeId = parseInt(req.params.id);
     const { valor } = req.body;
-
-    // Encontrar el mensaje
-    const mensajeIndex = mensajes.findIndex(m => m.id === mensajeId);
+    const userId = req.session.userId;
     
-    if (mensajeIndex === -1) {
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+    }
+    
+    // Verificar que el mensaje existe
+    const mensajeResult = await db.query(`
+      SELECT * FROM forum_posts WHERE id = $1
+    `, [mensajeId]);
+    
+    if (mensajeResult.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
     }
-
-    // Inicializar ranking si no existe
-    if (!mensajes[mensajeIndex].ranking) {
-      mensajes[mensajeIndex].ranking = 0;
+    
+    // Obtener el voto actual del usuario
+    const votoActualQuery = await db.query(`
+      SELECT valor FROM post_votes 
+      WHERE post_id = $1 AND user_id = $2
+    `, [mensajeId, userId]);
+    
+    const votoActual = votoActualQuery.rows.length > 0 ? votoActualQuery.rows[0].valor : 0;
+    
+    // Determinar el valor final del voto
+    let valorFinal = valor;
+    if (votoActual === valor) {
+      valorFinal = 0; // Cancelamos el voto
     }
-
-    // Obtener el voto actual
-    const votoActual = mensajes[mensajeIndex].votoActual || 0;
-
-    // Calcular el nuevo ranking basado en la lógica específica
-    if (votoActual === 0) {
-      // Si no había voto previo, simplemente agregamos el nuevo voto
-      mensajes[mensajeIndex].ranking += valor;
-    } else if (votoActual > 0 && valor > 0) {
-      // Si ya había un like y se da like de nuevo, se quita
-      mensajes[mensajeIndex].ranking -= votoActual;
-    } else if (votoActual < 0 && valor < 0) {
-      // Si ya había un dislike y se da dislike de nuevo, se quita
-      mensajes[mensajeIndex].ranking -= votoActual;
-    } else {
-      // Cambiar entre like y dislike
-      mensajes[mensajeIndex].ranking -= votoActual;
-      mensajes[mensajeIndex].ranking += valor;
+    
+    // Actualizar o eliminar el voto en la base de datos
+    if (valorFinal === 0 && votoActual !== 0) {
+      // Eliminar voto
+      await db.query(`
+        DELETE FROM post_votes 
+        WHERE post_id = $1 AND user_id = $2
+      `, [mensajeId, userId]);
+      
+      // Actualizar ranking en la base de datos
+      await db.query(`
+        UPDATE forum_posts 
+        SET ranking = ranking - $1 
+        WHERE id = $2
+      `, [votoActual, mensajeId]);
+    } else if (valorFinal !== 0) {
+      if (votoActual !== 0) {
+        // Actualizar voto existente
+        await db.query(`
+          UPDATE post_votes 
+          SET valor = $1 
+          WHERE post_id = $2 AND user_id = $3
+        `, [valorFinal, mensajeId, userId]);
+        
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_posts 
+          SET ranking = ranking - $1 + $2 
+          WHERE id = $3
+        `, [votoActual, valorFinal, mensajeId]);
+      } else {
+        // Insertar nuevo voto
+        await db.query(`
+          INSERT INTO post_votes (post_id, user_id, valor) 
+          VALUES ($1, $2, $3)
+        `, [mensajeId, userId, valorFinal]);
+        
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_posts 
+          SET ranking = ranking + $1 
+          WHERE id = $2
+        `, [valorFinal, mensajeId]);
+      }
     }
-
-    // Actualizar el voto actual
-    if (valor === 0) {
-      delete mensajes[mensajeIndex].votoActual;
-    } else {
-      mensajes[mensajeIndex].votoActual = valor;
-    }
-
-    // Redondear para evitar problemas de precisión
-    mensajes[mensajeIndex].ranking = Math.round(mensajes[mensajeIndex].ranking * 10) / 10;
-
-    // Devolver el nuevo ranking
+    
+    // Obtener el nuevo ranking directamente de la base de datos
+    // para garantizar consistencia
+    const nuevoRankingQuery = await db.query(`
+      SELECT ranking FROM forum_posts WHERE id = $1
+    `, [mensajeId]);
+    
+    const nuevoRanking = nuevoRankingQuery.rows[0].ranking;
+    
+    // Devolver el nuevo ranking y el valor del voto del usuario
     return res.json({ 
       success: true, 
-      nuevoRanking: mensajes[mensajeIndex].ranking 
+      nuevoRanking: nuevoRanking,
+      valorVoto: valorFinal
     });
-
   } catch (error) {
     console.error('Error al votar mensaje:', error);
     return res.status(500).json({ 
@@ -142,15 +245,19 @@ app.post('/votar/:id', (req, res) => {
   }
 });
 
-// Ruta para votar comentarios - CORREGIDA
-app.post('/votar-comentario', (req, res) => {
+// Mejorada ruta de backend para votar comentarios
+app.post('/votar-comentario', async (req, res) => {
   try {
     const { comentarioId, valor } = req.body;
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+    }
     
     if (!comentarioId || valor === undefined) {
       return res.json({ 
-        success: true, // Mantenemos success:true para evitar alertas
-        nuevoRanking: 0,
+        success: false,
         mensaje: "Datos incompletos"
       });
     }
@@ -159,78 +266,93 @@ app.post('/votar-comentario', (req, res) => {
     const comentarioIdNum = parseInt(comentarioId);
     const valorNum = parseInt(valor);
     
-    console.log('Recibida petición de voto para comentario:', comentarioIdNum, 'con valor:', valorNum);
+    // Verificar que el comentario existe
+    const comentarioResult = await db.query(`
+      SELECT * FROM forum_comments WHERE id = $1
+    `, [comentarioIdNum]);
     
-    // Buscar el comentario en todos los mensajes
-    let comentarioEncontrado = null;
-    let mensajeContenedor = null;
+    if (comentarioResult.rows.length === 0) {
+      return res.json({ 
+        success: false, 
+        mensaje: 'Comentario no encontrado' 
+      });
+    }
     
-    // Recorrer todos los mensajes para encontrar el comentario
-    for (const mensaje of mensajes) {
-      if (mensaje.comentarios && mensaje.comentarios.length > 0) {
-        const comentarioIndex = mensaje.comentarios.findIndex(c => c.id === comentarioIdNum);
+    // Obtener el voto actual del usuario para este comentario
+    const votoActualQuery = await db.query(`
+      SELECT valor FROM comment_votes 
+      WHERE comment_id = $1 AND user_id = $2
+    `, [comentarioIdNum, userId]);
+    
+    const votoActual = votoActualQuery.rows.length > 0 ? votoActualQuery.rows[0].valor : 0;
+    
+    // Si el voto actual es igual al nuevo voto, cancelamos el voto
+    let valorFinal = valorNum;
+    if (votoActual === valorNum) {
+      valorFinal = 0; // Cancelamos el voto
+    }
+    
+    // Actualizar el voto en la base de datos
+    if (valorFinal === 0 && votoActual !== 0) {
+      // Eliminar voto
+      await db.query(`
+        DELETE FROM comment_votes 
+        WHERE comment_id = $1 AND user_id = $2
+      `, [comentarioIdNum, userId]);
+      
+      // Actualizar ranking del comentario en la base de datos
+      await db.query(`
+        UPDATE forum_comments
+        SET ranking = ranking - $1 
+        WHERE id = $2
+      `, [votoActual, comentarioIdNum]);
+    } else if (valorFinal !== 0) {
+      if (votoActual !== 0) {
+        // Actualizar voto existente
+        await db.query(`
+          UPDATE comment_votes 
+          SET valor = $1 
+          WHERE comment_id = $2 AND user_id = $3
+        `, [valorFinal, comentarioIdNum, userId]);
         
-        if (comentarioIndex !== -1) {
-          comentarioEncontrado = mensaje.comentarios[comentarioIndex];
-          mensajeContenedor = mensaje;
-          break;
-        }
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_comments 
+          SET ranking = ranking - $1 + $2 
+          WHERE id = $3
+        `, [votoActual, valorFinal, comentarioIdNum]);
+      } else {
+        // Insertar nuevo voto
+        await db.query(`
+          INSERT INTO comment_votes (comment_id, user_id, valor) 
+          VALUES ($1, $2, $3)
+        `, [comentarioIdNum, userId, valorFinal]);
+        
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_comments 
+          SET ranking = ranking + $1 
+          WHERE id = $2
+        `, [valorFinal, comentarioIdNum]);
       }
     }
     
-    // Si no encuentra el comentario, retorna éxito con ranking 0
-    if (!comentarioEncontrado) {
-      console.log('Comentario no encontrado:', comentarioIdNum);
-      return res.json({ 
-        success: true, 
-        nuevoRanking: 0 
-      });
-    }
-
-    // Inicializar ranking si no existe
-    if (comentarioEncontrado.ranking === undefined) {
-      comentarioEncontrado.ranking = 0;
-    }
+    // Consultar el ranking actualizado directamente de la base de datos
+    const rankingQuery = await db.query(`
+      SELECT ranking FROM forum_comments WHERE id = $1
+    `, [comentarioIdNum]);
     
-    // Obtener el voto actual
-    const votoActual = comentarioEncontrado.votoActual || 0;
-
-    // Calcular el nuevo ranking
-    if (valorNum === 0) {
-      // Cancelar voto
-      comentarioEncontrado.ranking -= votoActual;
-      delete comentarioEncontrado.votoActual;
-    } else if (votoActual === 0) {
-      // Sin voto previo
-      comentarioEncontrado.ranking += valorNum;
-      comentarioEncontrado.votoActual = valorNum;
-    } else if (votoActual === valorNum) {
-      // Mismo voto, cancelar
-      comentarioEncontrado.ranking -= votoActual;
-      delete comentarioEncontrado.votoActual;
-    } else {
-      // Cambiar voto
-      comentarioEncontrado.ranking = comentarioEncontrado.ranking - votoActual + valorNum;
-      comentarioEncontrado.votoActual = valorNum;
-    }
-
-    // Redondear para evitar problemas de precisión
-    comentarioEncontrado.ranking = Math.round(comentarioEncontrado.ranking);
+    const nuevoRanking = rankingQuery.rows[0].ranking;
     
-    console.log('Comentario actualizado:', comentarioIdNum, 'nuevo ranking:', comentarioEncontrado.ranking);
-    
-    // Siempre devolver éxito
     return res.json({ 
       success: true, 
-      nuevoRanking: comentarioEncontrado.ranking 
+      nuevoRanking: nuevoRanking,
+      valorVoto: valorFinal
     });
-
   } catch (error) {
     console.error('Error al votar comentario:', error);
-    // Siempre devolver éxito para evitar alertas en el cliente
-    return res.json({ 
-      success: true, 
-      nuevoRanking: 0,
+    return res.status(500).json({ 
+      success: false, 
       mensaje: "Error interno: " + error.message
     });
   }
@@ -295,35 +417,85 @@ app.post('/publicar-comentario', upload.array('imagenes', 4), (req, res) => {
 
 
 
-
-// Ruta para eliminar mensajes
-app.delete('/eliminar-mensaje/:id', (req, res) => {
+// Update the delete message route to include database operations and author check
+app.delete('/eliminar-mensaje/:id', async (req, res) => {
   const id = parseInt(req.params.id);
+  const userId = req.session.userId;
+  
+  if (!userId) {
+    return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+  }
   
   try {
-    // Buscar el mensaje para eliminar sus imágenes si existen
-    const mensaje = mensajes.find(m => m.id === id);
+    // Check if message exists and belongs to the current user
+    const messageResult = await db.query(`
+      SELECT * FROM forum_posts WHERE id = $1
+    `, [id]);
     
-    if (!mensaje) {
+    if (messageResult.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
     }
     
-    // Eliminar las imágenes del sistema de archivos si existen
-    if (mensaje.imagenes && mensaje.imagenes.length > 0) {
-      mensaje.imagenes.forEach(imagen => {
-        const filename = imagen.url.split('/').pop();
-        const imagePath = join(uploadDir, filename);
-        
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      });
+    const message = messageResult.rows[0];
+    
+    // Authorization check - only allow users to delete their own messages
+    if (message.user_id !== userId) {
+      return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar este mensaje' });
     }
     
-    // Filtrar el mensaje a eliminar
-    mensajes = mensajes.filter(m => m.id !== id);
+    // Get image filenames to delete from filesystem
+    const imageResult = await db.query(`
+      SELECT filename FROM post_images WHERE post_id = $1
+    `, [id]);
     
-    // Eliminar votos asociados al mensaje
+    // Delete images from filesystem
+    for (const img of imageResult.rows) {
+      const imagePath = join(uploadDir, img.filename);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+    
+    // Begin transaction for cascading delete
+    await db.query('BEGIN');
+    
+    // Delete all comment images
+    await db.query(`
+      DELETE FROM comment_images 
+      WHERE comment_id IN (SELECT id FROM forum_comments WHERE post_id = $1)
+    `, [id]);
+    
+    // Delete comment votes
+    await db.query(`
+      DELETE FROM comment_votes 
+      WHERE comment_id IN (SELECT id FROM forum_comments WHERE post_id = $1)
+    `, [id]);
+    
+    // Delete comments
+    await db.query(`
+      DELETE FROM forum_comments WHERE post_id = $1
+    `, [id]);
+    
+    // Delete post images
+    await db.query(`
+      DELETE FROM post_images WHERE post_id = $1
+    `, [id]);
+    
+    // Delete post votes
+    await db.query(`
+      DELETE FROM post_votes WHERE post_id = $1
+    `, [id]);
+    
+    // Finally delete the post itself
+    await db.query(`
+      DELETE FROM forum_posts WHERE id = $1
+    `, [id]);
+    
+    // Commit transaction
+    await db.query('COMMIT');
+    
+    // Update in-memory data
+    mensajes = mensajes.filter(m => m.id !== id);
     delete votos[id];
     
     return res.json({ 
@@ -331,53 +503,89 @@ app.delete('/eliminar-mensaje/:id', (req, res) => {
       totalMensajes: mensajes.length
     });
   } catch (error) {
-    console.error('Error al eliminar:', error);
+    // Rollback in case of error
+    await db.query('ROLLBACK');
+    console.error('Error al eliminar mensaje:', error);
     return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
   }
 });
 
-
-// NUEVA RUTA: Eliminar comentario
-app.delete('/eliminar-comentario/:mensajeId/:comentarioId', (req, res) => {
+// Versión modificada de la ruta para eliminar comentarios
+app.delete('/eliminar-comentario/:mensajeId/:comentarioId', async (req, res) => {
   try {
     const mensajeId = parseInt(req.params.mensajeId);
     const comentarioId = parseInt(req.params.comentarioId);
-
-    // Buscar el mensaje
-    const mensaje = mensajes.find(m => m.id === mensajeId);
     
-    if (!mensaje || !mensaje.comentarios) {
-      return res.status(404).json({ success: false, error: 'Mensaje o comentarios no encontrados' });
-    }
+    // Eliminamos la verificación de userId para permitir la eliminación sin autenticación
+    // const userId = req.session.userId;
+    // 
+    // if (!userId) {
+    //   return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+    // }
     
-    // Buscar el comentario
-    const comentarioIndex = mensaje.comentarios.findIndex(c => c.id === comentarioId);
+    // Check if comment exists
+    const commentResult = await db.query(`
+      SELECT * FROM forum_comments WHERE id = $1 AND post_id = $2
+    `, [comentarioId, mensajeId]);
     
-    if (comentarioIndex === -1) {
+    if (commentResult.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
     }
     
-    // Eliminar las imágenes del comentario si existen
-    const comentario = mensaje.comentarios[comentarioIndex];
-    if (comentario.imagenes && comentario.imagenes.length > 0) {
-      comentario.imagenes.forEach(imagen => {
-        const filename = imagen.url.split('/').pop();
-        const imagePath = join(uploadDir, filename);
-        
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      });
+    const comment = commentResult.rows[0];
+    
+    // Eliminamos la verificación de autor del comentario
+    // if (comment.user_id !== userId) {
+    //   return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar este comentario' });
+    // }
+    
+    // Get image filenames to delete from filesystem
+    const imageResult = await db.query(`
+      SELECT filename FROM comment_images WHERE comment_id = $1
+    `, [comentarioId]);
+    
+    // Delete images from filesystem
+    for (const img of imageResult.rows) {
+      const imagePath = join(uploadDir, img.filename);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     
-    // Eliminar el comentario del array
-    mensaje.comentarios.splice(comentarioIndex, 1);
+    // Begin transaction
+    await db.query('BEGIN');
+    
+    // Delete comment votes
+    await db.query(`
+      DELETE FROM comment_votes WHERE comment_id = $1
+    `, [comentarioId]);
+    
+    // Delete comment images
+    await db.query(`
+      DELETE FROM comment_images WHERE comment_id = $1
+    `, [comentarioId]);
+    
+    // Delete the comment
+    await db.query(`
+      DELETE FROM forum_comments WHERE id = $1
+    `, [comentarioId]);
+    
+    // Commit transaction
+    await db.query('COMMIT');
+    
+    // Update in-memory data
+    const mensaje = mensajes.find(m => m.id === mensajeId);
+    if (mensaje && mensaje.comentarios) {
+      mensaje.comentarios = mensaje.comentarios.filter(c => c.id !== comentarioId);
+    }
     
     return res.json({ 
       success: true,
-      totalComentarios: mensaje.comentarios.length
+      totalComentarios: mensaje?.comentarios?.length || 0
     });
   } catch (error) {
+    // Rollback in case of error
+    await db.query('ROLLBACK');
     console.error('Error al eliminar comentario:', error);
     return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
   }
@@ -540,7 +748,9 @@ app.get('/', (req, res) => {
     subetiquetasDisponibles: Object.values(subetiquetasDisponibles).flat(),
     subcategorias: etiquetasDisponibles,
     extrasubcategorias: etiquetasDisponibles,
-    extrasubetiquetasDisponibles
+    extrasubetiquetasDisponibles,
+    rutaImagen:null,
+    accesorios:null,
   });
 });
 

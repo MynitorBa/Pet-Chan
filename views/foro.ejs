@@ -2,11 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="username" content="<%= username %>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foro Simple</title>
     <link rel="stylesheet" href="/styles/foro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <%- include("partials/header.ejs") %>
 
@@ -17,12 +19,13 @@
                 <div class="formulario-container">
                 <form action="/publicar" method="POST" id="mensaje-form" enctype="multipart/form-data">
                     <input type="hidden" id="mensaje-id" name="id" value="">
-                    <div class="form-group">
-                        <label for="autor">Tu nombre:</label>
-                        <input type="text" id="autor" name="autor" value="meme" required>
+                    <div class="form-group author-field">
+                        <div class="field-label">Autor:</div>
+                        <div class="autor-display"><%= username %></div>
+                        <input type="hidden" id="autor" name="autor" value="<%= username %>">
                     </div>
                     <div class="form-group">
-                        <label for="mensaje">Mensaje:</label>
+                        <div class="field-label">Mensaje:</div>
                         <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
                     </div>
 
@@ -80,12 +83,13 @@
                 <div class="formulario-container">
                     <form action="/publicar-comentario" method="POST" id="comentario-form" enctype="multipart/form-data">
                         <input type="hidden" id="mensaje-padre-id" name="mensaje_padre_id" value="">
-                        <div class="form-group">
-                            <label for="autor-comentario">Tu nombre:</label>
-                            <input type="text" id="autor-comentario" name="autor" value="meme" required>
+                        <div class="form-group author-field">
+                            <div class="field-label">Autor:</div>
+                            <div class="autor-display"><%= username %></div>
+                            <input type="hidden" id="autor-comentario" name="autor" value="<%= username %>">
                         </div>
                         <div class="form-group">
-                            <label for="comentario">Comentario:</label>
+                            <div class="field-label">Comentario:</div>
                             <textarea id="comentario" name="comentario" rows="4" required></textarea>
                         </div>
                         
@@ -168,7 +172,6 @@
                             <% const tipoOpciones = [
                                 { id: 'todos_tipo', valor: 'todos', texto: 'Todos los mensajes' },
                                 { id: 'mios', valor: 'mios', texto: 'Mis mensajes' },
-                                { id: 'otros', valor: 'otros', texto: 'Mensajes de otros' }
                             ]; %>
                             <% tipoOpciones.forEach(opcion => { %>
                                 <div class="filtro-item">
@@ -236,7 +239,7 @@
                             <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
                         <% } else { %>
                             <% mensajes.forEach(mensaje => { %>
-                                <div class="mensaje" data-id="<%= mensaje.id %>">
+                                <div class="mensaje" data-id="<%= mensaje.id %>" data-user-id="<%= mensaje.user_id %>">
                                     <div class="mensaje-cabecera">
                                         <span class="autor"><%= mensaje.autor %></span>
                                         <div class="etiquetas-container">
@@ -265,10 +268,13 @@
                                             <% } %>
                                         </div>
                                         <div class="mensaje-acciones">
-                                            <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                                            <% if (mensaje.autor === username) { %>
+                                                <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
+                                                <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                                            <% } %>
                                             <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
                                         </div>
+                                        
                                     </div>
                                     
                                     <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
@@ -303,58 +309,55 @@
                                         <div class="comentarios-lista">
                                             <% if (mensaje.comentarios && mensaje.comentarios.length > 0) { %>
                                                 <% mensaje.comentarios.forEach(comentario => { %>
-                                                    <div class="comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                    <div class="comentario" data-id="<%= comentario.id %>" data-user-id="<%= comentario.user_id %>">
                                                         <div class="comentario-cabecera">
                                                             <span class="comentario-autor"><%= comentario.autor %></span>
                                                             <div class="comentario-acciones">
-                                                                <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
+                                                                <% if (comentario.autor === username) { %>
+                                                                    <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                    <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                <% } %>
                                                             </div>
                                                         </div>
                                                         <div class="comentario-contenido"><%= comentario.comentario %></div>
 
-<!-- Images section remains unchanged -->
-<% if (comentario.imagenes && comentario.imagenes.length > 0) { %>
-    <div class="comentario-imagenes">
-        <% comentario.imagenes.forEach(imagen => { %>
-            <div class="imagen-comentario">
-                <img src="<%= imagen.url %>" alt="Imagen de comentario">
-            </div>
-        <% }); %>
-    </div>
-<% } %>
+                                                        <!-- Images section remains unchanged -->
+                                                        <% if (comentario.imagenes && comentario.imagenes.length > 0) { %>
+                                                            <div class="comentario-imagenes">
+                                                                <% comentario.imagenes.forEach(imagen => { %>
+                                                                    <div class="imagen-comentario">
+                                                                        <img src="<%= imagen.url %>" alt="Imagen de comentario">
+                                                                    </div>
+                                                                <% }); %>
+                                                            </div>
+                                                        <% } %>
 
-<!-- New footer layout -->
-<div class="comentario-pie">
-    <span class="comentario-fecha"><%= comentario.fechaStr %></span>
-    <div class="comentario-botones">
-        <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
-            <i class="fas fa-edit"></i>
-        </button>
-        <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
-            <i class="fas fa-trash"></i>
-        </button>
-    </div>
-</div>
+                                                        <!-- New footer layout -->
+                                                        <div class="comentario-pie">
+                                                            <span class="comentario-fecha"><%= comentario.fechaStr %></span>
+                                                            <% if (comentario.autor === username) { %>
+                                                            <div class="comentario-botones">
+
+                                                            </div>
+                                                            <% } %>
+                                                        </div>
                                                     </div>
                                                 <% }); %>
                                             <% } %>
                                         </div>
-                
                                         <div class="nuevo-comentario-container">
                                             <form class="nuevo-comentario-form" data-mensaje-id="<%= mensaje.id %>">
-                                                <div class="form-group">
-                                                    <input type="text" 
-                                                           name="autor" 
-                                                           placeholder="Tu nombre" 
-                                                           required 
-                                                           value="meme">
+                                                <div class="form-group author-field">
+                                                    <div class="field-label">Autor:</div>
+                                                    <div class="autor-display"><%= username %></div>
+                                                    <input type="hidden" name="autor" value="<%= username %>">
                                                 </div>
                                                 <div class="form-group">
+                                                    <div class="field-label">Comentario:</div>
                                                     <textarea 
                                                         name="comentario" 
                                                         placeholder="Escribe tu comentario" 

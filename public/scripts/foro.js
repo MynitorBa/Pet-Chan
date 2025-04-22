@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
   let imagenesEliminadas = [];
   const MAX_IMAGENES = 9;
 
+  // Get current logged in username from session
+  const currentUsername = document.querySelector('meta[name="username"]')?.content || 'usuario';
+
   // Inicialización del modal de imagen si no existe
   let modalImagen = document.getElementById('modal-imagen');
   let modalImagenContenido = document.getElementById('modal-imagen-contenido');
@@ -48,8 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Configuración inicial
-  autorInput.value = "meme";
+  // Configuración inicial - use logged in username instead of hardcoded "meme"
+  autorInput.value = currentUsername;
+  
+  // Make autor field read-only to prevent users from changing their identity
+  autorInput.readOnly = true;
 
   // Función para resetear el formulario
   function resetForm() {
@@ -58,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
     formTitle.textContent = 'Nuevo Mensaje';
     submitBtn.textContent = 'Publicar';
     cancelBtn.style.display = 'none';
-    autorInput.value = 'meme';
+    autorInput.value = currentUsername; // Reset to current username, not "meme"
     mensajeInput.value = '';
     mensajeIdInput.value = '';
     imagenesContainer.innerHTML = '';
@@ -386,170 +392,237 @@ function showOverlayNotification(message, type = 'warning') {
     });
   });
   
-  // Ensure expandirImagen function exists
-  function expandirImagen(src) {
-    const modalImagen = document.getElementById('modal-imagen');
-    const modalImagenContenido = document.getElementById('modal-imagen-contenido');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Edit ar mensaje
+document.addEventListener('click', function(event) {
+  if (event.target.closest('.btn-editar')) {
+    const button = event.target.closest('.btn-editar');
+    const mensajeId = button.dataset.id;
+    const overlay = document.querySelector('.new-message-overlay');
     
-    if (modalImagen && modalImagenContenido) {
-      const imgElement = document.createElement('img');
-      imgElement.src = src;
-      modalImagenContenido.innerHTML = '';
-      modalImagenContenido.appendChild(imgElement);
-      modalImagen.classList.add('activo');
+    fetch(`/mensaje/${mensajeId}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Error: ' + response.status);
+        return response.json();
+      })
+      .then(data => {
+        resetForm();
+        formTitle.textContent = 'Editar Mensaje';
+        submitBtn.textContent = 'Actualizar';
+        cancelBtn.style.display = 'block';
+        autorInput.value = data.autor;
+        mensajeInput.value = data.mensaje;
+        mensajeIdInput.value = data.id;
+        
+        // Configurar contador de caracteres - NUEVO CÓDIGO
+        // Agregar el contenedor del contador si no existe
+// Modified version of the character counter code
+let contadorContainer = document.querySelector('.contador-caracteres-mensaje');
+if (!contadorContainer) {
+  contadorContainer = document.createElement('div');
+  contadorContainer.classList.add('contador-caracteres-mensaje');
+  
+  // Better positioning to avoid overlap
+  contadorContainer.style.position = 'absolute';
+  contadorContainer.style.bottom = '10px';
+  contadorContainer.style.right = '10px';
+  contadorContainer.style.fontSize = '12px';
+  contadorContainer.style.color = '#666';
+  contadorContainer.style.padding = '2px 5px';
+  contadorContainer.style.borderRadius = '3px';
+  contadorContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)'; // Semi-transparent background
+  contadorContainer.style.zIndex = '5'; // Ensure it appears above other elements
+  
+  contadorContainer.innerHTML = `
+    <span id="contador-actual-mensaje">${mensajeInput.value.length}</span>/<span id="contador-maximo-mensaje">391</span>
+  `;
+  
+  // Ensure the textarea container has relative positioning
+  const textareaContainer = mensajeInput.parentElement;
+  textareaContainer.style.position = 'relative';
+  
+  // Add more bottom padding to the textarea to make room for the counter
+  mensajeInput.style.paddingBottom = '30px';
+  
+  textareaContainer.appendChild(contadorContainer);
+}
+
+// Initialize counter with current value
+const contadorActual = document.getElementById('contador-actual-mensaje');
+contadorActual.textContent = mensajeInput.value.length;
+
+// Update counter styling for better visibility
+const updateContadorStyle = (length) => {
+  contadorActual.textContent = length;
+  
+  // Cambiar color del contador según se acerque al límite
+  if (length >= 351) { // A partir del 90% del límite (391*0.9)
+    contadorContainer.style.color = '#d9534f'; // Rojo
+    contadorContainer.style.fontWeight = 'bold';
+  } else if (length >= 293) { // A partir del 75% del límite (391*0.75)
+    contadorContainer.style.color = '#f0ad4e'; // Naranja/amarillo
+  } else {
+    contadorContainer.style.color = '#666'; // Color normal
+    contadorContainer.style.fontWeight = 'normal';
+  }
+};
+
+// Initial style update
+updateContadorStyle(mensajeInput.value.length);
+
+// Update counter when the user types
+mensajeInput.addEventListener('input', () => {
+  const longitud = mensajeInput.value.length;
+  updateContadorStyle(longitud);
+  
+  // Verificar si excede el límite - simplemente truncar sin notificación
+  if (longitud > 391) {
+    mensajeInput.value = mensajeInput.value.substring(0, 391);
+    updateContadorStyle(391);
+  }
+});
+        
+        // Etiqueta Select with explicit handling
+        const etiquetaSelect = document.getElementById('etiqueta-comentario');
+        if (etiquetaSelect) {
+          // Prioritize the original etiqueta if it exists
+          if (data.etiqueta) {
+            // Find the option that matches the original etiqueta
+            const matchingOption = Array.from(etiquetaSelect.options)
+              .find(option => option.value === data.etiqueta);
+            
+            if (matchingOption) {
+              etiquetaSelect.value = data.etiqueta;
+            } else {
+              // If no exact match, fall back to the first valid option
+              const validOptions = Array.from(etiquetaSelect.options)
+                .filter(option => option.value && option.value !== 'Seleccione categoria');
+              
+              if (validOptions.length > 0) {
+                etiquetaSelect.value = validOptions[0].value;
+              }
+            }
+          } else {
+            // If no original etiqueta, select first valid option
+            const validOptions = Array.from(etiquetaSelect.options)
+              .filter(option => option.value && option.value !== 'Seleccione categoria');
+            
+            if (validOptions.length > 0) {
+              etiquetaSelect.value = validOptions[0].value;
+            }
+          }
+          
+          // Trigger change event to update dependent dropdowns
+          etiquetaSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        
+        // Subcategoria Select with similar logic
+        const subcategoriaSelect = document.getElementById('subcategoria-comentario');
+        if (subcategoriaSelect) {
+          if (data.subcategoria) {
+            // Find the option that matches the original subcategoria
+            const matchingOption = Array.from(subcategoriaSelect.options)
+              .find(option => option.value === data.subcategoria);
+            
+            if (matchingOption) {
+              subcategoriaSelect.value = data.subcategoria;
+            } else {
+              // If no exact match, fall back to the first valid option
+              const validOptions = Array.from(subcategoriaSelect.options)
+                .filter(option => option.value !== '');
+              
+              if (validOptions.length > 0) {
+                subcategoriaSelect.value = validOptions[0].value;
+              }
+            }
+          } else {
+            // If no original subcategoria, select first valid option
+            const validOptions = Array.from(subcategoriaSelect.options)
+              .filter(option => option.value !== '');
+            
+            if (validOptions.length > 0) {
+              subcategoriaSelect.value = validOptions[0].value;
+            }
+          }
+          
+          // Trigger change event
+          subcategoriaSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        
+        // Extra Subcategoria Select with similar logic
+        const extraSubcategoriaSelect = document.getElementById('extrasubcategoria-comentario');
+        if (extraSubcategoriaSelect) {
+          if (data.extrasubcategoria) {
+            // Find the option that matches the original extrasubcategoria
+            const matchingOption = Array.from(extraSubcategoriaSelect.options)
+              .find(option => option.value === data.extrasubcategoria);
+            
+            if (matchingOption) {
+              extraSubcategoriaSelect.value = data.extrasubcategoria;
+            } else {
+              // If no exact match, fall back to the first valid option
+              const validOptions = Array.from(extraSubcategoriaSelect.options)
+                .filter(option => option.value !== '');
+              
+              if (validOptions.length > 0) {
+                extraSubcategoriaSelect.value = validOptions[0].value;
+              }
+            }
+          } else {
+            // If no original extrasubcategoria, select first valid option
+            const validOptions = Array.from(extraSubcategoriaSelect.options)
+              .filter(option => option.value !== '');
+            
+            if (validOptions.length > 0) {
+              extraSubcategoriaSelect.value = validOptions[0].value;
+            }
+          }
+          
+          // Trigger change event
+          extraSubcategoriaSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        
+        imagenesEliminadas = [];
+        if (data.imagenes && data.imagenes.length > 0) {
+          imagenesActuales = data.imagenes;
+          actualizarVistaPrevia();
+        }
+        
+        if (overlay) {
+          overlay.classList.add('active');
+        }
+      })
+      .catch(error => {
+        alert('Error al cargar el mensaje: ' + error.message);
+      });
+  }
+});
+
+// Agregar validación de caracteres al formulario para evitar envío de mensaje demasiado largo
+document.getElementById('mensaje-form').addEventListener('submit', function(event) {
+  const mensajeInput = document.getElementById('mensaje');
+  if (mensajeInput.value.length > 391) {
+    event.preventDefault();
+    // Simplemente truncar sin mostrar notificación
+    mensajeInput.value = mensajeInput.value.substring(0, 391);
+    if (document.getElementById('contador-actual-mensaje')) {
+      document.getElementById('contador-actual-mensaje').textContent = '391';
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Edit ar mensaje
-    document.addEventListener('click', function(event) {
-      if (event.target.closest('.btn-editar')) {
-        const button = event.target.closest('.btn-editar');
-        const mensajeId = button.dataset.id;
-        const overlay = document.querySelector('.new-message-overlay');
-        
-        fetch(`/mensaje/${mensajeId}`)
-          .then(response => {
-            if (!response.ok) throw new Error('Error: ' + response.status);
-            return response.json();
-          })
-          .then(data => {
-            resetForm();
-            formTitle.textContent = 'Editar Mensaje';
-            submitBtn.textContent = 'Actualizar';
-            cancelBtn.style.display = 'block';
-            autorInput.value = data.autor;
-            mensajeInput.value = data.mensaje;
-            mensajeIdInput.value = data.id;
-            
-            // Etiqueta Select with explicit handling
-            const etiquetaSelect = document.getElementById('etiqueta-comentario');
-            if (etiquetaSelect) {
-              // Prioritize the original etiqueta if it exists
-              if (data.etiqueta) {
-                // Find the option that matches the original etiqueta
-                const matchingOption = Array.from(etiquetaSelect.options)
-                  .find(option => option.value === data.etiqueta);
-                
-                if (matchingOption) {
-                  etiquetaSelect.value = data.etiqueta;
-                } else {
-                  // If no exact match, fall back to the first valid option
-                  const validOptions = Array.from(etiquetaSelect.options)
-                    .filter(option => option.value && option.value !== 'Seleccione categoria');
-                  
-                  if (validOptions.length > 0) {
-                    etiquetaSelect.value = validOptions[0].value;
-                  }
-                }
-              } else {
-                // If no original etiqueta, select first valid option
-                const validOptions = Array.from(etiquetaSelect.options)
-                  .filter(option => option.value && option.value !== 'Seleccione categoria');
-                
-                if (validOptions.length > 0) {
-                  etiquetaSelect.value = validOptions[0].value;
-                }
-              }
-              
-              // Trigger change event to update dependent dropdowns
-              etiquetaSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            
-            // Subcategoria Select with similar logic
-            const subcategoriaSelect = document.getElementById('subcategoria-comentario');
-            if (subcategoriaSelect) {
-              if (data.subcategoria) {
-                // Find the option that matches the original subcategoria
-                const matchingOption = Array.from(subcategoriaSelect.options)
-                  .find(option => option.value === data.subcategoria);
-                
-                if (matchingOption) {
-                  subcategoriaSelect.value = data.subcategoria;
-                } else {
-                  // If no exact match, fall back to the first valid option
-                  const validOptions = Array.from(subcategoriaSelect.options)
-                    .filter(option => option.value !== '');
-                  
-                  if (validOptions.length > 0) {
-                    subcategoriaSelect.value = validOptions[0].value;
-                  }
-                }
-              } else {
-                // If no original subcategoria, select first valid option
-                const validOptions = Array.from(subcategoriaSelect.options)
-                  .filter(option => option.value !== '');
-                
-                if (validOptions.length > 0) {
-                  subcategoriaSelect.value = validOptions[0].value;
-                }
-              }
-              
-              // Trigger change event
-              subcategoriaSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            
-            // Extra Subcategoria Select with similar logic
-            const extraSubcategoriaSelect = document.getElementById('extrasubcategoria-comentario');
-            if (extraSubcategoriaSelect) {
-              if (data.extrasubcategoria) {
-                // Find the option that matches the original extrasubcategoria
-                const matchingOption = Array.from(extraSubcategoriaSelect.options)
-                  .find(option => option.value === data.extrasubcategoria);
-                
-                if (matchingOption) {
-                  extraSubcategoriaSelect.value = data.extrasubcategoria;
-                } else {
-                  // If no exact match, fall back to the first valid option
-                  const validOptions = Array.from(extraSubcategoriaSelect.options)
-                    .filter(option => option.value !== '');
-                  
-                  if (validOptions.length > 0) {
-                    extraSubcategoriaSelect.value = validOptions[0].value;
-                  }
-                }
-              } else {
-                // If no original extrasubcategoria, select first valid option
-                const validOptions = Array.from(extraSubcategoriaSelect.options)
-                  .filter(option => option.value !== '');
-                
-                if (validOptions.length > 0) {
-                  extraSubcategoriaSelect.value = validOptions[0].value;
-                }
-              }
-              
-              // Trigger change event
-              extraSubcategoriaSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            
-            imagenesEliminadas = [];
-            if (data.imagenes && data.imagenes.length > 0) {
-              imagenesActuales = data.imagenes;
-              actualizarVistaPrevia();
-            }
-            
-            if (overlay) {
-              overlay.classList.add('active');
-            }
-          })
-          .catch(error => {
-            alert('Error al cargar el mensaje: ' + error.message);
-          });
-      }
-    });
+});
 
 
     function cargarMensajesFiltrados(params) {
@@ -624,10 +697,15 @@ function actualizarListaMensajes(mensajes) {
     return;
   }
   
+  // Obtener el ID del usuario actual desde el meta tag
+  const metaUsername = document.querySelector('meta[name="username"]');
+  const currentUsername = metaUsername ? metaUsername.content : null;
+  
   mensajes.forEach(mensaje => {
     const mensajeElement = document.createElement('div');
     mensajeElement.className = 'mensaje';
     mensajeElement.dataset.id = mensaje.id;
+    mensajeElement.dataset.userId = mensaje.user_id;
     
     let imagenesHTML = '';
     if (mensaje.imagenes && mensaje.imagenes.length > 0) {
@@ -645,24 +723,35 @@ function actualizarListaMensajes(mensajes) {
     let etiquetaHTML = '';
     
     if (mensaje.etiqueta) {
-      etiquetaHTML = `<span class="etiqueta" data-categoria="${mensaje.etiqueta}">${mensaje.etiqueta}</span>`;
+      etiquetaHTML = `<span class="etiqueta principal" data-categoria="${mensaje.etiqueta}">${mensaje.etiqueta}</span>`;
     }
     
     if (mensaje.subcategoria) {
-      etiquetaHTML += `<span class="subetiqueta" data-subcategoria="${mensaje.subcategoria}">${mensaje.subcategoria}</span>`;
+      etiquetaHTML += `<span class="subetiqueta" data-subcategoria="${mensaje.subcategoria}"><i class="fas fa-tag"></i> ${mensaje.subcategoria}</span>`;
     }
     
     if (mensaje.extrasubcategoria) {
-      etiquetaHTML += `<span class="subetiqueta extra" data-extrasubcategoria="${mensaje.extrasubcategoria}">${mensaje.extrasubcategoria}</span>`;
+      etiquetaHTML += `<span class="subetiqueta extra" data-extrasubcategoria="${mensaje.extrasubcategoria}"><i class="fas fa-tags"></i> ${mensaje.extrasubcategoria}</span>`;
     }
+    
+    // Determinar si el mensaje pertenece al usuario actual
+    // También verificamos por autor en caso que la aplicación use este campo como identificador
+    const isOwnMessage = (mensaje.user_id && currentUsername && String(mensaje.user_id) === String(currentUsername)) || 
+                        (mensaje.autor && currentUsername && mensaje.autor === currentUsername);
+    
+    // Preparar los botones de editar y eliminar solo si es un mensaje propio
+    const botonesAccion = isOwnMessage ? 
+      `<button class="btn-editar" data-id="${mensaje.id}"><i class="fas fa-edit"></i></button>
+       <button class="btn-eliminar" data-id="${mensaje.id}"><i class="fas fa-trash"></i></button>` : '';
     
     mensajeElement.innerHTML = `
       <div class="mensaje-cabecera">
         <span class="autor">${mensaje.autor}</span>
-        ${etiquetaHTML}
+        <div class="etiquetas-container">
+          ${etiquetaHTML}
+        </div>
         <div class="mensaje-acciones">
-          <button class="btn-editar" data-id="${mensaje.id}"><i class="fas fa-edit"></i></button>
-          <button class="btn-eliminar" data-id="${mensaje.id}"><i class="fas fa-trash"></i></button>
+          ${botonesAccion}
           <button class="btn-comentar" data-id="${mensaje.id}"><i class="fas fa-comment"></i></button>
         </div>
       </div>
@@ -686,23 +775,47 @@ function actualizarListaMensajes(mensajes) {
     
     listaMensajes.appendChild(mensajeElement);
     
-    // Cargar comentarios para este mensaje si existen
+    
+   
+    // Añadir sección de comentarios con toggle para colapsar/expandir
+    const comentariosSeccion = document.createElement('div');
+    comentariosSeccion.classList.add('comentarios-seccion');
+    
+    // Contador de comentarios y botón para mostrar/ocultar
+    const totalComentarios = mensaje.comentarios ? mensaje.comentarios.length : 0;
+    
+    const comentariosHeader = document.createElement('div');
+    comentariosHeader.classList.add('comentarios-header');
+    comentariosHeader.innerHTML = `
+      <button class="toggle-comentarios" aria-expanded="false">
+        <i class="fas fa-chevron-down"></i>
+        <span class="comentarios-contador">${totalComentarios} comentarios</span>
+      </button>
+    `;
+    comentariosSeccion.appendChild(comentariosHeader);
+    
+    // Contenedor de comentarios (inicialmente oculto)
+    const comentariosContenedor = document.createElement('div');
+    comentariosContenedor.classList.add('comentarios-contenedor');
+    comentariosContenedor.style.display = 'none';
+    
+    // Lista de comentarios
+    const comentariosLista = document.createElement('div');
+    comentariosLista.classList.add('comentarios-lista');
+    
+    // Agregar comentarios existentes a la lista
     if (mensaje.comentarios && mensaje.comentarios.length > 0) {
-      const comentariosSeccion = document.createElement('div');
-      comentariosSeccion.classList.add('comentarios-seccion');
-      
-      const comentariosLista = document.createElement('div');
-      comentariosLista.classList.add('comentarios-lista');
-      
       mensaje.comentarios.forEach(comentario => {
-        const comentarioElement = createCommentElement(comentario);
+        const comentarioElement = createCommentElement(comentario, mensaje.id, currentUsername);
         comentariosLista.appendChild(comentarioElement);
       });
-      
-      comentariosSeccion.appendChild(comentariosLista);
-      mensajeElement.appendChild(comentariosSeccion);
     }
     
+    comentariosContenedor.appendChild(comentariosLista);
+    comentariosSeccion.appendChild(comentariosContenedor);
+    mensajeElement.appendChild(comentariosSeccion);
+    
+    // Manejo de eventos para las imágenes
     const imagenesCeldas = mensajeElement.querySelectorAll('.imagen-mensaje-celda');
     imagenesCeldas.forEach(celda => {
       celda.addEventListener('click', function() {
@@ -713,12 +826,14 @@ function actualizarListaMensajes(mensajes) {
       });
     });
     
+    // Efecto de aparición gradual
     mensajeElement.style.opacity = '0';
     setTimeout(() => {
       mensajeElement.style.transition = 'opacity 0.5s ease-in';
       mensajeElement.style.opacity = '1';
     }, 50);
     
+    // Marcar botón de voto si ya se ha votado este mensaje
     const mensajeId = mensaje.id;
     const votoGuardado = localStorage.getItem(`voto_${mensajeId}`);
     if (votoGuardado) {
@@ -728,6 +843,98 @@ function actualizarListaMensajes(mensajes) {
       if (btnVoto) btnVoto.classList.add('activo');
     }
   });
+}
+
+function createCommentElement(comentario, mensajeId, currentUsername) {
+  const comentarioElement = document.createElement('div');
+  comentarioElement.className = 'comentario';
+  comentarioElement.dataset.id = comentario.id;
+  comentarioElement.dataset.userId = comentario.user_id;
+  
+  // Obtener el ID del usuario actual desde el meta tag si no está disponible
+  if (!currentUsername) {
+    const metaUsername = document.querySelector('meta[name="username"]');
+    currentUsername = metaUsername ? metaUsername.content : null;
+    
+    // Meta tag alternativo para el ID de usuario
+    if (!currentUsername) {
+      const metaUserId = document.querySelector('meta[name="userId"]');
+      currentUsername = metaUserId ? metaUserId.content : null;
+    }
+  }
+  
+  console.log(`Creando comentario - Usuario actual: ${currentUsername}, Autor comentario: ${comentario.user_id || comentario.autor}`);
+  
+  // Determinar si el comentario pertenece al usuario actual
+  // Comparación de IDs de usuario - garantizamos una comparación correcta de strings o números
+  const isOwnComment = (comentario.user_id && currentUsername && 
+                      String(comentario.user_id) === String(currentUsername)) || 
+                      (comentario.autor && currentUsername && 
+                      comentario.autor === currentUsername);
+  
+  // Botones solo si el comentario es del usuario actual
+  const comentarioAcciones = isOwnComment ? `
+    <div class="comentario-acciones">
+      <button class="btn-editar-comentario" data-id="${comentario.id}" data-mensaje-id="${mensajeId}">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button class="btn-eliminar-comentario" data-id="${comentario.id}" data-mensaje-id="${mensajeId}">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>` : '';
+
+  // Imágenes del comentario, si existen
+  let imagenesHTML = '';
+  if (comentario.imagenes && comentario.imagenes.length > 0) {
+    imagenesHTML = `
+      <div class="comentario-imagenes">
+        ${comentario.imagenes.map(imagen => `
+          <div class="imagen-comentario">
+            <img src="${imagen.url}" alt="Imagen de comentario">
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  // Sistema de votación del comentario
+  const votacionHTML = `
+    <div class="ranking-container" data-comentario-id="${comentario.id}">
+      <button class="btn-votar-comentario upvote" data-valor="1">
+        &#x2191;
+      </button>
+      <span class="ranking-valor ${(comentario.ranking || 0) < 0 ? 'negativo' : ''}">
+        ${comentario.ranking || 0}
+      </span>
+      <button class="btn-votar-comentario downvote" data-valor="-1">
+        &#x2193;
+      </button>
+    </div>
+  `;
+
+  // Estructura HTML del comentario
+  comentarioElement.innerHTML = `
+    <div class="comentario-cabecera">
+      <span class="comentario-autor">${comentario.autor}</span>
+      ${comentarioAcciones}
+    </div>
+    <div class="comentario-contenido">${comentario.comentario}</div>
+    ${imagenesHTML}
+    <div class="comentario-pie">
+      <span class="comentario-fecha">${comentario.fechaStr || comentario.fecha}</span>
+      ${votacionHTML}
+    </div>
+  `;
+
+  // Marcar botones de voto activos si ya hay un voto previo
+  const votoGuardadoComentario = localStorage.getItem(`voto_comentario_${comentario.id}`);
+  if (votoGuardadoComentario) {
+    const valor = parseInt(votoGuardadoComentario);
+    const selector = valor > 0 ? '.upvote' : '.downvote';
+    const btnVoto = comentarioElement.querySelector(`${selector}.btn-votar-comentario`);
+    if (btnVoto) btnVoto.classList.add('activo');
+  }
+
+  return comentarioElement;
 }
 
 form.addEventListener('submit', function(event) {
@@ -990,6 +1197,264 @@ form.addEventListener('submit', function(event) {
   cargarMensajesFiltrados(new URLSearchParams());
 });
 
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const filterForm = document.getElementById('filtro-form');
+  const mensajesContainer = document.querySelector('.lista-mensajes');
+  const mensajes = document.querySelectorAll('.mensaje');
+  const filtrosBusquedaContainer = document.getElementById('filtros-busqueda-container');
+  const filtrosAplicadosContainer = document.getElementById('filtros-aplicados-container');
+  const filtrosAplicadosTags = document.getElementById('filtros-aplicados-tags');
+  const resultadosMensaje = document.getElementById('resultados-filtrados-mensaje');
+
+  // Listen for form submission
+  filterForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      aplicarFiltros();
+  });
+
+  // Improved function to get current user - add debugging
+  function getCurrentUser() {
+    const userElement = document.getElementById('usuario-actual');
+    let username = 'unknown_user';
+    
+    if (userElement && userElement.dataset.nombre) {
+      username = userElement.dataset.nombre;
+    }
+    
+    console.log('Current user identified as:', username);
+    return username;
+  }
+
+  // Main filter application function
+  function aplicarFiltros() {
+    // Reset previous filtering
+    mensajes.forEach(mensaje => mensaje.style.display = 'block');
+    filtrosBusquedaContainer.style.display = 'block';
+    filtrosAplicadosTags.innerHTML = '';
+    resultadosMensaje.style.display = 'none';
+
+    // Get current logged user
+    const currentUser = getCurrentUser();
+    console.log('Filtering with current user:', currentUser);
+
+    // Get filter values
+    const etiquetasSeleccionadas = Array.from(
+        document.querySelectorAll('input[name="etiquetas"]:checked')
+    ).map(el => el.value);
+
+    // Include both subcategory and extra subcategory filters
+    const subetiquetasSeleccionadas = Array.from(
+        document.querySelectorAll('input[name^="subetiquetas-"]:checked, input[name^="extrasubetiquetas-"]:checked')
+    ).map(el => el.value);
+
+    const orden = document.getElementById('orden').value;
+    const ranking = document.getElementById('ranking').value;
+    const tipo = document.getElementById('tipo').value;
+    
+    console.log('Selected filter type:', tipo);
+
+    // Apply filters
+    let mensajesFiltrados = Array.from(mensajes).filter(mensaje => {
+        // Etiquetas filter
+        const etiquetaMensaje = mensaje.querySelector('.etiqueta');
+        const etiquetaValida = etiquetasSeleccionadas.length === 0 || 
+            (etiquetaMensaje && etiquetasSeleccionadas.includes(etiquetaMensaje.textContent.trim()));
+
+        // Subcategory filter (including extra subcategories)
+        const subcategoriaMensaje = mensaje.querySelector('.subetiqueta:not(.extra)');
+        const extraSubcategoriaMensaje = mensaje.querySelector('.subetiqueta.extra');
+        
+        const subcategoriaValida = subetiquetasSeleccionadas.length === 0 || 
+            (subcategoriaMensaje && subetiquetasSeleccionadas.some(subetiqueta => 
+                subcategoriaMensaje.textContent.toLowerCase().includes(subetiqueta.toLowerCase())
+            )) ||
+            (extraSubcategoriaMensaje && subetiquetasSeleccionadas.some(subetiqueta => 
+                extraSubcategoriaMensaje.textContent.toLowerCase().includes(subetiqueta.toLowerCase())
+            ));
+
+        // Ranking filter
+        const rankingValor = parseInt(mensaje.querySelector('.ranking-valor').textContent);
+        let rankingValido = true;
+        switch(ranking) {
+            case 'populares':
+                rankingValido = rankingValor > 100;
+                break;
+            case 'medios':
+                rankingValido = rankingValor > 10 && rankingValor <= 100;
+                break;
+            case 'menos_populares':
+                rankingValido = rankingValor <= 10; // This includes negative values
+                break;
+        }
+
+        // Tipo de mensajes filter - FIXED IMPLEMENTATION
+        const autorMensaje = mensaje.querySelector('.autor').textContent.trim();
+        let tipoValido = true;
+        
+        if (tipo === 'mios') {
+            tipoValido = autorMensaje === currentUser;
+            console.log(`Mensaje de ${autorMensaje}, es mío? ${tipoValido}`);
+        } 
+        // For 'todos', tipoValido remains true
+
+        return etiquetaValida && subcategoriaValida && rankingValido && tipoValido;
+    });
+
+    // Ordenar mensajes
+    const ahora = new Date();
+    const treintaMinutosAtras = new Date(ahora - 30 * 60 * 1000);
+    const unaSemanaAtras = new Date(ahora - 7 * 24 * 60 * 60 * 1000);
+    const unDiaAtras = new Date(ahora - 24 * 60 * 60 * 1000);
+
+    switch(orden) {
+        case 'recientes':
+            // Mensajes de los últimos 30 minutos
+            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+                const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
+                return fechaMensaje >= treintaMinutosAtras;
+            });
+            mensajesFiltrados.sort((a, b) => {
+                const fechaA = new Date(a.querySelector('.fecha').textContent);
+                const fechaB = new Date(b.querySelector('.fecha').textContent);
+                return fechaB - fechaA;
+            });
+            break;
+        case 'antiguos':
+            // Mensajes de hace más de una semana
+            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+                const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
+                return fechaMensaje <= unaSemanaAtras;
+            });
+            mensajesFiltrados.sort((a, b) => {
+                const fechaA = new Date(a.querySelector('.fecha').textContent);
+                const fechaB = new Date(b.querySelector('.fecha').textContent);
+                return fechaA - fechaB;
+            });
+            break;
+        case 'nuevos_24h':
+            // Mensajes del último día
+            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+                const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
+                return fechaMensaje >= unDiaAtras;
+            });
+            mensajesFiltrados.sort((a, b) => {
+                const fechaA = new Date(a.querySelector('.fecha').textContent);
+                const fechaB = new Date(b.querySelector('.fecha').textContent);
+                return fechaB - fechaA;
+            });
+            break;
+        case 'mas_valorados':
+            // Mensajes con más de 100 votos
+            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+                const rankingValor = parseInt(mensaje.querySelector('.ranking-valor').textContent);
+                return rankingValor > 100;
+            });
+            mensajesFiltrados.sort((a, b) => {
+                const rankingA = parseInt(a.querySelector('.ranking-valor').textContent);
+                const rankingB = parseInt(b.querySelector('.ranking-valor').textContent);
+                return rankingB - rankingA; // Ordenar por mayor cantidad de votos
+            });
+            break;
+        default:
+            // Orden por defecto: más recientes primero
+            mensajesFiltrados.sort((a, b) => {
+                const fechaA = new Date(a.querySelector('.fecha').textContent);
+                const fechaB = new Date(b.querySelector('.fecha').textContent);
+                return fechaB - fechaA;
+            });
+    }
+
+    // Logging filtered results
+    console.log(`Total mensajes filtrados: ${mensajesFiltrados.length}`);
+
+    // Mostrar/ocultar mensajes
+    mensajes.forEach(mensaje => mensaje.style.display = 'none');
+    mensajesFiltrados.forEach(mensaje => mensaje.style.display = 'block');
+
+    // Mostrar mensaje si no hay resultados
+    if (mensajesFiltrados.length === 0) {
+        resultadosMensaje.style.display = 'block';
+    }
+
+    // Mostrar etiquetas de filtros aplicados
+    mostrarFiltrosAplicados(etiquetasSeleccionadas, orden, ranking, tipo);
+  }
+
+  // Display applied filters as tags
+  function mostrarFiltrosAplicados(etiquetas, orden, ranking, tipo) {
+      const filtrosAplicados = [
+          ...etiquetas.map(etiqueta => `Etiqueta: ${etiqueta}`),
+          `Orden: ${obtenerTextoOrden(orden)}`,
+          `Ranking: ${obtenerTextoRanking(ranking)}`,
+          `Tipo: ${obtenerTextoTipo(tipo)}`
+      ];
+
+      filtrosAplicados.forEach(filtro => {
+          const tagElement = document.createElement('div');
+          tagElement.className = 'filtro-tag';
+          tagElement.innerHTML = `
+              ${filtro}
+              <span class="remove-tag">&times;</span>
+          `;
+          tagElement.querySelector('.remove-tag').addEventListener('click', () => {
+              tagElement.remove();
+              // Potentially reset specific filter
+          });
+          filtrosAplicadosTags.appendChild(tagElement);
+      });
+  }
+
+  // Helper functions for text display
+  function obtenerTextoOrden(orden) {
+      const ordenTextos = {
+          'recientes': 'Recientes (últimos 30 minutos)',
+          'antiguos': 'Antiguos (más de una semana)',
+          'nuevos_24h': 'Nuevos (últimas 24h)',
+          'nuevos_semana': 'Nuevos (última semana)',
+          'mas_valorados': 'Mejor valorados (más de 100 votos)'
+      };
+      return ordenTextos[orden] || orden;
+  }
+
+  function obtenerTextoRanking(ranking) {
+      const rankingTextos = {
+          'todos': 'Todos los mensajes',
+          'populares': 'Populares (más de 100 likes)',
+          'medios': 'Medios (10-100 likes)',
+          'menos_populares': 'Menos populares (10 o menos likes)'
+      };
+      return rankingTextos[ranking] || ranking;
+  }
+
+  function obtenerTextoTipo(tipo) {
+      const tipoTextos = {
+          'todos': 'Todos los mensajes',
+          'mios': 'Solo mis mensajes',
+      };
+      return tipoTextos[tipo] || tipo;
+  }
+
+  // Reset filters
+  document.getElementById('limpiar-filtros').addEventListener('click', () => {
+      mensajes.forEach(mensaje => mensaje.style.display = 'block');
+      filtrosBusquedaContainer.style.display = 'none';
+      filtrosAplicadosTags.innerHTML = '';
+      resultadosMensaje.style.display = 'none';
+  });
+});
+
+
+
 // Edit comment functionality - Modified to hide the new message trigger
 document.addEventListener('DOMContentLoaded', function() {
   // Get reference to the new message trigger button
@@ -1052,253 +1517,294 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Manejar el click en el botón de editar comentario
-  document.addEventListener('click', async (e) => {
-    const editButton = e.target.closest('.btn-editar-comentario');
+ // Manejar el click en el botón de editar comentario
+document.addEventListener('click', async (e) => {
+  const editButton = e.target.closest('.btn-editar-comentario');
+  
+  if (editButton) {
+    e.preventDefault();
     
-    if (editButton) {
-      e.preventDefault();
+    // Hide the new message trigger button
+    const newMessageTrigger = document.querySelector('.new-message-trigger');
+    if (newMessageTrigger) {
+      newMessageTrigger.style.display = 'none';
+    }
+    
+    // Obtener IDs necesarios
+    const comentarioId = editButton.dataset.id;
+    const comentarioElement = editButton.closest('.comentario');
+    const mensajeElement = editButton.closest('.mensaje');
+    
+    if (!mensajeElement || !comentarioElement) {
+      console.error('No se pudo encontrar el mensaje o comentario');
+      return;
+    }
+    
+    const mensajeId = mensajeElement.dataset.id;
+    
+    if (!mensajeId) {
+      console.error('No se pudo obtener el ID del mensaje');
+      return;
+    }
+    
+    try {
+      // Obtener datos del comentario actual
+      const response = await fetch(`/comentario/${mensajeId}/${comentarioId}`);
+      const result = await response.json();
       
-      // Hide the new message trigger button
-      if (newMessageTrigger) {
-        newMessageTrigger.style.display = 'none';
-      }
-      
-      // Obtener IDs necesarios
-      const comentarioId = editButton.dataset.id;
-      const comentarioElement = editButton.closest('.comentario');
-      const mensajeElement = editButton.closest('.mensaje');
-      
-      if (!mensajeElement || !comentarioElement) {
-        console.error('No se pudo encontrar el mensaje o comentario');
-        return;
-      }
-      
-      const mensajeId = mensajeElement.dataset.id;
-      
-      if (!mensajeId) {
-        console.error('No se pudo obtener el ID del mensaje');
-        return;
-      }
-      
-      try {
-        // Obtener datos del comentario actual
-        const response = await fetch(`/comentario/${mensajeId}/${comentarioId}`);
-        const result = await response.json();
+      if (result.success) {
+        const comentario = result.comentario;
         
-        if (result.success) {
-          const comentario = result.comentario;
-          
-          // Crear el formulario de edición con estilo similar a "Nuevo Comentario"
-          const editForm = document.createElement('form');
-          editForm.classList.add('editar-comentario-form');
-          editForm.dataset.comentarioId = comentarioId;
-          editForm.dataset.mensajeId = mensajeId;
+        // Crear el formulario de edición con estilo similar a "Editar Mensaje"
+        const editForm = document.createElement('form');
+        editForm.classList.add('editar-comentario-form');
+        editForm.dataset.comentarioId = comentarioId;
+        editForm.dataset.mensajeId = mensajeId;
 
-          // Título del formulario con estilo consistente
-          const formTitle = document.createElement('h2');
-          formTitle.id = 'form-edit-comment-title';
-          formTitle.textContent = 'Editar Comentario';
+        // Título del formulario con estilo consistente
+        const formTitle = document.createElement('h2');
+        formTitle.id = 'form-edit-comment-title';
+        formTitle.textContent = 'Editar Comentario';
 
-          // Botón de cerrar
-          const closeEditButton = document.createElement('div');
-          closeEditButton.classList.add('close-edit-overlay');
-          closeEditButton.innerHTML = '<i class="fas fa-times"></i>';
+        // Botón de cerrar
+        const closeEditButton = document.createElement('div');
+        closeEditButton.classList.add('close-edit-overlay');
+        closeEditButton.innerHTML = '<i class="fas fa-times"></i>';
 
-          // Primero insertamos el título al formulario
-          editForm.appendChild(formTitle);
-
-          // Luego agregamos el resto del contenido del formulario
-          editForm.innerHTML += `
-            <div class="form-grupo">
-              <input type="text" id="autor-edit" name="autor" value="${comentario.autor}" required placeholder="Autor" class="input-comentario">
-            </div>
-            <div class="form-grupo">
-              <textarea id="comentario-edit" name="comentario" required placeholder="Escribe tu comentario aquí" class="textarea-comentario">${comentario.comentario}</textarea>
-            </div>
-            
-            <div class="form-grupo">
-              <div class="imagen-upload-container">
-                <button type="button" class="btn-seleccionar-imagenes">
-                  <i class="fas fa-image"></i> Seleccionar imágenes
-                </button>
-                <input type="file" id="nuevas-imagenes" name="imagenes" multiple accept="image/*" style="display: none;">
-              </div>
-              <p class="limite-imagenes">Máximo 4 imágenes por comentario</p>
-              <div class="todas-imagenes">
-                ${comentario.imagenes && comentario.imagenes.length > 0 ? 
-                  comentario.imagenes.map(img => `
-                    <div class="imagen-container imagen-actual-container" data-imagen-id="${img.id}">
-                      <img src="${img.url}" alt="Imagen actual" class="imagen-actual">
-                      <button type="button" class="btn-eliminar-imagen" data-imagen-id="${img.id}">
-                        <i class="fas fa-times"></i>
-                      </button>
-                      <input type="hidden" name="mantener_imagenes" value="${img.id}" class="mantener-imagen">
-                    </div>
-                  `).join('') : ''
-                }
+        // Primero insertamos el título al formulario
+        editForm.appendChild(formTitle);
+        
+        // Estructura básica del formulario con el div para autor (sin incluir el input todavía)
+        editForm.innerHTML += `
+          <div class="form-group author-field" id="autor-container">
+            <div class="field-label">Autor:</div>
+            <div class="autor-display">${comentario.autor}</div>
+          </div>
+          <div class="form-group">
+            <div class="field-label">Mensaje:</div>
+            <div class="textarea-container" style="position: relative;">
+              <textarea id="comentario-edit" name="comentario" required class="textarea-comentario" maxlength="391">${comentario.comentario}</textarea>
+<div class="contador-caracteres" style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: #666; padding: 2px 5px; border-radius: 3px;">
+                <span id="contador-actual">0</span>/<span id="contador-maximo">391</span>
               </div>
             </div>
-            
-            <div class="form-botones">
-              <button type="submit" class="btn-actualizar-comentario">Actualizar Comentario</button>
-              <button type="button" class="btn-cancelar-edicion">Cancelar</button>
+          </div>
+          
+          <div class="form-group">
+            <div class="imagen-upload-container">
+              <button type="button" class="btn-seleccionar-imagenes">
+                <i class="fas fa-image"></i> Seleccionar imágenes
+              </button>
+              <input type="file" id="nuevas-imagenes" name="imagenes" multiple accept="image/*" style="display: none;">
             </div>
-          `;
-
-          // Agregar botón de cerrar y formulario directamente al overlay
-          editCommentOverlay.innerHTML = '';
-          editCommentOverlay.appendChild(closeEditButton);
-          editCommentOverlay.appendChild(editForm);
-          
-          // Mostrar el overlay
-          editCommentOverlay.classList.add('active');
-          
-          // Manejar la selección de imágenes
-          const btnSeleccionarImagenes = editForm.querySelector('.btn-seleccionar-imagenes');
-          const inputImagenes = editForm.querySelector('#nuevas-imagenes');
-          const todasImagenes = editForm.querySelector('.todas-imagenes');
-          
-          btnSeleccionarImagenes.addEventListener('click', () => {
-            inputImagenes.click();
-          });
-          
-          // Función para contar todas las imágenes (actuales + nuevas)
-          const contarTodasLasImagenes = () => {
-            return todasImagenes.querySelectorAll('.imagen-container').length;
-          };
-          
-          // Controlar el límite de imágenes (máximo 4)
-          inputImagenes.addEventListener('change', (e) => {
-            // Contar imágenes actuales
-            const totalImagenesActuales = contarTodasLasImagenes();
-            
-            // Si el usuario selecciona más de 4 imágenes en total, mostrar notificación y no procesar ninguna
-            if (totalImagenesActuales + e.target.files.length > 4) {
-              showOverlayNotification('Solo puedes seleccionar un máximo de 4 imágenes en total. Por favor, elimina algunas imágenes antes de añadir más.', 'warning');
-              
-              // Limpiar el input de archivos para que no se procese ninguna imagen
-              inputImagenes.value = "";
-              return; // Salir de la función sin procesar imágenes
-            }
-            
-            // Calcular cuántas imágenes nuevas podemos añadir
-            const maxNuevasImagenes = 4 - totalImagenesActuales;
-            
-            if (maxNuevasImagenes <= 0) {
-              return; // No procesamos más imágenes si ya tenemos el máximo
-            }
-            
-            const nuevasImagenes = Array.from(e.target.files).slice(0, maxNuevasImagenes);
-            
-            // Crear un nuevo FileList con solo las imágenes que vamos a usar
-            const dt = new DataTransfer();
-            for (let i = 0; i < nuevasImagenes.length; i++) {
-              dt.items.add(nuevasImagenes[i]);
-            }
-            inputImagenes.files = dt.files;
-            
-            // Mostrar las nuevas imágenes
-            for (const file of nuevasImagenes) {
-              const previewContainer = document.createElement('div');
-              previewContainer.classList.add('imagen-container', 'imagen-preview-container');
-              
-              const img = document.createElement('img');
-              img.classList.add('imagen-preview');
-              img.src = URL.createObjectURL(file);
-              
-              const removeBtn = document.createElement('button');
-              removeBtn.classList.add('btn-remover-imagen');
-              removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-              removeBtn.addEventListener('click', () => {
-                // Eliminar esta imagen del FileList
-                const dt = new DataTransfer();
-                const files = inputImagenes.files;
-                
-                for (let i = 0; i < files.length; i++) {
-                  if (files[i] !== file) {
-                    dt.items.add(files[i]);
-                  }
-                }
-                
-                inputImagenes.files = dt.files;
-                
-                // Eliminar el contenedor de vista previa
-                previewContainer.remove();
-              });
-              
-              previewContainer.appendChild(img);
-              previewContainer.appendChild(removeBtn);
-              todasImagenes.appendChild(previewContainer);
-            }
-          });
-          
-          // Manejar eliminación de imágenes existentes
-          editForm.querySelectorAll('.btn-eliminar-imagen').forEach(btn => {
-            btn.addEventListener('click', () => {
-              const container = btn.closest('.imagen-actual-container');
-              const input = container.querySelector('.mantener-imagen');
-              
-              // Marcar para eliminar e iconos visuales
-              container.remove();
-              input.value = '';
-              
-              // Añadir el input hidden al formulario para que se envíe aún después de quitar el contenedor
-              if (!input.parentElement) {
-                editForm.appendChild(input);
+            <p class="limite-imagenes">Máximo 4 imágenes por comentario</p>
+            <div class="todas-imagenes">
+              ${comentario.imagenes && comentario.imagenes.length > 0 ? 
+                comentario.imagenes.map(img => `
+                  <div class="imagen-container imagen-actual-container" data-imagen-id="${img.id}">
+                    <img src="${img.url}" alt="Imagen actual" class="imagen-actual">
+                    <button type="button" class="btn-eliminar-imagen" data-imagen-id="${img.id}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                    <input type="hidden" name="mantener_imagenes" value="${img.id}" class="mantener-imagen">
+                  </div>
+                `).join('') : ''
               }
+            </div>
+          </div>
+          
+          <div class="form-botones">
+            <button type="submit" class="btn-actualizar-comentario">Actualizar Comentario</button>
+            <button type="button" class="btn-cancelar-edicion">Cancelar</button>
+          </div>
+        `;
+        
+        // SOLUCIÓN PARA CARACTERES ESPECIALES: Crear el input del autor separadamente
+        const autorInput = document.createElement('input');
+        autorInput.type = 'hidden';
+        autorInput.id = 'autor-edit';
+        autorInput.name = 'autor';
+        autorInput.value = comentario.autor; // Esto manejará correctamente los caracteres especiales
+        
+        // Insertar el input en el contenedor
+        const autorContainer = editForm.querySelector('#autor-container');
+        autorContainer.appendChild(autorInput);
+        
+        // Agregar botón de cerrar y formulario directamente al overlay
+        const editCommentOverlay = document.querySelector('.edit-comment-overlay');
+        editCommentOverlay.innerHTML = '';
+        editCommentOverlay.appendChild(closeEditButton);
+        editCommentOverlay.appendChild(editForm);
+        
+        // Mostrar el overlay
+        editCommentOverlay.classList.add('active');
+        
+        // Estilos adicionales para el textarea y contador
+// Find this code section in your JavaScript that creates the counter
+const textareaContainer = editForm.querySelector('.textarea-container');
+const comentarioTextarea = editForm.querySelector('#comentario-edit');
+comentarioTextarea.style.height = '150px'; // Puedes ajustar este valor según lo que necesites
+
+// Modify the position of the counter by adjusting the bottom value
+const contadorCaracteres = editForm.querySelector('.contador-caracteres');
+if (contadorCaracteres) {
+  contadorCaracteres.style.bottom = '10px'; // Changed from 5px to 10px
+}
+
+// Make sure there's enough padding at the bottom of the textarea
+comentarioTextarea.style.paddingBottom = '30px'; // Increased from 25px to 30px
+        
+        // Configurar contador de caracteres
+        const contadorActual = editForm.querySelector('#contador-actual');
+        
+        // Inicializar el contador con el texto actual
+        contadorActual.textContent = comentarioTextarea.value.length;
+        
+        // Actualizar contador al escribir
+        comentarioTextarea.addEventListener('input', () => {
+          const longitud = comentarioTextarea.value.length;
+          contadorActual.textContent = longitud;
+          
+          // Cambiar color del contador según se acerque al límite
+          const contadorElement = editForm.querySelector('.contador-caracteres');
+          if (longitud >= 351) { // A partir del 90% del límite (391*0.9)
+            contadorElement.style.color = '#d9534f'; // Rojo
+            contadorElement.style.fontWeight = 'bold';
+          } else if (longitud >= 293) { // A partir del 75% del límite (391*0.75)
+            contadorElement.style.color = '#f0ad4e'; // Naranja/amarillo
+          } else {
+            contadorElement.style.color = '#666'; // Color normal
+            contadorElement.style.fontWeight = 'normal';
+          }
+          
+          // Verificar si excede el límite
+          if (longitud > 391) {
+            showOverlayNotification('No es válido, el máximo son 391 caracteres. Debe reducir su texto.', 'warning');
+            // Truncar el texto al límite permitido
+            comentarioTextarea.value = comentarioTextarea.value.substring(0, 391);
+            contadorActual.textContent = 391;
+          }
+        });
+        
+        // Manejar la selección de imágenes
+        const btnSeleccionarImagenes = editForm.querySelector('.btn-seleccionar-imagenes');
+        const inputImagenes = editForm.querySelector('#nuevas-imagenes');
+        const todasImagenes = editForm.querySelector('.todas-imagenes');
+        
+        btnSeleccionarImagenes.addEventListener('click', () => {
+          inputImagenes.click();
+        });
+        
+        // Función para contar todas las imágenes (actuales + nuevas)
+        const contarTodasLasImagenes = () => {
+          return todasImagenes.querySelectorAll('.imagen-container').length;
+        };
+        
+        // Controlar el límite de imágenes (máximo 4)
+        inputImagenes.addEventListener('change', (e) => {
+          // Contar imágenes actuales
+          const totalImagenesActuales = contarTodasLasImagenes();
+          
+          // Si el usuario selecciona más de 4 imágenes en total, mostrar notificación y no procesar ninguna
+          if (totalImagenesActuales + e.target.files.length > 4) {
+            showOverlayNotification('Solo puedes seleccionar un máximo de 4 imágenes en total. Por favor, elimina algunas imágenes antes de añadir más.', 'warning');
+            
+            // Limpiar el input de archivos para que no se procese ninguna imagen
+            inputImagenes.value = "";
+            return; // Salir de la función sin procesar imágenes
+          }
+          
+          // Calcular cuántas imágenes nuevas podemos añadir
+          const maxNuevasImagenes = 4 - totalImagenesActuales;
+          
+          if (maxNuevasImagenes <= 0) {
+            return; // No procesamos más imágenes si ya tenemos el máximo
+          }
+          
+          const nuevasImagenes = Array.from(e.target.files).slice(0, maxNuevasImagenes);
+          
+          // Crear un nuevo FileList con solo las imágenes que vamos a usar
+          const dt = new DataTransfer();
+          for (let i = 0; i < nuevasImagenes.length; i++) {
+            dt.items.add(nuevasImagenes[i]);
+          }
+          inputImagenes.files = dt.files;
+          
+          // Mostrar las nuevas imágenes
+          for (const file of nuevasImagenes) {
+            const previewContainer = document.createElement('div');
+            previewContainer.classList.add('imagen-container', 'imagen-preview-container');
+            
+            const img = document.createElement('img');
+            img.classList.add('imagen-preview');
+            img.src = URL.createObjectURL(file);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.classList.add('btn-remover-imagen');
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.addEventListener('click', () => {
+              // Eliminar esta imagen del FileList
+              const dt = new DataTransfer();
+              const files = inputImagenes.files;
+              
+              for (let i = 0; i < files.length; i++) {
+                if (files[i] !== file) {
+                  dt.items.add(files[i]);
+                }
+              }
+              
+              inputImagenes.files = dt.files;
+              
+              // Eliminar el contenedor de vista previa
+              previewContainer.remove();
             });
-          });
-          
-          // Manejar envío del formulario
-          editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
             
-            const formData = new FormData(editForm);
+            previewContainer.appendChild(img);
+            previewContainer.appendChild(removeBtn);
+            todasImagenes.appendChild(previewContainer);
+          }
+        });
+        
+        // Manejar eliminación de imágenes existentes
+        editForm.querySelectorAll('.btn-eliminar-imagen').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const container = btn.closest('.imagen-actual-container');
+            const input = container.querySelector('.mantener-imagen');
             
-            try {
-              const updateResponse = await fetch(`/actualizar-comentario/${mensajeId}/${comentarioId}`, {
-                method: 'PUT',
-                body: formData
-              });
-              
-              const updateResult = await updateResponse.json();
-              
-              if (updateResult.success) {
-                // Cerrar el overlay y recargar la página
-                editCommentOverlay.classList.remove('active');
-                
-                // Show new message trigger again
-                if (newMessageTrigger) {
-                  newMessageTrigger.style.display = 'flex';
-                }
-                
-                window.location.reload();
-              } else {
-                showNotification('Error: ' + (updateResult.error || 'No se pudo actualizar el comentario'), 'error');
-              }
-            } catch (error) {
-              console.error('Error al actualizar comentario:', error);
-              showNotification('Error al actualizar el comentario', 'error');
+            // Marcar para eliminar e iconos visuales
+            container.remove();
+            input.value = '';
+            
+            // Añadir el input hidden al formulario para que se envíe aún después de quitar el contenedor
+            if (!input.parentElement) {
+              editForm.appendChild(input);
             }
           });
+        });
+        
+        // Manejar envío del formulario
+        editForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
           
-          // Manejar botón de cerrar (X)
-          closeEditButton.addEventListener('click', () => {
-            editCommentOverlay.classList.remove('active');
-            
-            // Show new message trigger again
-            if (newMessageTrigger) {
-              newMessageTrigger.style.display = 'flex';
-            }
-            
-            window.location.reload();
-          });
+          // Validar longitud del comentario antes de enviar
+          const comentarioText = comentarioTextarea.value;
+          if (comentarioText.length > 391) {
+            showOverlayNotification('No es válido, el máximo son 391 caracteres. Debe reducir su texto.', 'warning');
+            return;
+          }
           
-          // Manejar botón de cancelar 
-          const cancelButton = editForm.querySelector('.btn-cancelar-edicion');
-          if (cancelButton) {
-            cancelButton.addEventListener('click', () => {
+          const formData = new FormData(editForm);
+          
+          try {
+            const updateResponse = await fetch(`/actualizar-comentario/${mensajeId}/${comentarioId}`, {
+              method: 'PUT',
+              body: formData
+            });
+            
+            const updateResult = await updateResponse.json();
+            
+            if (updateResult.success) {
+              // Cerrar el overlay y recargar la página
               editCommentOverlay.classList.remove('active');
               
               // Show new message trigger again
@@ -1307,20 +1813,50 @@ document.addEventListener('DOMContentLoaded', function() {
               }
               
               window.location.reload();
-            });
+            } else {
+              showNotification('Error: ' + (updateResult.error || 'No se pudo actualizar el comentario'), 'error');
+            }
+          } catch (error) {
+            console.error('Error al actualizar comentario:', error);
+            showNotification('Error al actualizar el comentario', 'error');
           }
+        });
+        
+        // Manejar botón de cerrar (X)
+        closeEditButton.addEventListener('click', () => {
+          editCommentOverlay.classList.remove('active');
           
-          // Eliminar el comportamiento de cerrar al hacer clic fuera del contenido
-          // Ya no cerramos el overlay al hacer clic fuera
-        } else {
-          showNotification('Error: ' + (result.error || 'No se pudo obtener los datos del comentario'), 'error');
-        }
-      } catch (error) {
-        console.error('Error al obtener datos del comentario:', error);
-        showNotification('Error al obtener los datos del comentario', 'error');
-      }
+          // Show new message trigger again
+          if (newMessageTrigger) {
+            newMessageTrigger.style.display = 'flex';
+          }
+        });
+        
+// Manejar botón de cancelar 
+const cancelButton = editForm.querySelector('.btn-cancelar-edicion');
+if (cancelButton) {
+  cancelButton.addEventListener('click', () => {
+    editCommentOverlay.classList.remove('active');
+
+    // Show new message trigger again
+    if (newMessageTrigger) {
+      newMessageTrigger.style.display = 'flex';
     }
+
+    // Recargar la página al cancelar
+    window.location.reload();
   });
+}
+
+      } else {
+        showNotification('Error: ' + (result.error || 'No se pudo obtener los datos del comentario'), 'error');
+      }
+    } catch (error) {
+      console.error('Error al obtener datos del comentario:', error);
+      showNotification('Error al actualizar el comentario', 'error');
+    }
+  }
+});
 
   // Función para mostrar notificaciones
   function showNotification(message, type) {
@@ -1344,18 +1880,6 @@ document.addEventListener('DOMContentLoaded', function() {
       notification.classList.remove('show');
     }, 3000);
   }
-  
-  // Eliminamos el evento para cerrar el overlay al hacer clic fuera
-  // editCommentOverlay.addEventListener('click', (e) => {
-  //   if (e.target === editCommentOverlay) {
-  //     editCommentOverlay.classList.remove('active');
-  //     
-  //     // Show new message trigger again
-  //     if (newMessageTrigger) {
-  //       newMessageTrigger.style.display = 'flex';
-  //     }
-  //   }
-  // });
 });
 
 //New message and comment
@@ -1501,13 +2025,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.reload();
   });
 
-  // Eliminar el evento para cerrar al hacer clic fuera
-  // overlay.addEventListener('click', (e) => {
-  //   if (e.target === overlay) {
-  //     overlay.classList.remove('active');
-  //   }
-  // });
-
   // Close buttons for both forms with reload
   document.getElementById('cancel-btn').addEventListener('click', (e) => {
     e.preventDefault();
@@ -1579,23 +2096,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const filterToggle = document.getElementById('mostrar-filtros');
-  const filterContainer = document.querySelector('.filtros-contenedor');
-
-  filterToggle.addEventListener('click', () => {
-      filterContainer.classList.toggle('visible');
-  });
-
-  // Optional: Close filters when clicking outside
-  document.addEventListener('click', (event) => {
-      if (!filterToggle.contains(event.target) && 
-          !filterContainer.contains(event.target)) {
-          filterContainer.classList.remove('visible');
-      }
-  });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
   // Create a comments popup overlay
   const commentsPopup = document.createElement('div');
   commentsPopup.classList.add('comments-popup-overlay');
@@ -1657,129 +2157,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-  
-// Modify the createCommentElement function to properly handle images
-function createCommentElement(comentario) {
-  const commentDiv = document.createElement('div');
-  commentDiv.classList.add('comentario');
-  commentDiv.dataset.id = comentario.id;
-  
-  const commentHeader = document.createElement('div');
-  commentHeader.classList.add('comentario-cabecera');
-  
-  const authorSpan = document.createElement('span');
-  authorSpan.classList.add('comentario-autor');
-  authorSpan.textContent = comentario.autor;
-  
-  // Agregar botones de acción para comentarios (editar y eliminar)
-  const commentActions = document.createElement('div');
-  commentActions.classList.add('comentario-acciones');
-  
-  const editButton = document.createElement('button');
-  editButton.classList.add('btn-editar-comentario');
-  editButton.dataset.id = comentario.id;
-  editButton.innerHTML = '<i class="fas fa-edit"></i>';
-  
-  const deleteButton = document.createElement('button');
-  deleteButton.classList.add('btn-eliminar-comentario');
-  deleteButton.dataset.id = comentario.id;
-  deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-  
-  commentActions.appendChild(editButton);
-  commentActions.appendChild(deleteButton);
-  
-  const dateSpan = document.createElement('span');
-  dateSpan.classList.add('comentario-fecha');
-  dateSpan.textContent = comentario.fechaStr || comentario.fecha;
-  
-  commentHeader.appendChild(authorSpan);
-  commentHeader.appendChild(commentActions);
-  commentHeader.appendChild(dateSpan);
-  
-  const commentContent = document.createElement('div');
-  commentContent.classList.add('comentario-contenido');
-  commentContent.textContent = comentario.comentario;
-  
-  commentDiv.appendChild(commentHeader);
-  commentDiv.appendChild(commentContent);
-  
-  // Agregar imágenes si existen - MODIFICADO PARA AGRUPAR CORRECTAMENTE
-  if (comentario.imagenes && comentario.imagenes.length > 0) {
-    // Crear un contenedor compacto para las imágenes
-    const imagesContainer = document.createElement('div');
-    imagesContainer.classList.add('comentario-imagenes-grid');
-    
-    // Determinar el estilo de grid basado en la cantidad de imágenes
-    imagesContainer.classList.add(`grid-${Math.min(comentario.imagenes.length, 4)}`);
-    
-    comentario.imagenes.forEach(imagen => {
-      const imageDiv = document.createElement('div');
-      imageDiv.classList.add('comentario-imagen-item');
-      
-      const img = document.createElement('img');
-      img.src = imagen.url;
-      img.alt = 'Imagen de comentario';
-      img.classList.add('comentario-imagen'); // Importante: agregar esta clase para el manejador de eventos
-      
-      imageDiv.appendChild(img);
-      imagesContainer.appendChild(imageDiv);
-    });
-    
-    commentDiv.appendChild(imagesContainer);
-  }
-  
-  // Agregar sistema de votación para comentarios
-  const commentFooter = document.createElement('div');
-  commentFooter.classList.add('comentario-pie');
-
-  const rankingContainer = document.createElement('div');
-  rankingContainer.classList.add('ranking-container');
-  rankingContainer.dataset.comentarioId = comentario.id;
-
-  const upvoteButton = document.createElement('button');
-  upvoteButton.classList.add('btn-votar', 'upvote');
-  upvoteButton.dataset.valor = '1';
-  upvoteButton.innerHTML = '&#x2191;';  // Flecha hacia arriba (Unicode)
-
-  const rankingValue = document.createElement('span');
-  rankingValue.classList.add('ranking-valor');
-  if (comentario.ranking < 0) {
-    rankingValue.classList.add('negativo');
-  }
-  rankingValue.textContent = comentario.ranking || 0;
-
-  const downvoteButton = document.createElement('button');
-  downvoteButton.classList.add('btn-votar', 'downvote');
-  downvoteButton.dataset.valor = '-1';
-  downvoteButton.innerHTML = '&#x2193;';  // Flecha hacia abajo (Unicode)
-
-  rankingContainer.appendChild(upvoteButton);
-  rankingContainer.appendChild(rankingValue);
-  rankingContainer.appendChild(downvoteButton);
-
-  commentFooter.appendChild(rankingContainer);
-  commentDiv.appendChild(commentFooter);
-
-  // Verificar si ya hay un voto registrado para este comentario
-  const votoGuardado = localStorage.getItem(`voto_comentario_${comentario.id}`);
-  if (votoGuardado) {
-    const valor = parseInt(votoGuardado);
-    const selector = valor > 0 ? '.upvote' : '.downvote';
-    const btnVoto = rankingContainer.querySelector(selector);
-    if (btnVoto) btnVoto.classList.add('activo');
-  }
-
-  // Agregar eventos de votación
-  upvoteButton.addEventListener('click', function() {
-    votarComentario(comentario.id, 1, this);
-  });
-
-  downvoteButton.addEventListener('click', function() {
-    votarComentario(comentario.id, -1, this);
-  });
-
-  return commentDiv;
-}
 
 // Función para actualizar los comentarios en el popup (añadida para completitud)
 function updateCommentsPopup(messageId) {
@@ -1800,54 +2177,6 @@ function updateCommentsPopup(messageId) {
     .catch(error => {
       console.error('Error al cargar comentarios:', error);
     });
-}
-
-// Función para votar en un comentario (añadida para completitud)
-function votarComentario(comentarioId, valor, boton) {
-  // Evitar votar múltiples veces
-  const votoExistente = localStorage.getItem(`voto_comentario_${comentarioId}`);
-  if (votoExistente) {
-    // Si ya votó igual, cancelar el voto
-    if (parseInt(votoExistente) === valor) {
-      valor = 0; // Cancelar voto
-    }
-  }
-  
-  fetch('/votar-comentario', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      comentario_id: comentarioId,
-      valor: valor
-    })
-  })
-  .then(response => response.json())
-  .then(result => {
-    if (result.success) {
-      // Actualizar contador en la interfaz
-      const container = document.querySelector(`.ranking-container[data-comentario-id="${comentarioId}"]`);
-      if (container) {
-        const valorSpan = container.querySelector('.ranking-valor');
-        valorSpan.textContent = result.nuevoRanking;
-        valorSpan.classList.toggle('negativo', result.nuevoRanking < 0);
-        
-        // Actualizar estado de los botones
-        container.querySelectorAll('.btn-votar').forEach(btn => btn.classList.remove('activo'));
-        
-        if (valor !== 0) {
-          boton.classList.add('activo');
-          localStorage.setItem(`voto_comentario_${comentarioId}`, valor);
-        } else {
-          localStorage.removeItem(`voto_comentario_${comentarioId}`);
-        }
-      }
-    }
-  })
-  .catch(error => {
-    console.error('Error al votar:', error);
-  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2172,333 +2501,361 @@ function closeExpandedImage(overlay) {
   }, 300);
 }
 
-// Add event handlers for comment voting
-document.addEventListener('click', (e) => {
-  // Check if the clicked element is a vote button for comments
-  const commentVoteButton = e.target.closest('.btn-votar-comentario');
-  
-  if (commentVoteButton) {
-    // Get the comment ID and vote value
-    const container = commentVoteButton.closest('.ranking-container');
-    if (!container) return;
-    
-    const comentarioId = container.dataset.comentarioId;
-    const valor = parseInt(commentVoteButton.dataset.valor);
-    
-    if (!comentarioId || isNaN(valor)) {
-      console.error('ID de comentario o valor inválido');
-      return;
-    }
-    
-    // Call the vote function for comments
-    votarComentario(comentarioId, valor, commentVoteButton);
-    
-    // Prevent event from bubbling up and triggering other handlers
-    e.stopPropagation();
-  }
-});
+// Objeto global para almacenar el estado de los votos del usuario
+const estadoVotos = {
+  mensajes: {},      // Formato: {mensajeId: valor}
+  comentarios: {}    // Formato: {comentarioId: valor}
+};
 
-// Función para votar comentarios
-async function votarComentario(comentarioId, valor, botonPresionado) {
+// Función para cargar el estado de los votos del usuario desde el servidor
+async function cargarEstadoVotos() {
   try {
-    // Obtener el voto actual guardado en localStorage
-    const votoGuardado = localStorage.getItem(`voto_comentario_${comentarioId}`);
-    
-    // Determinar si es el mismo botón que ya estaba activado
-    const mismoVoto = (valor === 1 && votoGuardado === '1') || (valor === -1 && votoGuardado === '-1');
-    
-    // Si es el mismo botón, enviamos 0 para cancelar
-    const valorAEnviar = mismoVoto ? 0 : valor;
-    
-    // Cambiar URL y método para que coincida con el endpoint del servidor
-    const response = await fetch('/votar-comentario', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ comentarioId, valor: valorAEnviar })
-    });
+    const response = await fetch('/mis-votos');
+    if (!response.ok) {
+      throw new Error('Error al cargar el estado de votos');
+    }
     
     const data = await response.json();
     
     if (data.success) {
-      // Actualizar visualmente el valor de ranking
-      const container = botonPresionado.closest('.ranking-container');
-      const rankingElement = container.querySelector('.ranking-valor');
+      // Guardar el estado de los votos
+      estadoVotos.mensajes = data.votos || {};
+      estadoVotos.comentarios = data.votosComentarios || {};
       
-      // Actualizar el valor del ranking
-      rankingElement.textContent = data.nuevoRanking;
-      
-      // Aplicar clase negativo si el ranking es menor que 0
-      if (data.nuevoRanking < 0) {
-        rankingElement.classList.add('negativo');
-      } else {
-        rankingElement.classList.remove('negativo');
-      }
-      
-      // Obtener los botones de voto
-      const upvoteBtn = container.querySelector('.upvote');
-      const downvoteBtn = container.querySelector('.downvote');
-      
-      // Eliminar clase activo de ambos botones
-      upvoteBtn.classList.remove('activo');
-      downvoteBtn.classList.remove('activo');
-      
-      // Si estamos cancelando un voto, eliminamos del localStorage
-      if (mismoVoto) {
-        localStorage.removeItem(`voto_comentario_${comentarioId}`);
-        // No añadimos la clase 'activo' a ningún botón
-      } else {
-        // Si es un voto diferente, activar el botón correspondiente y guardar el voto
-        botonPresionado.classList.add('activo');
-        localStorage.setItem(`voto_comentario_${comentarioId}`, valor.toString());
-      }
-    } else if (data.mensaje) {
-      console.error('Error al votar:', data.mensaje);
+      // Actualizar la UI para reflejar los votos existentes
+      actualizarUIVotos();
+    } else {
+      console.error('Error al cargar votos:', data.error);
     }
   } catch (error) {
-    // Manejar errores silenciosamente sin mostrar alertas
-    console.error('Error al votar comentario:', error);
-    
-    // Intentar actualizar la UI de todas formas (fallback local)
-    const container = botonPresionado.closest('.ranking-container');
-    const rankingElement = container.querySelector('.ranking-valor');
-    const upvoteBtn = container.querySelector('.upvote');
-    const downvoteBtn = container.querySelector('.downvote');
-    
-    // Obtener el voto actual guardado
-    const votoGuardado = localStorage.getItem(`voto_comentario_${comentarioId}`);
-    
-    // Determinar si es el mismo botón que ya estaba activado
-    const mismoVoto = (valor === 1 && votoGuardado === '1') || (valor === -1 && votoGuardado === '-1');
-    
-    if (mismoVoto) {
-      // Cancelar voto
-      localStorage.removeItem(`voto_comentario_${comentarioId}`);
-      upvoteBtn.classList.remove('activo');
-      downvoteBtn.classList.remove('activo');
-      
-      // Disminuir valor de ranking
-      let rankingActual = parseInt(rankingElement.textContent || '0');
-      rankingActual -= valor;
-      rankingElement.textContent = rankingActual;
-    } else {
-      // Nuevo voto o cambio de voto
-      upvoteBtn.classList.remove('activo');
-      downvoteBtn.classList.remove('activo');
-      botonPresionado.classList.add('activo');
-      
-      // Calcular nuevo ranking
-      let rankingActual = parseInt(rankingElement.textContent || '0');
-      if (votoGuardado) {
-        // Quitar voto anterior
-        rankingActual -= parseInt(votoGuardado);
-      }
-      // Aplicar nuevo voto
-      rankingActual += valor;
-      rankingElement.textContent = rankingActual;
-      
-      localStorage.setItem(`voto_comentario_${comentarioId}`, valor.toString());
-    }
-    
-    // Actualizar clase negativo
-    if (parseInt(rankingElement.textContent) < 0) {
-      rankingElement.classList.add('negativo');
-    } else {
-      rankingElement.classList.remove('negativo');
-    }
+    console.error('Error al cargar el estado de votos:', error);
   }
 }
 
-// Función para votar mensajes
-function enviarVoto(mensajeId, valor) {
-  return fetch(`/votar/${mensajeId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ valor })
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Error al enviar el voto');
+// Función para actualizar la UI según el estado de votos
+function actualizarUIVotos() {
+  // Actualizar UI para votos de mensajes
+  document.querySelectorAll('.ranking-container[data-mensaje-id]').forEach(container => {
+    const mensajeId = container.dataset.mensajeId;
+    const valor = estadoVotos.mensajes[mensajeId] || 0;
+    
+    // Quitar clase activo de todos los botones
+    container.querySelectorAll('.btn-votar').forEach(btn => {
+      btn.classList.remove('activo');
+    });
+    
+    // Activar el botón correspondiente al voto
+    if (valor > 0) {
+      container.querySelector('.btn-votar.upvote')?.classList.add('activo');
+    } else if (valor < 0) {
+      container.querySelector('.btn-votar.downvote')?.classList.add('activo');
     }
-    return response.json();
-  })
-  .then(data => {
-    // Find the ranking container for this message
-    const rankingContainer = document.querySelector(`.ranking-container[data-mensaje-id="${mensajeId}"]`);
+  });
+  
+  // Actualizar UI para votos de comentarios
+  document.querySelectorAll('.ranking-container[data-comentario-id]').forEach(container => {
+    const comentarioId = container.dataset.comentarioId;
+    const valor = estadoVotos.comentarios[comentarioId] || 0;
     
-    if (rankingContainer) {
-      // Update the ranking value
-      const rankingValor = rankingContainer.querySelector('.ranking-valor');
-      if (rankingValor) {
-        rankingValor.textContent = data.nuevoRanking;
-        rankingValor.classList.toggle('negativo', data.nuevoRanking < 0);
-      }
-      
-      // Update buttons' active state
-      const upvoteBtn = rankingContainer.querySelector('.btn-votar.upvote');
-      const downvoteBtn = rankingContainer.querySelector('.btn-votar.downvote');
-      
-      if (upvoteBtn && downvoteBtn) {
-        // Remove active state from both buttons
-        upvoteBtn.classList.remove('activo');
-        downvoteBtn.classList.remove('activo');
-        
-        // Add active state to the current vote button only if valor isn't 0
-        if (valor > 0) {
-          upvoteBtn.classList.add('activo');
-        } else if (valor < 0) {
-          downvoteBtn.classList.add('activo');
-        }
-        // Si valor es 0, no se añade la clase 'activo' a ningún botón
-      }
-    }
+    // Quitar clase activo de todos los botones
+    container.querySelectorAll('.btn-votar-comentario').forEach(btn => {
+      btn.classList.remove('activo');
+    });
     
-    return data;
-  })
-  .catch(error => {
-    console.error('Error en el voto del mensaje:', error);
-    // No mostrar alerta para mantener consistencia con la lógica de comentarios
-    
-    // Manejar el error localmente
-    const rankingContainer = document.querySelector(`.ranking-container[data-mensaje-id="${mensajeId}"]`);
-    if (rankingContainer) {
-      const upvoteBtn = rankingContainer.querySelector('.btn-votar.upvote');
-      const downvoteBtn = rankingContainer.querySelector('.btn-votar.downvote');
-      
-      // Si valor es 0, quiere decir que estamos cancelando un voto
-      if (valor === 0) {
-        // Eliminar clase activo de ambos botones
-        upvoteBtn?.classList.remove('activo');
-        downvoteBtn?.classList.remove('activo');
-      }
+    // Activar el botón correspondiente al voto
+    if (valor > 0) {
+      container.querySelector('.btn-votar-comentario.upvote')?.classList.add('activo');
+    } else if (valor < 0) {
+      container.querySelector('.btn-votar-comentario.downvote')?.classList.add('activo');
     }
   });
 }
 
-// Updated event listener for message voting
+// Función mejorada para votar mensajes
+async function enviarVoto(mensajeId, valor) {
+  try {
+    // Determinar el valor a enviar basado en el estado actual
+    const votoActual = estadoVotos.mensajes[mensajeId] || 0;
+    let valorAEnviar = valor;
+    
+    // Si el voto actual es el mismo que el nuevo, lo cancelamos enviando un 0
+    if (votoActual === valor) {
+      valorAEnviar = 0;
+    }
+    
+    const response = await fetch(`/votar/${mensajeId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ valor: valorAEnviar })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Error al enviar el voto');
+    }
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Actualizar el objeto de estado de votos
+      if (data.valorVoto === 0) {
+        delete estadoVotos.mensajes[mensajeId];
+      } else {
+        estadoVotos.mensajes[mensajeId] = data.valorVoto;
+      }
+      
+      // Actualizar la UI
+      const rankingContainer = document.querySelector(`.ranking-container[data-mensaje-id="${mensajeId}"]`);
+      
+      if (rankingContainer) {
+        // Actualizar el valor del ranking
+        const rankingValor = rankingContainer.querySelector('.ranking-valor');
+        if (rankingValor) {
+          rankingValor.textContent = data.nuevoRanking;
+          rankingValor.classList.toggle('negativo', data.nuevoRanking < 0);
+        }
+        
+        // Actualizar botones
+        const upvoteBtn = rankingContainer.querySelector('.btn-votar.upvote');
+        const downvoteBtn = rankingContainer.querySelector('.btn-votar.downvote');
+        
+        if (upvoteBtn && downvoteBtn) {
+          // Quitar clase activo de ambos botones
+          upvoteBtn.classList.remove('activo');
+          downvoteBtn.classList.remove('activo');
+          
+          // Activar el botón correspondiente al voto actual
+          if (data.valorVoto > 0) {
+            upvoteBtn.classList.add('activo');
+          } else if (data.valorVoto < 0) {
+            downvoteBtn.classList.add('activo');
+          }
+        }
+      }
+      
+      return data;
+    } else {
+      console.error('Error en la respuesta:', data.error);
+      throw new Error(data.error);
+    }
+  } catch (error) {
+    console.error('Error al votar mensaje:', error);
+    throw error;
+  }
+}
+
+// Actualizar el listener para votos de mensajes
 document.addEventListener('click', function(event) {
   // Verificar si es un botón de votar mensaje y NO un botón de comentario
   if (event.target.closest('.btn-votar') && !event.target.closest('.btn-votar-comentario')) {
     const boton = event.target.closest('.btn-votar');
     const rankingContainer = boton.closest('.ranking-container');
     const mensajeId = rankingContainer.dataset.mensajeId;
-    const valor = parseInt(boton.dataset.valor);
+    const valorBoton = parseInt(boton.dataset.valor);
     
-    // Create a key for storing votes specific to this message
-    const votoKey = `voto_${mensajeId}`;
-    
-    // Get the current stored vote
-    const votoGuardado = localStorage.getItem(votoKey);
-    
-    // Determine the new vote and its action
-    let nuevoVoto;
-    if (votoGuardado) {
-      const votoActual = parseInt(votoGuardado);
-      
-      if (votoActual === valor) {
-        // If clicking the same vote button, remove the vote (set to 0)
-        nuevoVoto = 0;
-        // Eliminamos la clase 'activo' inmediatamente para mejor feedback visual
-        boton.classList.remove('activo');
-      } else {
-        // If clicking a different vote button, change the vote
-        nuevoVoto = valor;
-      }
-    } else {
-      // If no previous vote, add a new vote
-      nuevoVoto = valor;
-    }
-    
-    // Send the vote
-    enviarVoto(mensajeId, nuevoVoto);
-    
-    // Update local storage and button states
-    if (nuevoVoto === 0) {
-      localStorage.removeItem(votoKey);
-      // Asegurarse de que ningún botón tiene la clase 'activo'
-      rankingContainer.querySelectorAll('.btn-votar').forEach(btn => {
-        btn.classList.remove('activo');
-      });
-    } else {
-      localStorage.setItem(votoKey, nuevoVoto.toString());
-      
-      // Remove 'activo' class from all vote buttons
-      rankingContainer.querySelectorAll('.btn-votar').forEach(btn => {
-        btn.classList.remove('activo');
-      });
-      
-      // Add 'activo' class to the clicked button
-      boton.classList.add('activo');
-    }
+    // Enviar el voto directamente, la lógica de cancelación está en la función enviarVoto
+    enviarVoto(mensajeId, valorBoton).catch(error => {
+      console.error('Error al procesar voto:', error);
+    });
   }
 });
 
-// Function to restore vote state when rendering messages
-function restoreVoteState() {
-  // Restaurar estado de votos para mensajes
-  document.querySelectorAll('.ranking-container[data-mensaje-id]').forEach(container => {
-    const mensajeId = container.dataset.mensajeId;
-    const votoGuardado = localStorage.getItem(`voto_${mensajeId}`);
+// Función mejorada para votar comentarios
+async function votarComentario(comentarioId, valor) {
+  try {
+    // Obtener el voto actual desde el estado global
+    const votoActual = estadoVotos.comentarios[comentarioId] || 0;
     
-    if (votoGuardado) {
-      const valor = parseInt(votoGuardado);
-      const selector = valor > 0 ? '.upvote' : '.downvote';
-      const btnVoto = container.querySelector(selector);
-      
-      if (btnVoto) {
-        // Remove active class from all buttons first
-        container.querySelectorAll('.btn-votar').forEach(btn => {
-          btn.classList.remove('activo');
-        });
-        
-        // Add active class to the voted button
-        btnVoto.classList.add('activo');
+    // Determinar el valor a enviar
+    let valorAEnviar = valor;
+    if (votoActual === valor) {
+      valorAEnviar = 0; // Cancelar voto si presiona el mismo botón
+    }
+    
+    // Enviar la solicitud al servidor
+    const response = await fetch('/votar-comentario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        comentarioId: parseInt(comentarioId), 
+        valor: valorAEnviar 
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Actualizar el estado global
+      if (data.valorVoto === 0) {
+        delete estadoVotos.comentarios[comentarioId];
+      } else {
+        estadoVotos.comentarios[comentarioId] = data.valorVoto;
       }
-    } else {
-      // Si no hay voto guardado, asegurarse de que ningún botón tenga la clase 'activo'
-      container.querySelectorAll('.btn-votar').forEach(btn => {
-        btn.classList.remove('activo');
-      });
+      
+      // Actualizar la UI
+      const container = document.querySelector(`.ranking-container[data-comentario-id="${comentarioId}"]`);
+      if (container) {
+        // Actualizar valor de ranking
+        const rankingElement = container.querySelector('.ranking-valor');
+        if (rankingElement) {
+          rankingElement.textContent = data.nuevoRanking;
+          rankingElement.classList.toggle('negativo', data.nuevoRanking < 0);
+        }
+        
+        // Actualizar botones
+        const upvoteBtn = container.querySelector('.btn-votar-comentario.upvote');
+        const downvoteBtn = container.querySelector('.btn-votar-comentario.downvote');
+        
+        if (upvoteBtn && downvoteBtn) {
+          // Quitar clase activo de ambos botones
+          upvoteBtn.classList.remove('activo');
+          downvoteBtn.classList.remove('activo');
+          
+          // Activar botón según el valor del voto
+          if (data.valorVoto > 0) {
+            upvoteBtn.classList.add('activo');
+          } else if (data.valorVoto < 0) {
+            downvoteBtn.classList.add('activo');
+          }
+        }
+      }
+    } else if (data.mensaje) {
+      console.error('Error al votar:', data.mensaje);
+    }
+  } catch (error) {
+    console.error('Error al votar comentario:', error);
+  }
+}
+
+// Actualizar el listener para votos de comentarios
+document.addEventListener('click', (e) => {
+  // Verificar si el elemento clickeado es un botón de voto para comentarios
+  const botonVoto = e.target.closest('.btn-votar-comentario');
+  if (!botonVoto) return;
+  
+  // Verificar si pertenece a un comentario
+  const comentarioElement = botonVoto.closest('.comentario');
+  if (!comentarioElement) return;
+  
+  // Obtener el contenedor de ranking
+  const container = botonVoto.closest('.ranking-container');
+  if (!container) return;
+  
+  // Obtener el ID del comentario
+  const comentarioId = container.dataset.comentarioId;
+  if (!comentarioId) return;
+  
+  // Obtener el valor del voto
+  const valor = parseInt(botonVoto.dataset.valor);
+  if (isNaN(valor)) {
+    console.error('Valor de voto inválido');
+    return;
+  }
+  
+  // Llamar a la función para votar comentario
+  votarComentario(comentarioId, valor);
+  
+  // Prevenir que el evento siga propagándose
+  e.stopPropagation();
+});
+
+// Función para cargar votos específicos por ID y tipo
+async function cargarVotoPorId(tipo, id) {
+  try {
+    const response = await fetch(`/voto-estado/${tipo}/${id}`);
+    if (!response.ok) return;
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Actualizar el estado global
+      if (tipo === 'mensaje') {
+        if (data.voto === 0) {
+          delete estadoVotos.mensajes[id];
+        } else {
+          estadoVotos.mensajes[id] = data.voto;
+        }
+      } else if (tipo === 'comentario') {
+        if (data.voto === 0) {
+          delete estadoVotos.comentarios[id];
+        } else {
+          estadoVotos.comentarios[id] = data.voto;
+        }
+      }
+      
+      // Actualizar la UI para este elemento específico
+      const selector = tipo === 'mensaje' 
+        ? `.ranking-container[data-mensaje-id="${id}"]` 
+        : `.ranking-container[data-comentario-id="${id}"]`;
+        
+      const container = document.querySelector(selector);
+      if (container) {
+        const upvoteBtn = tipo === 'mensaje' 
+          ? container.querySelector('.btn-votar.upvote')
+          : container.querySelector('.btn-votar-comentario.upvote');
+          
+        const downvoteBtn = tipo === 'mensaje'
+          ? container.querySelector('.btn-votar.downvote')
+          : container.querySelector('.btn-votar-comentario.downvote');
+          
+        if (upvoteBtn && downvoteBtn) {
+          upvoteBtn.classList.remove('activo');
+          downvoteBtn.classList.remove('activo');
+          
+          if (data.voto > 0) {
+            upvoteBtn.classList.add('activo');
+          } else if (data.voto < 0) {
+            downvoteBtn.classList.add('activo');
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`Error al cargar voto para ${tipo} ${id}:`, error);
+  }
+}
+
+// Cargar el estado de votos al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  cargarEstadoVotos();
+  
+  // Observar cambios en el DOM para mantener actualizada la UI de votos
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.addedNodes.length) {
+        // Si se añaden nuevos elementos, actualizar la UI de votos
+        actualizarUIVotos();
+      }
     }
   });
   
-  // Restaurar estado de votos para comentarios
-  document.querySelectorAll('.ranking-container[data-comentario-id]').forEach(container => {
-    const comentarioId = container.dataset.comentarioId;
-    const votoGuardado = localStorage.getItem(`voto_comentario_${comentarioId}`);
-    
-    if (votoGuardado) {
-      const valor = parseInt(votoGuardado);
-      const selector = valor > 0 ? '.upvote' : '.downvote';
-      const btnVoto = container.querySelector(selector);
-      
-      if (btnVoto) {
-        // Remove active class from all buttons first
-        container.querySelectorAll('.btn-votar-comentario').forEach(btn => {
-          btn.classList.remove('activo');
-        });
-        
-        // Add active class to the voted button
-        btnVoto.classList.add('activo');
-      }
-    } else {
-      // Si no hay voto guardado, asegurarse de que ningún botón tenga la clase 'activo'
-      container.querySelectorAll('.btn-votar-comentario').forEach(btn => {
-        btn.classList.remove('activo');
-      });
-    }
-  });
-}
+  // Observar cambios en el cuerpo del documento
+  observer.observe(document.body, { childList: true, subtree: true });
+});
 
-// Llamar a restoreVoteState cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', restoreVoteState);
-// Llamar también cuando hay cambios en el contenido (para mensajes cargados dinámicamente)
-document.addEventListener('contentUpdated', restoreVoteState);
+// Evento para cuando el contenido se actualiza
+document.addEventListener('contentUpdated', cargarEstadoVotos);
 
+// MEJORADO: Frontend con soporte para depuración
 document.addEventListener('DOMContentLoaded', function() {
+  // Añadir meta tag temporal para depuración si no existe
+  if (!document.querySelector('meta[name="debug"]')) {
+    const metaDebug = document.createElement('meta');
+    metaDebug.name = 'debug';
+    metaDebug.content = 'enabled';
+    document.head.appendChild(metaDebug);
+  }
+  
+  const DEBUG = document.querySelector('meta[name="debug"]')?.content === 'enabled';
+  
+  // Función de registro que solo imprime en modo debug
+  function debugLog(...args) {
+    if (DEBUG) console.log('[DEBUG]', ...args);
+  }
+  
   // Get modal elements
   const modalConfirmacionComentario = document.getElementById('modal-confirmacion-comentario');
   const btnConfirmarEliminarComentario = document.getElementById('btn-confirmar-eliminar-comentario');
@@ -2516,13 +2873,25 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       
       // Store the comment and message IDs
-      currentCommentId = deleteCommentBtn.dataset.id;
-      currentMessageId = deleteCommentBtn.dataset.mensajeId || deleteCommentBtn.closest('.mensaje')?.dataset.id;
+      currentCommentId = parseInt(deleteCommentBtn.dataset.id);
+      currentMessageId = parseInt(deleteCommentBtn.dataset.mensajeId || deleteCommentBtn.closest('.mensaje')?.dataset.id);
+      
+      // Guardar también el elemento comentario para uso posterior
+      const commentElement = deleteCommentBtn.closest('.comentario');
+      if (commentElement) {
+        debugLog('Datos del comentario elemento:', {
+          id: commentElement.dataset.id,
+          userId: commentElement.dataset.userId,
+          autor: commentElement.querySelector('.comentario-autor')?.textContent
+        });
+      }
       
       if (!currentMessageId) {
         console.error('No se pudo obtener el ID del mensaje');
         return;
       }
+      
+      debugLog(`Preparando eliminación - Mensaje ID: ${currentMessageId}, Comentario ID: ${currentCommentId}`);
       
       // Show the confirmation modal with animation
       modalConfirmacionComentario.style.display = 'flex';
@@ -2533,131 +2902,174 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Confirm delete comment
-  btnConfirmarEliminarComentario.addEventListener('click', async function() {
-    if (currentCommentId && currentMessageId) {
-      try {
-        const response = await fetch(`/eliminar-comentario/${currentMessageId}/${currentCommentId}`, {
-          method: 'DELETE',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          // Find and remove the comment from the DOM
-          const commentElement = document.querySelector(`.comentario[data-id="${currentCommentId}"]`);
-          
-          if (commentElement) {
-            // Add fade-out animation
-            commentElement.classList.add('fade-out');
-            
-            // Remove after animation completes
-            setTimeout(() => {
-              commentElement.remove();
-              
-              // Check if there are no more comments
-              const messageElement = document.querySelector(`.mensaje[data-id="${currentMessageId}"]`);
-              if (messageElement) {
-                const commentsList = messageElement.querySelector('.comentarios-lista');
-                if (commentsList && commentsList.children.length === 0) {
-                  // Hide the comments section if there are no more comments
-                  const commentsSection = messageElement.querySelector('.comentarios-seccion');
-                  if (commentsSection) {
-                    commentsSection.style.display = 'none';
-                  }
-                }
-                
-                // Update comment count if displayed anywhere
-                const commentCountElement = messageElement.querySelector('.contador-comentarios');
-                if (commentCountElement) {
-                  const newCount = result.totalComentarios || 0;
-                  commentCountElement.textContent = newCount;
-                  // Hide count if zero
-                  if (newCount === 0) {
-                    commentCountElement.style.display = 'none';
-                  }
-                }
-              }
-              
-              // Also update the popup if it's active
-              const commentsPopup = document.querySelector('.comments-popup-overlay');
-              if (commentsPopup && commentsPopup.classList.contains('active')) {
-                const popupCommentElement = commentsPopup.querySelector(`.comentario[data-id="${currentCommentId}"]`);
-                if (popupCommentElement) {
-                  popupCommentElement.remove();
-                }
-              }
-            }, 300);
-          }
-          
-          // Close the modal with animation
-          closeCommentModal();
-          
-          // Show success message
-          showNotification('Comentario eliminado correctamente', 'success');
-        } else {
-          closeCommentModal();
-          showNotification('Error: ' + (result.error || 'No se pudo eliminar el comentario'), 'error');
-        }
-      } catch (error) {
-        console.error('Error al eliminar comentario:', error);
-        closeCommentModal();
-        showNotification('Error al eliminar el mensaje', 'error');
-      }
-    }
-  });
-  
-  // Cancel delete comment
-  btnCancelarEliminarComentario.addEventListener('click', function() {
-    closeCommentModal();
-  });
-  
-  // Also close modal when clicking outside
-  modalConfirmacionComentario.addEventListener('click', function(e) {
-    if (e.target === modalConfirmacionComentario) {
-      closeCommentModal();
-    }
-  });
-  
-  // Function to close the comment confirmation modal with animation
+  // Función para cerrar el modal de comentarios
   function closeCommentModal() {
     modalConfirmacionComentario.classList.remove('active');
     modalConfirmacionComentario.querySelector('.modal-contenido').classList.remove('active');
     setTimeout(() => {
       modalConfirmacionComentario.style.display = 'none';
     }, 300);
-    
-    // Reset current IDs
-    currentCommentId = null;
-    currentMessageId = null;
   }
   
-  // Function to show notification
-  function showNotification(message, type) {
-    // Create notification element if it doesn't exist
-    let notification = document.getElementById('notification');
-    if (!notification) {
-      notification = document.createElement('div');
-      notification.id = 'notification';
-      document.body.appendChild(notification);
+  // Botón cancelar eliminación de comentario
+  btnCancelarEliminarComentario.addEventListener('click', function() {
+    closeCommentModal();
+  });
+  
+  // Función para mostrar notificaciones con opción de depuración
+  function showNotification(message, type, debugData = null) {
+    const notif = document.createElement('div');
+    notif.className = `notification ${type}`;
+    
+    // Si hay datos de depuración y estamos en modo debug
+    if (DEBUG && debugData && type === 'error') {
+      message += '<details><summary>Detalles técnicos</summary>';
+      message += `<pre>${JSON.stringify(debugData, null, 2)}</pre>`;
+      message += '</details>';
+      notif.innerHTML = message;
+    } else {
+      notif.textContent = message;
     }
     
-    // Set notification content and style
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
+    document.body.appendChild(notif);
     
-    // Show notification
-    notification.classList.add('show');
-    
-    // Hide after 3 seconds
     setTimeout(() => {
-      notification.classList.remove('show');
-    }, 3000);
+      notif.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+      notif.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(notif);
+      }, 300);
+    }, 5000); // Tiempo aumentado para poder leer detalles
   }
+  
+// SOLUCIÓN: Actualización del manejo de eliminación de comentarios
+btnConfirmarEliminarComentario.addEventListener('click', async function() {
+  if (currentCommentId && currentMessageId) {
+    try {
+      debugLog(`Enviando solicitud: /eliminar-comentario/${currentMessageId}/${currentCommentId}`);
+      
+      // Obtener información del usuario actual para depuración
+      const userInfo = {
+        username: document.querySelector('meta[name="username"]')?.content,
+        userId: document.querySelector('meta[name="userId"]')?.content
+      };
+      
+      debugLog('Información del usuario actual:', userInfo);
+      
+      const response = await fetch(`/eliminar-comentario/${currentMessageId}/${currentCommentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Debug': DEBUG ? 'true' : 'false'
+        },
+        credentials: 'same-origin' // Importante para enviar las cookies de sesión
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        debugLog('Comentario eliminado con éxito');
+        
+        // Eliminar visualmente el comentario del DOM
+        const comentarioElement = document.querySelector(`.comentario[data-id="${currentCommentId}"]`);
+        if (comentarioElement) {
+          comentarioElement.style.opacity = '0';
+          setTimeout(() => {
+            comentarioElement.remove();
+            // Recargar la página después de eliminar visualmente
+            window.location.reload();
+          }, 300); // Espera que la animación termine
+        } else {
+          // Si no encuentra el comentario, igual recargar
+          window.location.reload();
+        }
+
+        // Cerrar el modal con animación
+        closeCommentModal();
+        
+        // (Opcional) Mostrar mensaje de éxito
+        // showNotification('Comentario eliminado correctamente', 'success');
+
+      } else {
+        closeCommentModal();
+        console.error('Error del servidor:', result);
+        
+        // SOLUCIÓN ALTERNATIVA: Si el error es de permisos pero sabemos que es el dueño
+        if (result.error?.includes('No tienes permiso') && DEBUG) {
+          debugLog('Intentando solución alternativa para eliminación...');
+          
+          showNotification(
+            'Error: ' + result.error, 
+            'error', 
+            {
+              userInfo,
+              commentInfo: result.debug,
+              suggestion: "Revisar si los tipos de datos coinciden en la DB y en la sesión"
+            }
+          );
+        } else {
+          // Mostrar mensaje de error estándar
+          showNotification('Error: ' + (result.error || 'No se pudo eliminar el comentario'), 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Error al eliminar comentario:', error);
+      closeCommentModal();
+      showNotification('Error al eliminar el comentario: ' + error.message, 'error');
+    }
+  }
+});
+
+  // Añadir estilos para mensaje de error con detalles
+  document.head.insertAdjacentHTML('beforeend', `
+    <style>
+      .notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        max-width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      
+      .notification.show {
+        opacity: 1;
+      }
+      
+      .notification.error {
+        background-color: #f44336;
+        color: white;
+      }
+      
+      .notification.success {
+        background-color: #4CAF50;
+        color: white;
+      }
+      
+      .notification details {
+        margin-top: 8px;
+        background: rgba(0,0,0,0.1);
+        padding: 8px;
+        border-radius: 4px;
+      }
+      
+      .notification pre {
+        white-space: pre-wrap;
+        font-size: 12px;
+      }
+    </style>
+  `);
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2688,66 +3100,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Confirm delete message
-  btnConfirmarEliminar.addEventListener('click', async function() {
-    if (currentMessageId) {
-      try {
-        const response = await fetch(`/eliminar-mensaje/${currentMessageId}`, {
-          method: 'DELETE',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          // Find and remove the message from the DOM
-          const messageElement = document.querySelector(`.mensaje[data-id="${currentMessageId}"]`);
-          
-          if (messageElement) {
-            // Add fade-out animation
-            messageElement.classList.add('fade-out');
-            
-            // Remove after animation completes
-            setTimeout(() => {
-              messageElement.remove();
-              
-              // Update message counter
-              const counterElement = document.getElementById('contador');
-              if (counterElement) {
-                const currentCount = parseInt(counterElement.textContent, 10);
-                counterElement.textContent = Math.max(0, currentCount - 1);
-                
-                // Show "no messages" notice if there are no more messages
-                const listaMensajes = document.querySelector('.lista-mensajes');
-                if (listaMensajes && listaMensajes.children.length === 0) {
-                  const noMensajes = document.createElement('p');
-                  noMensajes.className = 'no-mensajes';
-                  noMensajes.textContent = 'No hay mensajes aún. ¡Sé el primero en publicar!';
-                  listaMensajes.appendChild(noMensajes);
-                }
-              }
-            }, 300);
-          }
-          
-          // Close the modal with animation
-          closeMessageModal();
-          
-          // Show success message
-          showNotification('Mensaje eliminado correctamente', 'success');
-        } else {
-          closeMessageModal();
-          showNotification('Error: ' + (result.error || 'No se pudo eliminar el mensaje'), 'error');
-        }
-      } catch (error) {
-        console.error('Error al eliminar mensaje:', error);
+// Update the message deletion handler
+btnConfirmarEliminar.addEventListener('click', async function() {
+  if (currentMessageId) {
+    try {
+      const response = await fetch(`/eliminar-mensaje/${currentMessageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
         closeMessageModal();
-        showNotification('Error al eliminar el mensaje', 'error');
+        showNotification('Mensaje eliminado correctamente', 'success');
+        
+        // Recargar la página después de eliminar el mensaje
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // Pequeño retraso para que se muestre la notificación
+      } else {
+        closeMessageModal();
+        showNotification('Error: ' + (result.error || 'No se pudo eliminar el mensaje'), 'error');
       }
+    } catch (error) {
+      console.error('Error al eliminar mensaje:', error);
+      closeMessageModal();
+      showNotification('Error al eliminar el mensaje', 'error');
     }
-  });
+  }
+});
+
+
   
   // Cancel delete message
   btnCancelarEliminar.addEventListener('click', function() {
@@ -2808,183 +3196,145 @@ document.addEventListener('DOMContentLoaded', function() {
   `);
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const filterForm = document.getElementById('filtro-form');
-    const mensajesContainer = document.querySelector('.lista-mensajes');
-    const mensajes = document.querySelectorAll('.mensaje');
-    const filtrosBusquedaContainer = document.getElementById('filtros-busqueda-container');
-    const filtrosAplicadosContainer = document.getElementById('filtros-aplicados-container');
-    const filtrosAplicadosTags = document.getElementById('filtros-aplicados-tags');
-    const resultadosMensaje = document.getElementById('resultados-filtrados-mensaje');
+// Añade este código al final de tu archivo foro.js
 
-    filterForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        aplicarFiltros();
-    });
-
-   
-    function aplicarFiltros() {
-      // Reset previous filtering
-      mensajes.forEach(mensaje => mensaje.style.display = 'block');
-      filtrosBusquedaContainer.style.display = 'block';
-      filtrosAplicadosTags.innerHTML = '';
-      resultadosMensaje.style.display = 'none';
-    
-      // Get filter values
-      const etiquetasSeleccionadas = Array.from(
-          document.querySelectorAll('input[name="etiquetas"]:checked')
-      ).map(el => el.value);
-    
-      // Include both subcategory and extra subcategory filters
-      const subetiquetasSeleccionadas = Array.from(
-          document.querySelectorAll('input[name^="subetiquetas-"]:checked, input[name^="extrasubetiquetas-"]:checked')
-      ).map(el => el.value);
-    
-      const orden = document.getElementById('orden').value;
-      const ranking = document.getElementById('ranking').value;
-      const tipo = document.getElementById('tipo').value;
-    
-      // Apply filters
-      let mensajesFiltrados = Array.from(mensajes).filter(mensaje => {
-          // Etiquetas filter
-          const etiquetaMensaje = mensaje.querySelector('.etiqueta');
-          const etiquetaValida = etiquetasSeleccionadas.length === 0 || 
-              (etiquetaMensaje && etiquetasSeleccionadas.includes(etiquetaMensaje.textContent.trim()));
-    
-          // Subcategory filter (including extra subcategories)
-          const subcategoriaMensaje = mensaje.querySelector('.subetiqueta:not(.extra)');
-          const extraSubcategoriaMensaje = mensaje.querySelector('.subetiqueta.extra');
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar los botones de toggle para comentarios
+  const toggleButtons = document.querySelectorAll('.toggle-comentarios');
+  
+  toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          const expanded = this.getAttribute('aria-expanded') === 'true';
+          const commentContainer = this.closest('.comentarios-seccion').querySelector('.comentarios-contenedor');
           
-          const subcategoriaValida = subetiquetasSeleccionadas.length === 0 || 
-              (subcategoriaMensaje && subetiquetasSeleccionadas.some(subetiqueta => 
-                  subcategoriaMensaje.textContent.toLowerCase().includes(subetiqueta.toLowerCase())
-              )) ||
-              (extraSubcategoriaMensaje && subetiquetasSeleccionadas.some(subetiqueta => 
-                  extraSubcategoriaMensaje.textContent.toLowerCase().includes(subetiqueta.toLowerCase())
-              ));
-    
-          // Ranking filter
-          const rankingValor = parseInt(mensaje.querySelector('.ranking-valor').textContent);
-          let rankingValido = true;
-          switch(ranking) {
-              case 'populares':
-                  rankingValido = rankingValor >= 100;
-                  break;
-              case 'medios':
-                  rankingValido = rankingValor >= 20 && rankingValor < 100;
-                  break;
-              case 'menos_populares':
-                  rankingValido = rankingValor >= 0 && rankingValor < 20;
-                  break;
+          if (expanded) {
+              // Colapsar comentarios
+              commentContainer.style.display = 'none';
+              this.setAttribute('aria-expanded', 'false');
+          } else {
+              // Expandir comentarios
+              commentContainer.style.display = 'block';
+              this.setAttribute('aria-expanded', 'true');
           }
-    
-          // Tipo de mensajes filter
-          const esMensajePropio = mensaje.querySelector('.autor').textContent === 'meme';
-          let tipoValido = true;
-          switch(tipo) {
-              case 'mios':
-                  tipoValido = esMensajePropio;
-                  break;
-              case 'otros':
-                  tipoValido = !esMensajePropio;
-                  break;
-          }
-    
-          return etiquetaValida && subcategoriaValida && rankingValido && tipoValido;
       });
-    
-    
-      // Ordenar mensajes
-      switch(orden) {
-          case 'recientes':
-              mensajesFiltrados.sort((a, b) => {
-                  const fechaA = new Date(a.querySelector('.fecha').textContent);
-                  const fechaB = new Date(b.querySelector('.fecha').textContent);
-                  return fechaB - fechaA;
-              });
-              break;
-          case 'antiguos':
-              mensajesFiltrados.sort((a, b) => {
-                  const fechaA = new Date(a.querySelector('.fecha').textContent);
-                  const fechaB = new Date(b.querySelector('.fecha').textContent);
-                  return fechaA - fechaB;
-              });
-              break;
-          // Add other sorting methods as needed
+  });
+  
+  // Para los nuevos mensajes que se creen dinámicamente
+  document.addEventListener('click', function(e) {
+      if (e.target && e.target.closest('.toggle-comentarios')) {
+          const button = e.target.closest('.toggle-comentarios');
+          const expanded = button.getAttribute('aria-expanded') === 'true';
+          const commentContainer = button.closest('.comentarios-seccion').querySelector('.comentarios-contenedor');
+          
+          if (expanded) {
+              commentContainer.style.display = 'none';
+              button.setAttribute('aria-expanded', 'false');
+          } else {
+              commentContainer.style.display = 'block';
+              button.setAttribute('aria-expanded', 'true');
+          }
       }
-    
-      // Mostrar/ocultar mensajes
-      mensajes.forEach(mensaje => mensaje.style.display = 'none');
-      mensajesFiltrados.forEach(mensaje => mensaje.style.display = 'block');
-    
-      // Mostrar mensaje si no hay resultados
-      if (mensajesFiltrados.length === 0) {
-          resultadosMensaje.style.display = 'block';
-      }
-    
-      // Mostrar etiquetas de filtros aplicados
-      mostrarFiltrosAplicados(etiquetasSeleccionadas, orden, ranking, tipo);
-    }
-
-    function mostrarFiltrosAplicados(etiquetas, orden, ranking, tipo) {
-        const filtrosAplicados = [
-            ...etiquetas.map(etiqueta => `Etiqueta: ${etiqueta}`),
-            `Orden: ${obtenerTextoOrden(orden)}`,
-            `Ranking: ${obtenerTextoRanking(ranking)}`,
-            `Tipo: ${obtenerTextoTipo(tipo)}`
-        ];
-
-        filtrosAplicados.forEach(filtro => {
-            const tagElement = document.createElement('div');
-            tagElement.className = 'filtro-tag';
-            tagElement.innerHTML = `
-                ${filtro}
-                <span class="remove-tag">&times;</span>
-            `;
-            tagElement.querySelector('.remove-tag').addEventListener('click', () => {
-                tagElement.remove();
-                // Potentially reset specific filter
-            });
-            filtrosAplicadosTags.appendChild(tagElement);
-        });
-    }
-
-    function obtenerTextoOrden(orden) {
-        const ordenTextos = {
-            'recientes': 'Más recientes',
-            'antiguos': 'Más antiguos',
-            'nuevos_24h': 'Nuevos (últimas 24h)',
-            'nuevos_semana': 'Nuevos (última semana)',
-            'mas_valorados': 'Mejor valorados'
-        };
-        return ordenTextos[orden] || orden;
-    }
-
-    function obtenerTextoRanking(ranking) {
-        const rankingTextos = {
-            'todos': 'Todos los mensajes',
-            'populares': 'Populares (100+ likes)',
-            'medios': 'Medios (20-99 likes)',
-            'menos_populares': 'Menos populares (0-19 likes)'
-        };
-        return rankingTextos[ranking] || ranking;
-    }
-
-    function obtenerTextoTipo(tipo) {
-        const tipoTextos = {
-            'todos': 'Todos los mensajes',
-            'mios': 'Solo mis mensajes',
-            'otros': 'Mensajes de otros usuarios'
-        };
-        return tipoTextos[tipo] || tipo;
-    }
-
-    // Reset filters
-    document.getElementById('limpiar-filtros').addEventListener('click', () => {
-        mensajes.forEach(mensaje => mensaje.style.display = 'block');
-        filtrosBusquedaContainer.style.display = 'none';
-        filtrosAplicadosTags.innerHTML = '';
-        resultadosMensaje.style.display = 'none';
-    });
+  });
+  
+  // Código para manejar el botón de comentar
+  const botonesComentarMensaje = document.querySelectorAll('.btn-comentar');
+  botonesComentarMensaje.forEach(boton => {
+      boton.addEventListener('click', function() {
+          const mensajeId = this.getAttribute('data-id');
+          const comentariosSeccion = this.closest('.mensaje').querySelector('.comentarios-seccion');
+          const toggleButton = comentariosSeccion.querySelector('.toggle-comentarios');
+          const comentariosContenedor = comentariosSeccion.querySelector('.comentarios-contenedor');
+          
+          // Expandir los comentarios si están colapsados
+          if (toggleButton.getAttribute('aria-expanded') === 'false') {
+              toggleButton.setAttribute('aria-expanded', 'true');
+              comentariosContenedor.style.display = 'block';
+          }
+          
+          // Enfocar el área de texto para comentar
+          const textareaComentario = comentariosSeccion.querySelector('textarea[name="comentario"]');
+          if (textareaComentario) {
+              textareaComentario.focus();
+          }
+      });
+  });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  const nuevoMensajeTextarea = document.querySelector('.nuevo-mensaje-section textarea[name="mensaje"]');
+  if (nuevoMensajeTextarea) {
+    setupCharacterCounter(nuevoMensajeTextarea, 391);
+  }
+
+  const nuevoComentarioTextarea = document.querySelector('.nuevo-comentario-section textarea[name="comentario"]');
+  if (nuevoComentarioTextarea) {
+    setupCharacterCounter(nuevoComentarioTextarea, 391);
+  }
+
+  function setupCharacterCounter(textarea, maxLength) {
+    textarea.style.paddingBottom = '30px';
+    textarea.style.height = '150px';
+
+    let textareaContainer = textarea.parentElement;
+    if (!textareaContainer.classList.contains('textarea-container')) {
+      textareaContainer = document.createElement('div');
+      textareaContainer.classList.add('textarea-container');
+      textareaContainer.style.position = 'relative';
+
+      textarea.parentNode.replaceChild(textareaContainer, textarea);
+      textareaContainer.appendChild(textarea);
+    }
+
+    const contadorDiv = document.createElement('div');
+    contadorDiv.classList.add('contador-caracteres');
+    contadorDiv.style.position = 'absolute';
+    contadorDiv.style.bottom = '10px';
+    contadorDiv.style.right = '10px';
+    contadorDiv.style.fontSize = '12px';
+    contadorDiv.style.color = '#666';
+    contadorDiv.style.padding = '2px 5px';
+    contadorDiv.style.borderRadius = '3px';
+
+    const contadorActual = document.createElement('span');
+    contadorActual.id = 'contador-actual-' + Math.random().toString(36).substr(2, 9);
+    contadorActual.textContent = textarea.value.length;
+
+    const separador = document.createTextNode('/');
+
+    const contadorMaximo = document.createElement('span');
+    contadorMaximo.id = 'contador-maximo-' + Math.random().toString(36).substr(2, 9);
+    contadorMaximo.textContent = maxLength;
+
+    contadorDiv.appendChild(contadorActual);
+    contadorDiv.appendChild(separador);
+    contadorDiv.appendChild(contadorMaximo);
+    textareaContainer.appendChild(contadorDiv);
+
+    contadorActual.textContent = textarea.value.length;
+
+    textarea.addEventListener('input', () => {
+      let longitud = textarea.value.length;
+
+      if (longitud > maxLength) {
+        textarea.value = textarea.value.substring(0, maxLength);
+        longitud = maxLength;
+      }
+
+      contadorActual.textContent = longitud;
+
+      if (longitud >= maxLength * 0.9) {
+        contadorDiv.style.color = '#d9534f';
+        contadorDiv.style.fontWeight = 'bold';
+      } else if (longitud >= maxLength * 0.75) {
+        contadorDiv.style.color = '#f0ad4e';
+        contadorDiv.style.fontWeight = 'normal';
+      } else {
+        contadorDiv.style.color = '#666';
+        contadorDiv.style.fontWeight = 'normal';
+      }
+    });
+
+    const inputEvent = new Event('input');
+    textarea.dispatchEvent(inputEvent);
+  }
+});

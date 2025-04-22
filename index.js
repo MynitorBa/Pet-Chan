@@ -1,5 +1,4 @@
 import express from 'express';
-import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import { log } from 'console';
@@ -46,7 +45,7 @@ const db = new pg.Client({
     user: "postgres",
     host: "localhost",
     database: "pet_chan",
-    password: "123456",
+    password: "csgoisgoodgames123",
     port: 5432,
 })
 
@@ -1005,3 +1004,1419 @@ app.get('/minijuego2', (req, res) => {
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { urlencoded } from 'express';
+import { dirname, join } from 'path';
+import multer from 'multer';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+
+
+
+const uploadDir = join(__dirname, 'public', 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function(req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extension = file.originalname.split('.').pop();
+    cb(null, `imagen-${uniqueSuffix}.${extension}`);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: function(req, file, cb) {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Solo se permiten imágenes'));
+    }
+    cb(null, true);
+  }
+});
+
+app.set('view engine', 'ejs');
+app.set('views', join(__dirname, 'views'));
+app.use(express.static(join(__dirname, 'public')));
+app.use(express.json());
+app.use(urlencoded({ extended: true }));
+
+// Estructura de etiquetas
+const etiquetasDisponibles = [
+  'Ninguna','Videojuegos', 'Música', 'Cine', 'Tecnología', 
+  'Literatura', 'Ciencia', 'Deportes', 'Moda', 'Gastronomía'
+];
+
+const subetiquetasDisponibles = [
+  'Ninguna','Minecraft', 'Terraria', 'Roblox',
+  'Rock', 'Pop', 'Electrónica',
+  'Terror', 'Comedia', 'Acción',
+  'Smartphones', 'Laptops', 'Gadgets',
+  'Novela', 'Poesía', 'Ensayo',
+  'Física', 'Biología', 'Astronomía',
+  'Fútbol', 'Baloncesto', 'Tenis',
+  'Casual', 'Formal', 'Vintage',
+  'Guatemalteca', 'Estadounidense', 'Japonesa'
+];
+
+const extrasubetiquetasDisponibles = [
+  'Ninguna','Minecraft', 'Terraria', 'Roblox',
+  'Rock', 'Pop', 'Electrónica',
+  'Terror', 'Comedia', 'Acción',
+  'Smartphones', 'Laptops', 'Gadgets',
+  'Novela', 'Poesía', 'Ensayo',
+  'Física', 'Biología', 'Astronomía',
+  'Fútbol', 'Baloncesto', 'Tenis',
+  'Casual', 'Formal', 'Vintage',
+  'Guatemalteca', 'Estadounidense', 'Japonesa'
+];
+let mensajes = [];
+let nextId = 1;
+let votos = {};
+let comentarioNextId = 1;
+
+// Ruta para obtener el estado de voto mejorada
+app.get('/voto-estado/:tipo/:id', async (req, res) => {
+  try {
+    const { tipo, id } = req.params;
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        mensaje: 'Usuario no autenticado' 
+      });
+    }
+    
+    let query, params;
+    
+    if (tipo === 'mensaje') {
+      query = `SELECT valor FROM post_votes WHERE post_id = $1 AND user_id = $2`;
+    } else if (tipo === 'comentario') {
+      query = `SELECT valor FROM comment_votes WHERE comment_id = $1 AND user_id = $2`;
+    } else {
+      return res.status(400).json({ 
+        success: false, 
+        mensaje: 'Tipo inválido' 
+      });
+    }
+    
+    params = [parseInt(id), userId];
+    
+    const result = await db.query(query, params);
+    const valorVoto = result.rows.length > 0 ? result.rows[0].valor : 0;
+    
+    return res.json({
+      success: true,
+      voto: valorVoto
+    });
+  } catch (error) {
+    console.error('Error al obtener estado del voto:', error);
+    return res.status(500).json({ 
+      success: false, 
+      mensaje: 'Error interno del servidor' 
+    });
+  }
+});
+
+// Ruta para obtener mensaje para edición
+app.get('/mensaje/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const mensaje = mensajes.find(m => m.id === id);
+  
+  if (mensaje) {
+    // Preparar datos para la edición, preservando toda la información
+    const responseData = {
+      id: mensaje.id,
+      autor: mensaje.autor,
+      mensaje: mensaje.mensaje,
+      etiqueta: mensaje.etiqueta || '',
+      subcategoria: mensaje.subcategoria || '',
+      extrasubcategoria: mensaje.extrasubcategoria || '',
+      imagenes: mensaje.imagenes || []
+    };
+    
+    res.json(responseData);
+  } else {
+    res.status(404).json({ error: 'Mensaje no encontrado' });
+  }
+});
+
+
+// Ruta para votar mensajes (corregida)
+app.post('/votar/:id', async (req, res) => {
+  try {
+    const mensajeId = parseInt(req.params.id);
+    const { valor } = req.body;
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+    }
+    
+    // Encontrar el mensaje
+    const mensajeIndex = mensajes.findIndex(m => m.id === mensajeId);
+    
+    if (mensajeIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
+    }
+    
+    // Inicializar ranking si no existe
+    if (!mensajes[mensajeIndex].ranking) {
+      mensajes[mensajeIndex].ranking = 0;
+    }
+    
+    // Siempre consultar el voto actual directamente desde la base de datos
+    const votoActualQuery = await db.query(`
+      SELECT valor FROM post_votes 
+      WHERE post_id = $1 AND user_id = $2
+    `, [mensajeId, userId]);
+    
+    // Si no hay filas, significa que no hay un voto (podría haber sido eliminado manualmente)
+    const votoActual = votoActualQuery.rows.length > 0 ? votoActualQuery.rows[0].valor : 0;
+    
+    // Si el voto actual es igual al nuevo voto, cancelamos el voto
+    let valorFinal = valor;
+    if (votoActual === valor) {
+      valorFinal = 0; // Cancelamos el voto
+    }
+    
+    // Actualizar o insertar voto en la base de datos
+    if (valorFinal === 0) {
+      // Eliminar voto
+      await db.query(`
+        DELETE FROM post_votes 
+        WHERE post_id = $1 AND user_id = $2
+      `, [mensajeId, userId]);
+      
+      // Actualizar ranking en la base de datos
+      await db.query(`
+        UPDATE forum_posts 
+        SET ranking = ranking - $1 
+        WHERE id = $2
+      `, [votoActual, mensajeId]);
+    } else {
+      // Verificar si ya existe un voto de este usuario
+      if (votoActualQuery.rows.length > 0) {
+        // Actualizar voto existente
+        await db.query(`
+          UPDATE post_votes 
+          SET valor = $1 
+          WHERE post_id = $2 AND user_id = $3
+        `, [valorFinal, mensajeId, userId]);
+        
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_posts 
+          SET ranking = ranking - $1 + $2 
+          WHERE id = $3
+        `, [votoActual, valorFinal, mensajeId]);
+      } else {
+        // Insertar nuevo voto (como si fuera la primera vez)
+        await db.query(`
+          INSERT INTO post_votes (post_id, user_id, valor) 
+          VALUES ($1, $2, $3)
+        `, [mensajeId, userId, valorFinal]);
+        
+        // Actualizar ranking en la base de datos (solo sumamos el nuevo valor)
+        await db.query(`
+          UPDATE forum_posts 
+          SET ranking = ranking + $1 
+          WHERE id = $2
+        `, [valorFinal, mensajeId]);
+      }
+    }
+    
+    // Consultar el nuevo ranking directamente desde la base de datos para asegurar consistencia
+    const nuevoRankingQuery = await db.query(`
+      SELECT ranking FROM forum_posts WHERE id = $1
+    `, [mensajeId]);
+    
+    if (nuevoRankingQuery.rows.length > 0) {
+      mensajes[mensajeIndex].ranking = nuevoRankingQuery.rows[0].ranking;
+    }
+    
+    // Devolver el nuevo ranking y el valor del voto del usuario
+    return res.json({ 
+      success: true, 
+      nuevoRanking: mensajes[mensajeIndex].ranking,
+      valorVoto: valorFinal // Devolver el valor final del voto
+    });
+  } catch (error) {
+    console.error('Error al votar mensaje:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Error del servidor al procesar el voto: ' + error.message 
+    });
+  }
+});
+
+// Ruta para obtener todos los votos del usuario
+app.get('/mis-votos', async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+    }
+    
+    // Obtener todos los votos de mensajes del usuario
+    const postVotesQuery = await db.query(`
+      SELECT post_id, valor FROM post_votes WHERE user_id = $1
+    `, [userId]);
+    
+    // Crear un objeto con los votos de mensajes
+    const postVotos = {};
+    postVotesQuery.rows.forEach(voto => {
+      postVotos[voto.post_id] = voto.valor;
+    });
+    
+    // Obtener todos los votos de comentarios del usuario
+    const commentVotesQuery = await db.query(`
+      SELECT comment_id, valor FROM comment_votes WHERE user_id = $1
+    `, [userId]);
+    
+    // Crear un objeto con los votos de comentarios
+    const commentVotos = {};
+    commentVotesQuery.rows.forEach(voto => {
+      commentVotos[voto.comment_id] = voto.valor;
+    });
+    
+    return res.json({
+      success: true,
+      votos: postVotos,
+      votosComentarios: commentVotos
+    });
+  } catch (error) {
+    console.error('Error al obtener votos del usuario:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Error del servidor al obtener votos: ' + error.message
+    });
+  }
+});
+
+// Ruta para votar comentarios (corregida)
+app.post('/votar-comentario', async (req, res) => {
+  try {
+    const { comentarioId, valor } = req.body;
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+    }
+    
+    if (!comentarioId || valor === undefined) {
+      return res.json({ 
+        success: false,
+        mensaje: "Datos incompletos"
+      });
+    }
+    
+    // Convertir a números
+    const comentarioIdNum = parseInt(comentarioId);
+    const valorNum = parseInt(valor);
+    
+    console.log('Recibida petición de voto para comentario:', comentarioIdNum, 'con valor:', valorNum);
+    
+    // Buscar el comentario en todos los mensajes
+    let comentarioEncontrado = null;
+    let mensajeContenedor = null;
+    
+    // Recorrer todos los mensajes para encontrar el comentario
+    for (const mensaje of mensajes) {
+      if (mensaje.comentarios && mensaje.comentarios.length > 0) {
+        const comentarioIndex = mensaje.comentarios.findIndex(c => c.id === comentarioIdNum);
+        
+        if (comentarioIndex !== -1) {
+          comentarioEncontrado = mensaje.comentarios[comentarioIndex];
+          mensajeContenedor = mensaje;
+          break;
+        }
+      }
+    }
+    
+    // Si no encuentra el comentario, retorna error
+    if (!comentarioEncontrado) {
+      console.log('Comentario no encontrado:', comentarioIdNum);
+      return res.json({ 
+        success: false, 
+        mensaje: 'Comentario no encontrado' 
+      });
+    }
+
+    // Inicializar ranking si no existe
+    if (comentarioEncontrado.ranking === undefined) {
+      comentarioEncontrado.ranking = 0;
+    }
+    
+    // Obtener el voto actual del usuario para este comentario
+    const votoActualQuery = await db.query(`
+      SELECT valor FROM comment_votes 
+      WHERE comment_id = $1 AND user_id = $2
+    `, [comentarioIdNum, userId]);
+    
+    const votoActual = votoActualQuery.rows.length > 0 ? votoActualQuery.rows[0].valor : 0;
+    
+    // Si el voto actual es igual al nuevo voto, cancelamos el voto
+    let valorFinal = valorNum;
+    if (votoActual === valorNum) {
+      valorFinal = 0; // Cancelamos el voto
+    }
+    
+    // Actualizar el voto en la base de datos
+    if (valorFinal === 0) {
+      // Eliminar voto
+      await db.query(`
+        DELETE FROM comment_votes 
+        WHERE comment_id = $1 AND user_id = $2
+      `, [comentarioIdNum, userId]);
+      
+      // Actualizar ranking del comentario en la base de datos
+      await db.query(`
+        UPDATE forum_comments
+        SET ranking = ranking - $1 
+        WHERE id = $2
+      `, [votoActual, comentarioIdNum]);
+    } else {
+      if (votoActual !== 0) {
+        // Actualizar voto existente
+        await db.query(`
+          UPDATE comment_votes 
+          SET valor = $1 
+          WHERE comment_id = $2 AND user_id = $3
+        `, [valorFinal, comentarioIdNum, userId]);
+        
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_comments 
+          SET ranking = ranking - $1 + $2 
+          WHERE id = $3
+        `, [votoActual, valorFinal, comentarioIdNum]);
+      } else {
+        // Insertar nuevo voto
+        await db.query(`
+          INSERT INTO comment_votes (comment_id, user_id, valor) 
+          VALUES ($1, $2, $3)
+        `, [comentarioIdNum, userId, valorFinal]);
+        
+        // Actualizar ranking en la base de datos
+        await db.query(`
+          UPDATE forum_comments 
+          SET ranking = ranking + $1 
+          WHERE id = $2
+        `, [valorFinal, comentarioIdNum]);
+      }
+    }
+    
+    // Consultar el ranking actualizado de la base de datos
+    const rankingQuery = await db.query(`
+      SELECT ranking FROM forum_comments WHERE id = $1
+    `, [comentarioIdNum]);
+    
+    const nuevoRanking = rankingQuery.rows.length > 0 ? rankingQuery.rows[0].ranking : comentarioEncontrado.ranking;
+    
+    // Actualizar el ranking en memoria
+    comentarioEncontrado.ranking = nuevoRanking;
+    
+    console.log('Comentario actualizado:', comentarioIdNum, 'nuevo ranking:', nuevoRanking);
+    
+    return res.json({ 
+      success: true, 
+      nuevoRanking: nuevoRanking,
+      valorVoto: valorFinal
+    });
+
+  } catch (error) {
+    console.error('Error al votar comentario:', error);
+    return res.status(500).json({ 
+      success: false, 
+      mensaje: "Error interno: " + error.message
+    });
+  }
+});
+
+// Eliminar este endpoint duplicado y sus referencias
+// app.get('/voto-estado/:tipo/:id', async (req, res) => { ... });
+
+// Ruta para publicar comentario
+app.post('/publicar-comentario', upload.array('imagenes', 4), async (req, res) => {
+    try {
+      const { autor, comentario, mensaje_padre_id } = req.body;
+      const userId = req.session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+      }
+      
+      if (autor && comentario && mensaje_padre_id) {
+        // Insert the comment into the database
+        const commentResult = await db.query(
+          `INSERT INTO forum_comments 
+           (post_id, user_id, autor, comentario, fecha_str) 
+           VALUES ($1, $2, $3, $4, $5) 
+           RETURNING id, fecha`,
+          [
+            parseInt(mensaje_padre_id),
+            userId,
+            autor,
+            comentario,
+            new Date().toLocaleString()
+          ]
+        );
+        
+        const commentId = commentResult.rows[0].id;
+        const fecha = commentResult.rows[0].fecha;
+        
+        // Handle image uploads for the comment
+        const imagenes = [];
+        if (req.files && req.files.length > 0) {
+          for (const file of req.files) {
+            const imageId = Date.now() + Math.floor(Math.random() * 1000);
+            await db.query(
+              `INSERT INTO comment_images (comment_id, url, filename) VALUES ($1, $2, $3)`,
+              [commentId, `/uploads/${file.filename}`, file.filename]
+            );
+            
+            imagenes.push({
+              id: imageId,
+              url: `/uploads/${file.filename}`
+            });
+          }
+        }
+        
+        // Update in-memory data
+        const nuevoComentario = {
+          id: commentId,
+          autor,
+          comentario,
+          fecha,
+          fechaStr: new Date().toLocaleString(),
+          imagenes,
+          ranking: 0,
+          votoActual: 0
+        };
+        
+        const mensajeIndex = mensajes.findIndex(m => m.id === parseInt(mensaje_padre_id));
+        
+        if (mensajeIndex === -1) {
+          return res.status(404).json({ success: false, error: 'Mensaje padre no encontrado' });
+        }
+        
+        if (!mensajes[mensajeIndex].comentarios) {
+          mensajes[mensajeIndex].comentarios = [];
+        }
+        
+        mensajes[mensajeIndex].comentarios.push(nuevoComentario);
+        
+        res.json({ 
+          success: true, 
+          mensaje: "Comentario publicado correctamente", 
+          comentario: nuevoComentario 
+        });
+      } else {
+        res.status(400).json({ success: false, error: 'Datos incompletos' });
+      }
+    } catch (error) {
+      console.error('Error al publicar comentario:', error);
+      res.status(500).json({ success: false, error: 'Error al publicar el comentario' });
+    }
+  });
+
+
+// Function to load forum posts from the database
+async function loadForumPosts() {
+    try {
+      // Load all posts
+      const postResult = await db.query(`
+        SELECT fp.*, u.username 
+        FROM forum_posts fp
+        JOIN users u ON fp.user_id = u.id
+        ORDER BY fp.fecha DESC
+      `);
+      
+      // Create an empty array to store the posts
+      const dbMensajes = [];
+      
+      // Process each post
+      for (const post of postResult.rows) {
+        // Load images for this post
+        const imageResult = await db.query(`
+          SELECT id, url FROM post_images WHERE post_id = $1
+        `, [post.id]);
+        
+        // Load comments for this post
+        const commentResult = await db.query(`
+          SELECT fc.*, u.username 
+          FROM forum_comments fc
+          JOIN users u ON fc.user_id = u.id
+          WHERE fc.post_id = $1
+          ORDER BY fc.fecha ASC
+        `, [post.id]);
+        
+        // Process comments
+        const comments = [];
+        for (const comment of commentResult.rows) {
+          // Load images for this comment
+          const commentImageResult = await db.query(`
+            SELECT id, url FROM comment_images WHERE comment_id = $1
+          `, [comment.id]);
+          
+          comments.push({
+            id: comment.id,
+            autor: comment.autor,
+            comentario: comment.comentario,
+            fecha: comment.fecha,
+            fechaStr: comment.fecha_str,
+            imagenes: commentImageResult.rows.map(img => ({
+              id: img.id,
+              url: img.url
+            })),
+            ranking: comment.ranking || 0,
+            votoActual: 0 // This will be updated per user session
+          });
+        }
+        
+        // Add the post to our array
+        dbMensajes.push({
+          id: post.id,
+          user_id: post.user_id,
+          autor: post.autor,
+          mensaje: post.mensaje,
+          etiqueta: post.etiqueta || "Ninguna",
+          subcategoria: post.subcategoria || "Ninguna",
+          extrasubcategoria: post.extrasubcategoria || "Ninguna",
+          fecha: post.fecha,
+          fechaStr: post.fecha_str,
+          ranking: post.ranking || 0,
+          imagenes: imageResult.rows.map(img => ({
+            id: img.id,
+            url: img.url
+          })),
+          comentarios: comments
+        });
+      }
+      
+      return dbMensajes;
+    } catch (error) {
+      console.error('Error loading forum posts:', error);
+      return [];
+    }
+  }
+  
+  app.get('/foro', requireLogin, async (req, res) => {
+    try {
+      // Load posts from database
+      mensajes = await loadForumPosts();
+      nextId = mensajes.length > 0 ? Math.max(...mensajes.map(m => m.id)) + 1 : 1;
+      
+      // Load user votes to update votoActual values
+      if (req.session.userId) {
+        const userVotesResult = await db.query(`
+          SELECT post_id, valor FROM post_votes WHERE user_id = $1
+        `, [req.session.userId]);
+        
+        // Resto del código...
+      }
+      
+      res.render('foro', { 
+        username: req.session.username,
+        userId: req.session.userId, // Añadimos el ID del usuario a la plantilla
+        descripcion: req.session.descripcion,
+        money: req.session.money,
+        mascotaActual: req.session.mascotaActual || null,
+        mensajes,
+        etiquetasDisponibles,
+        subetiquetasDisponibles,
+        extrasubetiquetasDisponibles,
+        rutaImagen: req.session.mascotaActual ? req.session.mascotaActual.rutaImagen : null,
+        accesorios: req.session.accesorios
+      });
+    } catch (error) {
+      console.error('Error rendering forum page:', error);
+      res.status(500).send('Error loading forum page');
+    }
+  });
+
+  // NUEVA RUTA: Obtener comentario para edición
+app.get('/comentario/:mensajeId/:comentarioId', (req, res) => {
+  try {
+    const mensajeId = parseInt(req.params.mensajeId);
+    const comentarioId = parseInt(req.params.comentarioId);
+    
+    const mensaje = mensajes.find(m => m.id === mensajeId);
+    
+    if (!mensaje || !mensaje.comentarios) {
+      return res.status(404).json({ success: false, error: 'Mensaje o comentarios no encontrados' });
+    }
+    
+    const comentario = mensaje.comentarios.find(c => c.id === comentarioId);
+    
+    if (!comentario) {
+      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
+    }
+    
+    const datosComentario = {
+      id: comentario.id,
+      autor: comentario.autor,
+      comentario: comentario.comentario,
+      imagenes: comentario.imagenes || [],
+      fecha: comentario.fecha,
+      fechaStr: comentario.fechaStr
+    };
+    
+    res.json({
+      success: true,
+      comentario: datosComentario
+    });
+  } catch (error) {
+    console.error('Error al obtener comentario:', error);
+    return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+// NUEVA RUTA: Actualizar comentario
+app.put('/actualizar-comentario/:mensajeId/:comentarioId', upload.array('imagenes', 4), async (req, res) => {
+  try {
+    const mensajeId = parseInt(req.params.mensajeId);
+    const comentarioId = parseInt(req.params.comentarioId);
+    const { autor, comentario, mantener_imagenes } = req.body;
+    
+    // Validar datos básicos
+    if (!autor || !comentario) {
+      return res.status(400).json({ success: false, error: 'Datos incompletos' });
+    }
+    
+    // Buscar el mensaje en memoria para actualización local
+    const mensajeIndex = mensajes.findIndex(m => m.id === mensajeId);
+    
+    if (mensajeIndex === -1 || !mensajes[mensajeIndex].comentarios) {
+      return res.status(404).json({ success: false, error: 'Mensaje o comentarios no encontrados' });
+    }
+    
+    // Buscar el comentario en memoria
+    const comentarioIndex = mensajes[mensajeIndex].comentarios.findIndex(c => c.id === comentarioId);
+    
+    if (comentarioIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
+    }
+    
+    // Obtener la fecha actual formateada
+    const fechaActual = new Date();
+    const fechaStr = fechaActual.toLocaleString() + ' (editado)';
+    
+    // Actualizar en la base de datos
+    await db.query(`
+      UPDATE forum_comments 
+      SET autor = $1, comentario = $2, fecha_str = $3
+      WHERE id = $4 AND post_id = $5
+    `, [autor, comentario, fechaStr, comentarioId, mensajeId]);
+    
+    // Gestionar imágenes en la base de datos
+    if (mantener_imagenes) {
+      const mantenerArray = Array.isArray(mantener_imagenes) ? mantener_imagenes : [mantener_imagenes];
+      const idsAMantener = mantenerArray.map(id => parseInt(id));
+      
+      // Obtener imágenes actuales de la base de datos
+      const imagenesResult = await db.query(`
+        SELECT id, url FROM comment_images WHERE comment_id = $1
+      `, [comentarioId]);
+      
+      // Identificar imágenes a eliminar
+      for (const imagen of imagenesResult.rows) {
+        if (!idsAMantener.includes(imagen.id)) {
+          // Eliminar de la base de datos
+          await db.query(`DELETE FROM comment_images WHERE id = $1`, [imagen.id]);
+          
+          // Eliminar archivo físico
+          const filename = imagen.url.split('/').pop();
+          const imagePath = join(uploadDir, filename);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        }
+      }
+    } else {
+      // Si no hay imágenes a mantener, eliminar todas
+      const imagenesResult = await db.query(`
+        SELECT id, url FROM comment_images WHERE comment_id = $1
+      `, [comentarioId]);
+      
+      // Eliminar archivos físicos
+      for (const imagen of imagenesResult.rows) {
+        const filename = imagen.url.split('/').pop();
+        const imagePath = join(uploadDir, filename);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      
+      // Eliminar todas las imágenes de la base de datos
+      await db.query(`DELETE FROM comment_images WHERE comment_id = $1`, [comentarioId]);
+    }
+    
+    // Añadir nuevas imágenes si hay
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // SOLUCIÓN: Incluir el filename en la inserción
+        await db.query(`
+          INSERT INTO comment_images (comment_id, url, filename)
+          VALUES ($1, $2, $3)
+        `, [comentarioId, `/uploads/${file.filename}`, file.filename]);
+      }
+    }
+    
+    // Actualizar la versión en memoria
+    mensajes[mensajeIndex].comentarios[comentarioIndex].autor = autor;
+    mensajes[mensajeIndex].comentarios[comentarioIndex].comentario = comentario;
+    mensajes[mensajeIndex].comentarios[comentarioIndex].fechaStr = fechaStr;
+    
+    // Actualizar imágenes en memoria
+    if (mantener_imagenes) {
+      const mantenerArray = Array.isArray(mantener_imagenes) ? mantener_imagenes : [mantener_imagenes];
+      const idsAMantener = mantenerArray.map(id => parseInt(id));
+      
+      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes = 
+        mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.filter(imagen => 
+          idsAMantener.includes(imagen.id)
+        );
+    } else {
+      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes = [];
+    }
+    
+    // Añadir nuevas imágenes en memoria
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // Usar un ID único para las nuevas imágenes
+        const newImageId = Date.now() + Math.floor(Math.random() * 1000);
+        
+        mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.push({
+          id: newImageId,
+          url: `/uploads/${file.filename}`
+        });
+      }
+    }
+    
+    // Cargar la versión actualizada desde la base de datos para mantener consistencia
+    await loadForumPosts();
+    
+    res.json({ 
+      success: true, 
+      comentario: mensajes[mensajeIndex].comentarios[comentarioIndex] 
+    });
+  } catch (error) {
+    console.error('Error al actualizar comentario:', error);
+    res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+// Ruta para actualizar mensaje
+app.put('/actualizar/:id', upload.array('imagenes', 9), async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { 
+      autor, 
+      mensaje, 
+      etiqueta, 
+      subcategoria, 
+      extrasubcategoria, 
+      mantener_imagenes 
+    } = req.body;
+    
+    const index = mensajes.findIndex(m => m.id === id);
+    
+    if (index === -1) {
+      return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
+    }
+    
+    if (!autor || !mensaje) {
+      return res.status(400).json({ success: false, error: 'Datos incompletos' });
+    }
+    
+    // Fecha formateada para la actualización
+    const fechaStr = new Date().toLocaleString() + ' (editado)';
+    
+    // SOLUCIÓN: Actualizar en la base de datos
+    await db.query(`
+      UPDATE forum_posts 
+      SET autor = $1, mensaje = $2, etiqueta = $3, subcategoria = $4, 
+          extrasubcategoria = $5, fecha_str = $6
+      WHERE id = $7
+    `, [
+      autor, 
+      mensaje, 
+      etiqueta || "Ninguna", 
+      subcategoria || "Ninguna", 
+      extrasubcategoria || "Ninguna", 
+      fechaStr,
+      id
+    ]);
+    
+    // Actualizar datos básicos en memoria
+    mensajes[index].autor = autor;
+    mensajes[index].mensaje = mensaje;
+    mensajes[index].fechaStr = fechaStr;
+    mensajes[index].etiqueta = etiqueta || "Ninguna";
+    mensajes[index].subcategoria = subcategoria || "Ninguna";
+    mensajes[index].extrasubcategoria = extrasubcategoria || "Ninguna";
+    
+    // Gestionar imágenes en la base de datos
+    const imagenesAntiguas = [...mensajes[index].imagenes];
+    
+    if (mantener_imagenes) {
+      const mantenerArray = Array.isArray(mantener_imagenes) ? mantener_imagenes : [mantener_imagenes];
+      const idsAMantener = mantenerArray.map(id => parseInt(id));
+      
+      // Obtener imágenes actuales
+      const imagenesResult = await db.query(`
+        SELECT id, url FROM post_images WHERE post_id = $1
+      `, [id]);
+      
+      // Eliminar imágenes no seleccionadas para mantener
+      for (const imagen of imagenesResult.rows) {
+        if (!idsAMantener.includes(imagen.id)) {
+          // Eliminar de la base de datos
+          await db.query(`DELETE FROM post_images WHERE id = $1`, [imagen.id]);
+          
+          // Eliminar archivo físico
+          const filename = imagen.url.split('/').pop();
+          const imagePath = join(uploadDir, filename);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        }
+      }
+      
+      // Actualizar en memoria
+      mensajes[index].imagenes = imagenesAntiguas.filter(imagen => 
+        idsAMantener.includes(imagen.id)
+      );
+    } else {
+      // Eliminar todas las imágenes de la base de datos
+      const imagenesResult = await db.query(`
+        SELECT id, url FROM post_images WHERE post_id = $1
+      `, [id]);
+      
+      for (const imagen of imagenesResult.rows) {
+        await db.query(`DELETE FROM post_images WHERE id = $1`, [imagen.id]);
+        
+        // Eliminar archivo físico
+        const filename = imagen.url.split('/').pop();
+        const imagePath = join(uploadDir, filename);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      
+      mensajes[index].imagenes = [];
+    }
+    
+    // Añadir nuevas imágenes
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // Insertar en la base de datos
+        const result = await db.query(`
+          INSERT INTO post_images (post_id, url, filename)
+          VALUES ($1, $2, $3)
+          RETURNING id
+        `, [id, `/uploads/${file.filename}`, file.filename]);
+        
+        const newImageId = result.rows[0].id;
+        
+        // Añadir a la versión en memoria
+        mensajes[index].imagenes.push({
+          id: newImageId,
+          url: `/uploads/${file.filename}`
+        });
+      }
+    }
+    
+    // Refrescar todos los mensajes desde la base de datos
+    await loadForumPosts();
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error al actualizar:', error);
+    res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+// Ruta para obtener comentarios
+app.get('/comentarios/:messageId', (req, res) => {
+  try {
+    const messageId = parseInt(req.params.messageId);
+    const mensaje = mensajes.find(m => m.id === messageId);
+    
+    if (!mensaje) {
+      return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
+    }
+    
+    // Make sure we're returning comments in chronological order
+    const comentarios = mensaje.comentarios || [];
+    
+    // Sort comments by date/id if needed
+    // This ensures older comments appear first, newer comments at the bottom
+    comentarios.sort((a, b) => a.id - b.id);
+    
+    // Return all comments for this message
+    res.json({ 
+      success: true,
+      comentarios: comentarios
+    });
+  } catch (error) {
+    console.error('Error al obtener comentarios:', error);
+    res.status(500).json({ success: false, error: 'Error al obtener comentarios' });
+  }
+});
+
+app.get('/foro', requireLogin, (req, res) => {
+    res.render('foro', { 
+      username: req.session.username,
+      descripcion: req.session.descripcion,
+      money: req.session.money,
+      mascotaActual: req.session.mascotaActual || null,
+      mensajes,
+      etiquetasDisponibles,
+      subetiquetasDisponibles,
+      extrasubetiquetasDisponibles,
+      rutaImagen: req.session.mascotaActual ? req.session.mascotaActual.rutaImagen : null,
+      accesorios: req.session.accesorios
+    });
+  });
+
+
+// Ruta para eliminar mensajes con verificación de permisos
+app.delete('/eliminar-mensaje/:id', requireLogin, async (req, res) => {
+  const id = parseInt(req.params.id);
+  const userId = req.session.userId;
+  
+  try {
+    // Buscar el mensaje para verificar que el usuario sea el autor
+    const mensaje = mensajes.find(m => m.id === id);
+    
+    if (!mensaje) {
+      return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
+    }
+    
+    // Verificar que el usuario actual sea el autor del mensaje
+    if (mensaje.user_id !== userId) {
+      return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar este mensaje' });
+    }
+    
+    // Eliminar el mensaje de la base de datos
+    await db.query('DELETE FROM forum_posts WHERE id = $1 AND user_id = $2', [id, userId]);
+    
+    // Resto del código de eliminación...
+    await db.query('DELETE FROM post_images WHERE post_id = $1', [id]);
+    await db.query('DELETE FROM forum_comments WHERE post_id = $1', [id]);
+    
+    // Eliminar las imágenes del sistema de archivos si existen
+    if (mensaje.imagenes && mensaje.imagenes.length > 0) {
+      mensaje.imagenes.forEach(imagen => {
+        const filename = imagen.url.split('/').pop();
+        const imagePath = join(uploadDir, filename);
+        
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      });
+    }
+    
+    // Eliminar votos asociados al mensaje
+    await db.query('DELETE FROM post_votes WHERE post_id = $1', [id]);
+    
+    // Filtrar el mensaje a eliminar de la memoria
+    mensajes = mensajes.filter(m => m.id !== id);
+    
+    // Eliminar votos asociados al mensaje en memoria
+    delete votos[id];
+    
+    return res.json({ 
+      success: true,
+      totalMensajes: mensajes.length
+    });
+  } catch (error) {
+    console.error('Error al eliminar:', error);
+    return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+// SOLUCIÓN AVANZADA EN BACKEND: Añadiendo más depuración y análisis detallado
+app.delete('/eliminar-comentario/:mensajeId/:comentarioId', requireLogin, async (req, res) => {
+  try {
+    const mensajeId = parseInt(req.params.mensajeId);
+    const comentarioId = parseInt(req.params.comentarioId);
+    const userId = req.session.userId;
+
+    console.log(`DEBUG: Intento de eliminar comentario - Mensaje ID: ${mensajeId}, Comentario ID: ${comentarioId}`);
+    console.log(`DEBUG: Usuario en sesión - ID: ${userId}, Tipo: ${typeof userId}`);
+    
+    // Verificar que userId es válido
+    if (!userId) {
+      console.log('ERROR: No hay usuario en sesión');
+      return res.status(401).json({ success: false, error: 'Debes iniciar sesión para eliminar comentarios' });
+    }
+    
+    // Buscar el mensaje
+    const mensaje = mensajes.find(m => m.id === mensajeId);
+    
+    if (!mensaje || !mensaje.comentarios) {
+      console.log(`ERROR: Mensaje ${mensajeId} no encontrado o sin comentarios`);
+      return res.status(404).json({ success: false, error: 'Mensaje o comentarios no encontrados' });
+    }
+    
+    // Buscar el comentario
+    const comentarioIndex = mensaje.comentarios.findIndex(c => c.id === comentarioId);
+    
+    if (comentarioIndex === -1) {
+      console.log(`ERROR: Comentario ${comentarioId} no encontrado en mensaje ${mensajeId}`);
+      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
+    }
+    
+    const comentario = mensaje.comentarios[comentarioIndex];
+    
+    // Verificación exhaustiva del autor del comentario
+    console.log(`DEBUG: Datos del comentario - ID: ${comentarioId}`);
+    console.log(`DEBUG: ID autor comentario: ${comentario.user_id}, Tipo: ${typeof comentario.user_id}`);
+    console.log(`DEBUG: Nombre autor comentario: ${comentario.autor}`);
+    
+    // Comprobemos también los datos de la sesión completa
+    console.log(`DEBUG: Datos de sesión:`, req.session);
+    
+    // SOLUCIÓN 1: Verificación multi-nivel de permisos
+    let tienePermiso = false;
+    
+    // Verificación 1: Comparar user_id directamente (convertidos a string)
+    if (String(userId) === String(comentario.user_id)) {
+      console.log(`DEBUG: COINCIDENCIA DIRECTA DE IDs - Usuario ${userId} es autor ${comentario.user_id}`);
+      tienePermiso = true;
+    } 
+    // Verificación 2: Comprobar si el usuario actual es administrador
+    else if (req.session.isAdmin) {
+      console.log(`DEBUG: PERMISO ADMIN - Usuario ${userId} es administrador`);
+      tienePermiso = true;
+    }
+    // Verificación 3: Verificar también por nombre de usuario si está disponible
+    else if (req.session.username && comentario.autor && 
+             req.session.username.toLowerCase() === comentario.autor.toLowerCase()) {
+      console.log(`DEBUG: COINCIDENCIA POR NOMBRE - ${req.session.username} es ${comentario.autor}`);
+      tienePermiso = true;
+    }
+    
+    if (!tienePermiso) {
+      console.log(`ERROR: PERMISO DENEGADO - Usuario ${userId} intenta eliminar comentario de ${comentario.user_id}`);
+      return res.status(403).json({ 
+        success: false, 
+        error: 'No tienes permiso para eliminar este comentario',
+        debug: {
+          userIdSession: userId,
+          commentAuthorId: comentario.user_id,
+          userIdType: typeof userId,
+          authorIdType: typeof comentario.user_id
+        }
+      });
+    }
+    
+    console.log('DEBUG: Verificación correcta, procediendo con eliminación');
+    
+    // MODIFICADO: Eliminar el comentario sin restricción de user_id para diagnóstico
+    await db.query('DELETE FROM forum_comments WHERE id = $1', [comentarioId]);
+    
+    // Resto del código de eliminación...
+    await db.query('DELETE FROM comment_images WHERE comment_id = $1', [comentarioId]);
+    await db.query('DELETE FROM comment_votes WHERE comment_id = $1', [comentarioId]);
+    
+    // Eliminar las imágenes del comentario si existen
+    if (comentario.imagenes && comentario.imagenes.length > 0) {
+      comentario.imagenes.forEach(imagen => {
+        const filename = imagen.url.split('/').pop();
+        const imagePath = join(uploadDir, filename);
+        
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      });
+    }
+    
+    // Eliminar el comentario del array en memoria
+    mensaje.comentarios.splice(comentarioIndex, 1);
+    
+    return res.json({ 
+      success: true,
+      totalComentarios: mensaje.comentarios.length
+    });
+  } catch (error) {
+    console.error('ERROR GRAVE al eliminar comentario:', error);
+    return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+
+// Ruta para publicar mensaje
+app.post('/publicar', upload.array('imagenes', 9), async (req, res) => {
+    try {
+      const { autor, mensaje, etiqueta, subcategoria, extrasubcategoria } = req.body;
+      const userId = req.session.userId; // Get user ID from session
+      
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Usuario no autenticado' });
+      }
+      
+      if (autor && mensaje) {
+        // Insert the post into the database
+        const postResult = await db.query(
+          `INSERT INTO forum_posts 
+           (user_id, autor, mensaje, etiqueta, subcategoria, extrasubcategoria, fecha_str) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7) 
+           RETURNING id, fecha`,
+          [
+            userId,
+            autor,
+            mensaje,
+            etiqueta || "Ninguna",
+            subcategoria || "Ninguna",
+            extrasubcategoria || "Ninguna",
+            new Date().toLocaleString()
+          ]
+        );
+        
+        const postId = postResult.rows[0].id;
+        const fecha = postResult.rows[0].fecha;
+        
+        // Handle image uploads
+        if (req.files && req.files.length > 0) {
+          for (const file of req.files) {
+            await db.query(
+              `INSERT INTO post_images (post_id, url, filename) VALUES ($1, $2, $3)`,
+              [postId, `/uploads/${file.filename}`, file.filename]
+            );
+          }
+        }
+        
+        // Update in-memory array for the current session
+        const nuevoMensaje = {
+          id: postId,
+          user_id: userId,
+          autor,
+          mensaje,
+          etiqueta: etiqueta || "Ninguna",
+          subcategoria: subcategoria || "Ninguna",
+          extrasubcategoria: extrasubcategoria || "Ninguna",
+          fecha,
+          fechaStr: new Date().toLocaleString(),
+          ranking: 0,
+          imagenes: req.files ? req.files.map(file => ({
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            url: `/uploads/${file.filename}`
+          })) : [],
+          comentarios: []
+        };
+        
+        votos[postId] = {};
+        mensajes.push(nuevoMensaje);
+        
+        res.redirect('/foro');
+      } else {
+        res.status(400).json({ success: false, error: 'Datos incompletos' });
+      }
+    } catch (error) {
+      console.error('Error al publicar:', error);
+      res.status(500).send('Error al publicar el mensaje');
+    }
+  });
+
+
+  app.get('/filtrar', (req, res) => {
+    try {
+      const { etiquetas, subetiquetas, extrasubetiquetas, orden, ranking, tipo } = req.query;
+      const autor = req.session.usuario || req.query.autor; // Get current user from session or query
+      
+      // Clonar array de mensajes para no modificar el original
+      let mensajesFiltrados = [...mensajes];
+      
+      // Comprobar si tenemos algún filtro activo
+      const hayFiltrosActivos = etiquetas || subetiquetas || extrasubetiquetas || orden || ranking || tipo;
+      
+      // Si no hay filtros activos, devolver todos los mensajes ordenados por fecha
+      if (!hayFiltrosActivos) {
+        mensajesFiltrados.sort((a, b) => b.fecha - a.fecha);
+        return res.json({
+          success: true,
+          mensajes: mensajesFiltrados,
+          total: mensajesFiltrados.length
+        });
+      }
+      
+      // Filtrar por etiquetas principales
+      if (etiquetas && etiquetas.length > 0) {
+        const etiquetasArray = Array.isArray(etiquetas) ? etiquetas : [etiquetas];
+        mensajesFiltrados = mensajesFiltrados.filter(m => 
+          m.etiqueta && etiquetasArray.includes(m.etiqueta)
+        );
+      }
+      
+      // Filtrar por subetiquetas (subcategorías) - EXPANDIDO PARA INCLUIR EXTRA SUBCATEGORÍAS
+      if (subetiquetas && subetiquetas.length > 0) {
+        const subetiquetasArray = Array.isArray(subetiquetas) ? subetiquetas : [subetiquetas];
+        mensajesFiltrados = mensajesFiltrados.filter(m => 
+          // Verificar tanto subcategoria como extrasubcategoria
+          (m.subcategoria && subetiquetasArray.some(subt => 
+            m.subcategoria.toLowerCase().includes(subt.toLowerCase())
+          )) ||
+          (m.extrasubcategoria && subetiquetasArray.some(subt => 
+            m.extrasubcategoria.toLowerCase().includes(subt.toLowerCase())
+          ))
+        );
+      }
+      
+      // Filtrar por extra subetiquetas (con mayor flexibilidad)
+      if (extrasubetiquetas && extrasubetiquetas.length > 0) {
+        const extraSubetiquetasArray = Array.isArray(extrasubetiquetas) ? extrasubetiquetas : [extrasubetiquetas];
+        mensajesFiltrados = mensajesFiltrados.filter(m => 
+          m.extrasubcategoria && 
+          extraSubetiquetasArray.some(extrasubt => 
+            m.extrasubcategoria.toLowerCase().includes(extrasubt.toLowerCase())
+          )
+        );
+      }
+      
+// Filtrar por tipo de publicación
+if (tipo) {
+  const usuarioActual = req.session.usuario || req.query.autor;
+  console.log('Usuario actual (backend):', usuarioActual);
+  
+  switch (tipo) {
+    case 'mios':
+      mensajesFiltrados = mensajesFiltrados.filter(m => m.autor === usuarioActual);
+      break;
+    // caso 'todos' no requiere filtro
+  }
+}
+      
+      // Filtrar por ranking - FIXED thresholds
+      if (ranking) {
+        switch (ranking) {
+          case 'populares':
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.ranking > 100);
+            break;
+          case 'medios':
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.ranking > 10 && m.ranking <= 100);
+            break;
+          case 'menos_populares':
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.ranking <= 10); // Includes negative values
+            break;
+          // 'todos' no requiere filtrado
+        }
+      }
+      
+      // Current date for time-based filtering
+      const ahora = new Date();
+      const treintaMinutosAtras = new Date(ahora - 30 * 60 * 1000);
+      const unaSemanaAtras = new Date(ahora - 7 * 24 * 60 * 60 * 1000);
+      const unDiaAtras = new Date(ahora - 24 * 60 * 60 * 1000);
+      
+      // Ordenar resultados - FIXED time-based filtering
+      if (orden) {
+        switch (orden) {
+          case 'recientes':
+            // Mensajes de los últimos 30 minutos
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.fecha >= treintaMinutosAtras);
+            mensajesFiltrados.sort((a, b) => b.fecha - a.fecha);
+            break;
+          case 'antiguos':
+            // Mensajes de hace más de una semana
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.fecha <= unaSemanaAtras);
+            mensajesFiltrados.sort((a, b) => a.fecha - b.fecha);
+            break;
+          case 'nuevos_24h':
+            // Mensajes del último día
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.fecha >= unDiaAtras);
+            mensajesFiltrados.sort((a, b) => b.fecha - a.fecha);
+            break;
+          case 'mas_valorados':
+            // Mensajes con más de 100 votos
+            mensajesFiltrados = mensajesFiltrados.filter(m => m.ranking > 100);
+            mensajesFiltrados.sort((a, b) => b.ranking - a.ranking);
+            break;
+          default:
+            mensajesFiltrados.sort((a, b) => b.fecha - a.fecha);
+        }
+      } else {
+        // Orden predeterminado: recientes primero
+        mensajesFiltrados.sort((a, b) => b.fecha - a.fecha);
+      }
+      
+      res.json({
+        success: true,
+        mensajes: mensajesFiltrados,
+        total: mensajesFiltrados.length
+      });
+      
+    } catch (error) {
+      console.error('Error al filtrar:', error);
+      res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+    }
+  });
+
+// Ruta para obtener subcategorías basadas en una etiqueta principal
+app.get('/subcategorias/:etiqueta', (req, res) => {
+  const { etiqueta } = req.params;
+  const subcategoriasDisponibles = subetiquetasDisponibles[etiqueta] || [];
+  
+  res.json({
+    success: true,
+    subcategorias: subcategoriasDisponibles
+  });
+});
+

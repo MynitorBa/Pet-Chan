@@ -501,15 +501,17 @@ h1, h2 {
 
 
 
-
 /* ============= VARIABLES Y ESTILOS GENERALES ============= */
 :root {
   --color-primary: #9c27b0;
   --color-primary-hover: #7b1fa2;
   --color-primary-light: #ce93d8;
+  --color-primary-glow: rgba(156, 39, 176, 0.6);
   --color-secondary: #212121;
   --color-success: #4caf50;
+  --color-success-glow: rgba(76, 175, 80, 0.6);
   --color-danger: #f44336;
+  --color-danger-glow: rgba(244, 67, 54, 0.6);
   --color-warning: #ff9800;
   --color-info: #8e24aa;
   --color-light: #f8f9fa;
@@ -521,11 +523,13 @@ h1, h2 {
   --color-bg-light: #3c2747;
   --color-accent-blue: #3f51b5;
   --color-accent-blue-light: #5c6bc0;
+  --color-accent-blue-glow: rgba(63, 81, 181, 0.6);
 
-  --border-radius: 5px;
-  --box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-  --box-shadow-light: 0 2px 8px rgba(156, 39, 176, 0.3);
-  --transition: all 0.3s ease;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --box-shadow-light: 0 3px 10px rgba(156, 39, 176, 0.4);
+  --box-shadow-glow: 0 0 20px var(--color-primary-glow);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   
   /* Z-index para control de capas */
   --z-index-new-message-trigger: 800;
@@ -542,10 +546,17 @@ h1, h2 {
   background-color: var(--color-bg-medium);
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
+  transition: var(--transition);
+}
+
+.formulario:hover {
+  box-shadow: var(--box-shadow-glow);
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
 }
 
 label {
@@ -553,7 +564,14 @@ label {
   margin-bottom: 8px;
   font-weight: bold;
   color: var(--color-light);
-  text-shadow: rgba(96, 31, 116, 0.603);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transform: translateY(0);
+  transition: var(--transition);
+}
+
+.form-group:hover label {
+  transform: translateY(-2px);
+  color: var(--color-primary-light);
 }
 
 input[type="text"],
@@ -566,6 +584,14 @@ textarea {
   background-color: rgb(255, 255, 255);
   color: black;
   transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.25), 0 2px 5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 textarea {
@@ -575,11 +601,11 @@ textarea {
 
 .form-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 button {
-  padding: 10px 18px;
+  padding: 12px 22px;
   background-color: var(--color-primary);
   color: white;
   border: none;
@@ -589,12 +615,34 @@ button {
   transition: var(--transition);
   font-weight: 500;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+button:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s;
+}
+
+button:hover:before {
+  left: 100%;
 }
 
 button:hover {
   background-color: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 8px var(--color-primary-glow);
+}
+
+button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 #cancel-btn {
@@ -603,64 +651,111 @@ button:hover {
 
 #cancel-btn:hover {
   background-color: #d32f2f;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 8px var(--color-danger-glow);
 }
 
 .hint-text {
   font-size: 12px;
   color: var(--color-primary-light);
   margin-top: 5px;
+  transition: var(--transition);
+  opacity: 0.7;
+}
+
+.form-group:hover .hint-text {
+  opacity: 1;
 }
 
 select:focus, input[type="text"]:focus, textarea:focus {
   outline: none;
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* ============= CONTENEDOR DE LISTA DE MENSAJES ============= */
 .mensajes {
   background-color: var(--color-bg-medium);
-  padding: 20px;
+  padding: 25px;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   width: 100%;
   max-width: 1200px;
   margin: 10px auto 160px;
   border: 1px solid var(--color-primary);
+  transition: var(--transition);
+  position: relative;
 }
 
-/* Modificar el contenedor principal de mensajes para usar un diseño de cuadrícula */
+.mensajes:before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent-blue), var(--color-primary));
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.mensajes:hover {
+  box-shadow: var(--box-shadow-glow);
+}
+
 .lista-mensajes {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   width: 100%;
+  align-items: stretch;
 }
 
 .no-mensajes {
   text-align: center;
-  padding: 20px;
+  padding: 30px;
   color: var(--color-primary-light);
+  font-size: 18px;
+  animation: pulse 2s infinite ease-in-out;
 }
 
-/* ============= ESTILOS DE MENSAJE INDIVIDUAL ============= */
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
 .mensaje {
   background-color: rgba(96, 31, 116, 0.603);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  padding: 15px;
+  padding: 18px;
   display: flex;
   transition: var(--transition);
   overflow: hidden;
   box-shadow: var(--box-shadow-light);
   flex-direction: column;
-  height: 100%;
-  margin-bottom: 0; /* Eliminar el margen inferior ya que el gap de la cuadrícula maneja el espaciado */
+  height: auto;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.mensaje:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-blue), var(--color-primary-light));
+  transition: width 0.5s ease;
+}
+
+.mensaje:hover:after {
+  width: 100%;
 }
 
 .mensaje:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(156, 39, 176, 0.5);
   border-color: var(--color-accent-blue);
 }
 
@@ -694,6 +789,24 @@ select:focus, input[type="text"]:focus, textarea:focus {
   color: var(--color-light);
   line-height: 1.6;
   padding: 8px 0;
+
+  max-height: 300px; /* o ajusta la altura que necesites */
+  overflow-y: auto;
+  padding-right: 10px; /* espacio para el scroll */
+}
+
+/* Scroll personalizado */
+.mensaje-contenido::-webkit-scrollbar {
+  width: 10px;
+}
+
+.mensaje-contenido::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4); /* Color del scroll */
+  border-radius: 5px;
+}
+
+.mensaje-contenido::-webkit-scrollbar-track {
+  background: transparent; /* Fondo del track */
 }
 
 /* ============= ACCIONES DE MENSAJE ============= */
@@ -705,7 +818,58 @@ select:focus, input[type="text"]:focus, textarea:focus {
   border-top: 1px solid rgba(156, 39, 176, 0.4);
   padding-top: 12px;
 }
+/* Añade estos estilos a tu archivo foro.css */
 
+.author-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.field-label {
+  font-weight: normal;
+  min-width: 50px;
+  color: #333;
+  margin-right: 10px;
+}
+
+.autor-display {
+  padding: 6px 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  color: #333;
+  width: auto;
+  min-width: 500px;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+
+
+/* Estilo para los campos de entrada y textarea */
+.form-group textarea, 
+.form-group select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Botones más planos */
+button {
+  border-radius: 0;
+}
+
+/* Asegurar que el campo de autor se vea como un campo deshabilitado pero limpio */
+.autor-display {
+  background-color: #f9f9f9;
+  cursor: not-allowed;
+}
 /* Unificando tamaños y estilos de botones */
 .btn-comentar, 
 .btn-editar, 
@@ -1911,6 +2075,48 @@ select:focus, input[type="text"]:focus, textarea:focus {
 
 
 
+/* Estilos para los comentarios colapsables */
+.comentarios-header {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.toggle-comentarios {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  color: #ccc;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
+}
+
+.toggle-comentarios:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.toggle-comentarios i {
+  margin-right: 6px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-comentarios[aria-expanded="true"] i {
+  transform: rotate(180deg);
+}
+
+.comentarios-contador {
+  color: #ccc;
+}
+
+.comentarios-contenedor {
+  margin-left: 10px;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+  padding-left: 10px;
+}
 
 
 
