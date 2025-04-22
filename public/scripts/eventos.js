@@ -5,13 +5,13 @@ const eventosData = [
         titulo: "Torneo de Mascotas Virtuales",
         descripcion: "Participa en el torneo más grande de mascotas virtuales. ¡Gana premios exclusivos!",
         imagen: "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif",
-        fecha: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 5), // 5 días desde hoy
+        fecha: new Date(new Date().getFullYear(), 3, 6), // Abril 6
         hora: "18:00",
         duracion: "2 horas",
         plataforma: "Discord",
         etiquetas: ["Competitivo", "Premios", "Mascotas"],
         organizador: "Equipo Pet-Chan",
-        asistentes: 128,
+        asistentes: 225,
         popular: true,
         historialFechas: [],
         esEspecial: false // No es evento especial (como fin de año)
@@ -21,7 +21,7 @@ const eventosData = [
         titulo: "Concurso de Diseño de Mascotas",
         descripcion: "Diseña la mascota más creativa y gana reconocimiento en la comunidad.",
         imagen: "https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif",
-        fecha: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 15), // 15 del próximo mes
+        fecha: new Date(new Date().getFullYear(), 4, 15), // 15 de un mes
         hora: "16:00",
         duracion: "3 horas",
         plataforma: "Zoom",
@@ -53,7 +53,7 @@ const eventosData = [
         titulo: "Taller de Cuidado Virtual",
         descripcion: "Aprende los mejores tips para cuidar a tus mascotas virtuales.",
         imagen: "https://i.pinimg.com/originals/ff/01/76/ff0176290d1c7092aecb42168eed0348.gif",
-        fecha: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 10), // 10 días desde hoy
+        fecha: new Date(new Date().getFullYear(), 3, 11), // 10 días desde hoy
         hora: "15:00",
         duracion: "1.5 horas",
         plataforma: "YouTube Live",
@@ -69,16 +69,32 @@ const eventosData = [
         titulo: "Maratón de Juegos Retro",
         descripcion: "Juegos retro para mascotas virtuales con premios sorpresa.",
         imagen: "https://i.imgur.com/pnztT1T.gif",
-        fecha: new Date(new Date().getFullYear(), new Date().getMonth() + 2, 5), // 5 del mes siguiente
+        fecha: new Date(new Date().getFullYear(), 5, 5), // 5 del mes siguiente
         hora: "20:00",
         duracion: "5 horas",
         plataforma: "Twitch",
         etiquetas: ["Juegos", "Retro", "Diversión"],
         organizador: "Gamers Pet-Chan",
         asistentes: 156,
-        popular: true,
+        popular: false,
         historialFechas: [],
         esEspecial: false
+    },
+    {
+        id: 6,
+        titulo: "Pet-Chan Backrooms Survival",
+        descripcion: "Sobrevive en las backrooms con tus mascotas virtuales. ¡Un evento lleno de sorpresas y desafíos!",
+        imagen: "https://media.indiedb.com/images/games/1/72/71147/backrooms_glitch_gif.1.gif",
+        fecha: new Date(new Date().getFullYear(), 3, 25), // 5 días desde hoy
+        hora: "10:00",
+        duracion: "7 horas",
+        plataforma: "Discord",
+        etiquetas: ["Competitivo", "Premios", "Mascotas"],
+        organizador: "Equipo Pet-Chan",
+        asistentes: 367,
+        popular: true,
+        historialFechas: [],
+        esEspecial: false // No es evento especial (como fin de año)
     }
 ];
 
