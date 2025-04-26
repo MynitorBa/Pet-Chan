@@ -12,69 +12,475 @@
 <body>
     <%- include("partials/header.ejs") %>
 
+    <!-- Main Forum Welcome Banner (only shown when not in a community view) -->
+    <div class="community-header" id="main-forum-header">
+        <div class="community-banner">
+            <div class="community-banner-image" id="main-forum-banner-image">
+
+                <svg viewBox="0 0 1200 280" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Fondo principal negro -->
+                    <rect width="100%" height="100%" fill="#0D0221" />
+                    
+                    <!-- Patrón de pixeles para textura de fondo -->
+                    <defs>
+                      <pattern id="pixelPattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                        <rect width="9" height="9" fill="#0D0221" />
+                        <rect width="1" height="1" fill="#1C0B36" />
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#pixelPattern)" />
+                    
+                    <!-- Grilla de ciudad ciberpunk estilo Tron -->
+                    <g id="cyberGrid">
+                      <!-- Líneas de horizonte horizontales -->
+                      <line x1="0" y1="180" x2="1200" y2="180" stroke="#00FFFF" stroke-width="1" opacity="0.3" />
+                      <line x1="0" y1="190" x2="1200" y2="190" stroke="#00FFFF" stroke-width="1" opacity="0.4" />
+                      <line x1="0" y1="200" x2="1200" y2="200" stroke="#00FFFF" stroke-width="1" opacity="0.5" />
+                      <line x1="0" y1="210" x2="1200" y2="210" stroke="#00FFFF" stroke-width="1" opacity="0.6" />
+                      <line x1="0" y1="220" x2="1200" y2="220" stroke="#00FFFF" stroke-width="1" opacity="0.7" />
+                      <line x1="0" y1="230" x2="1200" y2="230" stroke="#00FFFF" stroke-width="1" opacity="0.8" />
+                      <line x1="0" y1="240" x2="1200" y2="240" stroke="#00FFFF" stroke-width="1" opacity="0.9" />
+                      <line x1="0" y1="250" x2="1200" y2="250" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="0" y1="260" x2="1200" y2="260" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="0" y1="270" x2="1200" y2="270" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="0" y1="280" x2="1200" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      
+                      <!-- Líneas de perspectiva verticales -->
+                      <line x1="100" y1="180" x2="100" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="200" y1="180" x2="200" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="300" y1="180" x2="300" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="400" y1="180" x2="400" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="500" y1="180" x2="500" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="600" y1="180" x2="600" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="700" y1="180" x2="700" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="800" y1="180" x2="800" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="900" y1="180" x2="900" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="1000" y1="180" x2="1000" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <line x1="1100" y1="180" x2="1100" y2="280" stroke="#00FFFF" stroke-width="1" />
+                    </g>
+                    
+                    <!-- Edificios pixelados de ciudad ciberpunk -->
+                    <g id="cyberBuildings">
+                      <!-- Edificio 1 -->
+                      <rect x="50" y="40" width="40" height="140" fill="#290066" />
+                      <rect x="55" y="45" width="30" height="10" fill="#FF00FF" opacity="0.7" />
+                      <rect x="55" y="60" width="30" height="10" fill="#00FFFF" opacity="0.7" />
+                      <rect x="55" y="75" width="30" height="10" fill="#FF00FF" opacity="0.7" />
+                      <rect x="55" y="90" width="30" height="10" fill="#00FFFF" opacity="0.7" />
+                      <rect x="55" y="105" width="30" height="10" fill="#FF00FF" opacity="0.7" />
+                      <rect x="55" y="120" width="30" height="10" fill="#00FFFF" opacity="0.7" />
+                      <rect x="55" y="135" width="30" height="10" fill="#FF00FF" opacity="0.7" />
+                      <rect x="55" y="150" width="30" height="10" fill="#00FFFF" opacity="0.7" />
+                      <rect x="55" y="165" width="30" height="10" fill="#FF00FF" opacity="0.7" />
+                      
+                      <!-- Edificio 2 -->
+                      <rect x="120" y="80" width="60" height="100" fill="#290066" />
+                      <rect x="130" y="85" width="40" height="5" fill="#FF00FF" opacity="0.8" />
+                      <rect x="130" y="95" width="40" height="5" fill="#00FFFF" opacity="0.8" />
+                      <rect x="130" y="105" width="40" height="5" fill="#FF00FF" opacity="0.8" />
+                      <rect x="130" y="115" width="40" height="5" fill="#00FFFF" opacity="0.8" />
+                      <rect x="130" y="125" width="40" height="5" fill="#FF00FF" opacity="0.8" />
+                      <rect x="130" y="135" width="40" height="5" fill="#00FFFF" opacity="0.8" />
+                      <rect x="130" y="145" width="40" height="5" fill="#FF00FF" opacity="0.8" />
+                      <rect x="130" y="155" width="40" height="5" fill="#00FFFF" opacity="0.8" />
+                      <rect x="130" y="165" width="40" height="5" fill="#FF00FF" opacity="0.8" />
+                      <rect x="130" y="175" width="40" height="5" fill="#00FFFF" opacity="0.8" />
+                      
+                      <!-- Edificio 3 - Torre alta -->
+                      <rect x="220" y="20" width="30" height="160" fill="#290066" />
+                      <rect x="225" y="25" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="35" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="45" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="55" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="65" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="75" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="85" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="95" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="105" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="115" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="125" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="135" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="145" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="155" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="225" y="165" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="225" y="175" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      
+                      <!-- Edificio 4 -->
+                      <rect x="280" y="60" width="50" height="120" fill="#290066" />
+                      <rect x="285" y="65" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="285" y="78" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="285" y="91" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="285" y="104" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="285" y="117" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="285" y="130" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="285" y="143" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="285" y="156" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="285" y="169" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      
+                      <!-- Edificio 5 -->
+                      <rect x="360" y="40" width="35" height="140" fill="#290066" />
+                      <rect x="365" y="45" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="365" y="57" width="25" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="365" y="69" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="365" y="81" width="25" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="365" y="93" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="365" y="105" width="25" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="365" y="117" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="365" y="129" width="25" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="365" y="141" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="365" y="153" width="25" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="365" y="165" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      
+                      <!-- Edificio 6 - Torre grande -->
+                      <rect x="430" y="10" width="70" height="170" fill="#290066" />
+                      <rect x="440" y="20" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="31" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="42" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="53" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="64" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="75" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="86" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="97" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="108" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="119" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="130" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="141" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="152" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="440" y="163" width="50" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="440" y="174" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      
+                      <!-- Edificios adicionales a la derecha -->
+                      <rect x="530" y="50" width="45" height="130" fill="#290066" />
+                      <rect x="535" y="55" width="35" height="6" fill="#FF00FF" opacity="0.9" />
+                      <rect x="535" y="66" width="35" height="6" fill="#00FFFF" opacity="0.9" />
+                      <rect x="535" y="77" width="35" height="6" fill="#FF00FF" opacity="0.9" />
+                      <rect x="535" y="88" width="35" height="6" fill="#00FFFF" opacity="0.9" />
+                      <rect x="535" y="99" width="35" height="6" fill="#FF00FF" opacity="0.9" />
+                      <rect x="535" y="110" width="35" height="6" fill="#00FFFF" opacity="0.9" />
+                      <rect x="535" y="121" width="35" height="6" fill="#FF00FF" opacity="0.9" />
+                      <rect x="535" y="132" width="35" height="6" fill="#00FFFF" opacity="0.9" />
+                      <rect x="535" y="143" width="35" height="6" fill="#FF00FF" opacity="0.9" />
+                      <rect x="535" y="154" width="35" height="6" fill="#00FFFF" opacity="0.9" />
+                      <rect x="535" y="165" width="35" height="6" fill="#FF00FF" opacity="0.9" />
+                      
+                      <rect x="610" y="30" width="60" height="150" fill="#290066" />
+                      <rect x="620" y="40" width="40" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="620" y="52" width="40" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="620" y="64" width="40" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="620" y="76" width="40" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="620" y="88" width="40" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="620" y="100" width="40" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="620" y="112" width="40" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="620" y="124" width="40" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="620" y="136" width="40" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="620" y="148" width="40" height="7" fill="#FF00FF" opacity="0.8" />
+                      <rect x="620" y="160" width="40" height="7" fill="#00FFFF" opacity="0.8" />
+                      <rect x="620" y="172" width="40" height="7" fill="#FF00FF" opacity="0.8" />
+                      
+                      <rect x="700" y="70" width="40" height="110" fill="#290066" />
+                      <rect x="705" y="75" width="30" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="705" y="86" width="30" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="705" y="97" width="30" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="705" y="108" width="30" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="705" y="119" width="30" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="705" y="130" width="30" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="705" y="141" width="30" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="705" y="152" width="30" height="6" fill="#00FFFF" opacity="0.7" />
+                      <rect x="705" y="163" width="30" height="6" fill="#FF00FF" opacity="0.7" />
+                      <rect x="705" y="174" width="30" height="6" fill="#00FFFF" opacity="0.7" />
+                      
+                      <rect x="770" y="50" width="55" height="130" fill="#290066" />
+                      <rect x="780" y="55" width="35" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="780" y="68" width="35" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="780" y="81" width="35" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="780" y="94" width="35" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="780" y="107" width="35" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="780" y="120" width="35" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="780" y="133" width="35" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="780" y="146" width="35" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="780" y="159" width="35" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="780" y="172" width="35" height="8" fill="#FF00FF" opacity="0.8" />
+                      
+                      <rect x="850" y="20" width="30" height="160" fill="#290066" />
+                      <rect x="855" y="25" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="35" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="45" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="55" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="65" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="75" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="85" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="95" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="105" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="115" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="125" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="135" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="145" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="155" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      <rect x="855" y="165" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <rect x="855" y="175" width="20" height="5" fill="#00FFFF" opacity="0.9" />
+                      
+                      <rect x="910" y="40" width="65" height="140" fill="#290066" />
+                      <rect x="920" y="50" width="45" height="7" fill="#00FFFF" opacity="0.7" />
+                      <rect x="920" y="62" width="45" height="7" fill="#FF00FF" opacity="0.7" />
+                      <rect x="920" y="74" width="45" height="7" fill="#00FFFF" opacity="0.7" />
+                      <rect x="920" y="86" width="45" height="7" fill="#FF00FF" opacity="0.7" />
+                      <rect x="920" y="98" width="45" height="7" fill="#00FFFF" opacity="0.7" />
+                      <rect x="920" y="110" width="45" height="7" fill="#FF00FF" opacity="0.7" />
+                      <rect x="920" y="122" width="45" height="7" fill="#00FFFF" opacity="0.7" />
+                      <rect x="920" y="134" width="45" height="7" fill="#FF00FF" opacity="0.7" />
+                      <rect x="920" y="146" width="45" height="7" fill="#00FFFF" opacity="0.7" />
+                      <rect x="920" y="158" width="45" height="7" fill="#FF00FF" opacity="0.7" />
+                      <rect x="920" y="170" width="45" height="7" fill="#00FFFF" opacity="0.7" />
+                      
+                      <rect x="1000" y="60" width="40" height="120" fill="#290066" />
+                      <rect x="1005" y="65" width="30" height="6" fill="#FF00FF" opacity="0.8" />
+                      <rect x="1005" y="76" width="30" height="6" fill="#00FFFF" opacity="0.8" />
+                      <rect x="1005" y="87" width="30" height="6" fill="#FF00FF" opacity="0.8" />
+                      <rect x="1005" y="98" width="30" height="6" fill="#00FFFF" opacity="0.8" />
+                      <rect x="1005" y="109" width="30" height="6" fill="#FF00FF" opacity="0.8" />
+                      <rect x="1005" y="120" width="30" height="6" fill="#00FFFF" opacity="0.8" />
+                      <rect x="1005" y="131" width="30" height="6" fill="#FF00FF" opacity="0.8" />
+                      <rect x="1005" y="142" width="30" height="6" fill="#00FFFF" opacity="0.8" />
+                      <rect x="1005" y="153" width="30" height="6" fill="#FF00FF" opacity="0.8" />
+                      <rect x="1005" y="164" width="30" height="6" fill="#00FFFF" opacity="0.8" />
+                      <rect x="1005" y="175" width="30" height="6" fill="#FF00FF" opacity="0.8" />
+                      
+                      <rect x="1070" y="30" width="50" height="150" fill="#290066" />
+                      <rect x="1080" y="40" width="30" height="7" fill="#00FFFF" opacity="0.9" />
+                      <rect x="1080" y="52" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                      <rect x="1080" y="64" width="30" height="7" fill="#00FFFF" opacity="0.9" />
+                      <rect x="1080" y="76" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                      <rect x="1080" y="88" width="30" height="7" fill="#00FFFF" opacity="0.9" />
+                      <rect x="1080" y="100" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                      <rect x="1080" y="112" width="30" height="7" fill="#00FFFF" opacity="0.9" />
+                      <rect x="1080" y="124" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                      <rect x="1080" y="136" width="30" height="7" fill="#00FFFF" opacity="0.9" />
+                      <rect x="1080" y="148" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                      <rect x="1080" y="160" width="30" height="7" fill="#00FFFF" opacity="0.9" />
+                      <rect x="1080" y="172" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                    </g>
+                    
+                    <!-- Elementos ciberpunk adicionales -->
+                    
+                    <!-- Círculos tecnológicos en esquina superior -->
+                    <circle cx="1100" cy="40" r="20" fill="#FF00FF" opacity="0.6" />
+                    <circle cx="1100" cy="40" r="15" fill="#00FFFF" opacity="0.6" />
+                    <circle cx="1100" cy="40" r="10" fill="#290066" opacity="0.9" />
+                    <circle cx="1100" cy="40" r="5" fill="#00FFFF" opacity="0.7" />
+                    
+                    <!-- Líneas de circuito simuladas -->
+                    <path d="M20,20 L50,20 L50,40 L80,40 L80,30 L120,30" stroke="#00FFFF" stroke-width="2" fill="none" opacity="0.7" />
+                    <path d="M20,50 L40,50 L40,70 L60,70 L60,90 L100,90" stroke="#FF00FF" stroke-width="2" fill="none" opacity="0.7" />
+                    <path d="M1100,120 L1130,120 L1130,140 L1160,140 L1160,170 L1180,170" stroke="#00FFFF" stroke-width="2" fill="none" opacity="0.7" />
+                    <path d="M1080,90 L1100,90 L1100,70 L1140,70 L1140,40 L1160,40" stroke="#FF00FF" stroke-width="2" fill="none" opacity="0.7" />
+                    
+                    <!-- Píxeles brillantes dispersos (como estrellas ciberpunk) -->
+                    <g id="brightPixels">
+                      <rect x="30" y="30" width="3" height="3" fill="#00FFFF" />
+                      <rect x="130" y="20" width="3" height="3" fill="#FF00FF" />
+                      <rect x="200" y="15" width="3" height="3" fill="#00FFFF" />
+                      <rect x="350" y="25" width="3" height="3" fill="#FF00FF" />
+                      <rect x="450" y="18" width="3" height="3" fill="#00FFFF" />
+                      <rect x="550" y="22" width="3" height="3" fill="#FF00FF" />
+                      <rect x="650" y="16" width="3" height="3" fill="#00FFFF" />
+                      <rect x="750" y="24" width="3" height="3" fill="#FF00FF" />
+                      <rect x="850" y="14" width="3" height="3" fill="#00FFFF" />
+                      <rect x="950" y="28" width="3" height="3" fill="#FF00FF" />
+                      <rect x="1050" y="19" width="3" height="3" fill="#00FFFF" />
+                      <rect x="1150" y="23" width="3" height="3" fill="#FF00FF" />
+                      <rect x="80" y="40" width="3" height="3" fill="#00FFFF" />
+                      <rect x="180" y="35" width="3" height="3" fill="#FF00FF" />
+                      <rect x="280" y="45" width="3" height="3" fill="#00FFFF" />
+                      <rect x="380" y="38" width="3" height="3" fill="#FF00FF" />
+                      <rect x="480" y="42" width="3" height="3" fill="#00FFFF" />
+                      <rect x="580" y="36" width="3" height="3" fill="#FF00FF" />
+                      <rect x="680" y="44" width="3" height="3" fill="#00FFFF" />
+                      <rect x="780" y="37" width="3" height="3" fill="#FF00FF" />
+                      <rect x="880" y="41" width="3" height="3" fill="#00FFFF" />
+                      <rect x="980" y="34" width="3" height="3" fill="#FF00FF" />
+                      <rect x="1080" y="43" width="3" height="3" fill="#00FFFF" />
+                    </g>
+                    
+<!-- Texto de título ciberpunk -->
+<text x="600" y="145" font-family="Arial, sans-serif" font-size="45" fill="#00FFFF" text-anchor="middle" dominant-baseline="middle">PETCHAN</text>
+  
+<!-- Resplandor para el texto -->
+<filter id="glow">
+  <feGaussianBlur stdDeviation="2.5" result="blur" />
+  <feMerge>
+    <feMergeNode in="blur" />
+    <feMergeNode in="SourceGraphic" />
+  </feMerge>
+</filter>
+
+<!-- Aplicando el resplandor al texto duplicado -->
+<text x="600" y="145" font-family="Arial, sans-serif" font-size="45" fill="#00FFFF" text-anchor="middle" dominant-baseline="middle" filter="url(#glow)">PETCHAN</text>
+
+                    <!-- Luna digital -->
+                    <circle cx="900" cy="70" r="25" fill="#290066" />
+                    <circle cx="900" cy="70" r="20" fill="#1C0B36" />
+                    <circle cx="890" cy="65" r="3" fill="#00FFFF" opacity="0.7" />
+                    <circle cx="910" cy="60" r="2" fill="#00FFFF" opacity="0.5" />
+                    <circle cx="905" cy="80" r="4" fill="#00FFFF" opacity="0.6" />
+                    
+                    <!-- Líneas diagonales adicionales -->
+                    <line x1="0" y1="180" x2="100" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                    <line x1="200" y1="180" x2="300" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                    <line x1="400" y1="180" x2="500" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                    <line x1="600" y1="180" x2="700" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                    <line x1="800" y1="180" x2="900" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                    <line x1="1000" y1="180" x2="1100" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                  </svg>
+            </div>
+            <div class="community-banner-overlay"></div>
+            <div class="community-tags-banner">
+                <span class="community-tag category">Pets</span>
+                <span class="community-tag subcategory">Foros</span>
+                <span class="community-tag subcategory-extra">Comunidad</span>
+            </div>
+            <div class="community-info">
+                <h1>Bienvenido a Pet-Foros</h1>
+                <div class="community-stats">
+                    <span><i class="fas fa-users"></i> <span id="total-users">1,238</span> miembros</span>
+                    <span><i class="fas fa-comments"></i> <span id="total-posts">3,542</span> publicaciones</span>
+                </div>
+                <a href="/comunidades" class="btn-join-community">Unirse a una comunidad</a>
+            </div>
+        </div>
+        
+        <div class="community-details">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h3><i class="fas fa-info-circle"></i> Descripción y Reglas</h3>
+                <i class="fas fa-chevron-down accordion-icon"></i>
+            </div>
+        
+            <div class="accordion-content" style="display: none;">
+                <div class="community-section">
+                    <p id="main-forum-description">Pet-Chan es una comunidad dedicada a crear recuerdos, momentos y experiencias inolvidables junto a tus mascotas. Aquí podrás compartir tus vivencias, buscar consejos y conocer a personas con la misma pasión por los animales.</p>
+                </div>
+                <div class="community-section">
+                    <h4><i class="fas fa-gavel"></i> Reglas</h4>
+                    <div id="main-forum-rules">
+                        <ol style="color: #333; line-height: 1.5; font-size: 1rem; padding-left: 20px; margin-top: 0;">
+                            <li>Tratar a todos los miembros con respeto y amabilidad</li>
+                            <li>No se permite contenido ofensivo o discriminatorio</li>
+                            <li>No compartir información personal sin consentimiento</li>
+                            <li>Las imágenes de mascotas deben ser apropiadas para todos los públicos</li>
+                            <li>No hacer spam o publicidad no relacionada con la comunidad</li>
+                            <li>Respetar la propiedad intelectual de los demás usuarios</li>
+                            <li>Publicar en las categorías adecuadas para mantener el orden</li>
+                            <li>No realizar acusaciones sin fundamento contra otros miembros</li>
+                            <li>Mantener un lenguaje apropiado en todas las publicaciones</li>
+                            <li>Los moderadores tienen la última palabra en caso de conflictos</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Header section (shown only in community view) -->
+    <div class="community-header" id="community-header" style="display: none;">
+        <div class="community-banner">
+            <div class="community-banner-image" id="community-banner-image"></div>
+            <div class="community-banner-overlay"></div>
+            <div class="community-tags-banner" id="community-tags-banner">
+                <span id="community-category" class="community-tag category"></span>
+                <span id="community-subcategory" class="community-tag subcategory"></span>
+                <span id="community-subcategory-extra" class="community-tag subcategory-extra"></span>
+            </div>
+            <div class="community-info">
+                <h1 id="community-title"></h1>
+                <div class="community-stats">
+                    <span><i class="fas fa-users"></i> <span id="community-members">0</span> miembros</span>
+                    <span><i class="fas fa-comments"></i> <span id="community-posts">0</span> publicaciones</span>
+                </div>
+                <button id="btn-join-community" class="btn-join-community">Unirse a la comunidad</button>
+            </div>
+        </div>
+        
+        <div class="community-details">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h3><i class="fas fa-info-circle"></i> Descripción y Reglas</h3>
+                <i class="fas fa-chevron-down accordion-icon"></i>
+            </div>
+        
+            <div class="accordion-content" style="display: none;">
+                <div class="community-section">
+                    <p id="community-description"></p>
+                </div>
+                <div class="community-section">
+                    <h4><i class="fas fa-gavel"></i> Reglas</h4>
+                    <div id="community-rules"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="top-sections-container">
             <section class="nuevo-mensaje-section">
                 <h2 id="form-title">Nuevo Mensaje</h2>
                 <div class="formulario-container">
-                <form action="/publicar" method="POST" id="mensaje-form" enctype="multipart/form-data">
-                    <input type="hidden" id="mensaje-id" name="id" value="">
-                    <div class="form-group author-field">
-                        <div class="field-label">Autor:</div>
-                        <div class="autor-display"><%= username %></div>
-                        <input type="hidden" id="autor" name="autor" value="<%= username %>">
-                    </div>
-                    <div class="form-group">
-                        <div class="field-label">Mensaje:</div>
-                        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
-                    </div>
+                    <!-- Place this in your mensaje-form -->
+                    <form action="/publicar" method="POST" id="mensaje-form" enctype="multipart/form-data">
+                        <input type="hidden" id="mensaje-id" name="id" value="">
+                        
+                        <!-- Add this for community context -->
+                        <% if (locals.comunidad_id) { %>
+                        <input type="hidden" name="comunidad_id" value="<%= comunidad_id %>">
+                        <% } %>
+                        
+                        <div class="form-group author-field">
+                            <div class="field-label">Autor:</div>
+                            <div class="autor-display"><%= username %></div>
+                            <input type="hidden" id="autor" name="autor" value="<%= username %>">
+                        </div>
+                        <div class="form-group">
+                            <div class="field-label">Mensaje:</div>
+                            <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+                        </div>
 
-                    <div class="categoria-container">
-                        <div class="form-group">
-                            <select id="etiqueta-comentario" name="etiqueta">
-                                <option value="">Seleccione categoría</option>
-                                <% etiquetasDisponibles.forEach(etiqueta => { %>
-                                    <option value="<%= etiqueta %>"><%= etiqueta %></option>
-                                <% }); %>
-                            </select>
+                        <div class="categoria-container">
+                            <div class="form-group">
+                                <select id="etiqueta-comentario" name="etiqueta">
+                                    <option value="">Seleccione categoría</option>
+                                    <% etiquetasDisponibles.forEach(etiqueta => { %>
+                                        <option value="<%= etiqueta %>"><%= etiqueta %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <select id="subcategoria-comentario" name="subcategoria">
+                                    <option value="">Seleccione subcategoría</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <select id="extrasubcategoria-comentario" name="extrasubcategoria">
+                                    <option value="">Seleccione subcategoría extra</option>
+                                </select>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <select id="subcategoria-comentario" name="subcategoria">
-                                <option value="">Seleccione subcategoría</option>
-                                <% Object.values(subetiquetasDisponibles).flat().forEach(subcategoria => { %>
-                                    <option value="<%= subcategoria %>"><%= subcategoria %></option>
-                                <% }); %>
-                            </select>
+                        <div class="form-group imagenes-input-container">
+                            <div id="drop-zone" class="drop-zone">
+                                <label for="imagenes-input" class="imagenes-input-label">
+                                    <i class="fas fa-images"></i> Seleccionar imágenes
+                                </label>
+                            </div>
+                            <input type="file" id="imagenes-input" name="imagenes" class="imagenes-input" accept="image/*" multiple>
+                            <div id="imagenes-preview-container"></div>
+                            <p class="hint-text">Máximo 9 imágenes por mensaje</p>
                         </div>
                         
-                        <div class="form-group">
-                            <select id="extrasubcategoria-comentario" name="extrasubcategoria">
-                                <option value="">Seleccione subcategoría extra</option>
-                                <% extrasubetiquetasDisponibles.forEach(extrasubcategoria => { %>
-                                    <option value="<%= extrasubcategoria %>"><%= extrasubcategoria %></option>
-                                <% }); %>
-                            </select>
+                        <div class="form-buttons">
+                            <button type="submit" id="submit-btn">Publicar</button>
+                            <button type="button" id="cancel-btn" class="cancel-message-btn">Cancelar</button>
                         </div>
-                    </div>
-                    
-                    <div class="form-group imagenes-input-container">
-                        <div id="drop-zone" class="drop-zone">
-                            <label for="imagenes-input" class="imagenes-input-label">
-                                <i class="fas fa-images"></i> Seleccionar imágenes
-                            </label>
-                        </div>
-                        <input type="file" id="imagenes-input" name="imagenes" class="imagenes-input" accept="image/*" multiple>
-                        <div id="imagenes-preview-container"></div>
-                        <p class="hint-text">Máximo 9 imágenes por mensaje</p>
-                    </div>
-                    
-                    <div class="form-buttons">
-                        <button type="submit" id="submit-btn">Publicar</button>
-                        <button type="button" id="cancel-btn" class="cancel-message-btn">Cancelar</button>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
             </section>
             
             <!-- Nuevo Comentario Section -->
@@ -114,287 +520,334 @@
             
             <section class="filtros-section">
                 <div class="filtros-container">
-                <div class="filtros-header">
-                    <div class="filtros-buttons">
-                        <button id="btn-orden" class="filtro-boton">Orden</button>
-                        <button id="btn-ranking" class="filtro-boton">Ranking</button>
-                        <button id="btn-tipo" class="filtro-boton">Tipo</button>
-                        <button id="btn-etiquetas" class="filtro-boton">Etiquetas</button>
-                        <button id="btn-subetiquetas" class="filtro-boton">Subetiquetas</button>
-                    </div>
-                    <div>
-                        <button id="aplicar-filtros" class="filtro-boton">Aplicar filtros</button>
-                        <button id="limpiar-filtros" class="filtro-boton">Limpiar filtros</button>
-                    </div>
-                </div>
-                
-                <form id="filter-form" action="/filtrar" method="GET">
-                    <!-- Orden Filters -->
-                    <div id="filtros-orden" class="filtros-expanded">
-                        <div class="filtros-grid">
-                            <% const ordenOpciones = [
-                                { id: 'recientes', valor: 'recientes', texto: 'Más recientes' },
-                                { id: 'antiguos', valor: 'antiguos', texto: 'Más antiguos' },
-                                { id: 'nuevos_24h', valor: 'nuevos_24h', texto: 'Nuevos (24h)' },
-                                { id: 'nuevos_semana', valor: 'nuevos_semana', texto: 'Nuevos (semana)' },
-                                { id: 'mas_valorados', valor: 'mas_valorados', texto: 'Mejor valorados' }
-                            ]; %>
-                            <% ordenOpciones.forEach(opcion => { %>
-                                <div class="filtro-item">
-                                    <input type="radio" id="<%= opcion.id %>" name="orden" value="<%= opcion.valor %>">
-                                    <label for="<%= opcion.id %>"><%= opcion.texto %></label>
-                                </div>
-                            <% }); %>
+                    <div class="filtros-header">
+                        <div class="filtros-buttons">
+                            <button id="btn-orden" class="filtro-boton">Orden</button>
+                            <button id="btn-ranking" class="filtro-boton">Ranking</button>
+                            <button id="btn-tipo" class="filtro-boton">Tipo</button>
+                            <button id="btn-etiquetas" class="filtro-boton">Etiquetas</button>
+                            <button id="btn-subetiquetas" class="filtro-boton">Subetiquetas</button>
+                            <button id="btn-comunidad" class="filtro-boton">Comunidad</button>
+                        </div>
+                        <div>
+                            <button id="aplicar-filtros" class="filtro-boton">Aplicar filtros</button>
+                            <button id="limpiar-filtros" class="filtro-boton">Limpiar filtros</button>
                         </div>
                     </div>
-                
-                    <!-- Ranking Filters -->
-                    <div id="filtros-ranking" class="filtros-expanded">
-                        <div class="filtros-grid">
-                            <% const rankingOpciones = [
-                                { id: 'todos_ranking', valor: 'todos', texto: 'Todos' },
-                                { id: 'populares', valor: 'populares', texto: 'Populares (+100 likes)' },
-                                { id: 'medios', valor: 'medios', texto: 'Medios (20-99 likes)' },
-                                { id: 'menos_populares', valor: 'menos_populares', texto: 'Menos populares (0-19)' }
-                            ]; %>
-                            <% rankingOpciones.forEach(opcion => { %>
-                                <div class="filtro-item">
-                                    <input type="radio" id="<%= opcion.id %>" name="ranking" value="<%= opcion.valor %>">
-                                    <label for="<%= opcion.id %>"><%= opcion.texto %></label>
-                                </div>
-                            <% }); %>
+                    
+                    <!-- Sección unificada de filtros de comunidad -->
+                    <div id="filtros-comunidad" class="filtros-expanded" style="display: none;">
+                        <h3>Filtrar por comunidad</h3>
+                        
+                        <!-- Opción para todas las comunidades -->
+                        <div class="filtro-item filtro-destacado">
+                            <input type="radio" id="comunidad-todas" name="comunidad_id" value="" 
+                                <%= (locals.filtros && (!filtros.comunidadId && !filtros.misComunidades)) ? 'checked' : '' %>>
+                            <label for="comunidad-todas">Todas las comunidades</label>
                         </div>
-                    </div>
-                
-                    <!-- Tipo Filters -->
-                    <div id="filtros-tipo" class="filtros-expanded">
-                        <div class="filtros-grid">
-                            <% const tipoOpciones = [
-                                { id: 'todos_tipo', valor: 'todos', texto: 'Todos los mensajes' },
-                                { id: 'mios', valor: 'mios', texto: 'Mis mensajes' },
-                            ]; %>
-                            <% tipoOpciones.forEach(opcion => { %>
-                                <div class="filtro-item">
-                                    <input type="radio" id="<%= opcion.id %>" name="tipo" value="<%= opcion.valor %>">
-                                    <label for="<%= opcion.id %>"><%= opcion.texto %></label>
-                                </div>
-                            <% }); %>
-                        </div>
-                    </div>
-                
-                    <!-- Etiquetas Filters -->
-                    <div id="filtros-etiquetas" class="filtros-expanded">
-                        <div class="filtros-grid">
-                            <% const etiquetasOpciones = [
-                            'Ninguna',
-                                'Videojuegos', 'Música', 'Cine', 'Tecnología', 
-                                'Literatura', 'Ciencia', 'Deportes', 'Moda', 'Gastronomía'
-                            ]; %>
-                            <% etiquetasOpciones.forEach(etiqueta => { %>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="<%= etiqueta.toLowerCase() %>" name="etiquetas" value="<%= etiqueta %>">
-                                    <label for="<%= etiqueta.toLowerCase() %>"><%= etiqueta %></label>
-                                </div>
-                            <% }); %>
-                        </div>
-                    </div>
-                
-                    <!-- Subetiquetas Filters -->
-                    <div id="filtros-subetiquetas" class="filtros-expanded">
-                        <div class="filtros-grid">
-                            <% const subetiquetasOpciones = {
-                                'Ninguna': ['Ninguna', 'Ninguna', 'Ninguna'],
-                                'Videojuegos': ['Minecraft', 'Terraria', 'Roblox'],
-                                'Música': ['Rock', 'Pop', 'Electrónica'],
-                                'Cine': ['Terror', 'Comedia', 'Acción'],
-                                'Tecnología': ['Smartphones', 'Laptops', 'Gadgets'],
-                                'Literatura': ['Novela', 'Poesía', 'Ensayo'],
-                                'Ciencia': ['Física', 'Biología', 'Astronomía'],
-                                'Deportes': ['Fútbol', 'Baloncesto', 'Tenis'],
-                                'Moda': ['Casual', 'Formal', 'Vintage'],
-                                'Gastronomía': ['Guatemalteca', 'Estadounidense', 'Japonesa']
-                            }; %>
-                            <% Object.entries(subetiquetasOpciones).forEach(([categoria, subetiquetas]) => { 
-                                subetiquetas.forEach(subetiqueta => { %>
+                        
+                        <div class="filtros-separator">Mis comunidades</div>
+                        
+                        <!-- Listado de comunidades del usuario -->
+                        <div id="mis-comunidades-container" class="filtros-grid">
+                            <% if (locals.userCommunities && userCommunities.length > 0) { %>
+                                <% userCommunities.forEach(comunidad => { %>
                                     <div class="filtro-item">
-                                        <input type="checkbox" 
-                                               id="<%= subetiqueta.toLowerCase() %>" 
-                                               name="subetiquetas-<%= categoria.toLowerCase() %>" 
-                                               value="<%= subetiqueta %>">
-                                        <label for="<%= subetiqueta.toLowerCase() %>"><%= subetiqueta %></label>
+                                        <input type="radio" id="comunidad-user-<%= comunidad.id %>" name="comunidad_id" value="<%= comunidad.id %>" 
+                                            <%= (locals.filtros && filtros.comunidadId == comunidad.id) ? 'checked' : '' %>>
+                                        <label for="comunidad-user-<%= comunidad.id %>"><%= comunidad.nombre %></label>
                                     </div>
-                                <% }); 
-                            }); %>
+                                <% }); %>
+                            <% } else { %>
+                                <p class="filtro-mensaje">No perteneces a ninguna comunidad todavía</p>
+                            <% } %>
+                        </div>
+                        
+                        <div class="filtros-separator">Todas las comunidades disponibles</div>
+                        
+                        <!-- Listado de todas las comunidades -->
+                        <div class="filtros-grid">
+                            <% if (locals.communities && communities.length > 0) { %>
+                                <% communities.forEach(comunidad => { %>
+                                    <div class="filtro-item">
+                                        <input type="radio" id="comunidad-global-<%= comunidad.id %>" name="comunidad_id" value="<%= comunidad.id %>" 
+                                            <%= (locals.filtros && filtros.comunidadId == comunidad.id && !filtros.misComunidades) ? 'checked' : '' %>>
+                                        <label for="comunidad-global-<%= comunidad.id %>"><%= comunidad.nombre %></label>
+                                    </div>
+                                <% }); %>
+                            <% } %>
                         </div>
                     </div>
-                </form>
-                </div>
-                
-                </section>
 
-                <section class="mensajes">
-                    <h2>Mensajes (<span id="contador"><%= mensajes.length %></span>)</h2>
-                    <div class="lista-mensajes">
-                        <% if (mensajes.length === 0) { %>
-                            <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
-                        <% } else { %>
-                            <% mensajes.forEach(mensaje => { %>
-                                <div class="mensaje" data-id="<%= mensaje.id %>" data-user-id="<%= mensaje.user_id %>">
-                                    <div class="mensaje-cabecera">
-                                        <span class="autor"><%= mensaje.autor %></span>
-                                        <div class="etiquetas-container">
-                                            <% if (mensaje.etiqueta) { %>
-                                                <span class="etiqueta principal" data-categoria="<%= mensaje.etiqueta %>">
-                                                    <%= mensaje.etiqueta %>
-                                                </span>
-                                            <% } %>
-                                            
-                                            <% if (mensaje.subcategoria) { %>
-                                                <span class="subetiqueta" 
-                                                    data-categoria="<%= mensaje.etiqueta %>"
-                                                    data-subcategoria="<%= mensaje.subcategoria %>">
-                                                    <i class="fas fa-tag"></i> 
-                                                    <%= mensaje.subcategoria %>
-                                                </span>
-                                            <% } %>
-                                            
-                                            <% if (mensaje.extrasubcategoria) { %>
-                                                <span class="subetiqueta extra" 
-                                                    data-categoria="<%= mensaje.etiqueta %>"
-                                                    data-extrasubcategoria="<%= mensaje.extrasubcategoria %>">
-                                                    <i class="fas fa-tags"></i> 
-                                                    <%= mensaje.extrasubcategoria %>
-                                                </span>
-                                            <% } %>
-                                        </div>
-                                        <div class="mensaje-acciones">
-                                            <% if (mensaje.autor === username) { %>
-                                                <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
-                                                <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
-                                            <% } %>
-                                            <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
-                                        </div>
-                                        
+                    <form id="filter-form" action="/filtrar" method="GET">
+                        <!-- Orden Filters -->
+                        <div id="filtros-orden" class="filtros-expanded">
+                            <div class="filtros-grid">
+                                <% const ordenOpciones = [
+                                    { id: 'recientes', valor: 'recientes', texto: 'Más recientes' },
+                                    { id: 'antiguos', valor: 'antiguos', texto: 'Más antiguos' },
+                                    { id: 'nuevos_24h', valor: 'nuevos_24h', texto: 'Nuevos (24h)' },
+                                    { id: 'nuevos_semana', valor: 'nuevos_semana', texto: 'Nuevos (semana)' },
+                                    { id: 'mas_valorados', valor: 'mas_valorados', texto: 'Mejor valorados' }
+                                ]; %>
+                                <% ordenOpciones.forEach(opcion => { %>
+                                    <div class="filtro-item">
+                                        <input type="radio" id="<%= opcion.id %>" name="orden" value="<%= opcion.valor %>">
+                                        <label for="<%= opcion.id %>"><%= opcion.texto %></label>
                                     </div>
-                                    
-                                    <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
-                                    
-                                    <% if (mensaje.imagenes && mensaje.imagenes.length > 0) { %>
-                                        <div class="mensaje-imagenes">
-                                            <% mensaje.imagenes.forEach(imagen => { %>
-                                                <div class="imagen-mensaje">
-                                                    <img src="<%= imagen.url %>" alt="Imagen adjunta">
-                                                </div>
-                                            <% }); %>
-                                        </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    
+                        <!-- Ranking Filters -->
+                        <div id="filtros-ranking" class="filtros-expanded">
+                            <div class="filtros-grid">
+                                <% const rankingOpciones = [
+                                    { id: 'todos_ranking', valor: 'todos', texto: 'Todos' },
+                                    { id: 'populares', valor: 'populares', texto: 'Populares (+100 likes)' },
+                                    { id: 'medios', valor: 'medios', texto: 'Medios (20-99 likes)' },
+                                    { id: 'menos_populares', valor: 'menos_populares', texto: 'Menos populares (0-19)' }
+                                ]; %>
+                                <% rankingOpciones.forEach(opcion => { %>
+                                    <div class="filtro-item">
+                                        <input type="radio" id="<%= opcion.id %>" name="ranking" value="<%= opcion.valor %>">
+                                        <label for="<%= opcion.id %>"><%= opcion.texto %></label>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    
+                        <!-- Tipo Filters -->
+                        <div id="filtros-tipo" class="filtros-expanded">
+                            <div class="filtros-grid">
+                                <% const tipoOpciones = [
+                                    { id: 'todos_tipo', valor: 'todos', texto: 'Todos los mensajes' },
+                                    { id: 'mios', valor: 'mios', texto: 'Mis mensajes' },
+                                ]; %>
+                                <% tipoOpciones.forEach(opcion => { %>
+                                    <div class="filtro-item">
+                                        <input type="radio" id="<%= opcion.id %>" name="tipo" value="<%= opcion.valor %>">
+                                        <label for="<%= opcion.id %>"><%= opcion.texto %></label>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    
+                        <!-- Etiquetas Filters -->
+                        <div id="filtros-etiquetas" class="filtros-expanded">
+                            <div class="filtros-grid">
+                                <% etiquetasDisponibles.forEach(etiqueta => { %>
+                                    <div class="filtro-item">
+                                        <input type="checkbox" id="filtro-<%= etiqueta.toLowerCase().replace(/\s+/g, '-') %>" name="etiquetas" value="<%= etiqueta %>">
+                                        <label for="filtro-<%= etiqueta.toLowerCase().replace(/\s+/g, '-') %>"><%= etiqueta %></label>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    
+                        <!-- Subetiquetas Filters - Cargado dinámicamente -->
+                        <div id="filtros-subetiquetas" class="filtros-expanded">
+                            <div class="filtros-grid" id="subetiquetas-grid">
+                                <!-- Se cargará dinámicamente con JS basado en las etiquetas seleccionadas -->
+                                <div class="filtro-item initial-option">
+                                    <input type="checkbox" id="filtro-ninguna-sub" name="subetiquetas" value="Ninguna">
+                                    <label for="filtro-ninguna-sub">Ninguna</label>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <!-- Extrasubetiquetas Filters - Añadido al filtro -->
+                        <div id="filtros-extrasubetiquetas" class="filtros-expanded">
+                            <div class="filtros-grid" id="extrasubetiquetas-grid">
+                                <!-- Se cargará dinámicamente con JS basado en las subetiquetas seleccionadas -->
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="filtro-ninguna-extra" name="extrasubetiquetas" value="Ninguna">
+                                    <label for="filtro-ninguna-extra">Ninguna</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="mensajes">
+                <h2>Mensajes (<span id="contador"><%= mensajes.length %></span>)</h2>
+                <div class="lista-mensajes">
+                    <% if (mensajes.length === 0) { %>
+                        <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
+                    <% } else { %>
+                        <% mensajes.forEach(mensaje => { %>
+                            <div class="mensaje" 
+                            data-id="<%= mensaje.id %>" 
+                            data-user-id="<%= mensaje.user_id %>" 
+                            data-comunidad-id="<%= mensaje.comunidad_id || '' %>">
+                            
+                            <div class="mensaje-cabecera">
+                                <!-- Dentro del div "mensaje-cabecera" después del nombre del autor -->
+                                <span class="autor"><%= mensaje.autor %></span>
+                                <!-- Sección de rangos (ahora muestra para cualquier mensaje) -->
+                                <div class="rangos-wrapper">
+                                    <div class="rango-item"><span class="rango-valor"><%= mensaje.rango1 || 'Ninguno' %></span></div>
+                                    <div class="rango-item"><span class="rango-valor"><%= mensaje.rango2 || 'Ninguno' %></span></div>
+                                    <div class="rango-item"><span class="rango-valor"><%= mensaje.rango3 || 'Ninguno' %></span></div>
+                                </div>
+                                <div class="etiquetas-container">
+                                    <% if (mensaje.etiqueta) { %>
+                                        <span class="etiqueta principal" data-categoria="<%= mensaje.etiqueta %>">
+                                            <i class="fas fa-tag"></i> 
+                                        </span>
+                                    <% } %>
+                                    <% if (mensaje.etiqueta) { %>
+                                        <span class="etiqueta principal" 
+                                            data-categoria="<%= mensaje.etiqueta %>"
+                                            data-extrasubcategoria="<%= mensaje.etiqueta %>">
+                                            <%= mensaje.extrasubcategoria %>
+                                        </span>
+                                    <% } %>
+                                    <% if (mensaje.subcategoria) { %>
+                                        <span class="subetiqueta" 
+                                            data-categoria="<%= mensaje.etiqueta %>"
+                                            data-subcategoria="<%= mensaje.subcategoria %>">
+                                            <%= mensaje.subcategoria %>
+                                        </span>
                                     <% } %>
                                     
-                                    <div class="mensaje-pie">
-                                        <span class="fecha"><%= mensaje.fechaStr %></span>
-                                        <div class="ranking-container" data-mensaje-id="<%= mensaje.id %>">
-                                            <button class="btn-votar upvote" data-valor="1">
-                                                &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
-                                            </button>
-                                            <span class="ranking-valor <%= mensaje.ranking < 0 ? 'negativo' : '' %>">
-                                                <%= mensaje.ranking %>
-                                            </span>
-                                            <button class="btn-votar downvote" data-valor="-1">
-                                                &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
-                                            </button>
-                                        </div>
-                                    </div>                                    
-                        
-                                    <!-- Sección de comentarios -->
-                                    <div class="comentarios-seccion">
-                                        <div class="comentarios-lista">
-                                            <% if (mensaje.comentarios && mensaje.comentarios.length > 0) { %>
-                                                <% mensaje.comentarios.forEach(comentario => { %>
-                                                    <div class="comentario" data-id="<%= comentario.id %>" data-user-id="<%= comentario.user_id %>">
-                                                        <div class="comentario-cabecera">
-                                                            <span class="comentario-autor"><%= comentario.autor %></span>
-                                                            <div class="comentario-acciones">
-                                                                <% if (comentario.autor === username) { %>
-                                                                    <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </button>
-                                                                    <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                <% } %>
-                                                            </div>
-                                                        </div>
-                                                        <div class="comentario-contenido"><%= comentario.comentario %></div>
-
-                                                        <!-- Images section remains unchanged -->
-                                                        <% if (comentario.imagenes && comentario.imagenes.length > 0) { %>
-                                                            <div class="comentario-imagenes">
-                                                                <% comentario.imagenes.forEach(imagen => { %>
-                                                                    <div class="imagen-comentario">
-                                                                        <img src="<%= imagen.url %>" alt="Imagen de comentario">
-                                                                    </div>
-                                                                <% }); %>
-                                                            </div>
-                                                        <% } %>
-
-                                                        <!-- New footer layout -->
-                                                        <div class="comentario-pie">
-                                                            <span class="comentario-fecha"><%= comentario.fechaStr %></span>
-                                                            <% if (comentario.autor === username) { %>
-                                                            <div class="comentario-botones">
-
-                                                            </div>
-                                                            <% } %>
-                                                        </div>
-                                                    </div>
-                                                <% }); %>
-                                            <% } %>
-                                        </div>
-                                        <div class="nuevo-comentario-container">
-                                            <form class="nuevo-comentario-form" data-mensaje-id="<%= mensaje.id %>">
-                                                <div class="form-group author-field">
-                                                    <div class="field-label">Autor:</div>
-                                                    <div class="autor-display"><%= username %></div>
-                                                    <input type="hidden" name="autor" value="<%= username %>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="field-label">Comentario:</div>
-                                                    <textarea 
-                                                        name="comentario" 
-                                                        placeholder="Escribe tu comentario" 
-                                                        required></textarea>
-                                                </div>
-                                                <div class="form-group imagenes-input-container">
-                                                    <div class="drop-zone-comentario">
-                                                        <label for="imagenes-comentario-<%= mensaje.id %>" class="imagenes-input-label">
-                                                            <i class="fas fa-images"></i> Seleccionar imágenes
-                                                        </label>
-                                                    </div>
-                                                    <input 
-                                                        type="file" 
-                                                        id="imagenes-comentario-<%= mensaje.id %>" 
-                                                        name="imagenes" 
-                                                        class="imagenes-input" 
-                                                        accept="image/*" 
-                                                        multiple>
-                                                    <div class="imagenes-preview-container"></div>
-                                                    <p class="hint-text">Máximo 4 imágenes por comentario</p>
-                                                </div>
-                                                <div class="form-actions">
-                                                    <button type="submit" class="btn-publicar">Publicar comentario</button>
-                                                    <button type="button" class="btn-cancelar">Cancelar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
+                                    <% if (mensaje.extrasubcategoria) { %>
+                                        <span class="subetiqueta extra" 
+                                            data-categoria="<%= mensaje.etiqueta %>"
+                                            data-extrasubcategoria="<%= mensaje.extrasubcategoria %>">
+                                            <%= mensaje.extrasubcategoria %>
+                                        </span>
+                                    <% } %>
                                 </div>
-                            <% }); %>
-                        <% } %>
-                    </div>
-                </section>
-                </div>
-                </div>
+                                <div class="mensaje-acciones">
+                                    <% if (mensaje.autor === username) { %>
+                                        <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                                    <% } %>
+                                    <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
+                            
+                            <% if (mensaje.imagenes && mensaje.imagenes.length > 0) { %>
+                                <div class="mensaje-imagenes">
+                                    <% mensaje.imagenes.forEach(imagen => { %>
+                                        <div class="imagen-mensaje">
+                                            <img src="<%= imagen.url %>" alt="Imagen adjunta">
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                            
+                            <div class="mensaje-pie">
+                                <span class="fecha"><%= mensaje.fechaStr %></span>
+                                <div class="ranking-container" data-mensaje-id="<%= mensaje.id %>">
+                                    <button class="btn-votar upvote" data-valor="1">
+                                        &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
+                                    </button>
+                                    <span class="ranking-valor <%= mensaje.ranking < 0 ? 'negativo' : '' %>">
+                                        <%= mensaje.ranking %>
+                                    </span>
+                                    <button class="btn-votar downvote" data-valor="-1">
+                                        &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
+                                    </button>
+                                </div>
+                            </div>                                    
                 
-                <!-- Modal para confirmar eliminación de mensaje -->
+                            <!-- Sección de comentarios -->
+                            <div class="comentarios-seccion">
+                                <div class="comentarios-lista">
+                                    <% if (mensaje.comentarios && mensaje.comentarios.length > 0) { %>
+                                        <% mensaje.comentarios.forEach(comentario => { %>
+                                            <div class="comentario" data-id="<%= comentario.id %>" data-user-id="<%= comentario.user_id %>">
+                                                <div class="comentario-cabecera">
+                                                    <span class="comentario-autor"><%= comentario.autor %></span>
+                                                    <div class="comentario-acciones">
+                                                        <% if (comentario.autor === username) { %>
+                                                            <button class="btn-editar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button class="btn-eliminar-comentario" data-id="<%= comentario.id %>" data-mensaje-id="<%= mensaje.id %>">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                                <div class="comentario-contenido"><%= comentario.comentario %></div>
+
+                                                <!-- Images section remains unchanged -->
+                                                <% if (comentario.imagenes && comentario.imagenes.length > 0) { %>
+                                                    <div class="comentario-imagenes">
+                                                        <% comentario.imagenes.forEach(imagen => { %>
+                                                            <div class="imagen-comentario">
+                                                                <img src="<%= imagen.url %>" alt="Imagen de comentario">
+                                                            </div>
+                                                        <% }); %>
+                                                    </div>
+                                                <% } %>
+
+                                                <!-- New footer layout -->
+                                                <div class="comentario-pie">
+                                                    <span class="comentario-fecha"><%= comentario.fechaStr %></span>
+                                                    <% if (comentario.autor === username) { %>
+                                                    <div class="comentario-botones">
+
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    <% } %>
+                                </div>
+                                <div class="nuevo-comentario-container">
+                                    <form class="nuevo-comentario-form" data-mensaje-id="<%= mensaje.id %>">
+                                        <div class="form-group author-field">
+                                            <div class="field-label">Autor:</div>
+                                            <div class="autor-display"><%= username %></div>
+                                            <input type="hidden" name="autor" value="<%= username %>">
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="field-label">Comentario:</div>
+                                            <textarea 
+                                                name="comentario" 
+                                                placeholder="Escribe tu comentario" 
+                                                required></textarea>
+                                        </div>
+                                        <div class="form-group imagenes-input-container">
+                                            <div class="drop-zone-comentario">
+                                                <label for="imagenes-comentario-<%= mensaje.id %>" class="imagenes-input-label">
+                                                    <i class="fas fa-images"></i> Seleccionar imágenes
+                                                </label>
+                                            </div>
+                                            <input 
+                                                type="file" 
+                                                id="imagenes-comentario-<%= mensaje.id %>" 
+                                                name="imagenes" 
+                                                class="imagenes-input" 
+                                                accept="image/*" 
+                                                multiple>
+                                            <div class="imagenes-preview-container"></div>
+                                            <p class="hint-text">Máximo 4 imágenes por comentario</p>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn-publicar">Publicar comentario</button>
+                                            <button type="button" class="btn-cancelar">Cancelar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </section>
+        </div>
+    </div>
+                
+<!-- Modal para confirmar eliminación de mensaje -->
 <div id="modal-confirmacion" class="modal">
     <div class="modal-contenido">
       <i class="fas fa-exclamation-triangle warning-icon"></i>

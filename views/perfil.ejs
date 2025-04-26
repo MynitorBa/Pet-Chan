@@ -6,12 +6,16 @@
     <div class="cabecera">
         <div class="info-usuario">
             <img src="./perfil de prueba.png" alt="Avatar de Usuario" class="avatar">
-            <div>
+            <div class="biografia-container">
                 <h1>★★ <%= usuario %> ★★</h1>
                 <h2>Bibliografia:</h2>
                 <p><%= descripcion %></p>
-                <p>⊱ Membrecía desde: <span> 2024 </span> ⊰</p>
-                <p>✧ Numero de publicaciones: <span>1,337</span> | Reputación: <span> Veterano </span> ✧</p>
+                <p>⊱ Membrecía desde: <span> 2024 </span></p>
+                <p>✧ Numero de publicaciones: <span>1,337</span></p>
+                <h2>Rangos:</h2>
+                <div class="rango-item"><span class="rango-etiqueta">✩ Rango Principal:</span> <span class="rango-valor"><%= rango1 %></span></div>
+                <div class="rango-item"><span class="rango-etiqueta">✩ Rango Secundario:</span> <span class="rango-valor"><%= rango2 %></span></div>
+                <div class="rango-item"><span class="rango-etiqueta">✩ Rango Especial:</span> <span class="rango-valor"><%= rango3 %></span></div>
             </div>
         </div>
     </div>
@@ -36,18 +40,14 @@
         
         <h2>★★ <span><%= mascotaNombre%></span> <span><%= pronombre%></span> <span><%= especieDeMascota%></span> ★★</h2>
         <div class="contenedor-mascota">
-
             
             <div class="ImagenCompletaContendor">
                 <img src="<%= rutaImagen %>" alt="Mascota Virtual" class="pixeleado imagen-mascota">
 
-
                 <% if (accesorios != null) { %>
-    
                     <% for (let i = 0; i < accesorios.length; i++) { %>
                         <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
                     <% } %>
-            
                 <% } %>
             </div>
 
@@ -76,6 +76,5 @@
         </div>
     </div>
 </div>
-
 
 <%- include("partials/footer.ejs") %>

@@ -10,9 +10,7 @@
         <div class="escenario-pasarela" id="escenario">
             <img src="<%= rutaImagen %>" alt="Tu mascota" class="mascota-preview pixeleado" id="mascota-preview">
             <!-- Los accesorios seleccionados se mostrarán aquí superpuestos a la mascota -->
-             
-
-         </div>
+        </div>
         
         <h3 class="titulo-pasarela">✧ Accesorios Disponibles ✧</h3>
         <div class="accesorios-disponibles">
@@ -24,7 +22,6 @@
             </div>
             <% } %>
             <% } %>
-
         </div>
     </div>
     
@@ -39,7 +36,6 @@
             
             <h2>○•○ Editar Perfil de <span><%= usuario %></span> ○•○</h2>
             
-
             <div class="previsualizacion-avatar">
                 <img src="https://th.bing.com/th/id/OIP.rIsI3TvodysyTi_2VOGK3gHaHa?rs=1&pid=ImgDetMain" alt="Avatar actual" class="avatar-actual">
                 <div class="info-usuario-container">
@@ -63,6 +59,68 @@
             <div class="Botones-accion">
                 <button type="button" class="Boton cancelar">⊱ Cancelar ⊰</button>
                 <button type="submit" class="Boton actualizar">★★ Actualizar Perfil ★★</button>
+            </div>
+        </form>
+        
+        <!-- Sección de Rangos de Usuario -->
+        <form action="/guardarRangos" id="form-rangos" class="seccion-form" method="post">
+            <div class="esquina-pixel esquina-pixel-si"></div>
+            <div class="esquina-pixel esquina-pixel-sd"></div>
+            <div class="esquina-pixel esquina-pixel-ii"></div>
+            <div class="esquina-pixel esquina-pixel-id"></div>
+            
+            <h2>✧ Mis Rangos ✧</h2>
+            
+            <div class="rangos-container">
+                <div class="rango-item">
+                    <label for="rango1">Rango Principal:</label>
+                    <select id="rango1" name="rango1">
+                        <option value="Ninguno" <%= userRangos && userRangos.rango1 === 'Ninguno' ? 'selected' : '' %>>Ninguno</option>
+                        <option value="Novato" <%= userRangos && userRangos.rango1 === 'Novato' ? 'selected' : '' %>>Novato</option>
+                        <option value="Aprendiz" <%= userRangos && userRangos.rango1 === 'Aprendiz' ? 'selected' : '' %>>Aprendiz</option>
+                        <option value="Experimentado" <%= userRangos && userRangos.rango1 === 'Experimentado' ? 'selected' : '' %>>Experimentado</option>
+                        <option value="Veterano" <%= userRangos && userRangos.rango1 === 'Veterano' ? 'selected' : '' %>>Veterano</option>
+                        <option value="Maestro" <%= userRangos && userRangos.rango1 === 'Maestro' ? 'selected' : '' %>>Maestro</option>
+                    </select>
+                </div>
+                
+                <div class="rango-item">
+                    <label for="rango2">Rango Secundario:</label>
+                    <select id="rango2" name="rango2">
+                        <option value="Ninguno" <%= userRangos && userRangos.rango2 === 'Ninguno' ? 'selected' : '' %>>Ninguno</option>
+                        <option value="Colaborador" <%= userRangos && userRangos.rango2 === 'Colaborador' ? 'selected' : '' %>>Colaborador</option>
+                        <option value="Artista" <%= userRangos && userRangos.rango2 === 'Artista' ? 'selected' : '' %>>Artista</option>
+                        <option value="Escritor" <%= userRangos && userRangos.rango2 === 'Escritor' ? 'selected' : '' %>>Escritor</option>
+                        <option value="Crítico" <%= userRangos && userRangos.rango2 === 'Crítico' ? 'selected' : '' %>>Crítico</option>
+                        <option value="Experto" <%= userRangos && userRangos.rango2 === 'Experto' ? 'selected' : '' %>>Experto</option>
+                    </select>
+                </div>
+                
+                <div class="rango-item">
+                    <label for="rango3">Rango Especial:</label>
+                    <select id="rango3" name="rango3">
+                        <option value="Ninguno" <%= userRangos && userRangos.rango3 === 'Ninguno' ? 'selected' : '' %>>Ninguno</option>
+                        <option value="Moderador" <%= userRangos && userRangos.rango3 === 'Moderador' ? 'selected' : '' %>>Moderador</option>
+                        <option value="Fundador" <%= userRangos && userRangos.rango3 === 'Fundador' ? 'selected' : '' %>>Fundador</option>
+                        <option value="VIP" <%= userRangos && userRangos.rango3 === 'VIP' ? 'selected' : '' %>>VIP</option>
+                        <option value="Administrador" <%= userRangos && userRangos.rango3 === 'Administrador' ? 'selected' : '' %>>Administrador</option>
+                        <option value="Premium" <%= userRangos && userRangos.rango3 === 'Premium' ? 'selected' : '' %>>Premium</option>
+                    </select>
+                </div>
+                
+                <div class="rangos-preview">
+                    <h4>Vista previa:</h4>
+                    <div class="rangos-usuario-preview">
+                        <span class="rango-usuario rango-1" id="preview-rango1"><%= userRangos ? userRangos.rango1 !== 'Ninguno' ? userRangos.rango1 : '' : '' %></span>
+                        <span class="rango-usuario rango-2" id="preview-rango2"><%= userRangos ? userRangos.rango2 !== 'Ninguno' ? userRangos.rango2 : '' : '' %></span>
+                        <span class="rango-usuario rango-3" id="preview-rango3"><%= userRangos ? userRangos.rango3 !== 'Ninguno' ? userRangos.rango3 : '' : '' %></span>
+                    </div>
+                </div>
+                
+                <div class="Botones-accion">
+                    <button type="button" class="Boton cancelar">⊱ Cancelar ⊰</button>
+                    <button type="submit" class="Boton actualizar">★★ Guardar Rangos ★★</button>
+                </div>
             </div>
         </form>
         
@@ -129,6 +187,5 @@
     const accesoriosActivos = <%- JSON.stringify(accesorios || []) %>;
 </script>
 <script src="scripts/perfil_personalizado.js"></script>
-
 
 <%- include("partials/footer.ejs") %>

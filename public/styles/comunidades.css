@@ -1,0 +1,1461 @@
+/* Estilos generales y reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base y estructura principal */
+.contenedor-principal {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Panel lateral */
+.panel-lateral {
+    background-color: #0b0033;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    height: 100%;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 20px;
+}
+
+.btn-crear-comunidad, .btn-admin-categoria {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    background-color: #00b2ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.btn-crear-comunidad:hover, .btn-admin-categoria:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.btn-crear-comunidad i, .btn-admin-categoria i {
+    margin-right: 8px;
+}
+
+.btn-admin-categoria {
+    background-color: #6f42ff;
+}
+
+.seccion {
+    margin-bottom: 30px;
+}
+
+.seccion h2 {
+    border-bottom: 2px solid #3d0099;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    color: #00eaff;
+    font-size: 20px;
+}
+
+.lista-destacados {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-destacados li {
+    padding: 10px 0;
+    border-bottom: 1px solid #3d0099;
+    color: #b8c5ff;
+}
+
+.lista-destacados li a {
+    color: #b8c5ff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: block;
+    padding: 5px 0;
+}
+
+.lista-destacados li a:hover {
+    color: #00eaff;
+}
+
+/* Panel principal de comunidades */
+.panel-comunidades {
+    background-color: #1a0059;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    color: #ffffff;
+}
+
+/* Pestañas */
+.pestanas {
+    display: flex;
+    border-bottom: 2px solid #3d0099;
+    margin-bottom: 25px;
+}
+
+.pestana {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    color: #b8c5ff;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-right: 5px;
+}
+
+.pestana.activa {
+    border-bottom-color: #00eaff;
+    color: #00eaff;
+    font-weight: 600;
+}
+
+.pestana:hover:not(.activa) {
+    color: #ffffff;
+    border-bottom-color: rgba(0, 234, 255, 0.3);
+}
+
+/* Filtros */
+.filtro-grupo {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#filtro-categoria, #filtro-subcategoria, #buscar-comunidad {
+    padding: 12px;
+    border: 1px solid #3d0099;
+    border-radius: 8px;
+    background-color: #0b0033;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+#filtro-categoria, #filtro-subcategoria {
+    flex: 1;
+    min-width: 150px;
+}
+
+#buscar-comunidad {
+    flex: 2;
+    min-width: 200px;
+}
+
+/* Contenido de pestañas */
+.contenido-pestana {
+    padding: 10px 0;
+}
+
+.contenido-pestana.oculto {
+    display: none;
+}
+
+/* Lista de comunidades */
+.lista-comunidades {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Cambiar la estructura de la tarjeta para la nueva organización */
+.tarjeta-comunidad {
+    border: 1px solid #3d0099;
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    background-color: #2a0080;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    width: 100%;
+    height: 250px; /* Altura fija para todas las tarjetas */
+    overflow: hidden;
+}
+
+.tarjeta-comunidad:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(83, 0, 236, 0.4);
+}
+
+.tarjeta-comunidad-imagen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.15;
+}
+
+.tarjeta-comunidad-contenido {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tarjeta-comunidad-encabezado {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.tarjeta-comunidad h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #00eaff;
+    font-weight: 600;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Reorganizar las etiquetas para que aparezcan antes del botón */
+.tarjeta-comunidad-etiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: auto;
+    margin-bottom: 10px;
+}
+
+.tarjeta-comunidad p {
+    color: #b8c5ff;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 15px;
+    flex-grow: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.categoria, .subcategoria, .subcategoria-extra {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #ffffff;
+    margin-right: 5px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.categoria {
+    background-color: #4a00b3;
+}
+
+.subcategoria {
+    background-color: #6f42ff;
+}
+
+.subcategoria-extra {
+    background-color: #00b2ff;
+}
+
+.categoria i, .subcategoria i, .subcategoria-extra i {
+    margin-right: 3px;
+    font-size: 9px;
+}
+
+.tarjeta-comunidad {
+    position: relative; /* Necesario para posicionar elementos absolutos dentro */
+}
+
+.tarjeta-comunidad .privacidad {
+    position: absolute;
+    top: 10px;
+    right: 0; /* Siempre alineado a la derecha */
+    background-color: #00ccff;
+    color: #0b0033;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 2;
+}
+
+.tarjeta-comunidad .privacidad i {
+    font-size: 10px;
+}
+
+/* En pantallas medianas (tablets), mantenemos la alineación a la derecha */
+@media (max-width: 768px) {
+    .tarjeta-comunidad .privacidad {
+        right: 0;
+    }
+}
+
+/* En móviles pequeños también se mantiene alineado a la derecha */
+@media (max-width: 480px) {
+    .tarjeta-comunidad .privacidad {
+        right: 0;
+    }
+}
+
+
+
+.miembro {
+    background-color: #6f42ff;
+}
+
+.miembro:hover {
+    background-color: #5a35d9;
+}
+
+/* Modal de creación */
+.formulario-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(11, 0, 51, 0.9);
+    overflow-y: auto;
+    backdrop-filter: blur(4px);
+}
+
+.contenido-modal {
+    background-color: #1a0059;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 800px;
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.cerrar-modal {
+    color: #00eaff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.cerrar-modal:hover {
+    color: #00a6b7;
+}
+
+.contenido-modal h2 {
+    color: #00eaff;
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #3d0099;
+}
+
+.formulario-grupo {
+    margin-bottom: 20px;
+}
+
+.formulario-grupo label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #00eaff;
+}
+
+.formulario-grupo input,
+.formulario-grupo textarea,
+.formulario-grupo select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #3d0099;
+    border-radius: 8px;
+    background-color: #0b0033;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.formulario-grupo input:focus,
+.formulario-grupo textarea:focus,
+.formulario-grupo select:focus {
+    outline: none;
+    border-color: #00b2ff;
+    box-shadow: 0 0 0 2px rgba(0, 178, 255, 0.2);
+}
+
+.formulario-grupo textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.formulario-grupo input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+.formulario-grupo .hint-text {
+    font-size: 12px;
+    color: #b8c5ff;
+    margin-top: 5px;
+}
+
+.boton-formulario {
+    padding: 12px 20px;
+    background-color: #6f42ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    font-weight: 600;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.boton-formulario:hover {
+    background-color: #5a35d9;
+    transform: translateY(-2px);
+}
+
+/* Mensaje cuando no hay contenido */
+.tarjeta-comunidad p:only-child {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #b8c5ff;
+}
+
+/* Estilos responsivos */
+@media (max-width: 992px) {
+    .lista-comunidades {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .contenedor-principal {
+        grid-template-columns: 1fr;
+    }
+    
+    .panel-lateral {
+        position: static;
+        margin-bottom: 20px;
+    }
+    
+    .filtro-grupo {
+        flex-direction: column;
+    }
+    
+    .filtro-grupo > * {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .lista-comunidades {
+        grid-template-columns: 1fr;
+    }
+    
+    .tarjeta-comunidad {
+        height: 220px;
+    }
+}
+
+/* Estilos para las pestañas administrativas */
+.pestanas-admin {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3d0099;
+}
+
+.pestana-admin {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    color: #b8c5ff;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-right: 5px;
+}
+
+.pestana-admin.activa {
+    border-bottom-color: #00eaff;
+    color: #00eaff;
+    font-weight: 600;
+}
+
+.pestana-admin:hover:not(.activa) {
+    color: #ffffff;
+    border-bottom-color: rgba(0, 234, 255, 0.3);
+}
+
+/* Estilos para los paneles administrativos */
+.panel-admin {
+    display: block;
+}
+
+.panel-admin.oculto {
+    display: none;
+}
+
+/* Estilos para la lista de categorías */
+.lista-categorias {
+    margin-top: 20px;
+    border: 1px solid #3d0099;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #2a0080;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.lista-categorias h3 {
+    color: #00eaff;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.categoria-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #3d0099;
+    color: #b8c5ff;
+}
+
+.categoria-item:last-child {
+    border-bottom: none;
+}
+
+.categoria-acciones {
+    display: flex;
+    gap: 8px;
+}
+
+.-editar-categoria,
+.btn-eliminar-categoria,
+.btn-editar-subcategoria,
+.btn-eliminar-subcategoria {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-editar-categoria,
+.btn-editar-subcategoria {
+    color: #00b2ff;
+}
+
+.btn-eliminar-categoria,
+.btn-eliminar-subcategoria {
+    color: #ff3d6e;
+}
+
+.btn-editar-categoria:hover,
+.btn-editar-subcategoria:hover {
+    background-color: rgba(0, 178, 255, 0.1);
+}
+
+.btn-eliminar-categoria:hover,
+.btn-eliminar-subcategoria:hover {
+    background-color: rgba(255, 61, 110, 0.1);
+}
+
+/* Estilos para las notificaciones */
+.notificacion {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-20px);
+    z-index: 1000;
+    max-width: 300px;
+}
+
+.notificacion.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* Estilos mejorados para descripción y reglas */
+.descripcion-contenedor, .reglas-contenedor {
+    position: relative;
+    margin-bottom: 15px;
+    background: rgba(11, 0, 51, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.descripcion-titulo, .reglas-titulo {
+    color: #00eaff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    text-align: left; /* Asegurar que el título esté alineado a la izquierda */
+}
+
+.descripcion-texto, .reglas-texto {
+    color: #e0e5ff;
+    font-size: 14px;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    text-align: left; /* Alinear texto a la izquierda */
+    overflow-wrap: break-word; /* Asegurar que las palabras largas se rompan correctamente */
+}
+
+
+.reglas-texto {
+    white-space: pre-line;
+}
+
+
+.descripcion-texto {
+    white-space: pre-line;
+}
+
+
+/* Estado truncado - modificado para evitar perder texto */
+.descripcion-texto.truncado, .reglas-texto.truncado {
+    max-height: 72px;
+    overflow: hidden;
+    /* Mantener el texto visible sin desvanecerse por completo */
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+/* Eliminar el after que podría ocultar texto */
+.descripcion-texto.truncado::after, .reglas-texto.truncado::after {
+    display: none; /* Esto elimina el degradado que podría ocultar texto */
+}
+
+/* Ajuste para cuando está expandido */
+.descripcion-texto.expandido, .reglas-texto.expandido {
+    max-height: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+
+.notificacion.exito {
+    background-color: #4CAF50;
+    border-left: 5px solid #2E7D32;
+}
+
+.notificacion.error {
+    background-color: #F44336;
+    border-left: 5px solid #B71C1C;
+}
+
+.notificacion.info {
+    background-color: #2196F3;
+    border-left: 5px solid #0D47A1;
+}
+
+
+
+/* Botón "Ver más/Ver menos" mejorado */
+.btn-expandir {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #00b2ff 0%, #0062ff 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-expandir:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 178, 255, 0.3);
+}
+
+.btn-expandir i {
+    margin-left: 5px;
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.btn-expandir.activo i {
+    transform: rotate(180deg);
+}
+
+
+/* Cambia esto */
+.lista-comunidades:not(:has(> :only-child:not([data-id]))) .tarjeta-comunidad {
+    height: auto; /* Cambia de height fija a auto */
+    min-height: 420px; /* Establece una altura mínima */
+}
+
+/* Ajuste responsivo para la vista de "no hay comunidades" */
+@media (max-width: 576px) {
+    .lista-comunidades:has(> :only-child:not([data-id])) .tarjeta-comunidad {
+        min-height: 100px;
+    }
+}
+
+
+
+
+.btn-ver-foro {
+    position: relative;
+    z-index: 2;
+}
+
+.btn-ver-foro {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #00b2ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.btn-ver-foro:hover {
+    background-color: #0095d9;
+    transform: translateY(-2px);
+}
+
+/* Corregir el problema principal del header */
+@media (max-width: 768px) {
+    .contenedor-principal {
+        grid-template-columns: 1fr;
+        margin: 0;
+        padding: 10px;
+        width: 100%;
+        overflow-x: hidden; /* Evita el deslizamiento horizontal */
+    }
+    
+    /* Asegurar que el panel lateral no cause scroll horizontal */
+    .panel-lateral {
+        position: static;
+        width: 100%;
+        margin-bottom: 10px;
+        min-height: auto;
+        padding: 15px;
+    }
+    
+    /* Ajustes para el encabezado en móvil */
+    header, nav {
+        width: 100%;
+        padding: 0;
+    }
+    
+    /* Ajustes para los botones principales */
+    .btn-crear-comunidad, .btn-admin-categoria {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    /* Evitar que el contenido se desborde en móvil */
+    body {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+        position: relative;
+    }
+}
+
+/* Mejoras adicionales para dispositivos muy pequeños */
+@media (max-width: 480px) {
+    .contenedor-principal {
+        padding: 5px;
+    }
+    
+    .panel-comunidades {
+        padding: 15px;
+    }
+    
+    /* Hacer que las pestañas sean más compactas */
+    .pestana {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* Ajustes para las tarjetas de comunidad */
+    .tarjeta-comunidad {
+        height: auto !important; /* Forzar altura automática */
+        min-height: 200px;
+        padding: 15px;
+    }
+    
+    /* Reducir tamaño de la tipografía */
+    .tarjeta-comunidad h3 {
+        font-size: 16px;
+    }
+    
+    .tarjeta-comunidad p {
+        font-size: 13px;
+    }
+    
+    /* Evitar que la navbar se desplace */
+    nav, .pestanas {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        width: 100%;
+        display: flex;
+    }
+    
+    /* Ajustes para los filtros */
+    .filtro-grupo {
+        gap: 10px;
+    }
+    
+    #filtro-categoria, #filtro-subcategoria, #buscar-comunidad {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    /* Esconder el panel lateral para dispositivos muy pequeños por defecto */
+    .panel-lateral-toggle {
+        display: block;
+    }
+    
+    /* Estilo para botón que muestra/oculta el panel lateral */
+    .btn-toggle-panel {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        background-color: #0b0033;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+}
+
+
+/* ==================== BASE ==================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    font-family: sans-serif;
+}
+
+/* ==================== CONTENEDORES MÁS PEQUEÑOS ==================== */
+/* Contenedor principal más compacto */
+.contenedor-principal {
+    max-width: 960px; /* Reducido de 1200px */
+    margin: 15px auto;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 15px; /* Reducido de 20px */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Panel lateral más pequeño */
+.panel-lateral {
+    background-color: #0b0033;
+    border-radius: 10px;
+    padding: 15px; /* Reducido de 20px */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    height: 100%;
+    min-height: 350px; /* Reducido de 400px */
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 15px;
+}
+
+/* Panel de comunidades más compacto */
+.panel-comunidades {
+    background-color: #1a0059;
+    border-radius: 10px;
+    padding: 20px; /* Reducido de 25px */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    color: #ffffff;
+}
+
+/* Tarjetas más pequeñas */
+.tarjeta-comunidad {
+    border: 1px solid #3d0099;
+    border-radius: 10px; /* Reducido de 12px */
+    padding: 15px; /* Reducido de 20px */
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    background-color: #2a0080;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    width: 100%;
+    height: 220px; /* Reducido de 250px */
+    overflow: hidden;
+}
+
+/* ==================== BOTÓN TOGGLE RESPONSIVE ==================== */
+.btn-toggle-panel {
+    background: linear-gradient(135deg, #0508a9, #643f85);
+    border: none;
+    border-radius: 1.5rem;
+    color: #fff;
+    padding: 0.5rem 1rem; /* Reducido de 0.6rem 1.2rem */
+    font-size: 0.9rem; /* Reducido de 1rem */
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    max-width: 250px; /* Reducido de 300px */
+    margin: 0.8rem auto;
+}
+
+.btn-toggle-panel:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-toggle-panel i {
+    font-size: 1.1rem; /* Reducido de 1.2rem */
+}
+
+/* ==================== TARJETAS Y LISTA ==================== */
+.lista-comunidades {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Reducido de 300px */
+    gap: 15px; /* Reducido de 20px */
+}
+
+.lista-comunidades:not(:has(> :only-child:not([data-id]))) .tarjeta-comunidad {
+    height: auto;
+    min-height: 360px; /* Reducido de 420px */
+}
+
+@media (max-width: 576px) {
+    .lista-comunidades:has(> :only-child:not([data-id])) .tarjeta-comunidad {
+        min-height: 80px; /* Reducido de 100px */
+    }
+}
+
+/* ==================== FORO ==================== */
+.btn-ver-foro {
+    display: block;
+    width: 100%;
+    padding: 8px; /* Reducido de 10px */
+    background-color: #00b2ff;
+    color: white;
+    border: none;
+    border-radius: 6px; /* Reducido de 8px */
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px; /* Tamaño reducido */
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-ver-foro:hover {
+    background-color: #0095d9;
+    transform: translateY(-2px);
+}
+
+/* ==================== LAYOUT RESPONSIVO ==================== */
+.contenedor-principal,
+.panel-comunidades,
+.panel-lateral {
+    max-width: 100%;
+    width: 100%;
+    padding: 10px;
+}
+
+/* Para tablets y móviles */
+@media (max-width: 768px) {
+    .contenedor-principal {
+        grid-template-columns: 1fr;
+        margin: 8px; /* Reducido de 0 */
+        padding: 8px; /* Reducido de 10px */
+        width: calc(100% - 16px); /* Asegura margen en ambos lados */
+    }
+
+    .panel-lateral {
+        position: static;
+        width: 100%;
+        margin-bottom: 8px; /* Reducido de 10px */
+        min-height: auto;
+        padding: 12px; /* Reducido de 15px */
+    }
+
+    header, nav {
+        width: 100%;
+        padding: 0;
+    }
+
+    .btn-crear-comunidad, .btn-admin-categoria {
+        padding: 8px; /* Reducido de 10px */
+        font-size: 13px; /* Reducido de 14px */
+    }
+    
+    .lista-comunidades {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Reducido para móviles */
+    }
+}
+
+/* Para móviles pequeños */
+@media (max-width: 480px) {
+    .contenedor-principal {
+        padding: 5px;
+        margin: 5px; /* Asegura margen en ambos lados */
+        width: calc(100% - 10px);
+    }
+
+    .panel-comunidades {
+        padding: 8px; /* Reducido de 10px */
+    }
+
+    .pestana {
+        padding: 6px 10px; /* Reducido de 8px 12px */
+        font-size: 13px; /* Reducido de 14px */
+    }
+
+    .tarjeta-comunidad {
+        min-height: 180px; /* Reducido de 200px */
+        padding: 12px; /* Reducido de 15px */
+        height: auto !important;
+    }
+
+    .tarjeta-comunidad h3 {
+        font-size: 15px; /* Reducido de 16px */
+    }
+
+    .tarjeta-comunidad p {
+        font-size: 12px; /* Reducido de 13px */
+    }
+
+    nav, .pestanas {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        display: flex;
+    }
+
+    .filtro-grupo {
+        gap: 8px; /* Reducido de 10px */
+    }
+
+    #filtro-categoria, #filtro-subcategoria, #buscar-comunidad {
+        width: 100%;
+        padding: 8px; /* Reducido */
+        font-size: 13px; /* Reducido */
+    }
+
+    .panel-lateral-toggle {
+        display: block;
+    }
+    
+    /* Hacer la lista de una sola columna en móviles muy pequeños */
+    .lista-comunidades {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Ajuste para garantizar que no haya desbordamiento */
+.tarjeta-comunidad-contenido {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Mejora para reducir espacios en categorías y etiquetas */
+.categoria, .subcategoria, .subcategoria-extra {
+    padding: 2px 6px; /* Reducido de 3px 8px */
+    font-size: 10px; /* Reducido de 11px */
+    margin-right: 3px; /* Reducido de 5px */
+}
+
+/* Reducir tamaño de privacidad */
+.tarjeta-comunidad .privacidad {
+    padding: 2px 6px; /* Reducido de 3px 8px */
+    font-size: 10px; /* Reducido de 11px */
+    top: 8px; /* Reducido de 10px */
+    right: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estilos para los botones en el panel lateral */
+.btn-solicitudes,
+.btn-admin-solicitudes {
+    display: flex;
+    align-items: center;
+    background-color: #6f42ff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-solicitudes:hover,
+.btn-admin-solicitudes:hover {
+    background-color: #5a32d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-solicitudes i,
+.btn-admin-solicitudes i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Estilos para la lista de solicitudes */
+.lista-solicitudes,
+.lista-solicitudes-admin {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+.solicitud-item,
+.solicitud-admin-item {
+    background-color: #2a1a5e;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.solicitud-item:hover,
+.solicitud-admin-item:hover {
+    background-color: #352270;
+}
+
+.solicitud-item[data-status="pendiente"] {
+    border-left-color: #ffc107;
+}
+
+.solicitud-item[data-status="aceptada"] {
+    border-left-color: #28a745;
+}
+
+.solicitud-item[data-status="rechazada"] {
+    border-left-color: #dc3545;
+}
+
+.solicitud-info,
+.solicitud-admin-info {
+    flex: 1;
+}
+
+.solicitud-info h3,
+.solicitud-admin-header h3 {
+    color: #fff;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+}
+
+.estado-solicitud {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.estado-solicitud i {
+    margin-right: 5px;
+}
+
+.estado-solicitud.pendiente {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.estado-solicitud.aceptada {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.estado-solicitud.rechazada {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.fecha-solicitud,
+.fecha-respuesta {
+    font-size: 13px;
+    color: #a8a8a8;
+    margin: 4px 0;
+}
+
+.respuesta-contenedor,
+.mensaje-contenedor {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.respuesta-titulo,
+.mensaje-titulo {
+    font-weight: 500;
+    margin: 0 0 5px 0;
+    color: #b8b8b8;
+    font-size: 14px;
+}
+
+.respuesta-texto,
+.mensaje-texto {
+    margin: 0;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.btn-cancelar-solicitud,
+.btn-ver-comunidad,
+.btn-aceptar-solicitud,
+.btn-rechazar-solicitud {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn-cancelar-solicitud {
+    background-color: #6c757d;
+}
+
+.btn-ver-comunidad {
+    background-color: #6f42ff;
+}
+
+.btn-aceptar-solicitud {
+    background-color: #28a745;
+    margin-right: 10px;
+}
+
+.btn-rechazar-solicitud {
+    background-color: #dc3545;
+}
+
+.btn-cancelar-solicitud:hover,
+.btn-ver-comunidad:hover,
+.btn-aceptar-solicitud:hover,
+.btn-rechazar-solicitud:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.sin-solicitudes {
+    text-align: center;
+    color: #a8a8a8;
+    font-style: italic;
+    padding: 20px;
+}
+
+.acciones-solicitud {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.acciones-solicitud button i {
+    margin-right: 5px;
+}
+
+/* Selector de comunidad */
+.selector-comunidad {
+    margin-bottom: 15px;
+}
+
+.selector-comunidad label {
+    display: block;
+    margin-bottom: 5px;
+    color: #b8b8b8;
+}
+
+/* Formulario de respuesta */
+.formulario-respuesta {
+    margin-top: 10px;
+}
+
+.respuesta-textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #422d8f;
+    background-color: #1a103a;
+    color: #fff;
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.respuesta-textarea:focus {
+    outline: none;
+    border-color: #6f42ff;
+    box-shadow: 0 0 0 2px rgba(111, 66, 255, 0.25);
+}
+
+.solicitud-comunidad {
+    background-color: rgba(111, 66, 255, 0.2);
+    color: #9d86ff;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.solicitud-admin-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+/* Modal de comunidad privada */
+.modal-privada-contenido {
+    text-align: center;
+    padding: 10px;
+}
+
+.modal-privada-icono {
+    font-size: 48px;
+    color: #ffc107;
+    margin-bottom: 15px;
+}
+
+.botones-privada {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .acciones-solicitud {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-aceptar-solicitud {
+        margin-right: 0;
+    }
+}
+

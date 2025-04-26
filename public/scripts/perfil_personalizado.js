@@ -90,8 +90,6 @@ document.querySelectorAll('.accesorio').forEach(accesorio => {
             accesorioElement.style.scale = '4';
             accesorioElement.style.imageRendering = 'pixelated';
             accesorioElement.style.transform = 'translateX(-10%) translateY(50%)';
-
-            
             
             // Añadir el accesorio como hijo del escenario (no de la mascota)
             document.getElementById('escenario').appendChild(accesorioElement);
@@ -147,14 +145,11 @@ function animarAccesorios() {
             let left = mascotaX + mascotaRect.width / 2;
             let top = mascotaY;
             
-           
-            
             accesorio.style.left = `${left}px`;
             accesorio.style.top = `${top}px`;
             accesorio.style.transform = originalTransform;
         }
     });
-    
     
     requestAnimationFrame(animarAccesorios);
 }
@@ -172,13 +167,67 @@ window.addEventListener('DOMContentLoaded', () => {
             accesorioElem.click(); // Simula el clic para marcarlo como seleccionado y mostrarlo
         }
     });
+    
+    // Agregar funcionalidad para la vista previa de rangos
+    const rango1 = document.getElementById('rango1');
+    const rango2 = document.getElementById('rango2');
+    const rango3 = document.getElementById('rango3');
+    
+    const previewRango1 = document.getElementById('preview-rango1');
+    const previewRango2 = document.getElementById('preview-rango2');
+    const previewRango3 = document.getElementById('preview-rango3');
+    
+    function actualizarPreviewRangos() {
+        previewRango1.textContent = rango1.value !== 'Ninguno' ? rango1.value : '';
+        previewRango2.textContent = rango2.value !== 'Ninguno' ? rango2.value : '';
+        previewRango3.textContent = rango3.value !== 'Ninguno' ? rango3.value : '';
+        
+        // Aplicar clases específicas para los estilos
+        previewRango1.className = 'rango-usuario rango-1';
+        previewRango2.className = 'rango-usuario rango-2';
+        previewRango3.className = 'rango-usuario rango-3';
+        
+        if (rango1.value !== 'Ninguno') {
+            previewRango1.classList.add('rango-' + rango1.value.toLowerCase());
+        }
+        
+        if (rango2.value !== 'Ninguno') {
+            previewRango2.classList.add('rango-' + rango2.value.toLowerCase());
+        }
+        
+        if (rango3.value !== 'Ninguno') {
+            previewRango3.classList.add('rango-' + rango3.value.toLowerCase());
+        }
+    }
+    
+    // Eventos para actualizar la vista previa cuando cambian los rangos
+    rango1.addEventListener('change', actualizarPreviewRangos);
+    rango2.addEventListener('change', actualizarPreviewRangos);
+    rango3.addEventListener('change', actualizarPreviewRangos);
+    
+    // Inicializar la vista previa
+    actualizarPreviewRangos();
 });
 
 // Botones de cancelar
-document.querySelectorAll('.boton.cancelar').forEach(boton => {
+document.querySelectorAll('.Boton.cancelar').forEach(boton => {
     boton.addEventListener('click', function() {
         const form = this.closest('form');
         form.reset();
+        
+        // Si es el formulario de rangos, actualizar la vista previa
+        if (form.id === 'form-rangos') {
+            const rango1 = document.getElementById('rango1');
+            const rango2 = document.getElementById('rango2');
+            const rango3 = document.getElementById('rango3');
+            
+            const previewRango1 = document.getElementById('preview-rango1');
+            const previewRango2 = document.getElementById('preview-rango2');
+            const previewRango3 = document.getElementById('preview-rango3');
+            
+            previewRango1.textContent = rango1.value !== 'Ninguno' ? rango1.value : '';
+            previewRango2.textContent = rango2.value !== 'Ninguno' ? rango2.value : '';
+            previewRango3.textContent = rango3.value !== 'Ninguno' ? rango3.value : '';
+        }
     });
 });
-

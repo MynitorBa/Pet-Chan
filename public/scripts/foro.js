@@ -353,6 +353,8 @@ function showOverlayNotification(message, type = 'warning') {
   }
 
   function limpiarCampos() {
+    // Clear community context before redirecting
+    localStorage.removeItem('currentCommunityId');
     window.location.href = '/';
   }
   
@@ -680,262 +682,278 @@ document.getElementById('mensaje-form').addEventListener('submit', function(even
       });
   }
 
-// THEN modify actualizarListaMensajes to properly use createCommentElement
-function actualizarListaMensajes(mensajes) {
-  const listaMensajes = document.querySelector('.lista-mensajes');
-  const contador = document.getElementById('contador');
-  if (!listaMensajes) return;
-  
-  listaMensajes.innerHTML = '';
-  
-  if (contador) {
-    contador.textContent = mensajes ? mensajes.length : 0;
-  }
-  
-  if (!mensajes || mensajes.length === 0) {
-    listaMensajes.innerHTML = '<p class="no-mensajes">No se encontraron mensajes con los filtros seleccionados.</p>';
-    return;
-  }
-  
-  // Obtener el ID del usuario actual desde el meta tag
-  const metaUsername = document.querySelector('meta[name="username"]');
-  const currentUsername = metaUsername ? metaUsername.content : null;
-  
-  mensajes.forEach(mensaje => {
-    const mensajeElement = document.createElement('div');
-    mensajeElement.className = 'mensaje';
-    mensajeElement.dataset.id = mensaje.id;
-    mensajeElement.dataset.userId = mensaje.user_id;
+  function actualizarListaMensajes(mensajes) {
+    const listaMensajes = document.querySelector('.lista-mensajes');
+    const contador = document.getElementById('contador');
+    if (!listaMensajes) return;
     
-    let imagenesHTML = '';
-    if (mensaje.imagenes && mensaje.imagenes.length > 0) {
-      imagenesHTML = `
-        <div class="mensaje-imagenes">
-          ${mensaje.imagenes.map(imagen => `
-            <div class="imagen-mensaje-celda">
-              <img src="${imagen.url}" alt="Imagen adjunta">
-            </div>
-          `).join('')}
+    listaMensajes.innerHTML = '';
+    
+    if (contador) {
+      contador.textContent = mensajes ? mensajes.length : 0;
+    }
+    
+    if (!mensajes || mensajes.length === 0) {
+      listaMensajes.innerHTML = '<p class="no-mensajes">No se encontraron mensajes con los filtros seleccionados.</p>';
+      return;
+    }
+    
+    // Obtener el ID del usuario actual desde el meta tag
+    const metaUsername = document.querySelector('meta[name="username"]');
+    const currentUsername = metaUsername ? metaUsername.content : null;
+    
+    mensajes.forEach(mensaje => {
+      const mensajeElement = document.createElement('div');
+      mensajeElement.className = 'mensaje';
+      mensajeElement.dataset.id = mensaje.id;
+      mensajeElement.dataset.userId = mensaje.user_id;
+      
+      let imagenesHTML = '';
+      if (mensaje.imagenes && mensaje.imagenes.length > 0) {
+        imagenesHTML = `
+          <div class="mensaje-imagenes">
+            ${mensaje.imagenes.map(imagen => `
+              <div class="imagen-mensaje-celda">
+                <img src="${imagen.url}" alt="Imagen adjunta">
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      let etiquetaHTML = '';
+      
+      if (mensaje.etiqueta) {
+        etiquetaHTML = `<span class="etiqueta principal" data-categoria="${mensaje.etiqueta}"><i class="fas fa-tag"></i> ${mensaje.etiqueta}</span>`;
+      }
+      
+      if (mensaje.subcategoria) {
+        etiquetaHTML += `<span class="subetiqueta" data-subcategoria="${mensaje.subcategoria}"><i class="fas fa-tag"></i> ${mensaje.subcategoria}</span>`;
+      }
+      
+      if (mensaje.extrasubcategoria) {
+        etiquetaHTML += `<span class="subetiqueta extra" data-extrasubcategoria="${mensaje.extrasubcategoria}"><i class="fas fa-tags"></i> ${mensaje.extrasubcategoria}</span>`;
+      }
+      
+      // Determinar si el mensaje pertenece al usuario actual
+      const isOwnMessage = (mensaje.user_id && currentUsername && String(mensaje.user_id) === String(currentUsername)) || 
+                          (mensaje.autor && currentUsername && mensaje.autor === currentUsername);
+      
+      // Preparar los botones de editar y eliminar solo si es un mensaje propio
+      const botonesAccion = isOwnMessage ? 
+        `<button class="btn-editar" data-id="${mensaje.id}"><i class="fas fa-edit"></i></button>
+         <button class="btn-eliminar" data-id="${mensaje.id}"><i class="fas fa-trash"></i></button>` : '';
+      
+      // Preparar los rangos HTML
+      const rangosHTML = `
+        <div class="rangos-wrapper">
+          <div class="rango-item"><span class="rango-valor">${mensaje.rango1 || 'Ninguno'}</span></div>
+          <div class="rango-item"><span class="rango-valor">${mensaje.rango2 || 'Ninguno'}</span></div>
+          <div class="rango-item"><span class="rango-valor">${mensaje.rango3 || 'Ninguno'}</span></div>
         </div>
       `;
-    }
-    
-    let etiquetaHTML = '';
-    
-    if (mensaje.etiqueta) {
-      etiquetaHTML = `<span class="etiqueta principal" data-categoria="${mensaje.etiqueta}">${mensaje.etiqueta}</span>`;
-    }
-    
-    if (mensaje.subcategoria) {
-      etiquetaHTML += `<span class="subetiqueta" data-subcategoria="${mensaje.subcategoria}"><i class="fas fa-tag"></i> ${mensaje.subcategoria}</span>`;
-    }
-    
-    if (mensaje.extrasubcategoria) {
-      etiquetaHTML += `<span class="subetiqueta extra" data-extrasubcategoria="${mensaje.extrasubcategoria}"><i class="fas fa-tags"></i> ${mensaje.extrasubcategoria}</span>`;
-    }
-    
-    // Determinar si el mensaje pertenece al usuario actual
-    // También verificamos por autor en caso que la aplicación use este campo como identificador
-    const isOwnMessage = (mensaje.user_id && currentUsername && String(mensaje.user_id) === String(currentUsername)) || 
-                        (mensaje.autor && currentUsername && mensaje.autor === currentUsername);
-    
-    // Preparar los botones de editar y eliminar solo si es un mensaje propio
-    const botonesAccion = isOwnMessage ? 
-      `<button class="btn-editar" data-id="${mensaje.id}"><i class="fas fa-edit"></i></button>
-       <button class="btn-eliminar" data-id="${mensaje.id}"><i class="fas fa-trash"></i></button>` : '';
-    
-    mensajeElement.innerHTML = `
-      <div class="mensaje-cabecera">
-        <span class="autor">${mensaje.autor}</span>
-        <div class="etiquetas-container">
-          ${etiquetaHTML}
+      
+      mensajeElement.innerHTML = `
+        <div class="mensaje-cabecera">
+          <span class="autor">${mensaje.autor}</span>
+          ${rangosHTML}
+          <div class="etiquetas-container">
+            ${etiquetaHTML}
+          </div>
+          <div class="mensaje-acciones">
+            ${botonesAccion}
+            <button class="btn-comentar" data-id="${mensaje.id}"><i class="fas fa-comment"></i></button>
+          </div>
         </div>
-        <div class="mensaje-acciones">
-          ${botonesAccion}
-          <button class="btn-comentar" data-id="${mensaje.id}"><i class="fas fa-comment"></i></button>
-        </div>
-      </div>
-      <div class="mensaje-contenido">${mensaje.mensaje}</div>
-      ${imagenesHTML}
-      <div class="mensaje-pie">
-        <span class="fecha">${mensaje.fechaStr || mensaje.fecha}</span>
-        <div class="ranking-container" data-mensaje-id="${mensaje.id}">
-          <button class="btn-votar upvote" data-valor="1">
-            &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
-          </button>
-          <span class="ranking-valor ${mensaje.ranking < 0 ? 'negativo' : ''}">
-            ${mensaje.ranking}
-          </span>
-          <button class="btn-votar downvote" data-valor="-1">
-            &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
-          </button>
-        </div>
-      </div>      
-    `;
-    
-    listaMensajes.appendChild(mensajeElement);
-    
-    
-   
-    // Añadir sección de comentarios con toggle para colapsar/expandir
-    const comentariosSeccion = document.createElement('div');
-    comentariosSeccion.classList.add('comentarios-seccion');
-    
-    // Contador de comentarios y botón para mostrar/ocultar
-    const totalComentarios = mensaje.comentarios ? mensaje.comentarios.length : 0;
-    
-    const comentariosHeader = document.createElement('div');
-    comentariosHeader.classList.add('comentarios-header');
-    comentariosHeader.innerHTML = `
-      <button class="toggle-comentarios" aria-expanded="false">
-        <i class="fas fa-chevron-down"></i>
-        <span class="comentarios-contador">${totalComentarios} comentarios</span>
-      </button>
-    `;
-    comentariosSeccion.appendChild(comentariosHeader);
-    
-    // Contenedor de comentarios (inicialmente oculto)
-    const comentariosContenedor = document.createElement('div');
-    comentariosContenedor.classList.add('comentarios-contenedor');
-    comentariosContenedor.style.display = 'none';
-    
-    // Lista de comentarios
-    const comentariosLista = document.createElement('div');
-    comentariosLista.classList.add('comentarios-lista');
-    
-    // Agregar comentarios existentes a la lista
-    if (mensaje.comentarios && mensaje.comentarios.length > 0) {
-      mensaje.comentarios.forEach(comentario => {
-        const comentarioElement = createCommentElement(comentario, mensaje.id, currentUsername);
-        comentariosLista.appendChild(comentarioElement);
+        <div class="mensaje-contenido">${mensaje.mensaje}</div>
+        ${imagenesHTML}
+        <div class="mensaje-pie">
+          <span class="fecha">${mensaje.fechaStr || mensaje.fecha}</span>
+          <div class="ranking-container" data-mensaje-id="${mensaje.id}">
+            <button class="btn-votar upvote" data-valor="1">
+              &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
+            </button>
+            <span class="ranking-valor ${mensaje.ranking < 0 ? 'negativo' : ''}">
+              ${mensaje.ranking}
+            </span>
+            <button class="btn-votar downvote" data-valor="-1">
+              &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
+            </button>
+          </div>
+        </div>      
+      `;
+      
+      listaMensajes.appendChild(mensajeElement);
+      
+      // Añadir sección de comentarios con toggle para colapsar/expandir
+      const comentariosSeccion = document.createElement('div');
+      comentariosSeccion.classList.add('comentarios-seccion');
+      
+      // Contador de comentarios y botón para mostrar/ocultar
+      const totalComentarios = mensaje.comentarios ? mensaje.comentarios.length : 0;
+      
+      const comentariosHeader = document.createElement('div');
+      comentariosHeader.classList.add('comentarios-header');
+      comentariosHeader.innerHTML = `
+        <button class="toggle-comentarios" aria-expanded="false">
+          <i class="fas fa-chevron-down"></i>
+          <span class="comentarios-contador">${totalComentarios} comentarios</span>
+        </button>
+      `;
+      comentariosSeccion.appendChild(comentariosHeader);
+      
+      // Contenedor de comentarios (inicialmente oculto)
+      const comentariosContenedor = document.createElement('div');
+      comentariosContenedor.classList.add('comentarios-contenedor');
+      comentariosContenedor.style.display = 'none';
+      
+      // Lista de comentarios
+      const comentariosLista = document.createElement('div');
+      comentariosLista.classList.add('comentarios-lista');
+      
+      // Agregar comentarios existentes a la lista
+      if (mensaje.comentarios && mensaje.comentarios.length > 0) {
+        mensaje.comentarios.forEach(comentario => {
+          const comentarioElement = createCommentElement(comentario, mensaje.id, currentUsername);
+          comentariosLista.appendChild(comentarioElement);
+        });
+      }
+      
+      comentariosContenedor.appendChild(comentariosLista);
+      comentariosSeccion.appendChild(comentariosContenedor);
+      mensajeElement.appendChild(comentariosSeccion);
+      
+      // Manejo de eventos para las imágenes
+      const imagenesCeldas = mensajeElement.querySelectorAll('.imagen-mensaje-celda');
+      imagenesCeldas.forEach(celda => {
+        celda.addEventListener('click', function() {
+          const img = this.querySelector('img');
+          if (img) {
+            expandirImagen(img.src);
+          }
+        });
       });
-    }
-    
-    comentariosContenedor.appendChild(comentariosLista);
-    comentariosSeccion.appendChild(comentariosContenedor);
-    mensajeElement.appendChild(comentariosSeccion);
-    
-    // Manejo de eventos para las imágenes
-    const imagenesCeldas = mensajeElement.querySelectorAll('.imagen-mensaje-celda');
-    imagenesCeldas.forEach(celda => {
-      celda.addEventListener('click', function() {
-        const img = this.querySelector('img');
-        if (img) {
-          expandirImagen(img.src);
-        }
-      });
+      
+      // Efecto de aparición gradual
+      mensajeElement.style.opacity = '0';
+      setTimeout(() => {
+        mensajeElement.style.transition = 'opacity 0.5s ease-in';
+        mensajeElement.style.opacity = '1';
+      }, 50);
+      
+      // Marcar botón de voto si ya se ha votado este mensaje
+      const mensajeId = mensaje.id;
+      const votoGuardado = localStorage.getItem(`voto_${mensajeId}`);
+      if (votoGuardado) {
+        const valor = parseInt(votoGuardado);
+        const selector = valor > 0 ? '.upvote' : '.downvote';
+        const btnVoto = mensajeElement.querySelector(selector);
+        if (btnVoto) btnVoto.classList.add('activo');
+      }
     });
+  }
+  
+  // Modificación de la función createCommentElement para incluir rangos
+  function createCommentElement(comentario, mensajeId, currentUsername) {
+    const comentarioElement = document.createElement('div');
+    comentarioElement.className = 'comentario';
+    comentarioElement.dataset.id = comentario.id;
+    comentarioElement.dataset.userId = comentario.user_id;
     
-    // Efecto de aparición gradual
-    mensajeElement.style.opacity = '0';
-    setTimeout(() => {
-      mensajeElement.style.transition = 'opacity 0.5s ease-in';
-      mensajeElement.style.opacity = '1';
-    }, 50);
+    // Obtener el ID del usuario actual desde el meta tag si no está disponible
+    if (!currentUsername) {
+      const metaUsername = document.querySelector('meta[name="username"]');
+      currentUsername = metaUsername ? metaUsername.content : null;
+      
+      // Meta tag alternativo para el ID de usuario
+      if (!currentUsername) {
+        const metaUserId = document.querySelector('meta[name="userId"]');
+        currentUsername = metaUserId ? metaUserId.content : null;
+      }
+    }
     
-    // Marcar botón de voto si ya se ha votado este mensaje
-    const mensajeId = mensaje.id;
-    const votoGuardado = localStorage.getItem(`voto_${mensajeId}`);
-    if (votoGuardado) {
-      const valor = parseInt(votoGuardado);
+    console.log(`Creando comentario - Usuario actual: ${currentUsername}, Autor comentario: ${comentario.user_id || comentario.autor}`);
+    
+    // Determinar si el comentario pertenece al usuario actual
+    const isOwnComment = (comentario.user_id && currentUsername && 
+                        String(comentario.user_id) === String(currentUsername)) || 
+                        (comentario.autor && currentUsername && 
+                        comentario.autor === currentUsername);
+    
+    // Botones solo si el comentario es del usuario actual
+    const comentarioAcciones = isOwnComment ? `
+      <div class="comentario-acciones">
+        <button class="btn-editar-comentario" data-id="${comentario.id}" data-mensaje-id="${mensajeId}">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-eliminar-comentario" data-id="${comentario.id}" data-mensaje-id="${mensajeId}">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>` : '';
+  
+    // Imágenes del comentario, si existen
+    let imagenesHTML = '';
+    if (comentario.imagenes && comentario.imagenes.length > 0) {
+      imagenesHTML = `
+        <div class="comentario-imagenes">
+          ${comentario.imagenes.map(imagen => `
+            <div class="imagen-comentario">
+              <img src="${imagen.url}" alt="Imagen de comentario">
+            </div>
+          `).join('')}
+        </div>`;
+    }
+  
+    // Sistema de votación del comentario
+    const votacionHTML = `
+      <div class="ranking-container" data-comentario-id="${comentario.id}">
+        <button class="btn-votar-comentario upvote" data-valor="1">
+          &#x2191;
+        </button>
+        <span class="ranking-valor ${(comentario.ranking || 0) < 0 ? 'negativo' : ''}">
+          ${comentario.ranking || 0}
+        </span>
+        <button class="btn-votar-comentario downvote" data-valor="-1">
+          &#x2193;
+        </button>
+      </div>
+    `;
+  
+    // Preparar HTML para los rangos del comentario
+    const rangosComentarioHTML = `
+      <div class="rangos-wrapper">
+        <div class="rango-item"><span class="rango-valor">${comentario.rango1 || 'Ninguno'}</span></div>
+        <div class="rango-item"><span class="rango-valor">${comentario.rango2 || 'Ninguno'}</span></div>
+        <div class="rango-item"><span class="rango-valor">${comentario.rango3 || 'Ninguno'}</span></div>
+      </div>
+    `;
+  
+    // Estructura HTML del comentario
+    comentarioElement.innerHTML = `
+      <div class="comentario-cabecera">
+        <span class="comentario-autor">${comentario.autor}</span>
+        ${rangosComentarioHTML}
+        ${comentarioAcciones}
+      </div>
+      <div class="comentario-contenido">${comentario.comentario}</div>
+      ${imagenesHTML}
+      <div class="comentario-pie">
+        <span class="comentario-fecha">${comentario.fechaStr || comentario.fecha}</span>
+        ${votacionHTML}
+      </div>
+    `;
+  
+    // Marcar botones de voto activos si ya hay un voto previo
+    const votoGuardadoComentario = localStorage.getItem(`voto_comentario_${comentario.id}`);
+    if (votoGuardadoComentario) {
+      const valor = parseInt(votoGuardadoComentario);
       const selector = valor > 0 ? '.upvote' : '.downvote';
-      const btnVoto = mensajeElement.querySelector(selector);
+      const btnVoto = comentarioElement.querySelector(`${selector}.btn-votar-comentario`);
       if (btnVoto) btnVoto.classList.add('activo');
     }
-  });
-}
-
-function createCommentElement(comentario, mensajeId, currentUsername) {
-  const comentarioElement = document.createElement('div');
-  comentarioElement.className = 'comentario';
-  comentarioElement.dataset.id = comentario.id;
-  comentarioElement.dataset.userId = comentario.user_id;
   
-  // Obtener el ID del usuario actual desde el meta tag si no está disponible
-  if (!currentUsername) {
-    const metaUsername = document.querySelector('meta[name="username"]');
-    currentUsername = metaUsername ? metaUsername.content : null;
-    
-    // Meta tag alternativo para el ID de usuario
-    if (!currentUsername) {
-      const metaUserId = document.querySelector('meta[name="userId"]');
-      currentUsername = metaUserId ? metaUserId.content : null;
-    }
+    return comentarioElement;
   }
-  
-  console.log(`Creando comentario - Usuario actual: ${currentUsername}, Autor comentario: ${comentario.user_id || comentario.autor}`);
-  
-  // Determinar si el comentario pertenece al usuario actual
-  // Comparación de IDs de usuario - garantizamos una comparación correcta de strings o números
-  const isOwnComment = (comentario.user_id && currentUsername && 
-                      String(comentario.user_id) === String(currentUsername)) || 
-                      (comentario.autor && currentUsername && 
-                      comentario.autor === currentUsername);
-  
-  // Botones solo si el comentario es del usuario actual
-  const comentarioAcciones = isOwnComment ? `
-    <div class="comentario-acciones">
-      <button class="btn-editar-comentario" data-id="${comentario.id}" data-mensaje-id="${mensajeId}">
-        <i class="fas fa-edit"></i>
-      </button>
-      <button class="btn-eliminar-comentario" data-id="${comentario.id}" data-mensaje-id="${mensajeId}">
-        <i class="fas fa-trash"></i>
-      </button>
-    </div>` : '';
-
-  // Imágenes del comentario, si existen
-  let imagenesHTML = '';
-  if (comentario.imagenes && comentario.imagenes.length > 0) {
-    imagenesHTML = `
-      <div class="comentario-imagenes">
-        ${comentario.imagenes.map(imagen => `
-          <div class="imagen-comentario">
-            <img src="${imagen.url}" alt="Imagen de comentario">
-          </div>
-        `).join('')}
-      </div>`;
-  }
-
-  // Sistema de votación del comentario
-  const votacionHTML = `
-    <div class="ranking-container" data-comentario-id="${comentario.id}">
-      <button class="btn-votar-comentario upvote" data-valor="1">
-        &#x2191;
-      </button>
-      <span class="ranking-valor ${(comentario.ranking || 0) < 0 ? 'negativo' : ''}">
-        ${comentario.ranking || 0}
-      </span>
-      <button class="btn-votar-comentario downvote" data-valor="-1">
-        &#x2193;
-      </button>
-    </div>
-  `;
-
-  // Estructura HTML del comentario
-  comentarioElement.innerHTML = `
-    <div class="comentario-cabecera">
-      <span class="comentario-autor">${comentario.autor}</span>
-      ${comentarioAcciones}
-    </div>
-    <div class="comentario-contenido">${comentario.comentario}</div>
-    ${imagenesHTML}
-    <div class="comentario-pie">
-      <span class="comentario-fecha">${comentario.fechaStr || comentario.fecha}</span>
-      ${votacionHTML}
-    </div>
-  `;
-
-  // Marcar botones de voto activos si ya hay un voto previo
-  const votoGuardadoComentario = localStorage.getItem(`voto_comentario_${comentario.id}`);
-  if (votoGuardadoComentario) {
-    const valor = parseInt(votoGuardadoComentario);
-    const selector = valor > 0 ? '.upvote' : '.downvote';
-    const btnVoto = comentarioElement.querySelector(`${selector}.btn-votar-comentario`);
-    if (btnVoto) btnVoto.classList.add('activo');
-  }
-
-  return comentarioElement;
-}
 
 form.addEventListener('submit', function(event) {
   if (isSubmitting) {
@@ -1118,83 +1136,90 @@ form.addEventListener('submit', function(event) {
      }
    });
 
- // Apply filters functionality
- const aplicarFiltros = document.getElementById('aplicar-filtros');
- aplicarFiltros.addEventListener('click', (e) => {
-   e.preventDefault();
-   const params = new URLSearchParams();
 
-   // Ordenar
-   const ordenSeleccionado = document.querySelector('input[name="orden"]:checked');
-   if (ordenSeleccionado) {
-     params.append('orden', ordenSeleccionado.value);
-   }
+// Apply filters functionality
+const aplicarFiltros = document.getElementById('aplicar-filtros');
+aplicarFiltros.addEventListener('click', (e) => {
+  e.preventDefault();
+  const params = new URLSearchParams();
+  
+  // Comunidad
+  const comunidadSeleccionada = document.querySelector('input[name="comunidad_id"]:checked');
+  if (comunidadSeleccionada && comunidadSeleccionada.value) {
+    params.append('comunidad_id', comunidadSeleccionada.value);
+    // Removed localStorage.setItem('currentCommunityId', comunidadSeleccionada.value);
+    console.log(`Setting community filter: ${comunidadSeleccionada.value}`);
+  } else {
+    // Removed localStorage.removeItem('currentCommunityId');
+    console.log('No community filter selected');
+  }
+  
+  // Ordenar
+  const ordenSeleccionado = document.querySelector('input[name="orden"]:checked');
+  if (ordenSeleccionado) {
+    params.append('orden', ordenSeleccionado.value);
+  }
+  
+  // Ranking
+  const rankingSeleccionado = document.querySelector('input[name="ranking"]:checked');
+  if (rankingSeleccionado) {
+    params.append('ranking', rankingSeleccionado.value);
+  }
+  
+  // Tipo
+  const tipoSeleccionado = document.querySelector('input[name="tipo"]:checked');
+  if (tipoSeleccionado) {
+    params.append('tipo', tipoSeleccionado.value);
+  }
+  
+  // Etiquetas
+  const etiquetasSeleccionadas = document.querySelectorAll('input[name="etiquetas"]:checked');
+  etiquetasSeleccionadas.forEach(etiqueta => {
+    params.append('etiquetas', etiqueta.value);
+  });
+  
+  // Subetiquetas
+  const subetiquetasContainers = document.querySelectorAll('input[name^="subetiquetas-"]:checked');
+  subetiquetasContainers.forEach(subetiqueta => {
+    params.append('subetiquetas', subetiqueta.value);
+  });
+  
+  // Extra Subcategorías
+  const extraSubetiquetasContainers = document.querySelectorAll('input[name^="extrasubetiquetas-"]:checked');
+  extraSubetiquetasContainers.forEach(extraSubetiqueta => {
+    params.append('extrasubetiquetas', extraSubetiqueta.value);
+  });
+  
+  // Ejecutar búsqueda
+  cargarMensajesFiltrados(params);
+});
 
-   // Ranking
-   const rankingSeleccionado = document.querySelector('input[name="ranking"]:checked');
-   if (rankingSeleccionado) {
-     params.append('ranking', rankingSeleccionado.value);
-   }
-
-   // Tipo
-   const tipoSeleccionado = document.querySelector('input[name="tipo"]:checked');
-   if (tipoSeleccionado) {
-     params.append('tipo', tipoSeleccionado.value);
-   }
-
-   // Etiquetas
-   const etiquetasSeleccionadas = document.querySelectorAll('input[name="etiquetas"]:checked');
-   etiquetasSeleccionadas.forEach(etiqueta => {
-     params.append('etiquetas', etiqueta.value);
-   });
-
-   // Subetiquetas
-   const subetiquetasContainers = document.querySelectorAll('input[name^="subetiquetas-"]:checked');
-   subetiquetasContainers.forEach(subetiqueta => {
-     params.append('subetiquetas', subetiqueta.value);
-   });
-
-   // Extra Subcategorías (Nueva sección)
-   const extraSubetiquetasContainers = document.querySelectorAll('input[name^="extrasubetiquetas-"]:checked');
-   extraSubetiquetasContainers.forEach(extraSubetiqueta => {
-     params.append('extrasubetiquetas', extraSubetiqueta.value);
-   });
-
-   // Ejecutar búsqueda
-   cargarMensajesFiltrados(params);
- });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Clear filters functionality
-  const limpiarFiltros = document.getElementById('limpiar-filtros');
-  limpiarFiltros.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked').forEach(input => {
-      input.checked = false;
-    });
-
-    filterExpanded.forEach(section => section.classList.remove('active'));
-    filterButtons.forEach(button => button.classList.remove('active'));
-
-    // Recargar todos los mensajes
-    cargarMensajesFiltrados(new URLSearchParams());
+// Clear filters functionality
+const limpiarFiltros = document.getElementById('limpiar-filtros');
+limpiarFiltros.addEventListener('click', (e) => {
+  e.preventDefault();
+  document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked').forEach(input => {
+    input.checked = false;
   });
 
-  // Initial loading of messages (with default params)
+  const todasComunidadesRadio = document.getElementById('comunidad-todas');
+  if (todasComunidadesRadio) {
+    todasComunidadesRadio.checked = true;
+  }
+  // Removed localStorage.removeItem('currentCommunityId');
+  
+  filterExpanded.forEach(section => section.classList.remove('active'));
+  filterButtons.forEach(button => button.classList.remove('active'));
+
+  // Recargar todos los mensajes
   cargarMensajesFiltrados(new URLSearchParams());
+});
+
+
+// Initial loading of messages (with default params)
+const initialParams = new URLSearchParams();
+// Removed localStorage check for community context
+cargarMensajesFiltrados(initialParams);
 });
 
 
@@ -1207,6 +1232,8 @@ form.addEventListener('submit', function(event) {
 
 
 
+
+// Second part - Filter application and related functionality
 document.addEventListener('DOMContentLoaded', () => {
   const filterForm = document.getElementById('filtro-form');
   const mensajesContainer = document.querySelector('.lista-mensajes');
@@ -1215,12 +1242,97 @@ document.addEventListener('DOMContentLoaded', () => {
   const filtrosAplicadosContainer = document.getElementById('filtros-aplicados-container');
   const filtrosAplicadosTags = document.getElementById('filtros-aplicados-tags');
   const resultadosMensaje = document.getElementById('resultados-filtrados-mensaje');
+  
+  // Get community ID from various sources
+  let comunidadId = getCommunityId();
+  
+
+  
+  // If community ID exists, apply community context
+  if (comunidadId) {
+    
+    // Add community context to form if needed
+    const existingInput = filterForm?.querySelector('input[name="comunidad_id"]');
+    if (filterForm && !existingInput) {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'comunidad_id';
+      hiddenInput.value = comunidadId;
+      filterForm.appendChild(hiddenInput);
+    }
+    
+    // Pre-select community radio button if available
+    const communityRadio = document.querySelector(`input[name="comunidad_id"][value="${comunidadId}"]`);
+    if (communityRadio) {
+      communityRadio.checked = true;
+    }
+  }
+  
+  // Set up all filter button handlers
+  const setupFilterButtons = () => {
+    // Get all filter buttons by their common class
+    const allFilterButtons = document.querySelectorAll('.filter-button, [id^="btn-"]');
+    const allFilterPanels = document.querySelectorAll('.filtros-expanded');
+    
+    allFilterButtons.forEach(button => {
+      // Remove any existing event listeners first to prevent duplicates
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+      
+      // Add new event listener
+      newButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Determine the target panel
+        let targetPanel;
+        if (this.getAttribute('data-target')) {
+          targetPanel = document.getElementById(this.getAttribute('data-target'));
+        } else if (this.id === 'btn-comunidad') {
+          targetPanel = document.getElementById('filtros-comunidad');
+        } else if (this.id === 'btn-etiquetas') {
+          targetPanel = document.getElementById('filtros-etiquetas');
+        } else if (this.id === 'btn-subetiquetas') {
+          targetPanel = document.getElementById('filtros-subetiquetas');
+        } else if (this.id === 'btn-orden') {
+          targetPanel = document.getElementById('filtros-orden');
+        } else if (this.id === 'btn-ranking') {
+          targetPanel = document.getElementById('filtros-ranking');
+        } else if (this.id === 'btn-tipo') {
+          targetPanel = document.getElementById('filtros-tipo');
+        }
+        
+        if (targetPanel) {
+          // Close all other panels first
+          allFilterPanels.forEach(panel => {
+            if (panel !== targetPanel) {
+              panel.style.display = 'none';
+            }
+          });
+          
+          // Toggle this panel
+          targetPanel.style.display = targetPanel.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+    });
+  };
+  
+  // Call this setup function to ensure all buttons are configured
+  setupFilterButtons();
+  
+
 
   // Listen for form submission
-  filterForm.addEventListener('submit', function(e) {
+  if (filterForm) {
+    filterForm.addEventListener('submit', function(e) {
       e.preventDefault();
       aplicarFiltros();
-  });
+      
+      // Hide all filter panels after form submission
+      document.querySelectorAll('.filtros-expanded').forEach(panel => {
+        panel.style.display = 'none';
+      });
+    });
+  }
 
   // Improved function to get current user - add debugging
   function getCurrentUser() {
@@ -1235,169 +1347,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return username;
   }
 
-  // Main filter application function
-  function aplicarFiltros() {
-    // Reset previous filtering
-    mensajes.forEach(mensaje => mensaje.style.display = 'block');
-    filtrosBusquedaContainer.style.display = 'block';
-    filtrosAplicadosTags.innerHTML = '';
-    resultadosMensaje.style.display = 'none';
-
-    // Get current logged user
-    const currentUser = getCurrentUser();
-    console.log('Filtering with current user:', currentUser);
-
-    // Get filter values
-    const etiquetasSeleccionadas = Array.from(
-        document.querySelectorAll('input[name="etiquetas"]:checked')
-    ).map(el => el.value);
-
-    // Include both subcategory and extra subcategory filters
-    const subetiquetasSeleccionadas = Array.from(
-        document.querySelectorAll('input[name^="subetiquetas-"]:checked, input[name^="extrasubetiquetas-"]:checked')
-    ).map(el => el.value);
-
-    const orden = document.getElementById('orden').value;
-    const ranking = document.getElementById('ranking').value;
-    const tipo = document.getElementById('tipo').value;
-    
-    console.log('Selected filter type:', tipo);
-
-    // Apply filters
-    let mensajesFiltrados = Array.from(mensajes).filter(mensaje => {
-        // Etiquetas filter
-        const etiquetaMensaje = mensaje.querySelector('.etiqueta');
-        const etiquetaValida = etiquetasSeleccionadas.length === 0 || 
-            (etiquetaMensaje && etiquetasSeleccionadas.includes(etiquetaMensaje.textContent.trim()));
-
-        // Subcategory filter (including extra subcategories)
-        const subcategoriaMensaje = mensaje.querySelector('.subetiqueta:not(.extra)');
-        const extraSubcategoriaMensaje = mensaje.querySelector('.subetiqueta.extra');
-        
-        const subcategoriaValida = subetiquetasSeleccionadas.length === 0 || 
-            (subcategoriaMensaje && subetiquetasSeleccionadas.some(subetiqueta => 
-                subcategoriaMensaje.textContent.toLowerCase().includes(subetiqueta.toLowerCase())
-            )) ||
-            (extraSubcategoriaMensaje && subetiquetasSeleccionadas.some(subetiqueta => 
-                extraSubcategoriaMensaje.textContent.toLowerCase().includes(subetiqueta.toLowerCase())
-            ));
-
-        // Ranking filter
-        const rankingValor = parseInt(mensaje.querySelector('.ranking-valor').textContent);
-        let rankingValido = true;
-        switch(ranking) {
-            case 'populares':
-                rankingValido = rankingValor > 100;
-                break;
-            case 'medios':
-                rankingValido = rankingValor > 10 && rankingValor <= 100;
-                break;
-            case 'menos_populares':
-                rankingValido = rankingValor <= 10; // This includes negative values
-                break;
-        }
-
-        // Tipo de mensajes filter - FIXED IMPLEMENTATION
-        const autorMensaje = mensaje.querySelector('.autor').textContent.trim();
-        let tipoValido = true;
-        
-        if (tipo === 'mios') {
-            tipoValido = autorMensaje === currentUser;
-            console.log(`Mensaje de ${autorMensaje}, es mío? ${tipoValido}`);
-        } 
-        // For 'todos', tipoValido remains true
-
-        return etiquetaValida && subcategoriaValida && rankingValido && tipoValido;
-    });
-
-    // Ordenar mensajes
-    const ahora = new Date();
-    const treintaMinutosAtras = new Date(ahora - 30 * 60 * 1000);
-    const unaSemanaAtras = new Date(ahora - 7 * 24 * 60 * 60 * 1000);
-    const unDiaAtras = new Date(ahora - 24 * 60 * 60 * 1000);
-
-    switch(orden) {
-        case 'recientes':
-            // Mensajes de los últimos 30 minutos
-            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
-                const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
-                return fechaMensaje >= treintaMinutosAtras;
-            });
-            mensajesFiltrados.sort((a, b) => {
-                const fechaA = new Date(a.querySelector('.fecha').textContent);
-                const fechaB = new Date(b.querySelector('.fecha').textContent);
-                return fechaB - fechaA;
-            });
-            break;
-        case 'antiguos':
-            // Mensajes de hace más de una semana
-            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
-                const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
-                return fechaMensaje <= unaSemanaAtras;
-            });
-            mensajesFiltrados.sort((a, b) => {
-                const fechaA = new Date(a.querySelector('.fecha').textContent);
-                const fechaB = new Date(b.querySelector('.fecha').textContent);
-                return fechaA - fechaB;
-            });
-            break;
-        case 'nuevos_24h':
-            // Mensajes del último día
-            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
-                const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
-                return fechaMensaje >= unDiaAtras;
-            });
-            mensajesFiltrados.sort((a, b) => {
-                const fechaA = new Date(a.querySelector('.fecha').textContent);
-                const fechaB = new Date(b.querySelector('.fecha').textContent);
-                return fechaB - fechaA;
-            });
-            break;
-        case 'mas_valorados':
-            // Mensajes con más de 100 votos
-            mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
-                const rankingValor = parseInt(mensaje.querySelector('.ranking-valor').textContent);
-                return rankingValor > 100;
-            });
-            mensajesFiltrados.sort((a, b) => {
-                const rankingA = parseInt(a.querySelector('.ranking-valor').textContent);
-                const rankingB = parseInt(b.querySelector('.ranking-valor').textContent);
-                return rankingB - rankingA; // Ordenar por mayor cantidad de votos
-            });
-            break;
-        default:
-            // Orden por defecto: más recientes primero
-            mensajesFiltrados.sort((a, b) => {
-                const fechaA = new Date(a.querySelector('.fecha').textContent);
-                const fechaB = new Date(b.querySelector('.fecha').textContent);
-                return fechaB - fechaA;
-            });
-    }
-
-    // Logging filtered results
-    console.log(`Total mensajes filtrados: ${mensajesFiltrados.length}`);
-
-    // Mostrar/ocultar mensajes
-    mensajes.forEach(mensaje => mensaje.style.display = 'none');
-    mensajesFiltrados.forEach(mensaje => mensaje.style.display = 'block');
-
-    // Mostrar mensaje si no hay resultados
-    if (mensajesFiltrados.length === 0) {
-        resultadosMensaje.style.display = 'block';
-    }
-
-    // Mostrar etiquetas de filtros aplicados
-    mostrarFiltrosAplicados(etiquetasSeleccionadas, orden, ranking, tipo);
-  }
-
+  
   // Display applied filters as tags
-  function mostrarFiltrosAplicados(etiquetas, orden, ranking, tipo) {
+  function mostrarFiltrosAplicados(etiquetas, orden, ranking, tipo, comunidadId) {
       const filtrosAplicados = [
           ...etiquetas.map(etiqueta => `Etiqueta: ${etiqueta}`),
           `Orden: ${obtenerTextoOrden(orden)}`,
           `Ranking: ${obtenerTextoRanking(ranking)}`,
           `Tipo: ${obtenerTextoTipo(tipo)}`
       ];
+      
+      // Add community filter tag if selected
+      if (comunidadId && comunidadId !== '') {
+          const comunidadNombre = obtenerNombreComunidad(comunidadId);
+          filtrosAplicados.push(`Comunidad: ${comunidadNombre}`);
+      }
 
       filtrosAplicados.forEach(filtro => {
           const tagElement = document.createElement('div');
@@ -1408,7 +1372,15 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
           tagElement.querySelector('.remove-tag').addEventListener('click', () => {
               tagElement.remove();
-              // Potentially reset specific filter
+              // Reset specific filter if it's a community filter
+              if (filtro.startsWith('Comunidad:')) {
+                  const todasComunidadesRadio = document.getElementById('comunidad-todas');
+                  if (todasComunidadesRadio) {
+                      todasComunidadesRadio.checked = true;
+                  }
+                  localStorage.removeItem('currentCommunityId');
+                  aplicarFiltros();
+              }
           });
           filtrosAplicadosTags.appendChild(tagElement);
       });
@@ -1443,15 +1415,72 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       return tipoTextos[tipo] || tipo;
   }
+  
+  // Obtener el nombre de la comunidad basado en su ID
+  function obtenerNombreComunidad(comunidadId) {
+      const comunidadElement = document.querySelector(`input[name="comunidad_id"][value="${comunidadId}"]`);
+      if (comunidadElement && comunidadElement.parentElement) {
+          const label = comunidadElement.parentElement.textContent.trim();
+          return label;
+      }
+      return `Comunidad ${comunidadId}`;
+  }
 
-  // Reset filters
-  document.getElementById('limpiar-filtros').addEventListener('click', () => {
-      mensajes.forEach(mensaje => mensaje.style.display = 'block');
-      filtrosBusquedaContainer.style.display = 'none';
-      filtrosAplicadosTags.innerHTML = '';
-      resultadosMensaje.style.display = 'none';
-  });
+// Obtener IDs de mis comunidades (simulado)
+function getMisComunidadesIds() {
+  // En un caso real, esto podría ser obtenido de una API o del estado del usuario
+  // Por ahora, devolvemos un array vacío o hardcodeado para pruebas
+  return localStorage.getItem('misComunidadesIds') ? 
+      JSON.parse(localStorage.getItem('misComunidadesIds')) : 
+      [];
+}
+
+// Helper para obtener ID de comunidad desde varios orígenes
+function getCommunityId() {
+  const path = window.location.pathname.split('/');
+  // Check URL path for community ID
+  if (path[1] === 'foro' && path[2]) {
+      return path[2];
+  }
+  // Check query params for community ID
+  const urlParams = new URLSearchParams(location.search);
+  const communityParam = urlParams.get('comunidad_id');
+  if (communityParam) {
+      return communityParam;
+  }
+  return null;
+}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3338,3 +3367,1343 @@ document.addEventListener('DOMContentLoaded', function() {
     textarea.dispatchEvent(inputEvent);
   }
 });
+
+function createConfetti(milestone) {
+  // Determinar si debemos mostrar confeti normal o monedas de Mario
+  const showMarioCoins = milestone % 100 === 0 && milestone > 0;
+  
+  // Creamos un contenedor para el confeti a pantalla completa
+  const confettiContainer = document.createElement('div');
+  confettiContainer.className = 'confetti-container';
+  document.body.appendChild(confettiContainer);
+  
+  // Número total de fichas/confeti a crear
+  const totalElements = 200;
+  
+  // Dividir la pantalla en secciones para asegurar distribución uniforme
+  const numColumns = 20; // Dividimos horizontalmente en 20 secciones
+  const numRows = 40;   // Dividimos verticalmente en 5 filas iniciales
+  
+  // Variables para rastrear la duración máxima
+  let maxDuration = 0;
+  let maxDelay = 0;
+  
+  if (showMarioCoins) {
+    // Crear monedas de Mario Bros distribuidas por toda la pantalla
+    for (let row = 0; row < numRows; row++) {
+      for (let col = 0; col < numColumns; col++) {
+        // Calcular cuántas monedas crear por cada celda para alcanzar aproximadamente totalElements
+        const coinsPerCell = Math.ceil(totalElements / (numColumns * numRows));
+        
+        for (let i = 0; i < coinsPerCell; i++) {
+          const coin = document.createElement('div');
+          coin.className = 'mario-coin confetti';
+          
+          // Posicionamiento por toda la pantalla:
+          // Base horizontal: distribuir en columnas + variación aleatoria
+          const baseX = (col / numColumns) * 100;
+          const randomOffsetX = (Math.random() * (100/numColumns)) - (50/numColumns);
+          coin.style.left = (baseX + randomOffsetX) + '%';
+          
+          // Posición vertical: distribuir en distintas "alturas" iniciales fuera de la pantalla
+          // Algunas monedas empiezan arriba (-10% a -30%) para caer gradualmente
+          const startY = -30 + (row * 5) + (Math.random() * 20);
+          coin.style.top = startY + '%';
+          
+          // Desplazamiento aleatorio durante la caída
+          const horizontalOffset = (Math.random() - 0.5) * 150;
+          coin.style.setProperty('--horizontal-offset', horizontalOffset + 'px');
+          
+          // Colores dorados para las monedas
+          const goldColors = ['#FFD700', '#FFDF00', '#F0E68C', '#DAA520', '#FFC000'];
+          coin.style.backgroundColor = goldColors[Math.floor(Math.random() * goldColors.length)];
+          
+          // Tamaños variados para las monedas
+          const size = Math.random() * 15 + 10;
+          coin.style.width = size + 'px';
+          coin.style.height = size + 'px';
+          
+          // Forma circular para las monedas
+          coin.style.borderRadius = '50%';
+          
+          // Borde para dar efecto de moneda
+          coin.style.border = '2px solid rgba(218, 165, 32, 0.8)';
+          
+          // Añadir símbolo $ en el centro
+          coin.innerHTML = `<span style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #8B4513;
+            font-weight: bold;
+            font-size: ${size * 0.6}px;
+          ">$</span>`;
+          
+          // Velocidades variadas
+          const duration = Math.random() * 3 + 3;
+          // Retrasos aleatorios para que no aparezcan todas a la vez
+          const delay = Math.random() * 3;
+          coin.style.animationDelay = delay + 's';
+          coin.style.animationDuration = duration + 's';
+          
+          // Actualizar máximos para calcular la duración total
+          maxDuration = Math.max(maxDuration, duration);
+          maxDelay = Math.max(maxDelay, delay);
+          
+          // Añadir al contenedor
+          confettiContainer.appendChild(coin);
+        }
+      }
+    }
+  } else {
+    // Confeti normal distribuido por toda la pantalla
+    const colors = ['#FFD700', '#FF4500', '#9370DB', '#32CD32', '#00BFFF', '#FF69B4', '#FF6347'];
+    
+    for (let row = 0; row < numRows; row++) {
+      for (let col = 0; col < numColumns; col++) {
+        // Calcular confeti por celda
+        const confettiPerCell = Math.ceil(totalElements / (numColumns * numRows));
+        
+        for (let i = 0; i < confettiPerCell; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          
+          // Formas variadas
+          const shape = Math.random() > 0.6 ? 'circle' : Math.random() > 0.5 ? 'square' : 'rectangle';
+          
+          // Distribuir horizontalmente por toda la pantalla
+          const baseX = (col / numColumns) * 100;
+          const randomOffsetX = (Math.random() * (100/numColumns)) - (50/numColumns);
+          confetti.style.left = (baseX + randomOffsetX) + '%';
+          
+          // Distribuir verticalmente en diferentes puntos de inicio
+          const startY = -30 + (row * 5) + (Math.random() * 20);
+          confetti.style.top = startY + '%';
+          
+          // Color aleatorio
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          
+          // Desplazamiento aleatorio durante la caída
+          const horizontalOffset = (Math.random() - 0.5) * 150;
+          confetti.style.setProperty('--horizontal-offset', horizontalOffset + 'px');
+          
+          // Tamaños variados
+          const size = Math.random() * 12 + 5;
+          confetti.style.width = size + 'px';
+          confetti.style.height = shape === 'rectangle' ? size * 1.5 + 'px' : size + 'px';
+          
+          // Formas diferentes
+          confetti.style.borderRadius = shape === 'circle' ? '50%' : '0';
+          
+          // Velocidades variadas
+          const duration = Math.random() * 3 + 3;
+          const delay = Math.random() * 3;
+          confetti.style.animationDelay = delay + 's';
+          confetti.style.animationDuration = duration + 's';
+          
+          // Actualizar máximos para calcular la duración total
+          maxDuration = Math.max(maxDuration, duration);
+          maxDelay = Math.max(maxDelay, delay);
+          
+          // Rotación aleatoria
+          confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+          
+          confettiContainer.appendChild(confetti);
+        }
+      }
+    }
+  }
+  
+  // Calculamos el tiempo total basado en la duración máxima y el delay máximo
+  // Convertimos segundos a milisegundos para setTimeout
+  const totalAnimationTime = (maxDelay + maxDuration) * 1000;
+  
+  // Eliminamos el confeti después de que termine la animación,
+  // agregando un pequeño margen para asegurar que todas las animaciones completen
+  setTimeout(() => {
+    confettiContainer.remove();
+  }, totalAnimationTime + 200); // Añadimos 200ms como margen de seguridad
+  
+  return confettiContainer;
+}
+
+// Función modificada para el frontend que muestra la recompensa
+function showStarReward(coins, milestone, type, bonusAwarded) {
+  // Crear overlay para oscurecer el fondo y bloquear interacciones
+  const overlay = document.createElement('div');
+  overlay.className = 'star-reward-overlay';
+  document.body.appendChild(overlay);
+  
+  // Crear confeti a pantalla completa - ahora pasamos el milestone
+  createConfetti(milestone);
+  
+  // Crear el contenedor principal de la notificación
+  const notification = document.createElement('div');
+  notification.className = 'star-reward-notification';
+  
+  // Personalizar mensaje según el tipo de recompensa
+  let rewardTitle = '¡RECOMPENSA!';
+  let milestoneText;
+  
+  // Adaptar mensaje según el tipo de actividad
+  if (type === 'post') {
+    // Recompensa por publicaciones
+    milestoneText = `Por alcanzar ${milestone} publicaciones`;
+    if (bonusAwarded && milestone % 100 === 0) {
+      rewardTitle = '¡SUPER RECOMPENSA!';
+      milestoneText = `¡Felicidades por alcanzar ${milestone} publicaciones!`;
+    }
+  } 
+  else if (type === 'comment') {
+    // Recompensa por comentarios
+    milestoneText = `Por alcanzar ${milestone} comentarios`;
+    if (bonusAwarded && milestone % 100 === 0) {
+      rewardTitle = '¡SUPER RECOMPENSA!';
+      milestoneText = `¡Felicidades por alcanzar ${milestone} comentarios!`;
+    }
+  }
+  else if (type === 'vote') {
+    // Recompensa por votos
+    milestoneText = `Por alcanzar ${milestone} votos`;
+    if (bonusAwarded && milestone % 100 === 0) {
+      rewardTitle = '¡SUPER RECOMPENSA!';
+      milestoneText = `¡Felicidades por alcanzar ${milestone} votos!`;
+    }
+  }
+  
+  // Crear el HTML para la estrella y el mensaje
+  notification.innerHTML = `
+  <div class="star-container">
+    <div class="reward-title">${rewardTitle}</div>
+    <div class="star"></div>
+    <div class="star-inner">
+      <div class="coins-amount">${coins} Ficha${coins > 1 ? 's' : ''}</div>
+      <div class="milestone-text">${milestoneText}</div>
+    </div>
+  </div>
+  `;
+  
+  // Añadir al documento
+  document.body.appendChild(notification);
+  
+  // Mostrar la notificación y el overlay gradualmente
+  requestAnimationFrame(() => {
+    overlay.style.display = 'block';
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+      overlay.style.opacity = '1';
+    }, 50);
+  });
+  
+  // Cerrar automáticamente después de 5 segundos
+  const animationDuration = 5000;
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      notification.remove();
+      overlay.remove();
+    }, 1000);
+  }, animationDuration);
+}
+
+// Las demás funciones permanecen igual
+function checkForRewards() {
+  fetch('/check-rewards')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.hasReward) {
+        const { coins, milestone, type, bonusAwarded } = data.notification;
+        showStarReward(coins, milestone, type, bonusAwarded);
+      }
+    })
+    .catch(error => console.error('Error checking rewards:', error));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  checkForRewards();
+  setInterval(checkForRewards, 10000);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Get the community ID from various possible sources
+  let comunidadId = getCommunityId();
+  
+  // Check if we're on the main forum page without community context
+  const isMainForumPage = window.location.pathname === '/foro' && !window.location.search.includes('comunidad_id');
+  
+  // Handle main forum page display
+  if (isMainForumPage) {
+    localStorage.removeItem('currentCommunityId');
+    // Show main forum header
+    document.getElementById('main-forum-header')?.style.setProperty('display', 'block');
+    // Hide community header
+    document.getElementById('community-header')?.style.setProperty('display', 'none');
+    // Remove community context class from container
+    document.querySelector('.container')?.classList.remove('community-context');
+    return; // Exit early
+  }
+  
+  // If we don't have a community ID in the URL, check localStorage
+  if (!comunidadId) {
+    comunidadId = localStorage.getItem('currentCommunityId');
+  }
+  
+  // If we still don't have a community ID, exit early
+  if (!comunidadId) return;
+  
+  // Store the community ID for persistence across page navigation
+  localStorage.setItem('currentCommunityId', comunidadId);
+  
+  // Add community context class
+  document.querySelector('.container')?.classList.add('community-context');
+  
+  // Hide main forum header and show community header
+  document.getElementById('main-forum-header')?.style.setProperty('display', 'none');
+  document.getElementById('community-header')?.style.setProperty('display', 'block');
+
+  try {
+    const res = await fetch(`/api/comunidad/${comunidadId}`);
+    if (!res.ok) throw new Error();
+    const c = await res.json();
+
+    // Update page with community info
+    document.getElementById('community-title').textContent = c.nombre;
+    document.getElementById('community-description').textContent = c.descripcion || 'Esta comunidad no tiene descripción.';
+    document.getElementById('community-category').textContent = c.categoria || '';
+    document.getElementById('community-subcategory').textContent = c.subcategoria || '';
+    document.getElementById('community-subcategory-extra').textContent = c.subcategoria_extra || '';
+
+    const banner = document.getElementById('community-banner-image');
+    banner.style.backgroundImage = c.imagen_url ? `url(${c.imagen_url})` : '';
+    if (!c.imagen_url) banner.innerHTML = createSVGBackground(c.id);
+
+    const reglas = document.getElementById('community-rules');
+    reglas.innerHTML = c.reglas?.trim() || '<p class="no-rules">Esta comunidad no tiene reglas definidas.</p>';
+
+    // Load community stats
+    const stats = await fetch(`/api/comunidad/${c.id}/stats`).then(r => r.json()).catch(() => ({ members: 0, posts: 0 }));
+    document.getElementById('community-members').textContent = stats.members;
+    document.getElementById('community-posts').textContent = stats.posts;
+
+    // Check if user is member
+    const isMember = await fetch(`/api/comunidad/${c.id}/is-member`).then(r => r.json()).then(d => d.isMember).catch(() => false);
+    const joinBtn = document.getElementById('btn-join-community');
+    if (joinBtn) {
+      joinBtn.textContent = isMember ? 'Miembro' : 'Unirse a la comunidad';
+      joinBtn.classList.toggle('is-member', isMember);
+      joinBtn.disabled = isMember;
+      if (!isMember) joinBtn.onclick = () => joinCommunity(c.id);
+    }
+
+    // Add community parameter to all internal links
+    addCommunityParamToLinks(c.id);
+
+    // Add hidden input to the form for community ID
+    const messageForm = document.getElementById('mensaje-form');
+    if (messageForm) {
+      // Remove any existing community_id input first to avoid duplicates
+      const existingInput = messageForm.querySelector('input[name="comunidad_id"]');
+      if (existingInput) existingInput.remove();
+      
+      // Add the new hidden input
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'comunidad_id';
+      hiddenInput.value = c.id;
+      messageForm.appendChild(hiddenInput);
+    }
+
+    // Also add to the comentario form if it exists
+    const commentForm = document.getElementById('comentario-form');
+    if (commentForm) {
+      // Remove any existing community_id input first
+      const existingInput = commentForm.querySelector('input[name="comunidad_id"]');
+      if (existingInput) existingInput.remove();
+      
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'comunidad_id';
+      hiddenInput.value = c.id;
+      commentForm.appendChild(hiddenInput);
+    }
+
+    preSelectOptions(c);
+  } catch (error) {
+    console.error('Error cargando datos de la comunidad:', error);
+  }
+});
+
+// Helper function to get community ID from various sources
+function getCommunityId() {
+  const path = window.location.pathname.split('/');
+  // Check URL path for community ID
+  if (path[1] === 'foro' && path[2]) {
+    return path[2];
+  }
+  // Check query params for community ID
+  const urlParams = new URLSearchParams(location.search);
+  const communityParam = urlParams.get('comunidad_id');
+  if (communityParam) {
+    return communityParam;
+  }
+  return null;
+}
+
+// Add community parameter to all internal links to maintain context
+function addCommunityParamToLinks(communityId) {
+  const internalLinks = document.querySelectorAll('a[href^="/"]');
+  internalLinks.forEach(link => {
+    // Skip links that already have the community parameter or are to the community page itself
+    if (link.href.includes('comunidad_id=') || link.href.includes(`/foro/${communityId}`)) {
+      return;
+    }
+    
+    // Skip links to the main forum page to allow exiting community context
+    if (link.href.endsWith('/foro')) {
+      return;
+    }
+    
+    const url = new URL(link.href);
+    // Don't modify logout, profile, etc. links
+    if (!url.pathname.startsWith('/foro') && !url.pathname.startsWith('/crear-post')) {
+      return;
+    }
+    
+    // Add community ID parameter
+    url.searchParams.set('comunidad_id', communityId);
+    link.href = url.toString();
+  });
+  
+  // Also handle form actions to maintain context
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    if (!form.action || form.action.includes('comunidad_id=')) return;
+    
+    // Skip adding to the filtrar form as it's handled separately
+    if (form.id === 'filter-form') return;
+    
+    // Remove any existing community_id input first
+    const existingInput = form.querySelector('input[name="comunidad_id"]');
+    if (existingInput) existingInput.remove();
+    
+    // Add hidden input with community ID
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'comunidad_id';
+    hiddenInput.value = communityId;
+    form.appendChild(hiddenInput);
+  });
+  
+  // Specially handle the filter form to add community context
+  const filterForm = document.getElementById('filter-form');
+  if (filterForm) {
+    const existingInput = filterForm.querySelector('input[name="comunidad_id"]');
+    if (existingInput) existingInput.remove();
+    
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'comunidad_id';
+    hiddenInput.value = communityId;
+    filterForm.appendChild(hiddenInput);
+  }
+}
+
+function createSVGBackground(id) {
+  return `<svg class="svg-bg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad${id}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3d0099;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#6f42ff;stop-opacity:0.6"/></linearGradient><pattern id="pat${id}" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="12" fill="rgba(0,234,255,0.15)"/></pattern></defs><rect width="100%" height="100%" fill="url(#grad${id})"/><rect width="100%" height="100%" fill="url(#pat${id})"/></svg>`;
+}
+
+function joinCommunity(id) {
+  fetch(`/api/comunidad/${id}/join`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const btn = document.getElementById('btn-join-community');
+        btn.textContent = 'Miembro';
+        btn.classList.add('is-member');
+        btn.disabled = true;
+        const count = document.getElementById('community-members');
+        count.textContent = parseInt(count.textContent) + 1;
+      }
+    })
+    .catch(() => alert('No se pudo unir a la comunidad.'));
+}
+
+function preSelectOptions(comunidad) {
+  // Si estamos en la página de crear nuevo post, preseleccionamos las categorías según la comunidad
+  const categoriaSelect = document.getElementById('categoria');
+  const subcategoriaSelect = document.getElementById('subcategoria');
+  const subcategoriaExtraSelect = document.getElementById('extrasubcategoria');
+  
+  if (!categoriaSelect || !subcategoriaSelect) return;
+  
+  // Implementar la lógica para preseleccionar las opciones basadas en la comunidad
+  if (comunidad.categoria) {
+    for (let i = 0; i < categoriaSelect.options.length; i++) {
+      if (categoriaSelect.options[i].value === comunidad.categoria) {
+        categoriaSelect.selectedIndex = i;
+        break;
+      }
+    }
+    
+    // Cargar las subcategorías basadas en la categoría seleccionada
+    fetch(`/subcategorias/${comunidad.categoria}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Poblar el select de subcategorías
+          subcategoriaSelect.innerHTML = '';
+          data.subcategorias.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = sub;
+            subcategoriaSelect.appendChild(option);
+          });
+          
+          // Seleccionar la subcategoría de la comunidad si existe
+          if (comunidad.subcategoria) {
+            for (let i = 0; i < subcategoriaSelect.options.length; i++) {
+              if (subcategoriaSelect.options[i].value === comunidad.subcategoria) {
+                subcategoriaSelect.selectedIndex = i;
+                break;
+              }
+            }
+            
+            // Cargar las extrasubcategorías si hay una subcategoría seleccionada
+            if (comunidad.subcategoria !== 'Ninguna') {
+              fetch(`/extrasubcategorias/${comunidad.subcategoria}`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data.success && subcategoriaExtraSelect) {
+                    // Poblar el select de extrasubcategorías
+                    subcategoriaExtraSelect.innerHTML = '';
+                    data.extrasubcategorias.forEach(extra => {
+                      const option = document.createElement('option');
+                      option.value = extra;
+                      option.textContent = extra;
+                      subcategoriaExtraSelect.appendChild(option);
+                    });
+                    
+                    // Seleccionar la extrasubcategoría de la comunidad si existe
+                    if (comunidad.subcategoria_extra) {
+                      for (let i = 0; i < subcategoriaExtraSelect.options.length; i++) {
+                        if (subcategoriaExtraSelect.options[i].value === comunidad.subcategoria_extra) {
+                          subcategoriaExtraSelect.selectedIndex = i;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                })
+                .catch(err => console.error('Error cargando extrasubcategorías:', err));
+            }
+          }
+        }
+      })
+      .catch(err => console.error('Error cargando subcategorías:', err));
+  }
+}
+
+// Función para manejar el toggle de los acordeones
+function toggleAccordion(element) {
+  const content = element.nextElementSibling;
+  const icon = element.querySelector('.accordion-icon');
+  
+  if (content.style.display === 'none' || content.style.display === '') {
+    content.style.display = 'block';
+    icon.classList.remove('fa-chevron-down');
+    icon.classList.add('fa-chevron-up');
+  } else {
+    content.style.display = 'none';
+    icon.classList.remove('fa-chevron-up');
+    icon.classList.add('fa-chevron-down');
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Load subcategories when a main category is selected
+  const etiquetaSelect = document.getElementById('etiqueta-comentario');
+  const subcategoriaSelect = document.getElementById('subcategoria-comentario');
+  const extrasubcategoriaSelect = document.getElementById('extrasubcategoria-comentario');
+  
+  if (etiquetaSelect) {
+    etiquetaSelect.addEventListener('change', function() {
+      const selectedEtiqueta = this.value;
+      console.log('Selected main category:', selectedEtiqueta);
+      
+      // Reset subcategories dropdown
+      subcategoriaSelect.innerHTML = '<option value="">Seleccione subcategoría</option>';
+      extrasubcategoriaSelect.innerHTML = '<option value="">Seleccione subcategoría extra</option>';
+      
+      if (selectedEtiqueta) {
+        // Fetch subcategories for the selected main category
+        fetch(`/subcategorias/${encodeURIComponent(selectedEtiqueta)}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('Received subcategories:', data);
+            
+            if (data.success && data.subcategorias) {
+              data.subcategorias.forEach(subcat => {
+                const option = document.createElement('option');
+                option.value = subcat;
+                option.textContent = subcat;
+                subcategoriaSelect.appendChild(option);
+              });
+            } else {
+              console.error('Failed to load subcategories:', data.error);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching subcategories:', error);
+          });
+      }
+    });
+  }
+  
+  // Load extra subcategories when a subcategory is selected
+  if (subcategoriaSelect) {
+    subcategoriaSelect.addEventListener('change', function() {
+      const selectedSubcategoria = this.value;
+      console.log('Selected subcategory:', selectedSubcategoria);
+      
+      // Reset extra subcategories dropdown
+      extrasubcategoriaSelect.innerHTML = '<option value="">Seleccione subcategoría extra</option>';
+      
+      if (selectedSubcategoria) {
+        // Fetch extra subcategories for the selected subcategory
+        fetch(`/extrasubcategorias/${encodeURIComponent(selectedSubcategoria)}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('Received extra subcategories:', data);
+            
+            if (data.success && data.extrasubcategorias) {
+              data.extrasubcategorias.forEach(extrasubcat => {
+                const option = document.createElement('option');
+                option.value = extrasubcat;
+                option.textContent = extrasubcat;
+                extrasubcategoriaSelect.appendChild(option);
+              });
+            } else {
+              console.error('Failed to load extra subcategories:', data.error);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching extra subcategories:', error);
+          });
+      }
+    });
+  }
+  
+  // Code for filter checkboxes
+  const etiquetasFilters = document.querySelectorAll('input[name="etiquetas"]');
+  if (etiquetasFilters.length > 0) {
+    etiquetasFilters.forEach(checkbox => {
+ 
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize category selection handlers
+  initCategorySelectors();
+  
+  initFilterCategories();
+  
+  // Validar estructura de categorías
+  validateCategoryStructure();
+});
+
+
+// Function to load extrasubcategories based on the main category
+// and filter out the selected subcategory
+function loadExtraSubcategories(category) {
+  const subcategorySelect = document.getElementById('subcategoria-comentario');
+  const extraSubcategorySelect = document.getElementById('extrasubcategoria-comentario');
+  
+  if (!extraSubcategorySelect) {
+    console.error('Extra subcategory select element not found');
+    return;
+  }
+  
+  // Reset extra subcategory dropdown
+  extraSubcategorySelect.innerHTML = '<option value="">Cargando subcategorías extras...</option>';
+  
+  if (!category || category === 'Ninguna' || category === '') {
+    extraSubcategorySelect.innerHTML = '<option value="">Seleccione subcategoría extra</option>';
+    return;
+  }
+  
+  console.log(`Solicitando subcategorías extras para la categoría principal: "${category}"`);
+  
+  // Use the same endpoint but duplicate it for extrasubcategories
+  const url = `/subcategorias/${encodeURIComponent(category)}`;
+  console.log('URL de solicitud para extrasubcategorías:', url);
+  
+  fetch(url)
+    .then(response => {
+      console.log('Estado de respuesta para extrasubcategorías:', response.status);
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Respuesta completa recibida para extrasubcategorías:', data);
+      if (data.success) {
+        // Populate extra subcategory dropdown
+        extraSubcategorySelect.innerHTML = '<option value="">Seleccione subcategoría extra</option>';
+        
+        if (data.subcategorias && data.subcategorias.length > 0) {
+          // Get current selected subcategory to filter it out
+          const selectedSubcategory = subcategorySelect.value;
+          console.log(`Se cargarán opciones para subcategorías extras, excluyendo "${selectedSubcategory}"`);
+          
+          data.subcategorias.forEach(extraSubcategoria => {
+            // Skip adding the option if it matches the selected subcategory
+            if (extraSubcategoria !== selectedSubcategory) {
+              const option = document.createElement('option');
+              option.value = extraSubcategoria;
+              option.textContent = extraSubcategoria;
+              extraSubcategorySelect.appendChild(option);
+            }
+          });
+        } else {
+          console.warn('No se encontraron opciones para subcategorías extras');
+          extraSubcategorySelect.innerHTML = '<option value="">No hay opciones disponibles</option>';
+        }
+      } else {
+        console.error('Error loading extra subcategories:', data.error);
+        extraSubcategorySelect.innerHTML = '<option value="">Error al cargar opciones</option>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching extra subcategories:', error);
+      extraSubcategorySelect.innerHTML = '<option value="">Error al cargar opciones</option>';
+    });
+}
+function initCategorySelectors() {
+  // Main category selector for new posts
+  const mainCategorySelect = document.getElementById('etiqueta-comentario');
+  const subcategorySelect = document.getElementById('subcategoria-comentario');
+  const extraSubcategorySelect = document.getElementById('extrasubcategoria-comentario');
+  
+  if (!mainCategorySelect || !subcategorySelect || !extraSubcategorySelect) {
+      console.error('Category selectors not found');
+      return;
+  }
+  
+  // Set default values
+  subcategorySelect.innerHTML = '<option value="">Seleccione subcategoría</option>';
+  extraSubcategorySelect.innerHTML = '<option value="">Seleccione subcategoría extra</option>';
+  
+  // Log to verify event listeners are being attached
+  console.log('Configurando event listeners para selectores de categorías');
+  
+  // Event listener for main category change
+  mainCategorySelect.addEventListener('change', function() {
+      const selectedCategory = this.value;
+      console.log('Categoría seleccionada:', selectedCategory);
+      
+      // Load subcategories based on the main category
+      loadSubcategories(selectedCategory);
+  });
+  
+  // Add event listener for subcategory change to update extrasubcategories
+  subcategorySelect.addEventListener('change', function() {
+      const selectedMainCategory = mainCategorySelect.value;
+      console.log('Subcategoría seleccionada:', this.value);
+      
+      // Reload extrasubcategories to filter out the selected subcategory
+      loadExtraSubcategories(selectedMainCategory);
+  });
+}
+
+
+// Function to load all subcategories for filtering, regardless of parent category
+function loadAllSubcategories() {
+  const subetiquetasGrid = document.getElementById('subetiquetas-grid');
+  if (!subetiquetasGrid) return;
+  
+  console.log('Loading all subcategories for independent filtering');
+  
+  // Reset the subcategories grid but keep the "Ninguna" option if it exists
+  const initialOption = subetiquetasGrid.querySelector('.initial-option');
+  subetiquetasGrid.innerHTML = '';
+  if (initialOption) subetiquetasGrid.appendChild(initialOption);
+  
+  // Fetch all subcategories from the server
+  fetch('/todas-subcategorias')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.subcategorias) {
+        console.log(`Loaded ${data.subcategorias.length} subcategories from all categories`);
+        
+        // Sort subcategories alphabetically
+        const sortedSubcategorias = data.subcategorias.sort();
+        
+        // Add each subcategory as a filter option
+        sortedSubcategorias.forEach(subcat => {
+          if (subcat !== 'Ninguna') {
+            const filterItem = document.createElement('div');
+            filterItem.className = 'filtro-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `filtro-${subcat.toLowerCase().replace(/\s+/g, '-')}`;
+            checkbox.name = 'subetiquetas-global';
+            checkbox.value = subcat;
+            
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = subcat;
+            
+            filterItem.appendChild(checkbox);
+            filterItem.appendChild(label);
+            subetiquetasGrid.appendChild(filterItem);
+          }
+        });
+        
+        // Add event listeners to the new checkboxes
+        subetiquetasGrid.querySelectorAll('input[name="subetiquetas-global"]').forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            console.log(`Subcategory filter "${this.value}" ${this.checked ? 'selected' : 'deselected'}`);
+            // Trigger filter application when a subcategory is selected
+            if (typeof aplicarFiltros === 'function') {
+              aplicarFiltros();
+            }
+          });
+        });
+      } else {
+        console.error('Failed to load all subcategories:', data.error || 'Unknown error');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching all subcategories:', error);
+    });
+}
+
+// Create a new endpoint on the server to get all subcategories
+// This would be implemented on the server-side, but here's how to use it:
+function setupIndependentFiltering() {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Load all subcategories when the page loads
+    loadAllSubcategories();
+    
+    // Modify the existing filter application function to work with our new independent subcategory filters
+    const originalAplicarFiltros = window.aplicarFiltros || function() {};
+    
+    window.aplicarFiltros = function() {
+      // Get selected subcategories from our new global subcategory filters
+      const subetiquetasSeleccionadasGlobal = Array.from(
+        document.querySelectorAll('input[name="subetiquetas-global"]:checked')
+      ).map(el => el.value);
+      
+      console.log('Selected subcategories (global):', subetiquetasSeleccionadasGlobal);
+      
+      // Get all messages
+      const mensajes = document.querySelectorAll('.mensaje');
+      
+      // Get other filter values (from the original function)
+      const etiquetasSeleccionadas = Array.from(
+        document.querySelectorAll('input[name="etiquetas"]:checked')
+      ).map(el => el.value);
+      
+      const ordenSelect = document.getElementById('orden');
+      const rankingSelect = document.getElementById('ranking');
+      const tipoSelect = document.getElementById('tipo');
+      
+      const orden = ordenSelect ? ordenSelect.value : 'recientes';
+      const ranking = rankingSelect ? rankingSelect.value : 'todos';
+      const tipo = tipoSelect ? tipoSelect.value : 'todos';
+      
+      // Community Filter - Get selected community
+      const comunidadSeleccionada = document.querySelector('input[name="comunidad_id"]:checked');
+      let comunidadId = comunidadSeleccionada ? comunidadSeleccionada.value : null;
+      
+      // Check if "Mis comunidades" is checked
+      const misComunidadesCheckbox = document.getElementById('mis-comunidades-checkbox');
+      const filtrarPorMisComunidades = misComunidadesCheckbox && misComunidadesCheckbox.checked;
+      
+      // Apply filters
+      let mensajesFiltrados = Array.from(mensajes).filter(mensaje => {
+        // Original category filter
+        const etiquetaMensaje = mensaje.querySelector('.etiqueta');
+        const etiquetaValida = etiquetasSeleccionadas.length === 0 || 
+          (etiquetaMensaje && etiquetasSeleccionadas.includes(etiquetaMensaje.textContent.trim()));
+        
+        // New independent subcategory filter
+        let subcategoriaValida = true;
+        if (subetiquetasSeleccionadasGlobal.length > 0) {
+          const subcategoriaMensaje = mensaje.querySelector('.subetiqueta:not(.extra)');
+          const extraSubcategoriaMensaje = mensaje.querySelector('.subetiqueta.extra');
+          
+          subcategoriaValida = 
+            (subcategoriaMensaje && subetiquetasSeleccionadasGlobal.includes(subcategoriaMensaje.textContent.trim())) ||
+            (extraSubcategoriaMensaje && subetiquetasSeleccionadasGlobal.includes(extraSubcategoriaMensaje.textContent.trim()));
+        }
+        
+        // Rest of the original filter logic...
+        // Ranking filter
+        const rankingElement = mensaje.querySelector('.ranking-valor');
+        let rankingValor = 0;
+        if (rankingElement) {
+          rankingValor = parseInt(rankingElement.textContent);
+        }
+        
+        let rankingValido = true;
+        switch(ranking) {
+          case 'populares':
+            rankingValido = rankingValor > 100;
+            break;
+          case 'medios':
+            rankingValido = rankingValor > 10 && rankingValor <= 100;
+            break;
+          case 'menos_populares':
+            rankingValido = rankingValor <= 10;
+            break;
+        }
+        
+        // Message type filter
+        const autorElement = mensaje.querySelector('.autor');
+        const autorMensaje = autorElement ? autorElement.textContent.trim() : '';
+        const currentUser = getCurrentUser();
+        let tipoValido = true;
+        
+        if (tipo === 'mios') {
+          tipoValido = autorMensaje === currentUser;
+        }
+        
+        // Community filter
+        let comunidadValida = true;
+        
+        if (comunidadId && comunidadId !== '') {
+          const mensajeComunidadId = mensaje.getAttribute('data-comunidad-id');
+          comunidadValida = mensajeComunidadId === comunidadId;
+        }
+        
+        // Filter by "My communities"
+        if (filtrarPorMisComunidades) {
+          const mensajeComunidadId = mensaje.getAttribute('data-comunidad-id');
+          const misComunidadesIds = getMisComunidadesIds();
+          comunidadValida = misComunidadesIds.includes(mensajeComunidadId);
+        }
+        
+        return etiquetaValida && subcategoriaValida && rankingValido && tipoValido && comunidadValida;
+      });
+      
+      // Apply sorting as in the original function
+      const ahora = new Date();
+      const treintaMinutosAtras = new Date(ahora - 30 * 60 * 1000);
+      const unaSemanaAtras = new Date(ahora - 7 * 24 * 60 * 60 * 1000);
+      const unDiaAtras = new Date(ahora - 24 * 60 * 60 * 1000);
+      
+      switch(orden) {
+        case 'recientes':
+          mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+            const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
+            return fechaMensaje >= treintaMinutosAtras;
+          });
+          mensajesFiltrados.sort((a, b) => {
+            const fechaA = new Date(a.querySelector('.fecha').textContent);
+            const fechaB = new Date(b.querySelector('.fecha').textContent);
+            return fechaB - fechaA;
+          });
+          break;
+        case 'antiguos':
+          mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+            const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
+            return fechaMensaje <= unaSemanaAtras;
+          });
+          mensajesFiltrados.sort((a, b) => {
+            const fechaA = new Date(a.querySelector('.fecha').textContent);
+            const fechaB = new Date(b.querySelector('.fecha').textContent);
+            return fechaA - fechaB;
+          });
+          break;
+        case 'nuevos_24h':
+          mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+            const fechaMensaje = new Date(mensaje.querySelector('.fecha').textContent);
+            return fechaMensaje >= unDiaAtras;
+          });
+          mensajesFiltrados.sort((a, b) => {
+            const fechaA = new Date(a.querySelector('.fecha').textContent);
+            const fechaB = new Date(b.querySelector('.fecha').textContent);
+            return fechaB - fechaA;
+          });
+          break;
+        case 'mas_valorados':
+          mensajesFiltrados = mensajesFiltrados.filter(mensaje => {
+            const rankingValor = parseInt(mensaje.querySelector('.ranking-valor').textContent);
+            return rankingValor > 100;
+          });
+          mensajesFiltrados.sort((a, b) => {
+            const rankingA = parseInt(a.querySelector('.ranking-valor').textContent);
+            const rankingB = parseInt(b.querySelector('.ranking-valor').textContent);
+            return rankingB - rankingA;
+          });
+          break;
+        default:
+          mensajesFiltrados.sort((a, b) => {
+            const fechaA = new Date(a.querySelector('.fecha').textContent);
+            const fechaB = new Date(b.querySelector('.fecha').textContent);
+            return fechaB - fechaA;
+          });
+      }
+      
+      // Hide/show messages based on filters
+      mensajes.forEach(mensaje => mensaje.style.display = 'none');
+      mensajesFiltrados.forEach(mensaje => mensaje.style.display = 'block');
+      
+      // Show message if no results
+      const resultadosMensaje = document.getElementById('resultados-filtrados-mensaje');
+      if (resultadosMensaje) {
+        resultadosMensaje.style.display = mensajesFiltrados.length === 0 ? 'block' : 'none';
+      }
+      
+      // Update applied filters display
+      const filtrosAplicadosTags = document.getElementById('filtros-aplicados-tags');
+      if (filtrosAplicadosTags) {
+        filtrosAplicadosTags.innerHTML = '';
+        
+        // Include subcategory filters in the applied filters display
+        const allAppliedFilters = [
+          ...etiquetasSeleccionadas.map(etiqueta => `Etiqueta: ${etiqueta}`),
+          ...subetiquetasSeleccionadasGlobal.map(subetiqueta => `Subetiqueta: ${subetiqueta}`),
+          `Orden: ${obtenerTextoOrden(orden)}`,
+          `Ranking: ${obtenerTextoRanking(ranking)}`,
+          `Tipo: ${obtenerTextoTipo(tipo)}`
+        ];
+        
+        // Add community filter tag if selected
+        if (comunidadId && comunidadId !== '') {
+          const comunidadNombre = obtenerNombreComunidad(comunidadId);
+          allAppliedFilters.push(`Comunidad: ${comunidadNombre}`);
+        }
+        
+        allAppliedFilters.forEach(filtro => {
+          const tagElement = document.createElement('div');
+          tagElement.className = 'filtro-tag';
+          tagElement.innerHTML = `
+            ${filtro}
+            <span class="remove-tag">&times;</span>
+          `;
+          
+          tagElement.querySelector('.remove-tag').addEventListener('click', () => {
+            tagElement.remove();
+            
+            // Handle removing specific filters
+            if (filtro.startsWith('Etiqueta:')) {
+              const etiquetaValor = filtro.replace('Etiqueta: ', '');
+              const checkbox = document.querySelector(`input[name="etiquetas"][value="${etiquetaValor}"]`);
+              if (checkbox) checkbox.checked = false;
+            } else if (filtro.startsWith('Subetiqueta:')) {
+              const subetiquetaValor = filtro.replace('Subetiqueta: ', '');
+              const checkbox = document.querySelector(`input[name="subetiquetas-global"][value="${subetiquetaValor}"]`);
+              if (checkbox) checkbox.checked = false;
+            } else if (filtro.startsWith('Comunidad:')) {
+              const todasComunidadesRadio = document.getElementById('comunidad-todas');
+              if (todasComunidadesRadio) {
+                todasComunidadesRadio.checked = true;
+              }
+              localStorage.removeItem('currentCommunityId');
+            }
+            
+            // Reapply filters
+            aplicarFiltros();
+          });
+          
+          filtrosAplicadosTags.appendChild(tagElement);
+        });
+      }
+      
+      console.log(`Total mensajes filtrados: ${mensajesFiltrados.length}`);
+    };
+  });
+}
+
+// Execute the setup function
+setupIndependentFiltering();
+// Function to load subcategories based on selected main category
+
+
+// Función para cargar categorías desde la base de datos
+async function loadCategoriesFromDB() {
+  try {
+    // Get main categories
+    const categoriasResult = await db.query(`
+      SELECT nombre FROM categories_metadata 
+      WHERE tipo = 'categoria' AND activo = TRUE 
+      ORDER BY nombre
+    `);
+    
+    const etiquetasDisponibles = ['Ninguna'];
+    categoriasResult.rows.forEach(row => {
+      if (!etiquetasDisponibles.includes(row.nombre)) {
+        etiquetasDisponibles.push(row.nombre);
+      }
+    });
+    
+    // Para debug
+    console.log('Categorías principales cargadas:', etiquetasDisponibles);
+    
+    // Cargar algunas subcategorías para debug
+    if (etiquetasDisponibles.length > 1) {
+      const primeraCategoria = etiquetasDisponibles[1]; // Primera categoría después de "Ninguna"
+      
+      // Verificar las subcategorías asociadas a esta categoría
+      const testSubcategoriasResult = await db.query(`
+        SELECT nombre 
+        FROM categories_metadata 
+        WHERE tipo = 'subcategoria' 
+        AND categoria = $1 
+        AND activo = TRUE
+      `, [primeraCategoria]);
+      
+      console.log(`Subcategorías para "${primeraCategoria}" (debug):`, 
+                 testSubcategoriasResult.rows.map(row => row.nombre));
+    }
+    
+    // Get all subcategories
+    const subcategoriasResult = await db.query(`
+      SELECT nombre FROM categories_metadata 
+      WHERE tipo = 'subcategoria' AND activo = TRUE 
+      ORDER BY nombre
+    `);
+    
+    const subetiquetasDisponibles = ['Ninguna'];
+    subcategoriasResult.rows.forEach(row => {
+      if (!subetiquetasDisponibles.includes(row.nombre)) {
+        subetiquetasDisponibles.push(row.nombre);
+      }
+    });
+    
+    // Get all extra subcategories
+    const extrasubcategoriasResult = await db.query(`
+      SELECT nombre FROM categories_metadata 
+      WHERE tipo = 'extrasubcategoria' AND activo = TRUE 
+      ORDER BY nombre
+    `);
+    
+    const extrasubetiquetasDisponibles = ['Ninguna'];
+    extrasubcategoriasResult.rows.forEach(row => {
+      if (!extrasubetiquetasDisponibles.includes(row.nombre)) {
+        extrasubetiquetasDisponibles.push(row.nombre);
+      }
+    });
+    
+    return {
+      etiquetasDisponibles,
+      subetiquetasDisponibles,
+      extrasubetiquetasDisponibles
+    };
+  } catch (error) {
+    console.error('Error loading categories from database:', error);
+    
+    // Fallback to only "Ninguna" if database loading fails
+    return {
+      etiquetasDisponibles: ['Ninguna'],
+      subetiquetasDisponibles: ['Ninguna'],
+      extrasubetiquetasDisponibles: ['Ninguna']
+    };
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to generate a consistent color based on string
+  function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Generate vibrant colors with good contrast against white text
+    const hue = Math.abs(hash % 360);
+    const saturation = 65 + (hash % 20); // Between 65-85% saturation
+    const lightness = 30 + (hash % 20);  // Between 30-50% lightness
+    
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  }
+  
+  // Apply colors to main categories
+  document.querySelectorAll('.etiqueta:not([data-categoria="Ninguna"])').forEach(el => {
+    const category = el.getAttribute('data-categoria');
+    if (category && category !== 'Ninguna') {
+      el.style.setProperty('--category-color', stringToColor(category));
+    }
+  });
+  
+  // Apply colors to subcategories
+  document.querySelectorAll('.subetiqueta:not([data-subcategoria="Ninguna"])').forEach(el => {
+    const subcategory = el.getAttribute('data-subcategoria');
+    if (subcategory && subcategory !== 'Ninguna') {
+      el.style.setProperty('--subcategory-color', stringToColor(subcategory));
+    }
+  });
+  
+  // Apply colors to extra subcategories
+  document.querySelectorAll('.subetiqueta.extra:not([data-extrasubcategoria="Ninguna"])').forEach(el => {
+    const extraSubcategory = el.getAttribute('data-extrasubcategoria');
+    if (extraSubcategory && extraSubcategory !== 'Ninguna') {
+      el.style.setProperty('--extrasubcategory-color', stringToColor(extraSubcategory));
+    }
+  });
+  
+  // Apply color to new elements as they are added to the DOM
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.addedNodes) {
+        mutation.addedNodes.forEach(function(node) {
+          // Check if the added node is an element
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // Apply color to main categories
+            if (node.classList.contains('etiqueta') && node.hasAttribute('data-categoria')) {
+              const category = node.getAttribute('data-categoria');
+              if (category && category !== 'Ninguna') {
+                node.style.setProperty('--category-color', stringToColor(category));
+              }
+            }
+            
+            // Apply color to subcategories
+            if (node.classList.contains('subetiqueta') && node.hasAttribute('data-subcategoria')) {
+              const subcategory = node.getAttribute('data-subcategoria');
+              if (subcategory && subcategory !== 'Ninguna') {
+                node.style.setProperty('--subcategory-color', stringToColor(subcategory));
+              }
+            }
+            
+            // Apply color to extra subcategories
+            if (node.classList.contains('subetiqueta') && 
+                node.classList.contains('extra') && 
+                node.hasAttribute('data-extrasubcategoria')) {
+              const extraSubcategory = node.getAttribute('data-extrasubcategoria');
+              if (extraSubcategory && extraSubcategory !== 'Ninguna') {
+                node.style.setProperty('--extrasubcategory-color', stringToColor(extraSubcategory));
+              }
+            }
+            
+            // Check children elements too
+            if (node.querySelectorAll) {
+              // Apply to category elements
+              node.querySelectorAll('.etiqueta:not([data-categoria="Ninguna"])').forEach(el => {
+                const category = el.getAttribute('data-categoria');
+                if (category && category !== 'Ninguna') {
+                  el.style.setProperty('--category-color', stringToColor(category));
+                }
+              });
+              
+              // Apply to subcategory elements
+              node.querySelectorAll('.subetiqueta:not([data-subcategoria="Ninguna"])').forEach(el => {
+                const subcategory = el.getAttribute('data-subcategoria');
+                if (subcategory && subcategory !== 'Ninguna') {
+                  el.style.setProperty('--subcategory-color', stringToColor(subcategory));
+                }
+              });
+              
+              // Apply to extra subcategory elements
+              node.querySelectorAll('.subetiqueta.extra:not([data-extrasubcategoria="Ninguna"])').forEach(el => {
+                const extraSubcategory = el.getAttribute('data-extrasubcategoria');
+                if (extraSubcategory && extraSubcategory !== 'Ninguna') {
+                  el.style.setProperty('--extrasubcategory-color', stringToColor(extraSubcategory));
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+  });
+  
+  // Observe changes in the entire document
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+});
+

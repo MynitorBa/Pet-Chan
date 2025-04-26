@@ -1,0 +1,626 @@
+<%- include("partials/header.ejs") %>
+<link rel="stylesheet" href="/styles/comunidades.css">
+<meta name="user-rango3" content="<%= userRangos.rango3 %>">
+
+<div class="contenedor-principal">
+    <div class="panel-lateral">
+        <a href="#" class="btn-crear-comunidad" id="btn-abrir-modal">
+            <i class="fas fa-plus"></i> Crear Comunidad
+        </a>
+        <a href="#" class="btn-admin-categoria" id="btn-admin-categorias">
+            <i class="fas fa-tags"></i> Administrar Categorías
+        </a>
+        
+        <a href="#" class="btn-solicitudes" id="btn-mis-solicitudes">
+            <i class="fas fa-user-clock"></i> Solicitudes en espera
+        </a>
+        
+        <% if (userRangos.rango3 === 'Moderador' || userRangos.rango3 === 'Administrador') { %>
+        <a href="#" class="btn-admin-solicitudes" id="btn-admin-solicitudes">
+            <i class="fas fa-users-cog"></i> Solicitudes de seguidores
+        </a>
+        <% } %>
+        
+        <div class="seccion">
+            <h2>Destacados</h2>
+            <ul class="lista-destacados">
+                <% if (comunidades && comunidades.length > 0) { %>
+                    <% comunidades.slice(0, 3).forEach(comunidad => { %>
+                        <li><a href="/comunidad/<%= comunidad.id %>"><%= comunidad.nombre %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No hay comunidades destacadas</li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel-comunidades">
+        <div class="pestanas">
+            <button class="pestana activa" data-tab="todas">Todas</button>
+            <button class="pestana" data-tab="mis-comunidades">Mis Comunidades</button>
+            <button class="pestana" data-tab="recomendadas">Recomendadas</button>
+        </div>
+
+        <div class="filtro-grupo">
+            <select id="filtro-categoria" class="formulario-control">
+                <option value="">Todas las categorías</option>
+                <% if (categorias && categorias.length > 0) { %>
+                    <% categorias.forEach(categoria => { %>
+                        <option value="<%= categoria.nombre %>"><%= categoria.nombre %></option>
+                    <% }); %>
+                <% } %>
+            </select>
+            
+            <select id="filtro-subcategoria" class="formulario-control">
+                <option value="">Todas las subcategorías</option>
+                <% if (subcategorias && subcategorias.length > 0) { %>
+                    <% subcategorias.forEach(subcategoria => { %>
+                        <option value="<%= subcategoria.nombre %>"><%= subcategoria.nombre %></option>
+                    <% }); %>
+                <% } %>
+            </select>
+            
+            <input type="text" id="buscar-comunidad" placeholder="Buscar comunidad...">
+        </div>
+
+        <div class="contenido-pestana" id="tab-todas">
+            <div class="lista-comunidades">
+                <% if (!comunidades || comunidades.length === 0) { %>
+                    <div class="tarjeta-comunidad">
+                        <p>No hay comunidades disponibles actualmente.</p>
+                    </div>
+                <% } else { %>
+                    <% comunidades.forEach(comunidad => { %>
+                        <div class="tarjeta-comunidad" 
+                             data-id="<%= comunidad.id %>" 
+                             data-categoria="<%= comunidad.categoria %>" 
+                             data-subcategoria="<%= comunidad.subcategoria %>" 
+                             data-subcategoria-extra="<%= comunidad.subcategoria_extra %>" 
+                             data-imagen="<%= comunidad.imagen_url %>">
+                           
+                            <% if (comunidad.imagen_url) { %>
+                                <img class="tarjeta-comunidad-imagen" src="<%= comunidad.imagen_url %>" alt="<%= comunidad.nombre %>">
+                            <% } else { %>
+                                <svg class="tarjeta-comunidad-imagen svg-bg" viewBox="0 0 800 500" height="280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="grad<%= comunidad.id %>" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#3d0099;stop-opacity:0.8" />
+                                            <stop offset="100%" style="stop-color:#6f42ff;stop-opacity:0.6" />
+                                        </linearGradient>
+                                        <pattern id="pattern<%= comunidad.id %>" width="50" height="50" patternUnits="userSpaceOnUse">
+                                            <circle cx="25" cy="25" r="12" fill="rgba(0, 234, 255, 0.15)" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#grad<%= comunidad.id %>)" />
+                                    <rect width="100%" height="100%" fill="url(#pattern<%= comunidad.id %>)" />
+                                
+                                    <circle cx="150" cy="100" r="80" fill="rgba(111, 66, 255, 0.3)" />
+                                    <circle cx="650" cy="400" r="120" fill="rgba(0, 178, 255, 0.2)" />
+                                    <path d="M0,250 Q200,150 400,250 T800,250" stroke="rgba(0, 234, 255, 0.3)" stroke-width="20" fill="none" />
+                                
+                                    <g transform="translate(400, 250) scale(0.8)">
+                                        <circle cx="0" cy="0" r="50" fill="rgba(255, 255, 255, 0.1)" />
+                                        <circle cx="-20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                        <circle cx="20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                        <circle cx="0" cy="20" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                    </g>
+                                </svg>
+                            <% } %>
+                            
+                            <div class="tarjeta-comunidad-contenido">
+                                <div class="tarjeta-comunidad-encabezado">
+                                    <h3><%= comunidad.nombre %></h3>
+                                    <% if (comunidad.es_privada) { %>
+                                        <span class="privacidad"><i class="fas fa-lock"></i> Privada</span>
+                                    <% } %>
+                                </div>
+        
+                                <div class="descripcion-contenedor">
+                                    <p class="descripcion-texto <%= comunidad.descripcion && comunidad.descripcion.length > 2 ? 'truncado' : '' %>">
+                                        <%= comunidad.descripcion || 'Sin descripción' %>
+                                    </p>
+                                </div>
+        
+                                <div class="reglas-contenedor">
+                                    <h4><i class="fas fa-gavel"></i> Reglas:</h4>
+                                    <p class="reglas-texto <%= comunidad.reglas && comunidad.reglas.length > 2 ? 'truncado' : '' %>">
+                                        <%= comunidad.reglas || 'Sin reglas definidas' %>
+                                    </p>
+                                </div>
+                                <div class="tarjeta-comunidad-etiquetas">
+                                    <% if (comunidad.categoria && comunidad.categoria !== 'Sin categoría') { %>
+                                        <span class="categoria"><i class="fas fa-tag"></i> <%= comunidad.categoria %></span>
+                                    <% } %>
+                                    
+                                    <% if (comunidad.subcategoria && comunidad.subcategoria !== 'Sin subcategoría') { %>
+                                        <span class="subcategoria"><i class="fas fa-tag"></i> <%= comunidad.subcategoria %></span>
+                                    <% } %>
+                                    
+                                    <% if (comunidad.subcategoria_extra && comunidad.subcategoria_extra !== 'Sin subcategoría extra') { %>
+                                        <span class="subcategoria-extra"><i class="fas fa-tag"></i> <%= comunidad.subcategoria_extra %></span>
+                                    <% } %>
+                                </div>
+                                
+                                <button onclick="verForo(<%= comunidad.id %>, <%= comunidad.es_privada %>)" class="btn-ver-foro" data-id="<%= comunidad.id %>" data-privada="<%= comunidad.es_privada %>">Ver Foro</button>
+
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="contenido-pestana oculto" id="tab-mis-comunidades">
+            <div class="lista-comunidades">
+                <% if (!misComunidades || misComunidades.length === 0) { %>
+                    <div class="tarjeta-comunidad">
+                        <p>No perteneces a ninguna comunidad actualmente.</p>
+                        <button id="btn-unirse" class="boton-unirse">Unirse a una comunidad</button>
+                    </div>
+                <% } else { %>
+                    <% misComunidades.forEach(comunidad => { %>
+                        <div class="tarjeta-comunidad" 
+                             data-id="<%= comunidad.id %>" 
+                             data-categoria="<%= comunidad.categoria %>" 
+                             data-subcategoria="<%= comunidad.subcategoria || '' %>" 
+                             data-subcategoria-extra="<%= comunidad.subcategoria_extra || '' %>">
+                            
+                            <% if (comunidad.imagen_url) { %>
+                                <img class="tarjeta-comunidad-imagen" src="<%= comunidad.imagen_url %>" alt="<%= comunidad.nombre %>">
+                            <% } else { %>
+                                <svg class="tarjeta-comunidad-imagen svg-bg" viewBox="0 0 800 500" height="280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gradMis<%= comunidad.id %>" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#3d0099;stop-opacity:0.8" />
+                                            <stop offset="100%" style="stop-color:#6f42ff;stop-opacity:0.6" />
+                                        </linearGradient>
+                                        <pattern id="patternMis<%= comunidad.id %>" width="50" height="50" patternUnits="userSpaceOnUse">
+                                            <circle cx="25" cy="25" r="12" fill="rgba(0, 234, 255, 0.15)" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#gradMis<%= comunidad.id %>)" />
+                                    <rect width="100%" height="100%" fill="url(#patternMis<%= comunidad.id %>)" />
+                                
+                                    <circle cx="150" cy="100" r="80" fill="rgba(111, 66, 255, 0.3)" />
+                                    <circle cx="650" cy="400" r="120" fill="rgba(0, 178, 255, 0.2)" />
+                                    <path d="M0,250 Q200,150 400,250 T800,250" stroke="rgba(0, 234, 255, 0.3)" stroke-width="20" fill="none" />
+                                
+                                    <g transform="translate(400, 250) scale(0.8)">
+                                        <circle cx="0" cy="0" r="50" fill="rgba(255, 255, 255, 0.1)" />
+                                        <circle cx="-20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                        <circle cx="20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                        <circle cx="0" cy="20" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                    </g>
+                                </svg>
+                            <% } %>
+                            
+                            <div class="tarjeta-comunidad-contenido">
+                                <div class="tarjeta-comunidad-encabezado">
+                                    <h3><%= comunidad.nombre %></h3>
+                                    <% if (comunidad.es_privada) { %>
+                                        <span class="privacidad"><i class="fas fa-lock"></i> Privada</span>
+                                    <% } %>
+                                </div>
+        
+                                <div class="descripcion-contenedor">
+                                    <p class="descripcion-texto <%= comunidad.descripcion && comunidad.descripcion.length > 100 ? 'truncado' : '' %>">
+                                        <%= comunidad.descripcion || 'Sin descripción' %>
+                                    </p>
+                                </div>
+        
+                                <div class="tarjeta-comunidad-etiquetas">
+                                    <% if (comunidad.categoria && comunidad.categoria !== 'Sin categoría') { %>
+                                        <span class="categoria"><i class="fas fa-tag"></i> <%= comunidad.categoria %></span>
+                                    <% } %>
+                                    
+                                    <% if (comunidad.subcategoria && comunidad.subcategoria !== 'Sin subcategoría') { %>
+                                        <span class="subcategoria"><i class="fas fa-tag"></i> <%= comunidad.subcategoria %></span>
+                                    <% } %>
+                                    
+                                    <% if (comunidad.subcategoria_extra && comunidad.subcategoria_extra !== 'Sin subcategoría extra') { %>
+                                        <span class="subcategoria-extra"><i class="fas fa-tag"></i> <%= comunidad.subcategoria_extra %></span>
+                                    <% } %>
+                                </div>
+                                
+                                <button onclick="verForo(<%= comunidad.id %>, <%= comunidad.es_privada %>)" class="btn-ver-foro" data-id="<%= comunidad.id %>" data-privada="<%= comunidad.es_privada %>">Ver Foro</button>
+
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="contenido-pestana oculto" id="tab-recomendadas">
+            <div class="lista-comunidades">
+                <% if (!comunidades || comunidades.length === 0) { %>
+                    <div class="tarjeta-comunidad">
+                        <p>No hay comunidades recomendadas actualmente.</p>
+                    </div>
+                <% } else { %>
+                    <% // Mostrar algunas comunidades aleatorias como recomendadas
+                    const recomendadas = [...comunidades].sort(() => 0.5 - Math.random()).slice(0, 6); %>
+                    <% recomendadas.forEach(comunidad => { %>
+                        <div class="tarjeta-comunidad" 
+                             data-id="<%= comunidad.id %>" 
+                             data-categoria="<%= comunidad.categoria %>" 
+                             data-subcategoria="<%= comunidad.subcategoria || '' %>" 
+                             data-subcategoria-extra="<%= comunidad.subcategoria_extra || '' %>">
+                            
+                            <% if (comunidad.imagen_url) { %>
+                                <img class="tarjeta-comunidad-imagen" src="<%= comunidad.imagen_url %>" alt="<%= comunidad.nombre %>">
+                            <% } else { %>
+                                <svg class="tarjeta-comunidad-imagen svg-bg" viewBox="0 0 800 500" height="280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gradRec<%= comunidad.id %>" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#3d0099;stop-opacity:0.8" />
+                                            <stop offset="100%" style="stop-color:#6f42ff;stop-opacity:0.6" />
+                                        </linearGradient>
+                                        <pattern id="patternRec<%= comunidad.id %>" width="50" height="50" patternUnits="userSpaceOnUse">
+                                            <circle cx="25" cy="25" r="12" fill="rgba(0, 234, 255, 0.15)" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#gradRec<%= comunidad.id %>)" />
+                                    <rect width="100%" height="100%" fill="url(#patternRec<%= comunidad.id %>)" />
+                                
+                                    <circle cx="150" cy="100" r="80" fill="rgba(111, 66, 255, 0.3)" />
+                                    <circle cx="650" cy="400" r="120" fill="rgba(0, 178, 255, 0.2)" />
+                                    <path d="M0,250 Q200,150 400,250 T800,250" stroke="rgba(0, 234, 255, 0.3)" stroke-width="20" fill="none" />
+                                
+                                    <g transform="translate(400, 250) scale(0.8)">
+                                        <circle cx="0" cy="0" r="50" fill="rgba(255, 255, 255, 0.1)" />
+                                        <circle cx="-20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                        <circle cx="20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                        <circle cx="0" cy="20" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                                    </g>
+                                </svg>
+                            <% } %>
+                            
+                            <div class="tarjeta-comunidad-contenido">
+                                <div class="tarjeta-comunidad-encabezado">
+                                    <h3><%= comunidad.nombre %></h3>
+                                    <% if (comunidad.es_privada) { %>
+                                        <span class="privacidad"><i class="fas fa-lock"></i> Privada</span>
+                                    <% } %>
+                                </div>
+        
+                                <div class="descripcion-contenedor">
+                                    <p class="descripcion-texto <%= comunidad.descripcion && comunidad.descripcion.length > 100 ? 'truncado' : '' %>">
+                                        <%= comunidad.descripcion || 'Sin descripción' %>
+                                    </p>
+                                </div>
+        
+                                <div class="tarjeta-comunidad-etiquetas">
+                                    <% if (comunidad.categoria && comunidad.categoria !== 'Sin categoría') { %>
+                                        <span class="categoria"><i class="fas fa-tag"></i> <%= comunidad.categoria %></span>
+                                    <% } %>
+                                    
+                                    <% if (comunidad.subcategoria && comunidad.subcategoria !== 'Sin subcategoría') { %>
+                                        <span class="subcategoria"><i class="fas fa-tag"></i> <%= comunidad.subcategoria %></span>
+                                    <% } %>
+                                    
+                                    <% if (comunidad.subcategoria_extra && comunidad.subcategoria_extra !== 'Sin subcategoría extra') { %>
+                                        <span class="subcategoria-extra"><i class="fas fa-tag"></i> <%= comunidad.subcategoria_extra %></span>
+                                    <% } %>
+                                </div>
+                                
+                                <button onclick="verForo(<%= comunidad.id %>, <%= comunidad.es_privada %>)" class="btn-ver-foro" data-id="<%= comunidad.id %>" data-privada="<%= comunidad.es_privada %>">Ver Foro</button>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear comunidad -->
+<div id="modal-crear-comunidad" class="formulario-modal">
+    <div class="contenido-modal">
+        <span id="cerrar-modal" class="cerrar-modal">&times;</span>
+        <h2>Crear Nueva Comunidad</h2>
+        <form action="/comunidad/crear" method="POST" enctype="multipart/form-data">
+            <div class="formulario-grupo">
+                <label for="nombre">Nombre de la comunidad</label>
+                <input type="text" id="nombre" name="nombre" required maxlength="100">
+            </div>
+            <div class="formulario-grupo">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" rows="3" required></textarea>
+            </div>
+            <div class="formulario-grupo">
+                <label for="categoria">Categoría *</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Seleccione una categoría</option>
+                    <% if (categorias && categorias.length > 0) { %>
+                        <% categorias.forEach(categoria => { %>
+                            <option value="<%= categoria.nombre %>"><%= categoria.nombre %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+            <div class="formulario-grupo">
+                <label for="subcategoria">Subcategoría (opcional)</label>
+                <select id="subcategoria" name="subcategoria">
+                    <option value="">Seleccione una subcategoría</option>
+                    <% if (subcategorias && subcategorias.length > 0) { %>
+                        <% subcategorias.forEach(subcategoria => { %>
+                            <option value="<%= subcategoria.nombre %>"><%= subcategoria.nombre %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+            
+            <div class="formulario-grupo">
+                <label for="subcategoria-extra">Sub-etiqueta extra (opcional)</label>
+                <select id="subcategoria-extra" name="subcategoria_extra">
+                    <option value="">Seleccione una sub-etiqueta extra</option>
+                    <% if (subcategorias && subcategorias.length > 0) { %>
+                        <% subcategorias.forEach(subcategoria => { %>
+                            <option value="<%= subcategoria.nombre %>"><%= subcategoria.nombre %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="formulario-grupo">
+                <label for="imagen">Imagen de portada</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+            </div>
+            <div class="formulario-grupo">
+                <label for="reglas">Reglas de la comunidad</label>
+                <textarea id="reglas" name="reglas" rows="3"></textarea>
+                    
+            </div>
+            <div class="formulario-grupo">
+                <input type="checkbox" id="es_privada" name="es_privada">
+                <label for="es_privada" style="display: inline;">Comunidad privada</label>
+                <p class="hint-text">Las comunidades privadas requieren aprobación para unirse</p>
+            </div>
+            <div class="formulario-grupo">
+                <button type="submit" class="boton-formulario">Crear Comunidad</button>
+                <button type="button" class="boton-formulario" id="cancel-btn">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+<!-- Modal para ver mis solicitudes pendientes -->
+<div id="modal-mis-solicitudes" class="formulario-modal">
+    <div class="contenido-modal">
+        <span id="cerrar-modal-mis-solicitudes" class="cerrar-modal">&times;</span>
+        <h2>Mis Solicitudes Pendientes</h2>
+        
+        <div class="lista-solicitudes">
+            <% if (misSolicitudes && misSolicitudes.length > 0) { %>
+                <% misSolicitudes.forEach(solicitud => { %>
+                    <div class="solicitud-item" data-id="<%= solicitud.id %>">
+                        <div class="solicitud-info">
+                            <h3><%= solicitud.nombre_comunidad %></h3>
+                            <p class="estado-solicitud <%= solicitud.estado %>">
+                                <i class="<%= solicitud.estado === 'pendiente' ? 'fas fa-clock' : (solicitud.estado === 'aceptada' ? 'fas fa-check-circle' : 'fas fa-times-circle') %>"></i>
+                                <%= solicitud.estado.charAt(0).toUpperCase() + solicitud.estado.slice(1) %>
+                            </p>
+                            <p class="fecha-solicitud">Enviada: <%= new Date(solicitud.fecha_solicitud).toLocaleDateString() %></p>
+                            
+                            <% if (solicitud.estado !== 'pendiente' && solicitud.fecha_respuesta) { %>
+                                <p class="fecha-respuesta">Respondida: <%= new Date(solicitud.fecha_respuesta).toLocaleDateString() %></p>
+                            <% } %>
+                            
+                            <% if (solicitud.respuesta) { %>
+                                <div class="respuesta-contenedor">
+                                    <p class="respuesta-titulo">Respuesta:</p>
+                                    <p class="respuesta-texto"><%= solicitud.respuesta %></p>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <% if (solicitud.estado === 'pendiente') { %>
+                            <button class="btn-cancelar-solicitud" data-id="<%= solicitud.id %>">Cancelar</button>
+                        <% } else if (solicitud.estado === 'aceptada') { %>
+                            <a href="/foro?comunidad_id=<%= solicitud.comunidad_id %>" class="btn-ver-comunidad">Ver Foro</a>
+                        <% } %>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p class="sin-solicitudes">No tienes solicitudes pendientes para unirte a comunidades.</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para administrar solicitudes de seguidores (solo para administradores/moderadores) -->
+<div id="modal-admin-solicitudes" class="formulario-modal">
+    <div class="contenido-modal">
+        <span id="cerrar-modal-admin-solicitudes" class="cerrar-modal">&times;</span>
+        <h2>Solicitudes de Seguidores</h2>
+        
+        <div class="selector-comunidad">
+            <label for="filtro-comunidad">Filtrar por comunidad:</label>
+            <select id="filtro-comunidad" class="formulario-control">
+                <option value="">Todas mis comunidades</option>
+                <% if (misComunidadesAdmin && misComunidadesAdmin.length > 0) { %>
+                    <% misComunidadesAdmin.forEach(comunidad => { %>
+                        <option value="<%= comunidad.id %>"><%= comunidad.nombre %></option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        
+        <div class="lista-solicitudes-admin">
+            <% if (solicitudesAdmin && solicitudesAdmin.length > 0) { %>
+                <% solicitudesAdmin.forEach(solicitud => { %>
+                    <div class="solicitud-admin-item" data-id="<%= solicitud.id %>" data-comunidad="<%= solicitud.comunidad_id %>">
+                        <div class="solicitud-admin-info">
+                            <div class="solicitud-admin-header">
+                                <h3><%= solicitud.username %></h3>
+                                <span class="solicitud-comunidad">Para: <%= solicitud.nombre_comunidad %></span>
+                                <p class="fecha-solicitud">Recibida: <%= new Date(solicitud.fecha_solicitud).toLocaleDateString() %></p>
+                            </div>
+                            
+                            <% if (solicitud.mensaje) { %>
+                                <div class="mensaje-contenedor">
+                                    <p class="mensaje-titulo">Mensaje:</p>
+                                    <p class="mensaje-texto"><%= solicitud.mensaje %></p>
+                                </div>
+                            <% } %>
+                            
+                            <div class="formulario-respuesta">
+                                <textarea class="respuesta-textarea" placeholder="Escribe una respuesta (opcional)..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="acciones-solicitud">
+                            <button class="btn-aceptar-solicitud" data-id="<%= solicitud.id %>">
+                                <i class="fas fa-check"></i> Aceptar
+                            </button>
+                            <button class="btn-rechazar-solicitud" data-id="<%= solicitud.id %>">
+                                <i class="fas fa-times"></i> Rechazar
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p class="sin-solicitudes">No hay solicitudes pendientes para tus comunidades.</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de alerta para comunidades privadas -->
+<div id="modal-comunidad-privada" class="formulario-modal">
+    <div class="contenido-modal">
+        <span id="cerrar-modal-privada" class="cerrar-modal">&times;</span>
+        <div class="modal-privada-contenido">
+            <i class="fas fa-lock modal-privada-icono"></i>
+            <h2>Comunidad Privada</h2>
+            <p>Esta comunidad requiere aprobación para unirse.</p>
+            
+            <form id="form-solicitud-privada">
+                <input type="hidden" id="comunidad-id-privada" name="comunidad_id">
+                <div class="formulario-grupo">
+                    <label for="mensaje-solicitud">Mensaje para el administrador (opcional):</label>
+                    <textarea id="mensaje-solicitud" name="mensaje" rows="3" placeholder="Explica por qué quieres unirte a esta comunidad..."></textarea>
+                </div>
+                <div class="formulario-grupo botones-privada">
+                    <button type="submit" class="boton-formulario">Enviar Solicitud</button>
+                    <button type="button" class="boton-formulario" id="cancelar-solicitud-btn">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal para administrar categorías -->
+<div id="modal-admin-categorias" class="formulario-modal">
+    <div class="contenido-modal">
+        <span id="cerrar-modal-categorias" class="cerrar-modal">&times;</span>
+        <h2>Administrar Categorías y Subcategorías</h2>
+        
+        <div class="pestanas-admin">
+            <button class="pestana-admin activa" data-tab-admin="categorias">Categorías</button>
+            <button class="pestana-admin" data-tab-admin="subcategorias">Subcategorías</button>
+        </div>
+
+        <div class="panel-admin" id="panel-categorias">
+            <form id="form-categoria" action="/admin/categorias/crear" method="POST">
+                <input type="hidden" id="categoria-id" name="categoriaId">
+                <div class="formulario-grupo">
+                    <label for="nombre-categoria">Nombre de la categoría</label>
+                    <input type="text" id="nombre-categoria" name="nombre" required maxlength="50">
+                </div>
+                <div class="formulario-grupo">
+                    <label for="descripcion-categoria">Descripción (opcional)</label>
+                    <textarea id="descripcion-categoria" name="descripcion" rows="2"></textarea>
+                </div>
+                <div class="formulario-grupo">
+                    <button type="submit" class="boton-formulario" id="guardar-categoria-btn">Guardar Categoría</button>
+                    <button type="button" class="boton-formulario" id="cancelar-categoria-btn">Cancelar</button>
+                </div>
+            </form>
+            
+            <div class="lista-categorias">
+                <h3>Categorías existentes</h3>
+                <div id="categorias-container">
+                    <% if (categorias && categorias.length > 0) { %>
+                        <% categorias.forEach(categoria => { %>
+                            <div class="categoria-item">
+                                <span><%= categoria.nombre %></span>
+                                <div class="categoria-acciones">
+                                    <button class="btn-editar-categoria" data-id="<%= categoria.id %>" data-nombre="<%= categoria.nombre %>">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-eliminar-categoria" data-id="<%= categoria.id %>">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No hay categorías disponibles.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-admin oculto" id="panel-subcategorias">
+            <form id="form-subcategoria" action="/admin/subcategorias/crear" method="POST">
+                <input type="hidden" id="subcategoria-id" name="subcategoriaId">
+                <div class="formulario-grupo">
+                    <label for="categoria-padre">Categoría Padre *</label>
+                    <select id="categoria-padre" name="categoriaPadre" required>
+                        <option value="">Seleccione una categoría</option>
+                        <% if (categorias && categorias.length > 0) { %>
+                            <% categorias.forEach(categoria => { %>
+                                <option value="<%= categoria.nombre %>"><%= categoria.nombre %></option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="formulario-grupo">
+                    <label for="nombre-subcategoria">Nombre de la subcategoría</label>
+                    <input type="text" id="nombre-subcategoria" name="nombre" required maxlength="50">
+                </div>
+                <div class="formulario-grupo">
+                    <label for="descripcion-subcategoria">Descripción (opcional)</label>
+                    <textarea id="descripcion-subcategoria" name="descripcion" rows="2"></textarea>
+                </div>
+                <div class="formulario-grupo">
+                    <button type="submit" class="boton-formulario" id="guardar-subcategoria-btn">Guardar Subcategoría</button>
+                    <button type="button" class="boton-formulario" id="cancelar-subcategoria-btn">Cancelar</button>
+                </div>
+            </form>
+            
+            <div class="lista-categorias">
+                <h3>Subcategorías existentes</h3>
+                <div id="subcategorias-container">
+                    <% if (subcategorias && subcategorias.length > 0) { %>
+                        <% subcategorias.forEach(subcategoria => { %>
+                            <div class="categoria-item">
+                                <span><%= subcategoria.nombre %> <small>(Categoría: <%= subcategoria.categoria %>)</small></span>
+                                <div class="categoria-acciones">
+                                    <button class="btn-editar-subcategoria" data-id="<%= subcategoria.id %>" data-nombre="<%= subcategoria.nombre %>">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-eliminar-subcategoria" data-id="<%= subcategoria.id %>">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No hay subcategorías disponibles.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/scripts/comunidades.js"></script>
+<%- include("partials/footer.ejs") %>
