@@ -1137,158 +1137,6 @@ app.listen(3000, '0.0.0.0', () => {
 
 
 
-// Endpoint para obtener información básica de una comunidad
-app.get('/api/comunidad/:id', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    
-    // Obtener información de la comunidad
-    const comunidadResult = await db.query(`
-      SELECT * FROM comunidades WHERE id = $1
-    `, [comunidadId]);
-    
-    if (comunidadResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Comunidad no encontrada' });
-    }
-    
-    res.json(comunidadResult.rows[0]);
-  } catch (error) {
-    console.error('Error al obtener información de la comunidad:', error);
-    res.status(500).json({ error: 'Error al obtener información de la comunidad' });
-  }
-});
-
-// Endpoint para obtener estadísticas de la comunidad
-app.get('/api/comunidad/:id/stats', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    
-    // Contar miembros
-    const miembrosResult = await db.query(`
-      SELECT COUNT(*) as members FROM comunidades_usuarios 
-      WHERE comunidad_id = $1
-    `, [comunidadId]);
-    
-    // Contar publicaciones
-    const postsResult = await db.query(`
-      SELECT COUNT(*) as posts FROM forum_posts 
-      WHERE comunidad_id = $1
-    `, [comunidadId]);
-    
-    res.json({
-      members: parseInt(miembrosResult.rows[0].members) || 0,
-      posts: parseInt(postsResult.rows[0].posts) || 0
-    });
-  } catch (error) {
-    console.error('Error al obtener estadísticas de la comunidad:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas de la comunidad' });
-  }
-});
-
-// Endpoint para verificar si el usuario es miembro
-app.get('/api/comunidad/:id/is-member', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    const userId = req.session.userId;
-    
-    // Verificar en comunidades_usuarios
-    const memberResult = await db.query(`
-      SELECT * FROM comunidades_usuarios 
-      WHERE comunidad_id = $1 AND user_id = $2
-    `, [comunidadId, userId]);
-    
-    // Verificar si es creador
-    const comunidadResult = await db.query(`
-      SELECT * FROM comunidades 
-      WHERE id = $1 AND creador_id = $2
-    `, [comunidadId, userId]);
-    
-    const isMember = memberResult.rows.length > 0 || comunidadResult.rows.length > 0;
-    
-    res.json({ isMember });
-  } catch (error) {
-    console.error('Error al verificar membresía en la comunidad:', error);
-    res.status(500).json({ error: 'Error al verificar membresía' });
-  }
-});
-
-// Endpoint para unirse a una comunidad (versión API)
-app.post('/api/comunidad/:id/join', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    const userId = req.session.userId;
-    
-    // Verificar si la comunidad existe
-    const comunidadResult = await db.query(`
-      SELECT * FROM comunidades WHERE id = $1
-    `, [comunidadId]);
-    
-    if (comunidadResult.rows.length === 0) {
-      return res.status(404).json({ success: false, mensaje: 'Comunidad no encontrada' });
-    }
-    
-    const comunidad = comunidadResult.rows[0];
-    
-    // Verificar si ya es miembro (creador)
-    if (comunidad.creador_id === userId) {
-      return res.status(400).json({ success: false, mensaje: 'Ya eres el administrador de esta comunidad' });
-    }
-    
-    // Verificar si ya es miembro
-    const isMemberResult = await db.query(`
-      SELECT * FROM comunidades_usuarios 
-      WHERE comunidad_id = $1 AND user_id = $2
-    `, [comunidadId, userId]);
-    
-    if (isMemberResult.rows.length > 0) {
-      return res.status(400).json({ success: false, mensaje: 'Ya eres miembro de esta comunidad' });
-    }
-    
-    // Si la comunidad es privada, crear solicitud
-    if (comunidad.es_privada) {
-      await db.query(`
-        INSERT INTO solicitudes_comunidad 
-        (usuario_id, comunidad_id, mensaje) 
-        VALUES ($1, $2, $3)
-        ON CONFLICT (usuario_id, comunidad_id) DO NOTHING
-      `, [userId, comunidadId, req.body.mensaje || '']);
-      
-      return res.json({ 
-        success: true, 
-        mensaje: 'Solicitud enviada correctamente. Espera la aprobación de un administrador.',
-        pending: true
-      });
-    }
-    
-    // Si la comunidad es pública, agregar directamente como miembro
-    await db.query(`
-      INSERT INTO comunidades_usuarios
-      (comunidad_id, user_id, rol, fecha_union)
-      VALUES ($1, $2, 'miembro', NOW())
-    `, [comunidadId, userId]);
-    
-    return res.json({ 
-      success: true, 
-      mensaje: 'Te has unido a la comunidad correctamente', 
-      pending: false 
-    });
-  } catch (error) {
-    console.error('Error al unirse a la comunidad:', error);
-    res.status(500).json({ success: false, mensaje: 'Error al procesar la solicitud' });
-  }
-});
-
-
-
-
-
-
-
-
-
-
-
-
 
 import { urlencoded } from 'express';
 import { dirname, join } from 'path';
@@ -3683,6 +3531,318 @@ async function checkAndAwardCoins(userId, username, type, req) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.get('/comunidad', requireLogin, async (req, res) => {
   try {
     // Obtener todas las comunidades (ahora incluyendo subcategorías)
@@ -4795,3 +4955,220 @@ app.delete('/admin/subcategorias/:id', requireLogin, isAdmin, async (req, res) =
 
 
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Endpoint para obtener información básica de una comunidad
+app.get('/api/comunidad/:id', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    
+    // Obtener información de la comunidad
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Comunidad no encontrada' });
+    }
+    
+    res.json(comunidadResult.rows[0]);
+  } catch (error) {
+    console.error('Error al obtener información de la comunidad:', error);
+    res.status(500).json({ error: 'Error al obtener información de la comunidad' });
+  }
+});
+
+// Endpoint para obtener estadísticas de la comunidad
+app.get('/api/comunidad/:id/stats', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    
+    // Contar miembros
+    const miembrosResult = await db.query(`
+      SELECT COUNT(*) as members FROM comunidades_usuarios 
+      WHERE comunidad_id = $1
+    `, [comunidadId]);
+    
+    // Contar publicaciones
+    const postsResult = await db.query(`
+      SELECT COUNT(*) as posts FROM forum_posts 
+      WHERE comunidad_id = $1
+    `, [comunidadId]);
+    
+    res.json({
+      members: parseInt(miembrosResult.rows[0].members) || 0,
+      posts: parseInt(postsResult.rows[0].posts) || 0
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de la comunidad:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas de la comunidad' });
+  }
+});
+
+// Endpoint para verificar si el usuario es miembro
+app.get('/api/comunidad/:id/is-member', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    // Verificar en comunidades_usuarios
+    const memberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, userId]);
+    
+    // Verificar si es creador
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades 
+      WHERE id = $1 AND creador_id = $2
+    `, [comunidadId, userId]);
+    
+    const isMember = memberResult.rows.length > 0 || comunidadResult.rows.length > 0;
+    
+    res.json({ isMember });
+  } catch (error) {
+    console.error('Error al verificar membresía en la comunidad:', error);
+    res.status(500).json({ error: 'Error al verificar membresía' });
+  }
+});
+
+// Endpoint para unirse a una comunidad (versión API)
+app.post('/api/comunidad/:id/join', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    // Verificar si la comunidad existe
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ success: false, mensaje: 'Comunidad no encontrada' });
+    }
+    
+    const comunidad = comunidadResult.rows[0];
+    
+    // Verificar si ya es miembro (creador)
+    if (comunidad.creador_id === userId) {
+      return res.status(400).json({ success: false, mensaje: 'Ya eres el administrador de esta comunidad' });
+    }
+    
+    // Verificar si ya es miembro
+    const isMemberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, userId]);
+    
+    if (isMemberResult.rows.length > 0) {
+      return res.status(400).json({ success: false, mensaje: 'Ya eres miembro de esta comunidad' });
+    }
+    
+    // Si la comunidad es privada, crear solicitud
+    if (comunidad.es_privada) {
+      await db.query(`
+        INSERT INTO solicitudes_comunidad 
+        (usuario_id, comunidad_id, mensaje) 
+        VALUES ($1, $2, $3)
+        ON CONFLICT (usuario_id, comunidad_id) DO NOTHING
+      `, [userId, comunidadId, req.body.mensaje || '']);
+      
+      return res.json({ 
+        success: true, 
+        mensaje: 'Solicitud enviada correctamente. Espera la aprobación de un administrador.',
+        pending: true
+      });
+    }
+    
+    // Si la comunidad es pública, agregar directamente como miembro
+    await db.query(`
+      INSERT INTO comunidades_usuarios
+      (comunidad_id, user_id, rol, fecha_union)
+      VALUES ($1, $2, 'miembro', NOW())
+    `, [comunidadId, userId]);
+    
+    return res.json({ 
+      success: true, 
+      mensaje: 'Te has unido a la comunidad correctamente', 
+      pending: false 
+    });
+  } catch (error) {
+    console.error('Error al unirse a la comunidad:', error);
+    res.status(500).json({ success: false, mensaje: 'Error al procesar la solicitud' });
+  }
+});
+
+
+
+
+
+
+
+
