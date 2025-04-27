@@ -88,16 +88,6 @@
                     <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos en detalle qué problema estás experimentando..."></textarea>
                 </div>
                 
-                <div class="campo-form">
-                    <label>✧ Imagen o captura de pantalla ✧</label>
-                    <div class="adjuntar-archivo">
-                        <div class="Boton-archivo">
-                            <span>⊱⋆⊰ Adjuntar archivo ⊱⋆⊰</span>
-                        </div>
-                        <input type="file" id="archivo" name="archivo" accept="image/*">
-                    </div>
-                </div>
-                
                 <div class="Botones-accion">
                     <button type="reset" class="Boton limpiar">
                         <span>⊱ Limpiar Formulario ⊰</span>
@@ -116,6 +106,15 @@
             <!-- La mascota y la carta se clonarán aquí para la animación final -->
         </div>
     </div>
+
+<!-- Script de EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+    (function() {
+        // Inicializar EmailJS con tu clave pública
+        emailjs.init("w_93u8YPmSEMwmA9u"); // Reemplaza "YOUR_PUBLIC_KEY" con tu clave pública de EmailJS
+    })();
+</script>
 
 <script src="scripts/soporte.js"></script>
 

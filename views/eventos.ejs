@@ -1,4 +1,3 @@
-
 <%- include("partials/header.ejs") %>
 <!DOCTYPE html>
 <html lang="es">
@@ -6,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos en Pet-Chan</title>
-    <link rel="stylesheet" href="styles/eventos.css">
+    <link rel="stylesheet" href="/styles/eventos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -20,84 +19,150 @@
             </div>
             <h1>Eventos en Pet-Chan</h1>
             <h2>Unete al Discord y participa en nuestros eventos</h2>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         </div>
 
         <!-- Sección de Eventos -->
         <div class="seccion-eventos">
             <h2>Próximos Eventos</h2>
+            
+            <div class="filtros-eventos">
+                <button class="filtro-btn activo" data-filtro="todos">Todos</button>
+                <button class="filtro-btn" data-filtro="competitivo">Competitivos</button>
+                <button class="filtro-btn" data-filtro="diseño">Diseño</button>
+                <button class="filtro-btn" data-filtro="fiesta">Fiestas</button>
+                <button class="filtro-btn" data-filtro="juegos">Juegos</button>
+                <button class="filtro-btn" data-filtro="educativo">Educativos</button>
+            </div>
+            
             <div class="lista-eventos">
-                <!-- Evento 1 -->
-                <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif');">
-                    <div class="marco-dorado"></div>
-                    <div class="fecha-evento">
-                        <span class="dia">25</span>
-                        <span class="mes">Oct</span>
-                        <span class="año">2024</span>
-                    </div>
-                    <div class="info-evento">
-                        <h3 class="titulo-evento">Torneo de Mascotas Virtuales</h3>
-                        <p class="descripcion-evento">Participa en el torneo más grande de mascotas virtuales. ¡Gana premios exclusivos!</p>
-                        <div class="etiquetas-evento">
-                            <span class="etiqueta">Competitivo</span>
-                            <span class="etiqueta">Premios</span>
-                            <span class="etiqueta">Mascotas</span>
+                <!-- Eventos dinámicos cargados desde la base de datos -->
+                <% if (typeof eventosData !== 'undefined' && eventosData.length > 0) { %>
+                    <% eventosData.forEach(evento => { %>
+                        <div class="evento <%= evento.popular ? 'evento-popular' : '' %>" 
+                             style="background-image: url('<%= evento.imagen || 'https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif' %>');"
+                             data-id="<%= evento.id %>">
+                            <div class="marco-dorado"></div>
+                            <div class="fecha-evento">
+                                <span class="dia"><%= new Date(evento.fecha).getDate() %></span>
+                                <span class="mes"><%= new Date(evento.fecha).toLocaleString('es-ES', { month: 'short' }) %></span>
+                                <span class="año"><%= new Date(evento.fecha).getFullYear() %></span>
+                            </div>
+                            <div class="info-evento">
+                                <h3 class="titulo-evento"><%= evento.titulo %></h3>
+                                <p class="descripcion-evento"><%= evento.descripcion %></p>
+                                <div class="detalles-evento">
+                                    <div class="detalle"><i class="fas fa-clock"></i> <%= evento.hora %></div>
+                                    <div class="detalle"><i class="fas fa-stopwatch"></i> <%= evento.duracion || '2 horas' %></div>
+                                    <div class="detalle"><i class="fas fa-laptop"></i> <%= evento.plataforma %></div>
+                                </div>
+                                <div class="etiquetas-evento">
+                                    <% if (evento.etiquetas) { %>
+                                        <% if (Array.isArray(evento.etiquetas)) { %>
+                                            <% evento.etiquetas.forEach(etiqueta => { %>
+                                                <span class="etiqueta"><%= etiqueta %></span>
+                                            <% }); %>
+                                        <% } else if (typeof evento.etiquetas === 'string') { %>
+                                            <% evento.etiquetas.split(',').forEach(etiqueta => { %>
+                                                <span class="etiqueta"><%= etiqueta.trim() %></span>
+                                            <% }); %>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                                <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
+                                <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                                    <button class="boton-editar" data-id="<%= evento.id %>"><i class="fas fa-edit"></i> Editar</button>
+                                    <button class="boton-eliminar" data-id="<%= evento.id %>"><i class="fas fa-trash"></i> Eliminar</button>
+                                <% } %>
+                            </div>
+                            <div class="brillo-evento"></div>
+                            <div class="reflejo"></div>
                         </div>
-                        <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
+                    <% }); %>
+                <% } else { %>
+                    <!-- Eventos estáticos de respaldo (se mostrarán si no hay datos de eventos) -->
+                    <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif');">
+                        <div class="marco-dorado"></div>
+                        <div class="fecha-evento">
+                            <span class="dia">25</span>
+                            <span class="mes">Oct</span>
+                            <span class="año">2024</span>
+                        </div>
+                        <div class="info-evento">
+                            <h3 class="titulo-evento">Torneo de Mascotas Virtuales</h3>
+                            <p class="descripcion-evento">Participa en el torneo más grande de mascotas virtuales. ¡Gana premios exclusivos!</p>
+                            <div class="etiquetas-evento">
+                                <span class="etiqueta">Competitivo</span>
+                                <span class="etiqueta">Premios</span>
+                                <span class="etiqueta">Mascotas</span>
+                            </div>
+                            <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
+                        </div>
+                        <div class="brillo-evento"></div>
+                        <div class="reflejo"></div>
                     </div>
-                    <div class="brillo-evento"></div>
-                    <div class="reflejo"></div>
-                </div>
 
-                <!-- Evento 2 -->
-                <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif');">
-                    <div class="marco-dorado"></div>
-                    <div class="fecha-evento">
-                        <span class="dia">15</span>
-                        <span class="mes">Nov</span>
-                        <span class="año">2024</span>
-                    </div>
-                    <div class="info-evento">
-                        <h3 class="titulo-evento">Concurso de Diseño de Mascotas</h3>
-                        <p class="descripcion-evento">Diseña la mascota más creativa y gana reconocimiento en la comunidad.</p>
-                        <div class="etiquetas-evento">
-                            <span class="etiqueta">Creatividad</span>
-                            <span class="etiqueta">Diseño</span>
-                            <span class="etiqueta">Reconocimiento</span>
+                    <div class="evento evento-destacado" style="background-image: url('https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif');">
+                        <div class="marco-dorado"></div>
+                        <div class="fecha-evento">
+                            <span class="dia">15</span>
+                            <span class="mes">Nov</span>
+                            <span class="año">2024</span>
                         </div>
-                        <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
-                    </div>
-                    <div class="brillo-evento"></div>
-                    <div class="reflejo"></div>
-                </div>
-
-                <!-- Evento 3 -->
-                <div class="evento evento-destacado" style="background-image: url('https://favim.com/pd/p/orig/2019/02/11/8bit-city-8-bit-Favim.com-6875655.gif');">
-                    <div class="marco-dorado"></div>
-                    <div class="fecha-evento">
-                        <span class="dia">30</span>
-                        <span class="mes">Dic</span>
-                        <span class="año">2024</span>
-                    </div>
-                    <div class="info-evento">
-                        <h3 class="titulo-evento">Fiesta de Fin de Año</h3>
-                        <p class="descripcion-evento">Celebra el fin de año con una gran fiesta virtual y sorpresas especiales.</p>
-                        <div class="etiquetas-evento">
-                            <span class="etiqueta">Fiesta</span>
-                            <span class="etiqueta">Sorpresas</span>
-                            <span class="etiqueta">Celebración</span>
+                        <div class="info-evento">
+                            <h3 class="titulo-evento">Concurso de Diseño de Mascotas</h3>
+                            <p class="descripcion-evento">Diseña la mascota más creativa y gana reconocimiento en la comunidad.</p>
+                            <div class="etiquetas-evento">
+                                <span class="etiqueta">Creatividad</span>
+                                <span class="etiqueta">Diseño</span>
+                                <span class="etiqueta">Reconocimiento</span>
+                            </div>
+                            <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
                         </div>
-                        <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
+                        <div class="brillo-evento"></div>
+                        <div class="reflejo"></div>
                     </div>
-                    <div class="brillo-evento"></div>
-                    <div class="reflejo"></div>
-                </div>
+                <% } %>
             </div>
         </div>
     </div>
 
-    <script src="scripts/eventos.js"></script>
+    <!-- Modal para formularios y detalles -->
+    <div class="modal" style="display: none;"></div>
+
+    <!-- Panel flotante de admin (solo visible para administradores) -->
+    <div id="panel-admin" class="panel-admin" style="display: none;">
+        <button id="toggle-admin-panel" class="boton-admin">
+            <i class="fas fa-cog"></i> Admin
+        </button>
+        <div id="admin-tools" class="admin-tools" style="display: none;">
+            <h3>Herramientas de Administración</h3>
+            <button id="nuevo-evento" class="boton-admin-accion">
+                <i class="fas fa-plus"></i> Nuevo Evento
+            </button>
+            <button id="gestionar-eventos" class="boton-admin-accion">
+                <i class="fas fa-tasks"></i> Gestionar Eventos
+            </button>
+        </div>
+    </div>
+
+    <!-- Botón flotante para añadir evento (solo visible para administradores) -->
+    <button id="boton-flotante" class="boton-flotante" style="display: none;">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // Inicializar variables globales con datos del servidor
+        let initialEventsData = <% if (typeof eventosData !== 'undefined' && eventosData.length > 0) { %>
+            <%= JSON.stringify(eventosData) %>
+        <% } else { %>
+            []
+        <% } %>;
+        
+        // Establecer si el usuario es administrador
+        let isAdmin = <%= typeof isAdmin !== 'undefined' && isAdmin ? 'true' : 'false' %>;
+    </script>
+    <script src="/scripts/eventos.js"></script>
 </body>
 </html>
-
 <%- include("partials/footer.ejs") %>
