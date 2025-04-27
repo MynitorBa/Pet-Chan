@@ -1,176 +1,52 @@
-// API de eventos - Datos simulados pero con fechas reales
-const eventosData = [
-    {
-        id: 1,
-        titulo: "Torneo de Mascotas Virtuales",
-        descripcion: "Participa en el torneo más grande de mascotas virtuales. ¡Gana premios exclusivos!",
-        imagen: "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif",
-        fecha: new Date(new Date().getFullYear(), 3, 6), // Abril 6
-        hora: "18:00",
-        duracion: "2 horas",
-        plataforma: "Discord",
-        etiquetas: ["Competitivo", "Premios", "Mascotas"],
-        organizador: "Equipo Pet-Chan",
-        asistentes: 225,
-        popular: true,
-        historialFechas: [],
-        esEspecial: false // No es evento especial (como fin de año)
-    },
-    {
-        id: 2,
-        titulo: "Concurso de Diseño de Mascotas",
-        descripcion: "Diseña la mascota más creativa y gana reconocimiento en la comunidad.",
-        imagen: "https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif",
-        fecha: new Date(new Date().getFullYear(), 4, 15), // 15 de un mes
-        hora: "16:00",
-        duracion: "3 horas",
-        plataforma: "Zoom",
-        etiquetas: ["Creatividad", "Diseño", "Reconocimiento"],
-        organizador: "Artistas Pet-Chan",
-        asistentes: 75,
-        popular: false,
-        historialFechas: [],
-        esEspecial: false
-    },
-    {
-        id: 3,
-        titulo: "Fiesta de Fin de Año",
-        descripcion: "Celebra el fin de año con una gran fiesta virtual y sorpresas especiales.",
-        imagen: "https://favim.com/pd/p/orig/2019/02/11/8bit-city-8-bit-Favim.com-6875655.gif",
-        fecha: new Date(new Date().getFullYear(), 11, 31), // 31 de diciembre
-        hora: "22:00",
-        duracion: "4 horas",
-        plataforma: "Twitch",
-        etiquetas: ["Fiesta", "Sorpresas", "Celebración"],
-        organizador: "Comunidad Pet-Chan",
-        asistentes: 210,
-        popular: true,
-        historialFechas: [],
-        esEspecial: true // Evento especial (fin de año)
-    },
-    {
-        id: 4,
-        titulo: "Taller de Cuidado Virtual",
-        descripcion: "Aprende los mejores tips para cuidar a tus mascotas virtuales.",
-        imagen: "https://i.pinimg.com/originals/ff/01/76/ff0176290d1c7092aecb42168eed0348.gif",
-        fecha: new Date(new Date().getFullYear(), 3, 11), // 10 días desde hoy
-        hora: "15:00",
-        duracion: "1.5 horas",
-        plataforma: "YouTube Live",
-        etiquetas: ["Educativo", "Taller", "Cuidado"],
-        organizador: "Expertos Pet-Chan",
-        asistentes: 92,
-        popular: false,
-        historialFechas: [],
-        esEspecial: false
-    },
-    {
-        id: 5,
-        titulo: "Maratón de Juegos Retro",
-        descripcion: "Juegos retro para mascotas virtuales con premios sorpresa.",
-        imagen: "https://i.imgur.com/pnztT1T.gif",
-        fecha: new Date(new Date().getFullYear(), 5, 5), // 5 del mes siguiente
-        hora: "20:00",
-        duracion: "5 horas",
-        plataforma: "Twitch",
-        etiquetas: ["Juegos", "Retro", "Diversión"],
-        organizador: "Gamers Pet-Chan",
-        asistentes: 156,
-        popular: false,
-        historialFechas: [],
-        esEspecial: false
-    },
-    {
-        id: 6,
-        titulo: "Pet-Chan Backrooms Survival",
-        descripcion: "Sobrevive en las backrooms con tus mascotas virtuales. ¡Un evento lleno de sorpresas y desafíos!",
-        imagen: "https://media.indiedb.com/images/games/1/72/71147/backrooms_glitch_gif.1.gif",
-        fecha: new Date(new Date().getFullYear(), 3, 25), // 5 días desde hoy
-        hora: "10:00",
-        duracion: "7 horas",
-        plataforma: "Discord",
-        etiquetas: ["Competitivo", "Premios", "Mascotas"],
-        organizador: "Equipo Pet-Chan",
-        asistentes: 367,
-        popular: true,
-        historialFechas: [],
-        esEspecial: false // No es evento especial (como fin de año)
-    }
-];
-
-// Función para reprogramar eventos cuando llega su fecha
-// Función para reprogramar eventos cuando llega su fecha
-function verificarYReprogramarEventos() {
-    const ahora = new Date();
-    
-    eventosData.forEach(evento => {
-        // Si la fecha del evento ya pasó
-        if (evento.fecha < ahora) {
-            // Agregar la fecha actual al historial
-            evento.historialFechas.push(new Date(evento.fecha));
-            
-            // Reprogramar el evento
-            if (evento.esEspecial) {
-                // Eventos especiales (como fin de año) se reprograman para exactamente 1 año después
-                const nuevaFecha = new Date(evento.fecha);
-                nuevaFecha.setFullYear(nuevaFecha.getFullYear() + 1);
-                evento.fecha = nuevaFecha;
-            } else {
-                // Eventos normales se reprograman para 1 mes después
-                const nuevaFecha = new Date(evento.fecha);
-                nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);  // Cambiado de +3 a +1
-                evento.fecha = nuevaFecha;
-            }
-            
-            console.log(`Evento "${evento.titulo}" reprogramado para ${evento.fecha}`);
-        }
-    });
-    
-    // Volver a generar los eventos en la página
-    generarEventos();
-}
-
-// Verificar y reprogramar eventos cada hora (3600000 ms = 1 hora)
-setInterval(verificarYReprogramarEventos, 60 * 60 * 1000);
+// Variables globales
+let isAdmin = false;
+let adminPanelVisible = false;
+let eventosData = []; // This will be populated from the database
 
 // Carrusel principal
-const carrusel = document.querySelector('.carrusel');
-const imagenes = document.querySelectorAll('.carrusel-imagen');
-let indiceActual = 0;
-let intervaloCarrusel;
-
-function cambiarImagen(direccion = 1) {
-    imagenes[indiceActual].classList.remove('activa');
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize
+    fetchEventosFromServer();
+    checkAdminStatus();
     
-    if (direccion === 1) {
-        indiceActual = (indiceActual + 1) % imagenes.length;
-    } else {
-        indiceActual = (indiceActual - 1 + imagenes.length) % imagenes.length;
+    const carrusel = document.querySelector('.carrusel');
+    if (!carrusel) return; // Salir si no hay carrusel
+    
+    const imagenes = document.querySelectorAll('.carrusel-imagen');
+    let indiceActual = 0;
+    let intervaloCarrusel;
+    
+    // Función para cambiar imágenes
+    function cambiarImagen(direccion = 1) {
+        imagenes[indiceActual].classList.remove('activa');
+        
+        if (direccion === 1) {
+            indiceActual = (indiceActual + 1) % imagenes.length;
+        } else {
+            indiceActual = (indiceActual - 1 + imagenes.length) % imagenes.length;
+        }
+        
+        imagenes[indiceActual].classList.add('activa');
     }
     
-    imagenes[indiceActual].classList.add('activa');
-}
-
-function iniciarCarrusel() {
-    detenerCarrusel();
-    intervaloCarrusel = setInterval(() => cambiarImagen(1), 5000);
-}
-
-function detenerCarrusel() {
-    if (intervaloCarrusel) {
-        clearInterval(intervaloCarrusel);
+    // Iniciar/detener carrusel
+    function iniciarCarrusel() {
+        if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+        intervaloCarrusel = setInterval(() => cambiarImagen(1), 5000);
     }
-}
-
-// Iniciar el carrusel automáticamente
-iniciarCarrusel();
-
-// Pausar el carrusel al pasar el mouse por encima
-carrusel.addEventListener('mouseenter', detenerCarrusel);
-carrusel.addEventListener('mouseleave', iniciarCarrusel);
-
-// Agregar botones de navegación al carrusel
-function agregarControlesCarrusel() {
+    
+    function detenerCarrusel() {
+        if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+    }
+    
+    // Iniciar automáticamente
+    iniciarCarrusel();
+    
+    // Pausar al pasar el mouse
+    carrusel.addEventListener('mouseenter', detenerCarrusel);
+    carrusel.addEventListener('mouseleave', iniciarCarrusel);
+    
+    // Agregar botones de navegación
     const controles = document.createElement('div');
     controles.className = 'controles-carrusel';
     controles.innerHTML = `
@@ -179,119 +55,130 @@ function agregarControlesCarrusel() {
     `;
     carrusel.appendChild(controles);
     
-    document.querySelector('.control-carrusel.prev').addEventListener('click', () => {
+    document.querySelector('.control-carrusel.prev')?.addEventListener('click', () => {
         detenerCarrusel();
         cambiarImagen(-1);
         iniciarCarrusel();
     });
     
-    document.querySelector('.control-carrusel.next').addEventListener('click', () => {
+    document.querySelector('.control-carrusel.next')?.addEventListener('click', () => {
         detenerCarrusel();
         cambiarImagen(1);
         iniciarCarrusel();
     });
-}
-
-// Función para formatear fechas
-function formatearFecha(fecha) {
-    const opciones = { day: 'numeric', month: 'short', year: 'numeric' };
-    return fecha.toLocaleDateString('es-ES', opciones);
-}
-
-// Función para calcular la diferencia de tiempo
-function calcularTiempoRestante(fechaEvento) {
-    const ahora = new Date();
-    const diferencia = fechaEvento - ahora;
     
-    if (diferencia <= 0) {
-        return "¡Evento en progreso!";
+    // Configurar los botones de filtro
+    document.querySelectorAll('.filtro-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
+            this.classList.add('activo');
+            filtrarEventos(this.dataset.filtro);
+        });
+    });
+    
+    // Cerrar modal haciendo clic fuera
+    const modal = document.querySelector('.modal');
+    if (modal) {
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
     }
     
-    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
-    
-    return `Faltan: ${dias}d ${horas}h ${minutos}m`;
+    // Manejar botones de inscripción
+    setupInscripcionButtons();
+});
+
+// Function to check if user is admin
+function checkAdminStatus() {
+    fetch('/api/check-admin')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.isAdmin) {
+                isAdmin = true;
+                // Show admin controls
+                document.getElementById('panel-admin').style.display = 'block';
+                document.getElementById('boton-flotante').style.display = 'flex';
+                
+                // Add event listener for toggle button
+                document.getElementById('toggle-admin-panel').addEventListener('click', function() {
+                    var adminTools = document.getElementById('admin-tools');
+                    if (adminTools.style.display === 'none') {
+                        adminTools.style.display = 'block';
+                    } else {
+                        adminTools.style.display = 'none';
+                    }
+                });
+                
+                // Add events to admin panel buttons
+                document.getElementById('nuevo-evento').addEventListener('click', function() {
+                    abrirFormularioEvento('crear');
+                });
+                
+                document.getElementById('gestionar-eventos').addEventListener('click', function() {
+                    mostrarListaEventosAdmin();
+                });
+                
+                // Add event to floating button
+                document.getElementById('boton-flotante').addEventListener('click', function() {
+                    abrirFormularioEvento('crear');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error checking admin status:', error);
+        });
 }
 
-// Función para actualizar los contadores de tiempo
-function actualizarContadores() {
-    document.querySelectorAll('.contador-regresivo').forEach((contador, index) => {
-        const fechaEvento = eventosData[index].fecha;
-        contador.textContent = calcularTiempoRestante(fechaEvento);
-    });
+// Function to fetch events from server
+function fetchEventosFromServer() {
+    fetch('/api/eventos-data')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                eventosData = data.eventos.map(event => {
+                    // Convert date strings to Date objects
+                    return {
+                        ...event,
+                        fecha: new Date(event.fecha)
+                    };
+                });
+                // Generate events
+                generarEventos();
+            } else {
+                console.error('Error fetching events:', data.error);
+                mostrarNotificacion('Error al cargar eventos', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching events:', error);
+            mostrarNotificacion('Error de conexión al cargar eventos', 'error');
+        });
 }
 
-// Función para generar eventos dinámicamente
-function generarEventos() {
-    const listaEventos = document.querySelector('.lista-eventos');
-    listaEventos.innerHTML = '';
-    
-    eventosData.sort((a, b) => a.fecha - b.fecha).forEach((evento, index) => {
-        const eventoElement = document.createElement('div');
-        eventoElement.className = `evento ${evento.popular ? 'evento-popular' : ''}`;
-        eventoElement.style.backgroundImage = `url('${evento.imagen}')`;
-        eventoElement.dataset.id = evento.id;
-        
-        const dia = evento.fecha.getDate();
-        const mes = evento.fecha.toLocaleString('es-ES', { month: 'short' });
-        const año = evento.fecha.getFullYear();
-        
-        eventoElement.innerHTML = `
-            <div class="marco-dorado"></div>
-            <div class="fecha-evento">
-                <span class="dia">${dia}</span>
-                <span class="mes">${mes}</span>
-                <span class="año">${año}</span>
-                <div class="contador-regresivo">${calcularTiempoRestante(evento.fecha)}</div>
-            </div>
-            <div class="info-evento">
-                <h3 class="titulo-evento">${evento.titulo}</h3>
-                <p class="descripcion-evento">${evento.descripcion}</p>
-                <div class="detalles-evento">
-                    <div class="detalle"><i class="fas fa-clock"></i> ${evento.hora}</div>
-                    <div class="detalle"><i class="fas fa-stopwatch"></i> ${evento.duracion}</div>
-                    <div class="detalle"><i class="fas fa-laptop"></i> ${evento.plataforma}</div>
-                </div>
-                <div class="etiquetas-evento">
-                    ${evento.etiquetas.map(etiqueta => `<span class="etiqueta">${etiqueta}</span>`).join('')}
-                </div>
-                <div class="acciones-evento">
-                    <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
-                    <button class="boton-compartir"><i class="fas fa-share-alt"></i> Compartir</button>
-                    <button class="boton-recordatorio"><i class="fas fa-bell"></i> Recordatorio</button>
-                </div>
-                <div class="participantes">
-                    <div>Asistentes: ${evento.asistentes} personas</div>
-                    <div class="participantes-avatars">
-                        <div class="avatar">A</div>
-                        <div class="avatar">B</div>
-                        <div class="avatar">C</div>
-                        <div class="avatar">+</div>
-                    </div>
-                </div>
-            </div>
-            <div class="brillo-evento"></div>
-            <div class="reflejo"></div>
-        `;
-        
-        listaEventos.appendChild(eventoElement);
-    });
-    
-    // Agregar funcionalidad a los botones
-    agregarFuncionalidadBotones();
-}
-
-// Función para agregar funcionalidad a los botones
-function agregarFuncionalidadBotones() {
-    // Botón de inscripción
+// Función para configurar botones de inscripción
+function setupInscripcionButtons() {
     document.querySelectorAll('.boton-inscribirse').forEach(boton => {
         boton.addEventListener('click', function(e) {
             e.stopPropagation();
-            const eventoId = this.closest('.evento').dataset.id;
-            const evento = eventosData.find(e => e.id == eventoId);
+            const eventoElement = this.closest('.evento');
+            const eventoId = eventoElement ? eventoElement.dataset.id : null;
             
-            // Crear formulario de inscripción
+            // Buscar el evento
+            let evento;
+            if (eventoId) {
+                evento = eventosData.find(e => e.id == eventoId);
+            } else {
+                // Si no hay ID, usar el título del evento desde el DOM
+                const titulo = eventoElement.querySelector('.titulo-evento').innerText;
+                evento = eventosData.find(e => e.titulo === titulo) || {
+                    titulo: titulo,
+                    plataforma: "Discord"
+                };
+            }
+            
+            // Mostrar formulario de inscripción
             const modal = document.querySelector('.modal');
             modal.innerHTML = `
                 <div class="modal-contenido">
@@ -328,178 +215,43 @@ function agregarFuncionalidadBotones() {
                 modal.style.display = 'none';
             });
             
-            // Enviar formulario
+            // Enviar formulario (registro a evento)
             document.getElementById('formulario-inscripcion')?.addEventListener('submit', function(e) {
                 e.preventDefault();
-                alert('¡Inscripción exitosa! Te hemos enviado un correo con los detalles.');
-                modal.style.display = 'none';
-            });
-        });
-    });
-    
-    // Botón de compartir
-    document.querySelectorAll('.boton-compartir').forEach(boton => {
-        boton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const eventoId = this.closest('.evento').dataset.id;
-            const evento = eventosData.find(e => e.id == eventoId);
-            
-            // Mostrar opciones de compartir
-            const modal = document.querySelector('.modal');
-            modal.innerHTML = `
-                <div class="modal-contenido">
-                    <span class="cerrar-modal">×</span>
-                    <h2 class="modal-titulo">Compartir evento</h2>
-                    <div class="modal-cuerpo">
-                        <p>¡Comparte "${evento.titulo}" con tus amigos!</p>
-                        <div class="redes-sociales">
-                            <button class="boton-red-social facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
-                            <button class="boton-red-social twitter"><i class="fab fa-twitter"></i> Twitter</button>
-                            <button class="boton-red-social whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-                            <button class="boton-red-social copiar"><i class="fas fa-copy"></i> Copiar enlace</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            modal.style.display = 'block';
-            
-            // Cerrar modal
-            document.querySelector('.cerrar-modal').addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
-            
-            // Funcionalidad de compartir
-            const url = `https://pet-chan.com/eventos/${evento.id}`;
-            const texto = `¡Mira este evento en Pet-Chan: ${evento.titulo} - ${evento.descripcion.substring(0, 100)}...`;
-            
-            document.querySelector('.boton-red-social.facebook').addEventListener('click', function() {
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-            });
-            
-            document.querySelector('.boton-red-social.twitter').addEventListener('click', function() {
-                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(url)}`, '_blank');
-            });
-            
-            document.querySelector('.boton-red-social.whatsapp').addEventListener('click', function() {
-                window.open(`https://wa.me/?text=${encodeURIComponent(texto + ' ' + url)}`, '_blank');
-            });
-            
-            document.querySelector('.boton-red-social.copiar').addEventListener('click', function() {
-                navigator.clipboard.writeText(url);
-                alert('¡Enlace copiado al portapapeles!');
-            });
-        });
-    });
-    
-    // Botón de recordatorio
-    document.querySelectorAll('.boton-recordatorio').forEach(boton => {
-        boton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const eventoId = this.closest('.evento').dataset.id;
-            const evento = eventosData.find(e => e.id == eventoId);
-            
-            // Verificar si el navegador soporta notificaciones
-            if (!("Notification" in window)) {
-                alert("Este navegador no soporta notificaciones del sistema");
-                return;
-            }
-            
-            // Pedir permiso si no lo tenemos
-            if (Notification.permission !== "granted") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        configurarRecordatorio(evento);
-                    }
-                });
-            } else {
-                configurarRecordatorio(evento);
-            }
-            
-            function configurarRecordatorio(evento) {
-                const ahora = new Date();
-                const tiempoRestante = evento.fecha - ahora;
                 
-                if (tiempoRestante <= 0) {
-                    alert("Este evento ya ha ocurrido");
-                    return;
+                // Here you would send a request to register the user for the event
+                // For now, we'll just show a success message
+                
+                // Increase attendance count
+                if (eventoId) {
+                    fetch(`/api/eventos/${eventoId}/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: document.getElementById('nombre').value,
+                            email: document.getElementById('email').value,
+                            mascota: document.getElementById('mascota').value,
+                            comentarios: document.getElementById('comentarios').value
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            mostrarNotificacion('¡Inscripción exitosa! Te hemos enviado un correo con los detalles.', 'success');
+                        } else {
+                            mostrarNotificacion('Error al registrarse: ' + data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error registering for event:', error);
+                        mostrarNotificacion('Error de conexión al registrarse', 'error');
+                    });
+                } else {
+                    // Fallback for static events without IDs
+                    mostrarNotificacion('¡Inscripción exitosa! Te hemos enviado un correo con los detalles.', 'success');
                 }
                 
-                // Notificación inmediata de confirmación
-                new Notification("Recordatorio configurado", {
-                    body: `Te notificaremos 1 hora antes del evento "${evento.titulo}"`,
-                    icon: "https://i.imgur.com/JQ9aiGu.png"
-                });
-                
-                // Configurar notificación para 1 hora antes del evento
-                setTimeout(() => {
-                    new Notification(`¡El evento "${evento.titulo}" comenzará pronto!`, {
-                        body: `El evento comienza a las ${evento.hora} en ${evento.plataforma}`,
-                        icon: "https://i.imgur.com/JQ9aiGu.png"
-                    });
-                }, tiempoRestante - (60 * 60 * 1000)); // 1 hora antes
-                
-                alert("Recordatorio configurado. Te notificaremos 1 hora antes del evento.");
-            }
-        });
-    });
-    
-    // Click en el evento para ver detalles
-    document.querySelectorAll('.evento').forEach(evento => {
-        evento.addEventListener('click', function(e) {
-            // No abrir el modal si se hace clic en los botones
-            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                return;
-            }
-            
-            const eventoId = this.dataset.id;
-            const evento = eventosData.find(e => e.id == eventoId);
-            
-            // Llenar modal con datos del evento
-            const modal = document.querySelector('.modal');
-            modal.innerHTML = `
-                <div class="modal-contenido">
-                    <span class="cerrar-modal">×</span>
-                    <h2 class="modal-titulo">${evento.titulo}</h2>
-                    <div class="modal-cuerpo">
-                        <div class="modal-imagen" style="background-image: url('${evento.imagen}'); height: 200px; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 15px;"></div>
-                        <div class="modal-fecha"><i class="far fa-calendar-alt"></i> <strong>Fecha:</strong> ${formatearFecha(evento.fecha)} a las ${evento.hora}</div>
-                        <div class="modal-descripcion"><i class="far fa-comment-dots"></i> <strong>Descripción:</strong> ${evento.descripcion}</div>
-                        <div class="modal-info-adicional">
-                            <p><i class="fas fa-user-tie"></i> <strong>Organizador:</strong> ${evento.organizador}</p>
-                            <p><i class="fas fa-laptop"></i> <strong>Plataforma:</strong> ${evento.plataforma}</p>
-                            <p><i class="fas fa-stopwatch"></i> <strong>Duración:</strong> ${evento.duracion}</p>
-                            <p><i class="fas fa-tags"></i> <strong>Etiquetas:</strong> ${evento.etiquetas.join(', ')}</p>
-                            <p><i class="fas fa-users"></i> <strong>Asistentes registrados:</strong> ${evento.asistentes}</p>
-                            ${evento.historialFechas.length > 0 ? 
-                              `<p><i class="fas fa-history"></i> <strong>Fechas anteriores:</strong> ${evento.historialFechas.map(f => formatearFecha(f)).join(', ')}</p>` : ''}
-                        </div>
-                        <div class="modal-acciones">
-                            <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
-                            <button class="boton-compartir"><i class="fas fa-share-alt"></i> Compartir</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            modal.style.display = 'block';
-            
-            // Cerrar modal
-            document.querySelector('.cerrar-modal').addEventListener('click', function() {
                 modal.style.display = 'none';
-            });
-            
-            // Funcionalidad de los botones en el modal
-            document.querySelector('.modal .boton-inscribirse')?.addEventListener('click', function() {
-                modal.style.display = 'none';
-                const botonInscripcion = document.querySelector(`.evento[data-id="${eventoId}"] .boton-inscribirse`);
-                botonInscripcion.click();
-            });
-            
-            document.querySelector('.modal .boton-compartir')?.addEventListener('click', function() {
-                modal.style.display = 'none';
-                const botonCompartir = document.querySelector(`.evento[data-id="${eventoId}"] .boton-compartir`);
-                botonCompartir.click();
             });
         });
     });
@@ -510,11 +262,10 @@ function filtrarEventos(filtro) {
     const eventos = document.querySelectorAll('.evento');
     
     eventos.forEach(evento => {
-        const eventoId = evento.dataset.id;
-        const eventoData = eventosData.find(e => e.id == eventoId);
-        const etiquetas = eventoData.etiquetas.map(e => e.toLowerCase());
+        const etiquetas = Array.from(evento.querySelectorAll('.etiqueta'))
+            .map(e => e.innerText.toLowerCase());
         
-        if (filtro === 'todos' || etiquetas.includes(filtro.toLowerCase())) {
+        if (filtro === 'todos' || etiquetas.some(e => e.includes(filtro.toLowerCase()))) {
             evento.style.display = 'flex';
         } else {
             evento.style.display = 'none';
@@ -522,58 +273,484 @@ function filtrarEventos(filtro) {
     });
 }
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', function() {
-    // Verificar y reprogramar eventos al cargar la página
-    verificarYReprogramarEventos();
+// Función para formatear fechas
+function formatearFecha(fecha) {
+    if (!(fecha instanceof Date)) {
+        fecha = new Date(fecha);
+    }
+    const opciones = { day: 'numeric', month: 'short', year: 'numeric' };
+    return fecha.toLocaleDateString('es-ES', opciones);
+}
+
+// Funciones para administración de eventos
+function abrirFormularioEvento(modo, eventoId = null) {
+    let evento = null;
+    let titulo = 'Crear nuevo evento';
     
-    // Agregar controles al carrusel
-    if (!document.querySelector('.controles-carrusel')) {
-        agregarControlesCarrusel();
+    if (modo === 'editar' && eventoId) {
+        evento = eventosData.find(e => e.id == eventoId);
+        if (!evento) {
+            mostrarNotificacion('Evento no encontrado', 'error');
+            return;
+        }
+        titulo = `Editar evento: ${evento.titulo}`;
     }
     
-    // Generar eventos dinámicamente
-    generarEventos();
+    // Formatear la fecha para el input date (YYYY-MM-DD)
+    let fechaFormateada = '';
+    if (evento) {
+        const fecha = evento.fecha;
+        fechaFormateada = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;
+    }
     
-    // Actualizar contadores cada minuto
-    setInterval(actualizarContadores, 60000);
+    const modal = document.querySelector('.modal');
+    modal.innerHTML = `
+        <div class="modal-contenido modal-grande">
+            <span class="cerrar-modal">×</span>
+            <h2 class="modal-titulo">${titulo}</h2>
+            <div class="modal-cuerpo">
+                <form id="formulario-evento" class="formulario-evento">
+                    <input type="hidden" id="evento-id" value="${evento ? evento.id : ''}">
+                    <div class="form-group">
+                        <label for="titulo"><i class="fas fa-heading"></i> Título del evento *</label>
+                        <input type="text" id="titulo" name="titulo" value="${evento ? evento.titulo : ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion"><i class="fas fa-align-left"></i> Descripción del evento *</label>
+                        <textarea id="descripcion" name="descripcion" rows="3" required>${evento ? evento.descripcion : ''}</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="fecha"><i class="fas fa-calendar"></i> Fecha *</label>
+                            <input type="date" id="fecha" name="fecha" value="${fechaFormateada}" required>
+                        </div>
+                        <div class="form-group half">
+                            <label for="hora"><i class="fas fa-clock"></i> Hora *</label>
+                            <input type="time" id="hora" name="hora" value="${evento ? evento.hora : '18:00'}" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="duracion"><i class="fas fa-hourglass"></i> Duración</label>
+                            <input type="text" id="duracion" name="duracion" value="${evento ? evento.duracion : '2 horas'}" placeholder="Ej: 2 horas">
+                        </div>
+                        <div class="form-group half">
+                            <label for="plataforma"><i class="fas fa-laptop"></i> Plataforma *</label>
+                            <select id="plataforma" name="plataforma" required>
+                                <option value="Discord" ${evento && evento.plataforma === 'Discord' ? 'selected' : ''}>Discord</option>
+                                <option value="Zoom" ${evento && evento.plataforma === 'Zoom' ? 'selected' : ''}>Zoom</option>
+                                <option value="Twitch" ${evento && evento.plataforma === 'Twitch' ? 'selected' : ''}>Twitch</option>
+                                <option value="YouTube Live" ${evento && evento.plataforma === 'YouTube Live' ? 'selected' : ''}>YouTube Live</option>
+                                <option value="Pet-Chan App" ${evento && evento.plataforma === 'Pet-Chan App' ? 'selected' : ''}>Pet-Chan App</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="imagen"><i class="fas fa-image"></i> URL de la imagen</label>
+                        <input type="url" id="imagen" name="imagen" value="${evento ? evento.imagen : ''}" placeholder="https://ejemplo.com/imagen.gif">
+                        <div class="help-text">Deja en blanco para usar una imagen predeterminada.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="etiquetas"><i class="fas fa-tags"></i> Etiquetas (separadas por coma)</label>
+                        <input type="text" id="etiquetas" name="etiquetas" value="${evento ? (evento.etiquetas && evento.etiquetas.join ? evento.etiquetas.join(', ') : evento.etiquetas) : ''}" placeholder="Ej: Competitivo, Premios, Mascotas">
+                    </div>
+                    <div class="form-group">
+                        <label for="es-especial" class="checkbox-label">
+                            <input type="checkbox" id="es-especial" name="esEspecial" ${evento && evento.es_especial ? 'checked' : ''}>
+                            <span><i class="fas fa-star"></i> Evento especial (anual)</span>
+                        </label>
+                        <div class="help-text">Los eventos especiales se reprograman automáticamente para el año siguiente.</div>
+                    </div>
+                    <div class="form-group buttons-group">
+                        <button type="submit" class="boton-enviar">${modo === 'editar' ? '<i class="fas fa-save"></i> Guardar cambios' : '<i class="fas fa-plus"></i> Crear evento'}</button>
+                        <button type="button" class="boton-cancelar" id="cancelar-evento"><i class="fas fa-times"></i> Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
     
-    // Agregar sección de filtros
-    const seccionEventos = document.querySelector('.seccion-eventos');
-    if (!document.querySelector('.filtros-eventos') && seccionEventos) {
-        const filtros = document.createElement('div');
-        filtros.className = 'filtros-eventos';
-        filtros.innerHTML = `
-            <button class="filtro-btn activo" data-filtro="todos">Todos</button>
-            <button class="filtro-btn" data-filtro="competitivo">Competitivos</button>
-            <button class="filtro-btn" data-filtro="diseño">Diseño</button>
-            <button class="filtro-btn" data-filtro="fiesta">Fiestas</button>
-            <button class="filtro-btn" data-filtro="juegos">Juegos</button>
-            <button class="filtro-btn" data-filtro="educativo">Educativos</button>
-        `;
-        seccionEventos.insertBefore(filtros, document.querySelector('.lista-eventos'));
+    modal.style.display = 'block';
+    
+    // Cerrar modal
+    document.querySelector('.cerrar-modal').addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Botón cancelar
+    document.getElementById('cancelar-evento').addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Enviar formulario
+    document.getElementById('formulario-evento')?.addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        // Agregar funcionalidad a los filtros
-        document.querySelectorAll('.filtro-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
-                this.classList.add('activo');
-                filtrarEventos(this.dataset.filtro);
+        // Recopilar datos del formulario
+        const eventoId = document.getElementById('evento-id').value;
+        const formData = {
+            titulo: document.getElementById('titulo').value,
+            descripcion: document.getElementById('descripcion').value,
+            fecha: document.getElementById('fecha').value,
+            hora: document.getElementById('hora').value,
+            duracion: document.getElementById('duracion').value || '2 horas',
+            plataforma: document.getElementById('plataforma').value,
+            imagen: document.getElementById('imagen').value,
+            etiquetas: document.getElementById('etiquetas').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+            esEspecial: document.getElementById('es-especial').checked
+        };
+        
+        // Validar campos obligatorios
+        if (!formData.titulo || !formData.descripcion || !formData.fecha || !formData.hora || !formData.plataforma) {
+            mostrarNotificacion('Por favor, completa todos los campos obligatorios', 'error');
+            return;
+        }
+        
+        // Determinar si es crear o actualizar
+        const method = eventoId ? 'PUT' : 'POST';
+        const url = eventoId ? `/api/eventos/${eventoId}` : '/api/eventos';
+        
+        // Llamar a la API
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Refresh events from server
+                fetchEventosFromServer();
+                
+                // Show success message
+                mostrarNotificacion(
+                    eventoId ? 'Evento actualizado correctamente' : 'Evento creado correctamente', 
+                    'success'
+                );
+                
+                // Close modal
+                modal.style.display = 'none';
+            } else {
+                mostrarNotificacion('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al comunicarse con el servidor', 'error');
+        });
+    });
+}
+
+function mostrarListaEventosAdmin() {
+    const modal = document.querySelector('.modal');
+    
+    // Ordenar eventos por fecha
+    const eventosOrdenados = [...eventosData].sort((a, b) => a.fecha - b.fecha);
+    
+    let eventosHTML = '';
+    eventosOrdenados.forEach(evento => {
+        const fechaFormateada = formatearFecha(evento.fecha);
+        eventosHTML += `
+            <tr>
+                <td>${evento.id}</td>
+                <td>${evento.titulo}</td>
+                <td>${fechaFormateada}</td>
+                <td>${evento.hora}</td>
+                <td>${evento.plataforma}</td>
+                <td>${evento.asistentes || 0}</td>
+                <td>
+                    <button class="btn-admin-editar" data-id="${evento.id}"><i class="fas fa-edit"></i></button>
+                    <button class="btn-admin-eliminar" data-id="${evento.id}"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div class="modal-contenido modal-grande">
+            <span class="cerrar-modal">×</span>
+            <h2 class="modal-titulo">Gestión de Eventos</h2>
+            <div class="modal-cuerpo">
+                <div class="acciones-admin">
+                    <button id="btn-crear-evento" class="boton-primario">
+                        <i class="fas fa-plus"></i> Nuevo Evento
+                    </button>
+                </div>
+                <div class="tabla-container">
+                    <table class="tabla-admin">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Plataforma</th>
+                                <th>Asistentes</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${eventosHTML}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+    
+    // Cerrar modal
+    document.querySelector('.cerrar-modal').addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Botón para crear nuevo evento
+    document.getElementById('btn-crear-evento').addEventListener('click', function() {
+        modal.style.display = 'none';
+        abrirFormularioEvento('crear');
+    });
+    
+    // Botones de editar
+    document.querySelectorAll('.btn-admin-editar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const eventoId = this.dataset.id;
+            modal.style.display = 'none';
+            abrirFormularioEvento('editar', eventoId);
+        });
+    });
+    
+    // Botones de eliminar
+    document.querySelectorAll('.btn-admin-eliminar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const eventoId = this.dataset.id;
+            const evento = eventosData.find(e => e.id == eventoId);
+            
+            if (confirm(`¿Estás seguro de que deseas eliminar el evento "${evento.titulo}"?`)) {
+                // Llamar a la API para eliminar
+                fetch(`/api/eventos/${eventoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Refresh events from server
+                        fetchEventosFromServer();
+                        
+                        // Show success message and update the list
+                        mostrarNotificacion('Evento eliminado correctamente', 'success');
+                        mostrarListaEventosAdmin();
+                    } else {
+                        mostrarNotificacion('Error: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarNotificacion('Error al comunicarse con el servidor', 'error');
+                });
+            }
+        });
+    });
+}
+
+// Función para mostrar notificaciones al usuario
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Si no existe el contenedor de notificaciones, crearlo
+    let notificacionesContainer = document.querySelector('.notificaciones-container');
+    
+    if (!notificacionesContainer) {
+        notificacionesContainer = document.createElement('div');
+        notificacionesContainer.className = 'notificaciones-container';
+        document.body.appendChild(notificacionesContainer);
+    }
+    
+    // Crear elemento de notificación
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion notificacion-${tipo}`;
+    
+    // Icono según el tipo
+    let icono = '';
+    switch (tipo) {
+        case 'success':
+            icono = '<i class="fas fa-check-circle"></i>';
+            break;
+        case 'error':
+            icono = '<i class="fas fa-exclamation-circle"></i>';
+            break;
+        case 'warning':
+            icono = '<i class="fas fa-exclamation-triangle"></i>';
+            break;
+        default:
+            icono = '<i class="fas fa-info-circle"></i>';
+    }
+    
+    notificacion.innerHTML = `
+        ${icono}
+        <p>${mensaje}</p>
+        <button class="cerrar-notificacion"><i class="fas fa-times"></i></button>
+    `;
+    
+    // Agregar al contenedor
+    notificacionesContainer.appendChild(notificacion);
+    
+    // Cerrar botón
+    notificacion.querySelector('.cerrar-notificacion').addEventListener('click', () => {
+        notificacion.classList.add('desvaneciendo');
+        setTimeout(() => {
+            notificacion.remove();
+        }, 300);
+    });
+    
+    // Eliminar automáticamente después de 5 segundos
+    setTimeout(() => {
+        notificacion.classList.add('desvaneciendo');
+        setTimeout(() => {
+            notificacion.remove();
+        }, 300);
+    }, 5000);
+}
+
+// Función para generar eventos dinámicamente (usada para renovar la lista de eventos)
+function generarEventos() {
+    const listaEventos = document.querySelector('.lista-eventos');
+    if (!listaEventos) return;
+    
+    // Limpiar lista actual
+    listaEventos.innerHTML = '';
+    
+    // Verificar si hay eventos
+    if (!eventosData || eventosData.length === 0) {
+        listaEventos.innerHTML = `
+            <div class="evento">
+                <div class="info-evento">
+                    <h3 class="titulo-evento">No hay eventos programados</h3>
+                    <p class="descripcion-evento">No hay eventos disponibles en este momento. ¡Vuelve pronto!</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar eventos por fecha
+    const eventosOrdenados = [...eventosData].sort((a, b) => {
+        // First sort by date
+        const dateComparison = new Date(a.fecha) - new Date(b.fecha);
+        if (dateComparison !== 0) return dateComparison;
+        
+        // If same date, sort by time
+        return a.hora.localeCompare(b.hora);
+    });
+    
+    // Generar HTML para cada evento
+    eventosOrdenados.forEach(evento => {
+        // Check if the event date is valid
+        if (!evento.fecha) {
+            console.error('Invalid date for event:', evento);
+            return; // Skip this event
+        }
+        
+        const fechaObj = new Date(evento.fecha);
+        const dia = fechaObj.getDate();
+        const mes = fechaObj.toLocaleString('es-ES', { month: 'short' });
+        const año = fechaObj.getFullYear();
+        
+        // Check if the event is in the past
+        const isPast = fechaObj < new Date();
+        
+        // CSS classes for the event
+        let eventClasses = 'evento';
+        if (evento.popular) eventClasses += ' evento-popular';
+        if (isPast) eventClasses += ' evento-pasado';
+        
+        const eventoElement = document.createElement('div');
+        eventoElement.className = eventClasses;
+        eventoElement.style.backgroundImage = `url('${evento.imagen || "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif"}')`;
+        eventoElement.dataset.id = evento.id;
+        
+        // Format etiquetas
+        const etiquetasHTML = Array.isArray(evento.etiquetas) 
+            ? evento.etiquetas.map(etiqueta => `<span class="etiqueta">${etiqueta}</span>`).join('')
+            : '';
+        
+        eventoElement.innerHTML = `
+            <div class="marco-dorado"></div>
+            <div class="fecha-evento">
+                <span class="dia">${dia}</span>
+                <span class="mes">${mes}</span>
+                <span class="año">${año}</span>
+            </div>
+            <div class="info-evento">
+                <h3 class="titulo-evento">${evento.titulo}</h3>
+                <p class="descripcion-evento">${evento.descripcion}</p>
+                <div class="detalles-evento">
+                    <div class="detalle"><i class="fas fa-clock"></i> ${evento.hora}</div>
+                    <div class="detalle"><i class="fas fa-stopwatch"></i> ${evento.duracion || '2 horas'}</div>
+                    <div class="detalle"><i class="fas fa-laptop"></i> ${evento.plataforma}</div>
+                </div>
+                <div class="etiquetas-evento">
+                    ${etiquetasHTML}
+                </div>
+                <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
+                ${isAdmin ? `
+                <button class="boton-editar" data-id="${evento.id}"><i class="fas fa-edit"></i> Editar</button>
+                <button class="boton-eliminar" data-id="${evento.id}"><i class="fas fa-trash"></i> Eliminar</button>
+                ` : ''}
+            </div>
+            <div class="brillo-evento"></div>
+            <div class="reflejo"></div>
+        `;
+        
+        listaEventos.appendChild(eventoElement);
+    });
+    
+    // Reconfigurar botones de inscripción
+    setupInscripcionButtons();
+    
+    // Configurar botones de admin si es necesario
+    if (isAdmin) {
+        document.querySelectorAll('.boton-editar').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const eventoId = this.dataset.id;
+                abrirFormularioEvento('editar', eventoId);
+            });
+        });
+        
+        document.querySelectorAll('.boton-eliminar').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const eventoId = this.dataset.id;
+                const evento = eventosData.find(e => e.id == eventoId);
+                
+                if (confirm(`¿Estás seguro de que deseas eliminar el evento "${evento.titulo}"?`)) {
+                    // Llamar a la API para eliminar
+                    fetch(`/api/eventos/${eventoId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Actualizar datos y UI
+                            fetchEventosFromServer();
+                            mostrarNotificacion('Evento eliminado correctamente', 'success');
+                        } else {
+                            mostrarNotificacion('Error: ' + data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        mostrarNotificacion('Error al comunicarse con el servidor', 'error');
+                    });
+                }
             });
         });
     }
-    
-    // Crear modal si no existe
-    if (!document.querySelector('.modal')) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        document.body.appendChild(modal);
-    }
-    
-    // Cerrar modal haciendo clic fuera
-    window.addEventListener('click', function(e) {
-        if (e.target === document.querySelector('.modal')) {
-            document.querySelector('.modal').style.display = 'none';
-        }
-    });
-});
+}

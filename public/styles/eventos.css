@@ -79,6 +79,14 @@ body {
     animation: tituloBrillo 3s infinite alternate; /* Animación de brillo */
 }
 
+.seccion-hero h2 {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    margin-top: 20px;
+    font-size: 1.5rem;
+}
+
 @keyframes tituloBrillo {
     0% {
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff;
@@ -86,6 +94,37 @@ body {
     100% {
         text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8), 0 0 30px #ff00ff, 0 0 60px #ff00ff;
     }
+}
+
+/* Controles del carrusel */
+.controles-carrusel {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 3;
+}
+
+.control-carrusel {
+    background: rgba(98, 2, 150, 0.7);
+    border: 1px solid #cf7cfc;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-carrusel:hover {
+    background: rgba(207, 124, 252, 0.7);
+    transform: scale(1.1);
 }
 
 /* Sección de Eventos */
@@ -115,50 +154,7 @@ body {
     gap: 20px;
 }
 
-/* Controles de navegación para eventos */
-.controles-eventos {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px 0;
-}
-
-.evento-destacado {
-    border: 2px solid #ffd700;
-    background: rgba(255, 215, 0, 0.05);
-}
-
-.evento-destacado::before {
-    content: "⭐";
-    position: absolute;
-    left: -5px;
-    top: -5px;
-    background: #252525;
-    border-radius: 50%;
-    border: 2px solid #ffd700;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-}
-
-.control-btn {
-    background: rgba(207, 124, 252, 0.2);
-    border: 1px solid #cf7cfc;
-    padding: 8px 16px;
-    border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.control-btn:hover {
-    background: rgba(207, 124, 252, 0.6);
-    transform: translateY(-2px);
-}
-
+/* Filtros de eventos */
 .filtros-eventos {
     display: flex;
     justify-content: center;
@@ -185,7 +181,7 @@ body {
     background: rgba(163, 4, 250, 0.5);
 }
 
-/* Estilos para cada evento - Fondo oscurecido */
+/* Estilos para cada evento */
 .evento {
     display: flex;
     background: rgba(0, 0, 0, 0.6);
@@ -198,8 +194,6 @@ body {
     background-size: cover;
     background-position: center;
 }
-
-
 
 .evento:hover {
     transform: translateY(-5px);
@@ -269,15 +263,6 @@ body {
     color: #fff;
 }
 
-/* Contador regresivo */
-.contador-regresivo {
-    display: flex;
-    gap: 5px;
-    margin-top: 5px;
-    font-size: 0.7rem;
-    color: #ffd700;
-}
-
 /* Información del evento */
 .info-evento {
     flex: 1;
@@ -316,18 +301,11 @@ body {
     gap: 5px;
 }
 
-.detalle svg {
-    width: 16px;
-    height: 16px;
-    fill: #cf7cfc;
-}
-
 .etiquetas-evento {
     display: flex;
     gap: 8px;
-    margin-bottom: 10px;
+    margin: 10px 0;
     flex-wrap: wrap;
-    z-index: 2;
 }
 
 .etiqueta {
@@ -341,17 +319,10 @@ body {
 
 .etiqueta:hover {
     background: #a304fa;
-    transform: translateY(-2px);
 }
 
 /* Botones de acción */
-.acciones-evento {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.boton-inscribirse {
+.boton-inscribirse, .boton-editar, .boton-eliminar {
     background: #cf7cfc;
     border: none;
     padding: 8px 16px;
@@ -362,101 +333,28 @@ body {
     cursor: pointer;
     transition: background 0.3s ease;
     z-index: 2;
+    margin-top: 10px;
+    margin-right: 5px;
 }
 
 .boton-inscribirse:hover {
     background: #a304fa;
-    transform: translateY(-2px);
 }
 
-.boton-compartir {
-    background: rgba(98, 2, 150, 0.5);
-    border: 1px solid #cf7cfc;
-    padding: 8px 16px;
-    border-radius: 5px;
-    color: #fff;
-    font-family: inherit;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+.boton-editar {
+    background: #4caf50;
 }
 
-.boton-compartir:hover {
-    background: rgba(98, 2, 150, 0.8);
+.boton-editar:hover {
+    background: #3d8b40;
 }
 
-.boton-recordatorio {
-    background: transparent;
-    border: 1px solid #cf7cfc;
-    padding: 8px 16px;
-    border-radius: 5px;
-    color: #fff;
-    font-family: inherit;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 2;
+.boton-eliminar {
+    background: #f44336;
 }
 
-.boton-recordatorio:hover {
-    background: rgba(207, 124, 252, 0.2);
-}
-
-/* Contador de participantes */
-.participantes {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #ccc;
-}
-
-.participantes-avatars {
-    display: flex;
-    margin-top: 5px;
-}
-
-.avatar {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background-color: #620296;
-    border: 1px solid #cf7cfc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: -8px;
-}
-
-/* Sección de paginación */
-.paginacion {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    margin-top: 20px;
-}
-
-.pagina {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(98, 2, 150, 0.3);
-    border: 1px solid #cf7cfc;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.pagina.activa {
-    background: #a304fa;
-}
-
-.pagina:hover:not(.activa) {
-    background: rgba(163, 4, 250, 0.3);
+.boton-eliminar:hover {
+    background: #d32f2f;
 }
 
 /* Efecto de brillo */
@@ -492,30 +390,7 @@ body {
     z-index: 1;
 }
 
-/* Modo oscuro/claro toggle */
-.modo-toggle {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(98, 2, 150, 0.7);
-    border: 1px solid #cf7cfc;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
-}
-
-.modo-toggle:hover {
-    transform: rotate(30deg);
-    background: rgba(163, 4, 250, 0.7);
-}
-
-/* Modal para detalles del evento */
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -534,13 +409,17 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 80%;
-    max-width: 800px;
+    max-width: 600px;
     background: rgba(98, 2, 150, 0.95);
     border: 2px solid #cf7cfc;
     border-radius: 10px;
     padding: 20px;
     max-height: 80vh;
     overflow-y: auto;
+}
+
+.modal-grande {
+    max-width: 800px;
 }
 
 .cerrar-modal {
@@ -560,28 +439,17 @@ body {
     font-size: 1.2rem;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
-    .evento {
-        flex-direction: column;
-    }
-    
-    .fecha-evento {
-        margin-right: 0;
-        margin-bottom: 10px;
-        flex-direction: row;
-        width: 100%;
-        gap: 10px;
-    }
-    
-    .acciones-evento {
-        flex-direction: column;
-    }
+.modal-titulo {
+    color: #ffb8ff;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
 }
 
-
-/* Estilos para el formulario de inscripción */
-.formulario-inscripcion {
+/* Formularios */
+.formulario-inscripcion, .formulario-evento {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -593,6 +461,15 @@ body {
     gap: 5px;
 }
 
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-group.half {
+    width: 50%;
+}
+
 .form-group label {
     color: #ffb8ff;
     display: flex;
@@ -601,7 +478,8 @@ body {
 }
 
 .form-group input, 
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #cf7cfc;
@@ -615,102 +493,367 @@ body {
     min-height: 80px;
 }
 
-.boton-enviar {
-    background: #cf7cfc;
+/* Panel de administración y botón flotante */
+.panel-admin {
+    position: fixed;
+    bottom: 80px;
+    left: 15px;
+    z-index: 10;
+    background: rgba(35, 10, 60, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid #cf7cfc;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.boton-admin {
+    background: linear-gradient(45deg, #620296, #a304fa);
+    color: white;
     border: none;
-    padding: 12px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.admin-tools {
+    padding: 15px;
+    background: rgba(40, 10, 70, 0.95);
+}
+
+.boton-admin-accion {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #cf7cfc;
+    background: rgba(207, 124, 252, 0.2);
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.boton-flotante {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #620296, #a304fa);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+/* Tabla de administración */
+.tabla-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(40, 10, 60, 0.8);
+    color: white;
+}
+
+.tabla-admin th {
+    background: rgba(60, 10, 90, 0.9);
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid #cf7cfc;
+}
+
+.tabla-admin td {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(207, 124, 252, 0.3);
+}
+
+/* Notificaciones */
+.notificaciones-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+}
+
+.notificacion {
+    background: rgba(50, 50, 50, 0.9);
+    border-left: 4px solid #ccc;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s forwards;
+    backdrop-filter: blur(5px);
+}
+
+.notificacion.desvaneciendo {
+    animation: slideOut 0.3s forwards;
+}
+
+.notificacion-success {
+    border-left-color: #4caf50;
+}
+
+.notificacion-error {
+    border-left-color: #f44336;
+}
+
+.notificacion-warning {
+    border-left-color: #ff9800;
+}
+
+.notificacion-info {
+    border-left-color: #2196f3;
+}
+
+.notificacion i {
+    font-size: 1.2rem;
+}
+
+.notificacion-success i {
+    color: #4caf50;
+}
+
+.notificacion-error i {
+    color: #f44336;
+}
+
+.notificacion-warning i {
+    color: #ff9800;
+}
+
+.notificacion-info i {
+    color: #2196f3;
+}
+
+.notificacion p {
+    flex: 1;
+    margin: 0;
+}
+
+.cerrar-notificacion {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.cerrar-notificacion:hover {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Estilos para el formulario de evento */
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+.help-text {
+    font-size: 0.8rem;
+    color: #ccc;
+    margin-top: 5px;
+}
+
+.buttons-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.boton-enviar,
+.boton-primario {
+    background: linear-gradient(45deg, #620296, #a304fa);
+    border: none;
+    padding: 12px 20px;
     border-radius: 5px;
     color: #fff;
     font-family: inherit;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s ease;
-    margin-top: 10px;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-}
-
-.boton-enviar:hover {
-    background: #a304fa;
-}
-
-/* Estilos para las opciones de compartir */
-.redes-sociales {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.boton-red-social {
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    color: white;
-    font-family: inherit;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: transform 0.3s ease;
-}
-
-.boton-red-social:hover {
-    transform: translateY(-2px);
-}
-
-.boton-red-social.facebook {
-    background: #3b5998;
-}
-
-.boton-red-social.twitter {
-    background: #1da1f2;
-}
-
-.boton-red-social.whatsapp {
-    background: #25d366;
-}
-
-.boton-red-social.copiar {
-    background: #620296;
-}
-
-/* Estilos para iconos */
-i {
-    font-size: 1rem;
-}
-
-/* Estilos para el modal de detalles */
-.modal-info-adicional {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.modal-info-adicional p {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 5px 0;
-}
-
-.modal-acciones {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.modal-acciones button {
     flex: 1;
 }
 
+.boton-cancelar {
+    background: rgba(50, 50, 50, 0.7);
+    border: 1px solid #999;
+    padding: 12px 20px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+}
 
+.boton-enviar:hover,
+.boton-primario:hover {
+    background: linear-gradient(45deg, #7b02c1, #b620ff);
+    transform: translateY(-2px);
+}
 
-/* Marco dorado */
+.boton-cancelar:hover {
+    background: rgba(80, 80, 80, 0.8);
+}
+
+/* Botones de la tabla de administración */
+.btn-admin-editar,
+.btn-admin-eliminar {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0 5px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.btn-admin-editar {
+    color: #4caf50;
+}
+
+.btn-admin-eliminar {
+    color: #f44336;
+}
+
+.btn-admin-editar:hover {
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.btn-admin-eliminar:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.acciones-admin {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+/* Adaptaciones para móviles */
+@media (max-width: 768px) {
+    .seccion-hero h1 {
+        font-size: 2.5rem;
+        padding: 15px 20px;
+    }
+    
+    .seccion-hero h2 {
+        font-size: 1.2rem;
+    }
+    
+    .evento {
+        flex-direction: column;
+    }
+    
+    .fecha-evento {
+        margin-right: 0;
+        margin-bottom: 10px;
+        flex-direction: row;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .form-group.half {
+        width: 100%;
+    }
+    
+    .boton-flotante {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .panel-admin {
+        bottom: 80px;
+        right: 10px;
+    }
+    
+    .notificaciones-container {
+        width: calc(100% - 40px);
+    }
+    
+    .modal-contenido {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .buttons-group {
+        flex-direction: column;
+    }
+}
+
+/* Marco dorado para eventos destacados */
 .marco-dorado {
     position: absolute;
     top: -2px;
@@ -722,66 +865,4 @@ i {
     pointer-events: none;
     z-index: 1;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-/* Efecto de brillo mejorado */
-.brillo-evento {
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg, 
-        transparent, 
-        rgba(255, 215, 0, 0.4), 
-        transparent
-    );
-    animation: brillo 3s infinite;
-    z-index: 1;
-}
-
-@keyframes brillo {
-    0% { left: -100%; opacity: 0.5; }
-    100% { left: 100%; opacity: 1; }
-}
-
-/* Reflejo mejorado */
-.reflejo {
-    position: absolute;
-    bottom: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(
-        circle, 
-        rgba(255, 215, 0, 0.2), 
-        transparent 70%
-    );
-    transform: rotate(45deg);
-    z-index: 1;
-}
-
-/* Animación de título */
-@keyframes tituloBrillo {
-    0% {
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff;
-    }
-    100% {
-        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8), 0 0 30px #ff00ff, 0 0 60px #ff00ff;
-    }
-}
-
-.seccion-hero h1 {
-    animation: tituloBrillo 3s infinite alternate;
-}
-/* Responsividad para el modal */
-@media (max-width: 768px) {
-    .modal-contenido {
-        width: 95% !important;
-    }
-    
-    .modal-acciones {
-        flex-direction: column;
-    }
 }

@@ -60,6 +60,19 @@ const requireLogin = (req, res, next) => {
     }
     next();
 };
+
+
+// Inicializar eventos al inicio del servidor
+app.use(async (req, res, next) => {
+  // Inicializar eventos si no se ha hecho ya
+  if (!req.app.get('eventsInitialized')) {
+    await initializeEventsTable();
+    req.app.set('eventsInitialized', true);
+  }
+  next();
+});
+
+
 //configuracion de la base de datos
 /*---------------------------variable necesarias para la base de datos------------------------------------------------ */
 
@@ -871,21 +884,34 @@ app.get('/inicio', requireLogin, (req, res) => {
     
     });
 
-app.get('/eventos', requireLogin, (req, res) => {
-
-    const mascota = req.session.mascotaActual;
-
-    //Create a mensaje object with the data you need
-    const mensaje = {
-        imagenesUrl: [] // Empty array or populate with actual image URLs
-    };
+    app.get('/eventos', requireLogin, async (req, res) => {
+      try {
+        const mascota = req.session.mascotaActual;
     
-    res.render('eventos.ejs', {
-        mensaje,
-        rutaImagen: mascota.rutaImagen,
-        accesorios: req.session.accesorios
+        // Obtener eventos de la base de datos
+        const eventosResult = await db.query(`SELECT * FROM eventos ORDER BY fecha`);
+        
+        // Formatear los eventos para la plantilla
+        const eventosData = eventosResult.rows.map(event => ({
+          ...event,
+          fecha: new Date(event.fecha), // Convertir string a objeto Date
+          etiquetas: event.etiquetas ? event.etiquetas.split(',').map(tag => tag.trim()) : [],
+          popular: event.popular || false
+        }));
+        
+        // Renderizar la plantilla con los datos de eventos
+        res.render('eventos.ejs', {
+          mensaje: { imagenesUrl: [] },
+          rutaImagen: mascota.rutaImagen,
+          accesorios: req.session.accesorios,
+          eventosData: eventosData, // Pasar los datos de eventos a la plantilla
+          isAdmin: req.session.rango3 === 'Administrador'
+        });
+      } catch (error) {
+        console.error('Error al renderizar página de eventos:', error);
+        res.status(500).send('Error al cargar página de eventos');
+      }
     });
-});
 
 app.get('/formularioSoporte', requireLogin, (req, res) => {
 
@@ -5167,6 +5193,357 @@ app.post('/api/comunidad/:id/join', requireLogin, async (req, res) => {
 
 
 
+
+
+// ---------------------- API DE EVENTOS -------------------------
+// API endpoints para la gestión de eventos
+
+// GET - Obtener todos los eventos
+app.get('/api/eventos-data', requireLogin, async (req, res) => {
+  try {
+    // Query to retrieve events from database
+    const result = await db.query(`
+      SELECT * FROM eventos 
+      ORDER BY fecha DESC
+    `);
+    
+    // Process the database results (convert date objects, parse etiquetas to array)
+    const events = result.rows.map(event => ({
+      ...event,
+      etiquetas: event.etiquetas ? event.etiquetas.split(',').map(tag => tag.trim()) : []
+    }));
+    
+    res.json({
+      success: true,
+      eventos: events
+    });
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error retrieving events from database' 
+    });
+  }
+});
+
+// GET - Obtener un evento específico por ID
+app.get('/api/eventos/:id', requireLogin, async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    
+    const result = await db.query(`
+      SELECT * FROM eventos WHERE id = $1
+    `, [eventId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+    
+    // Process event (convert etiquetas to array)
+    const event = {
+      ...result.rows[0],
+      etiquetas: result.rows[0].etiquetas ? result.rows[0].etiquetas.split(',').map(tag => tag.trim()) : []
+    };
+    
+    res.json({
+      success: true,
+      evento: event
+    });
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    res.status(500).json({ success: false, error: 'Error retrieving event from database' });
+  }
+});
+
+// Middleware para verificar si el usuario es administrador
+const isAdminEventos = async (req, res, next) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ success: false, mensaje: 'Debes iniciar sesión' });
+    }
+    
+    // Verificar si el usuario tiene el rango3 = 'Administrador'
+    if (req.session.rango3 !== 'Administrador') {
+      return res.status(403).json({ success: false, mensaje: 'No tienes permisos de administrador' });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Error al verificar permisos de administrador:', error);
+    res.status(500).json({ success: false, mensaje: 'Error al verificar permisos' });
+  }
+};
+
+// POST - Crear un nuevo evento (solo admin)
+app.post('/api/eventos', requireLogin, isAdminEventos, async (req, res) => {
+  try {
+    const { titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, esEspecial } = req.body;
+    
+    // Validate required fields
+    if (!titulo || !descripcion || !fecha || !hora || !plataforma) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Faltan campos obligatorios (título, descripción, fecha, hora, plataforma)' 
+      });
+    }
+    
+    // Process etiquetas (convert array to comma-separated string if needed)
+    const etiquetasString = Array.isArray(etiquetas) ? etiquetas.join(',') : etiquetas;
+    
+    // Insert the new event into the database
+    const result = await db.query(`
+      INSERT INTO eventos 
+      (titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, organizador, es_especial) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *
+    `, [
+      titulo, 
+      descripcion,
+      imagen || "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif", // Default image
+      fecha,
+      hora,
+      duracion || "1 hora",
+      plataforma,
+      etiquetasString,
+      "Equipo Pet-Chan", // Default organizer
+      esEspecial === true || esEspecial === 'true'
+    ]);
+    
+    // Format the returned event for the response
+    const newEvent = {
+      ...result.rows[0],
+      etiquetas: result.rows[0].etiquetas ? result.rows[0].etiquetas.split(',').map(tag => tag.trim()) : []
+    };
+    
+    res.status(201).json({
+      success: true,
+      mensaje: 'Evento creado correctamente',
+      evento: newEvent
+    });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    res.status(500).json({ success: false, error: 'Error al crear evento en la base de datos' });
+  }
+});
+
+// PUT - Actualizar un evento existente (solo admin)
+app.put('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const { titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, esEspecial } = req.body;
+    
+    // Check if the event exists
+    const checkResult = await db.query(`SELECT * FROM eventos WHERE id = $1`, [eventId]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Evento no encontrado' });
+    }
+    
+    // Process etiquetas
+    const etiquetasString = Array.isArray(etiquetas) ? etiquetas.join(',') : etiquetas;
+    
+    // Update the event in the database
+    const updateResult = await db.query(`
+      UPDATE eventos SET
+        titulo = COALESCE($1, titulo),
+        descripcion = COALESCE($2, descripcion),
+        imagen = COALESCE($3, imagen),
+        fecha = COALESCE($4, fecha),
+        hora = COALESCE($5, hora),
+        duracion = COALESCE($6, duracion),
+        plataforma = COALESCE($7, plataforma),
+        etiquetas = COALESCE($8, etiquetas),
+        es_especial = COALESCE($9, es_especial)
+      WHERE id = $10
+      RETURNING *
+    `, [
+      titulo || null,
+      descripcion || null,
+      imagen || null,
+      fecha || null,
+      hora || null,
+      duracion || null,
+      plataforma || null,
+      etiquetasString || null,
+      esEspecial !== undefined ? (esEspecial === true || esEspecial === 'true') : null,
+      eventId
+    ]);
+    
+    // Format the returned event for the response
+    const updatedEvent = {
+      ...updateResult.rows[0],
+      etiquetas: updateResult.rows[0].etiquetas ? updateResult.rows[0].etiquetas.split(',').map(tag => tag.trim()) : []
+    };
+    
+    res.json({
+      success: true,
+      mensaje: 'Evento actualizado correctamente',
+      evento: updatedEvent
+    });
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ success: false, error: 'Error al actualizar evento en la base de datos' });
+  }
+});
+
+// DELETE - Eliminar un evento (solo admin)
+app.delete('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    
+    // Check if the event exists
+    const checkResult = await db.query(`SELECT * FROM eventos WHERE id = $1`, [eventId]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Evento no encontrado' });
+    }
+    
+    // Delete the event
+    await db.query(`DELETE FROM eventos WHERE id = $1`, [eventId]);
+    
+    res.json({
+      success: true,
+      mensaje: 'Evento eliminado correctamente',
+      evento: checkResult.rows[0] // Return the deleted event info
+    });
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    res.status(500).json({ success: false, error: 'Error al eliminar evento de la base de datos' });
+  }
+});
+
+// POST - Registrarse para un evento (aumentar contador de asistentes)
+app.post('/api/eventos/:id/register', requireLogin, async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const { nombre, email, mascota, comentarios } = req.body;
+    
+    // Check if the event exists
+    const checkResult = await db.query(`SELECT * FROM eventos WHERE id = $1`, [eventId]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Evento no encontrado' });
+    }
+    
+    // Increment attendance count
+    await db.query(`
+      UPDATE eventos 
+      SET asistentes = asistentes + 1 
+      WHERE id = $1
+    `, [eventId]);
+    
+    // In a complete implementation, you would store the registration details
+    // and perhaps send a confirmation email
+    
+    res.json({
+      success: true,
+      mensaje: 'Registro exitoso',
+      evento: checkResult.rows[0]
+    });
+  } catch (error) {
+    console.error('Error registering for event:', error);
+    res.status(500).json({ success: false, error: 'Error al registrarse para el evento' });
+  }
+});
+
+// GET - Verificar si el usuario actual es administrador
+app.get('/api/check-admin', requireLogin, (req, res) => {
+  try {
+    // Verificar si el usuario tiene el rango de administrador
+    const isAdmin = req.session.rango3 === 'Administrador';
+    
+    res.json({
+      success: true,
+      isAdmin: isAdmin
+    });
+  } catch (error) {
+    console.error('Error al verificar estado admin:', error);
+    res.status(500).json({ success: false, error: 'Error al verificar permisos' });
+  }
+});
+
+// Función para inicializar la tabla de eventos con datos de ejemplo
+async function initializeEventsTable() {
+  try {
+    const checkResult = await db.query('SELECT COUNT(*) FROM eventos');
+    
+    if (parseInt(checkResult.rows[0].count) === 0) {
+      console.log('Inicializando tabla de eventos con datos de ejemplo...');
+      
+      // Eventos de ejemplo
+      const sampleEvents = [
+        {
+          titulo: "Torneo de Mascotas Virtuales",
+          descripcion: "Participa en el torneo más grande de mascotas virtuales. ¡Gana premios exclusivos!",
+          imagen: "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif",
+          fecha: new Date(new Date().getFullYear(), 9, 25), // 25 de Octubre
+          hora: "18:00",
+          duracion: "2 horas",
+          plataforma: "Discord",
+          etiquetas: "Competitivo,Premios,Mascotas",
+          organizador: "Equipo Pet-Chan",
+          asistentes: 0,
+          popular: true,
+          es_especial: false
+        },
+        {
+          titulo: "Concurso de Diseño de Mascotas",
+          descripcion: "Diseña la mascota más creativa y gana reconocimiento en la comunidad.",
+          imagen: "https://i.pinimg.com/originals/f0/ae/4d/f0ae4d94c7e930bc50632d4c7d79b59d.gif", 
+          fecha: new Date(new Date().getFullYear(), 10, 15), // 15 de Noviembre
+          hora: "16:00",
+          duracion: "3 horas",
+          plataforma: "Zoom",
+          etiquetas: "Creatividad,Diseño,Reconocimiento",
+          organizador: "Artistas Pet-Chan",
+          asistentes: 0,
+          popular: false,
+          es_especial: false
+        },
+        {
+          titulo: "Fiesta de Fin de Año",
+          descripcion: "Celebra el fin de año con una gran fiesta virtual y sorpresas especiales.",
+          imagen: "https://favim.com/pd/p/orig/2019/02/11/8bit-city-8-bit-Favim.com-6875655.gif",
+          fecha: new Date(new Date().getFullYear(), 11, 30), // 30 de Diciembre
+          hora: "22:00",
+          duracion: "4 horas",
+          plataforma: "Twitch",
+          etiquetas: "Fiesta,Sorpresas,Celebración",
+          organizador: "Comunidad Pet-Chan",
+          asistentes: 0,
+          popular: true,
+          es_especial: true
+        }
+      ];
+      
+      // Insertar eventos de ejemplo
+      for (const event of sampleEvents) {
+        await db.query(`
+          INSERT INTO eventos 
+          (titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, organizador, asistentes, popular, es_especial) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        `, [
+          event.titulo,
+          event.descripcion,
+          event.imagen,
+          event.fecha,
+          event.hora,
+          event.duracion,
+          event.plataforma,
+          event.etiquetas,
+          event.organizador,
+          event.asistentes,
+          event.popular,
+          event.es_especial
+        ]);
+      }
+      
+      console.log('Eventos de ejemplo añadidos a la base de datos');
+    }
+  } catch (error) {
+    console.error('Error al inicializar tabla de eventos:', error);
+  }
+}
 
 
 
