@@ -20,5 +20,17 @@
     <br>
 </footer>
 
+<script>
+  window.addEventListener('load', function() {
+    setInterval(() => {
+      fetch('/actualizar-actividad', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: miUsuarioId })
+      });
+    }, 10 * 60 * 1000);
+  });
+</script>
+
 </body>
 </html>

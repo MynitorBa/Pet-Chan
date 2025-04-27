@@ -754,62 +754,88 @@ document.getElementById('mensaje-form').addEventListener('submit', function(even
       `;
       
       mensajeElement.innerHTML = `
-        <div class="mensaje-cabecera">
-          <span class="autor">${mensaje.autor}</span>
-          ${rangosHTML}
-          <div class="etiquetas-container">
-            ${etiquetaHTML}
-          </div>
-          <div class="mensaje-acciones">
-            ${botonesAccion}
-            <button class="btn-comentar" data-id="${mensaje.id}"><i class="fas fa-comment"></i></button>
-          </div>
+      <div class="mensaje-cabecera">
+        <span class="autor">${mensaje.autor}</span>
+        <div class="mensaje-acciones">
+          ${botonesAccion}
+          <button class="btn-comentar" data-id="${mensaje.id}"><i class="fas fa-comment"></i></button>
         </div>
-        <div class="mensaje-contenido">${mensaje.mensaje}</div>
-        ${imagenesHTML}
-        <div class="mensaje-pie">
-          <span class="fecha">${mensaje.fechaStr || mensaje.fecha}</span>
-          <div class="ranking-container" data-mensaje-id="${mensaje.id}">
-            <button class="btn-votar upvote" data-valor="1">
-              &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
-            </button>
-            <span class="ranking-valor ${mensaje.ranking < 0 ? 'negativo' : ''}">
-              ${mensaje.ranking}
-            </span>
-            <button class="btn-votar downvote" data-valor="-1">
-              &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
-            </button>
-          </div>
-        </div>      
-      `;
+      </div>
       
-      listaMensajes.appendChild(mensajeElement);
+      <div class="rangos-container">
+        <div class="rangos-wrapper">
+          ${rangosHTML}
+        </div>
+      </div>
       
-      // Añadir sección de comentarios con toggle para colapsar/expandir
-      const comentariosSeccion = document.createElement('div');
-      comentariosSeccion.classList.add('comentarios-seccion');
+      <div class="etiquetas-container">
+        <div class="etiquetas-wrapper">
+          ${etiquetaHTML}
+        </div>
+      </div>
       
-      // Contador de comentarios y botón para mostrar/ocultar
-      const totalComentarios = mensaje.comentarios ? mensaje.comentarios.length : 0;
+      <div class="mensaje-contenido">${mensaje.mensaje}</div>
+      ${imagenesHTML}
       
-      const comentariosHeader = document.createElement('div');
-      comentariosHeader.classList.add('comentarios-header');
-      comentariosHeader.innerHTML = `
-        <button class="toggle-comentarios" aria-expanded="false">
-          <i class="fas fa-chevron-down"></i>
-          <span class="comentarios-contador">${totalComentarios} comentarios</span>
-        </button>
-      `;
-      comentariosSeccion.appendChild(comentariosHeader);
+      <div class="mensaje-pie">
+        <div class="ranking-container" data-mensaje-id="${mensaje.id}">
+          <button class="btn-votar upvote" data-valor="1">
+            &#x2191;
+          </button>
+          <span class="ranking-valor ${mensaje.ranking < 0 ? 'negativo' : ''}">
+            ${mensaje.ranking}
+          </span>
+          <button class="btn-votar downvote" data-valor="-1">
+            &#x2193;
+          </button>
+        </div>
+        <span class="fecha mensaje-fecha-pie">${mensaje.fechaStr || mensaje.fecha}</span>
+      </div>
+    `;
       
-      // Contenedor de comentarios (inicialmente oculto)
-      const comentariosContenedor = document.createElement('div');
-      comentariosContenedor.classList.add('comentarios-contenedor');
-      comentariosContenedor.style.display = 'none';
-      
-      // Lista de comentarios
-      const comentariosLista = document.createElement('div');
-      comentariosLista.classList.add('comentarios-lista');
+  // Añadir el mensaje a la lista primero
+    listaMensajes.appendChild(mensajeElement);
+    
+    // DESPUÉS creamos la sección de comentarios como un elemento separado
+    const comentariosSeccion = document.createElement('div');
+    comentariosSeccion.classList.add('comentarios-seccion');
+    
+    // Contador de comentarios y botón para mostrar/ocultar
+    const totalComentarios = mensaje.comentarios ? mensaje.comentarios.length : 0;
+    
+    const comentariosHeader = document.createElement('div');
+    comentariosHeader.classList.add('comentarios-header');
+    comentariosHeader.innerHTML = `
+      <button class="toggle-comentarios" aria-expanded="false">
+        <i class="fas fa-chevron-down"></i>
+        <span class="comentarios-contador">${totalComentarios} comentarios</span>
+      </button>
+    `;
+    comentariosSeccion.appendChild(comentariosHeader);
+    
+    // Contenedor de comentarios (inicialmente oculto)
+    const comentariosContenedor = document.createElement('div');
+    comentariosContenedor.classList.add('comentarios-contenedor');
+    comentariosContenedor.style.display = 'none';
+    
+    // Lista de comentarios
+    const comentariosLista = document.createElement('div');
+    comentariosLista.classList.add('comentarios-lista');
+    
+    if (mensaje.comentarios && mensaje.comentarios.length > 0) {
+      mensaje.comentarios.forEach(comentario => {
+        const comentarioElement = createCommentElement(comentario, mensaje.id, currentUsername);
+        comentariosLista.appendChild(comentarioElement);
+      });
+    }
+
+       comentariosContenedor.appendChild(comentariosLista);
+    comentariosSeccion.appendChild(comentariosContenedor);
+    
+    // Añadir la sección de comentarios DESPUÉS del mensaje
+    listaMensajes.appendChild(comentariosSeccion);
+
+
       
       // Agregar comentarios existentes a la lista
       if (mensaje.comentarios && mensaje.comentarios.length > 0) {
@@ -4706,4 +4732,112 @@ document.addEventListener('DOMContentLoaded', function() {
     subtree: true
   });
 });
+
+// Estilos para las imágenes circulares y la expansión
+const style = document.createElement('style');
+style.textContent = `
+/* Estilo para las miniaturas (antes de hacer clic) */
+.imagen-comentario img {
+    width: 100%;
+    height: 100%;
+    border-radius: 2%; /* Borde ligeramente redondeado */
+    object-fit: cover;
+    background-color: white;
+    border: 2px solid white;
+}
+
+.imagen-comentario {
+    width: 100px;
+    height: 100px;
+    border-radius: 2%;
+    overflow: hidden;
+    display: inline-block;
+    margin: 5px;
+    background-color: white;
+}
+
+/* Estilo para la imagen expandida */
+.modal-imagen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999999;
+    cursor: pointer;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.imagen-expandida-contenedor {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 2px solid white;
+    background-color: white;
+    max-width: 90%;
+    max-height: 90vh;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.imagen-expandida {
+    display: block;
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain; /* Cambiado a contain para mostrar la imagen completa */
+    background-color: white;
+}
+`;
+document.head.appendChild(style);
+
+// Crear el modal para la imagen expandida
+const modal = document.createElement('div');
+modal.className = 'modal-imagen';
+modal.innerHTML = '<div class="imagen-expandida-contenedor"><img class="imagen-expandida" src="" alt="Imagen expandida"></div>';
+document.body.appendChild(modal);
+
+// Función para cerrar el modal al hacer clic
+modal.addEventListener('click', function(e) {
+    // Solo cerrar si se hace clic fuera de la imagen
+    if (e.target === modal) {
+        this.style.display = 'none';
+    }
+});
+
+// Evitar que los clics en la imagen cierren el modal
+document.querySelector('.imagen-expandida-contenedor').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+
+// Agregar evento a todas las imágenes de comentarios
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.matches('.imagen-comentario img')) {
+        // Prevenir comportamiento predeterminado
+        e.stopPropagation();
+        
+        // Obtener la URL de la imagen
+        const imagenSrc = e.target.src;
+        
+        // Establecer la imagen expandida
+        document.querySelector('.imagen-expandida').src = imagenSrc;
+        
+        // Mostrar el modal
+        modal.style.display = 'flex';
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 

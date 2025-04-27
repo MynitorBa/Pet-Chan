@@ -1,5 +1,3 @@
-/* Estilos para la página de minijuegos - mantiene la estética ciberpunk/neón */
-
 /* Contenedor principal */
 #contenedor-juego {
     font-family: 'Press Start 2P', cursive;
@@ -67,9 +65,90 @@
     animation: neon-pulse 2s infinite;
 }
 
-@keyframes neon-pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
+/* Selector de minijuegos - Estilo ciberpunk */
+.selector-minijuegos {
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.selector-minijuegos label {
+    display: block;
+    margin-bottom: 10px;
+    color: #cf7cfc;
+    font-size: 0.9rem;
+    text-shadow: 0 0 5px rgba(207, 124, 252, 0.7);
+    animation: flicker 1.5s infinite alternate;
+}
+
+.selector-minijuegos select {
+    background-color: rgba(25, 15, 35, 0.9);
+    border: 2px solid #cf7cfc;
+    border-radius: 6px;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    padding: 10px 15px;
+    width: 100%;
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+    box-shadow: 0 0 15px rgba(163, 4, 250, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+/* Flecha personalizada para el select */
+.selector-minijuegos::after {
+    content: '▼';
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    color: #cf7cfc;
+    font-size: 0.7rem;
+    pointer-events: none;
+    z-index: 3;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(-50%); }
+    50% { transform: translateY(-30%); }
+}
+
+.selector-minijuegos select:hover {
+    box-shadow: 0 0 20px rgba(207, 124, 252, 0.7);
+    border-color: #ff00ff;
+}
+
+.selector-minijuegos select:focus {
+    border-color: #ff00ff;
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.8);
+}
+
+/* Efecto de fondo para el select */
+.selector-minijuegos::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        rgba(207, 124, 252, 0.1) 0%, 
+        rgba(255, 0, 255, 0.2) 50%, 
+        rgba(207, 124, 252, 0.1) 100%);
+    border-radius: 6px;
+    z-index: 1;
+    animation: gradient-pulse 4s ease infinite;
+    filter: blur(1px);
+}
+
+@keyframes gradient-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
 }
 
 /* Sección donde se mostrará el juego */
@@ -82,12 +161,12 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(163, 4, 250, 0.4);
-    cursor: pointer; /* Indicador para clickear */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    pointer-events: auto; /* Asegura que los clicks pasen al juego */
 }
 
 /* Efecto de líneas para el área del juego */
@@ -113,34 +192,21 @@
     animation: grid-move 60s linear infinite;
 }
 
-@keyframes grid-move {
-    0% { background-position: 0 0; }
-    100% { background-position: 1000px 1000px; }
-}
-
-/* Al hacer hover sobre la sección del juego */
-.seccion-del_juego:hover {
-    box-shadow: 0 0 30px rgba(207, 124, 252, 0.7);
-    transform: scale(1.01);
-}
-
-/* Efecto de "haz clic para jugar" */
+/* Efecto de escáner para la sección del juego */
 .seccion-del_juego::after {
+    content: '';
     position: absolute;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 1.2rem;
-    text-shadow: 0 0 10px rgba(207, 124, 252, 0.9);
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(207, 124, 252, 0.5) 50%, 
+        transparent 100%);
+    opacity: 0.7;
     z-index: 1;
-    animation: flicker 1.5s infinite alternate;
-}
-
-@keyframes flicker {
-    0%, 18%, 22%, 25%, 53%, 57%, 100% {
-        opacity: 1;
-    }
-    20%, 24%, 55% {
-        opacity: 0;
-    }
+    animation: escaneo 4s linear infinite;
 }
 
 /* Puntos ganados */
@@ -148,53 +214,40 @@
     font-size: 1.2rem;
     color: #ffffff;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-}
-
-#contenedor-juego p span {
-    color: #ffd700; /* Dorado para los puntos */
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-    animation: puntos-brillantes 2s infinite;
-}
-
-@keyframes puntos-brillantes {
-    0%, 100% {
-        text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-    }
-    50% {
-        text-shadow: 0 0 20px rgba(255, 215, 0, 1);
-    }
-}
-
-/* Efecto de escáner para la sección del juego */
-.seccion-del_juego::before {
-    content: '';
-    position: absolute;
-    top: -100%;
-    width: 200%;
-    height: 10px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(207, 124, 252, 0.5) 50%, 
-        transparent 100%);
-    opacity: 0.7;
-    z-index: 2;
-    animation: escaneo 4s linear infinite;
-}
-
-@keyframes escaneo {
-    0% { top: -5%; }
-    100% { top: 105%; }
-}
-
-/* Borde brillante para puntos ganados */
-#contenedor-juego > p {
     position: relative;
     padding: 10px 15px;
     border-radius: 8px;
     background: rgba(163, 4, 250, 0.2);
     display: inline-block;
     border: 1px solid rgba(207, 124, 252, 0.4);
+    margin-top: 20px;
+}
+
+#contenedor-juego p span {
+    color: #ffd700;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    animation: puntos-brillantes 2s infinite;
+}
+
+/* Efecto de conexión digital */
+.digital-connection {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #cf7cfc 20%,
+        #ff00ff 50%,
+        #cf7cfc 80%,
+        transparent 100%);
+    animation: connection-flow 3s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes connection-flow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 /* Responsive */
@@ -216,7 +269,46 @@
         font-size: 1rem;
     }
     
-    .seccion-del_juego::after {
-        font-size: 1rem;
+    .selector-minijuegos label {
+        font-size: 0.7rem;
     }
+    
+    .selector-minijuegos select {
+        font-size: 0.7rem;
+        padding: 8px 12px;
+    }
+}
+
+/* Animaciones compartidas */
+@keyframes neon-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+@keyframes grid-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 1000px; }
+}
+
+@keyframes flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        opacity: 1;
+    }
+    20%, 24%, 55% {
+        opacity: 0;
+    }
+}
+
+@keyframes puntos-brillantes {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(255, 215, 0, 1);
+    }
+}
+
+@keyframes escaneo {
+    0% { top: -5%; }
+    100% { top: 105%; }
 }

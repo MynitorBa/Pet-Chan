@@ -17,319 +17,111 @@
         <div class="community-banner">
             <div class="community-banner-image" id="main-forum-banner-image">
 
-                <svg viewBox="0 0 1200 280" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Fondo principal negro -->
+                <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Dark background -->
                     <rect width="100%" height="100%" fill="#0D0221" />
                     
-                    <!-- Patrón de pixeles para textura de fondo -->
-                    <defs>
-                      <pattern id="pixelPattern" width="10" height="10" patternUnits="userSpaceOnUse">
-                        <rect width="9" height="9" fill="#0D0221" />
-                        <rect width="1" height="1" fill="#1C0B36" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#pixelPattern)" />
-                    
-                    <!-- Grilla de ciudad ciberpunk estilo Tron -->
-                    <g id="cyberGrid">
-                      <!-- Líneas de horizonte horizontales -->
-                      <line x1="0" y1="180" x2="1200" y2="180" stroke="#00FFFF" stroke-width="1" opacity="0.3" />
-                      <line x1="0" y1="190" x2="1200" y2="190" stroke="#00FFFF" stroke-width="1" opacity="0.4" />
-                      <line x1="0" y1="200" x2="1200" y2="200" stroke="#00FFFF" stroke-width="1" opacity="0.5" />
-                      <line x1="0" y1="210" x2="1200" y2="210" stroke="#00FFFF" stroke-width="1" opacity="0.6" />
-                      <line x1="0" y1="220" x2="1200" y2="220" stroke="#00FFFF" stroke-width="1" opacity="0.7" />
-                      <line x1="0" y1="230" x2="1200" y2="230" stroke="#00FFFF" stroke-width="1" opacity="0.8" />
-                      <line x1="0" y1="240" x2="1200" y2="240" stroke="#00FFFF" stroke-width="1" opacity="0.9" />
-                      <line x1="0" y1="250" x2="1200" y2="250" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="0" y1="260" x2="1200" y2="260" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="0" y1="270" x2="1200" y2="270" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="0" y1="280" x2="1200" y2="280" stroke="#00FFFF" stroke-width="1" />
+                    <!-- Grid pattern -->
+                    <g id="grid" stroke="#00FFFF" stroke-width="1" opacity="0.4">
+                      <!-- Horizontal lines -->
+                      <line x1="0" y1="200" x2="800" y2="200" />
+                      <line x1="0" y1="250" x2="800" y2="250" />
+                      <line x1="0" y1="300" x2="800" y2="300" />
+                      <line x1="0" y1="350" x2="800" y2="350" />
                       
-                      <!-- Líneas de perspectiva verticales -->
-                      <line x1="100" y1="180" x2="100" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="200" y1="180" x2="200" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="300" y1="180" x2="300" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="400" y1="180" x2="400" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="500" y1="180" x2="500" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="600" y1="180" x2="600" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="700" y1="180" x2="700" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="800" y1="180" x2="800" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="900" y1="180" x2="900" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="1000" y1="180" x2="1000" y2="280" stroke="#00FFFF" stroke-width="1" />
-                      <line x1="1100" y1="180" x2="1100" y2="280" stroke="#00FFFF" stroke-width="1" />
+                      <!-- Vertical lines -->
+                      <line x1="100" y1="200" x2="100" y2="400" />
+                      <line x1="200" y1="200" x2="200" y2="400" />
+                      <line x1="300" y1="200" x2="300" y2="400" />
+                      <line x1="400" y1="200" x2="400" y2="400" />
+                      <line x1="500" y1="200" x2="500" y2="400" />
+                      <line x1="600" y1="200" x2="600" y2="400" />
+                      <line x1="700" y1="200" x2="700" y2="400" />
                     </g>
                     
-                    <!-- Edificios pixelados de ciudad ciberpunk -->
-                    <g id="cyberBuildings">
-                      <!-- Edificio 1 -->
-                      <rect x="50" y="40" width="40" height="140" fill="#290066" />
-                      <rect x="55" y="45" width="30" height="10" fill="#FF00FF" opacity="0.7" />
-                      <rect x="55" y="60" width="30" height="10" fill="#00FFFF" opacity="0.7" />
-                      <rect x="55" y="75" width="30" height="10" fill="#FF00FF" opacity="0.7" />
-                      <rect x="55" y="90" width="30" height="10" fill="#00FFFF" opacity="0.7" />
-                      <rect x="55" y="105" width="30" height="10" fill="#FF00FF" opacity="0.7" />
-                      <rect x="55" y="120" width="30" height="10" fill="#00FFFF" opacity="0.7" />
-                      <rect x="55" y="135" width="30" height="10" fill="#FF00FF" opacity="0.7" />
-                      <rect x="55" y="150" width="30" height="10" fill="#00FFFF" opacity="0.7" />
-                      <rect x="55" y="165" width="30" height="10" fill="#FF00FF" opacity="0.7" />
+                    <!-- Cyberpunk buildings -->
+                    <g id="buildings">
+                      <!-- Building 1 -->
+                      <rect x="50" y="50" width="40" height="150" fill="#290066" />
+                      <rect x="55" y="60" width="30" height="10" fill="#FF00FF" opacity="0.8" />
+                      <rect x="55" y="80" width="30" height="10" fill="#00FFFF" opacity="0.8" />
+                      <rect x="55" y="100" width="30" height="10" fill="#FF00FF" opacity="0.8" />
+                      <rect x="55" y="120" width="30" height="10" fill="#00FFFF" opacity="0.8" />
+                      <rect x="55" y="140" width="30" height="10" fill="#FF00FF" opacity="0.8" />
+                      <rect x="55" y="160" width="30" height="10" fill="#00FFFF" opacity="0.8" />
                       
-                      <!-- Edificio 2 -->
-                      <rect x="120" y="80" width="60" height="100" fill="#290066" />
-                      <rect x="130" y="85" width="40" height="5" fill="#FF00FF" opacity="0.8" />
-                      <rect x="130" y="95" width="40" height="5" fill="#00FFFF" opacity="0.8" />
-                      <rect x="130" y="105" width="40" height="5" fill="#FF00FF" opacity="0.8" />
-                      <rect x="130" y="115" width="40" height="5" fill="#00FFFF" opacity="0.8" />
-                      <rect x="130" y="125" width="40" height="5" fill="#FF00FF" opacity="0.8" />
-                      <rect x="130" y="135" width="40" height="5" fill="#00FFFF" opacity="0.8" />
-                      <rect x="130" y="145" width="40" height="5" fill="#FF00FF" opacity="0.8" />
-                      <rect x="130" y="155" width="40" height="5" fill="#00FFFF" opacity="0.8" />
-                      <rect x="130" y="165" width="40" height="5" fill="#FF00FF" opacity="0.8" />
-                      <rect x="130" y="175" width="40" height="5" fill="#00FFFF" opacity="0.8" />
+                      <!-- Building 2 (taller) -->
+                      <rect x="150" y="20" width="60" height="180" fill="#290066" />
+                      <rect x="160" y="30" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="160" y="48" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="160" y="66" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="160" y="84" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="160" y="102" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="160" y="120" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="160" y="138" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="160" y="156" width="40" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="160" y="174" width="40" height="8" fill="#00FFFF" opacity="0.7" />
                       
-                      <!-- Edificio 3 - Torre alta -->
-                      <rect x="220" y="20" width="30" height="160" fill="#290066" />
-                      <rect x="225" y="25" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="35" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="45" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="55" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="65" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="75" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="85" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="95" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="105" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="115" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="125" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="135" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="145" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="155" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="225" y="165" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="225" y="175" width="20" height="5" fill="#FF00FF" opacity="0.9" />
+                      <!-- Building 3 -->
+                      <rect x="270" y="80" width="50" height="120" fill="#290066" />
+                      <rect x="275" y="90" width="40" height="10" fill="#FF00FF" opacity="0.9" />
+                      <rect x="275" y="110" width="40" height="10" fill="#00FFFF" opacity="0.9" />
+                      <rect x="275" y="130" width="40" height="10" fill="#FF00FF" opacity="0.9" />
+                      <rect x="275" y="150" width="40" height="10" fill="#00FFFF" opacity="0.9" />
+                      <rect x="275" y="170" width="40" height="10" fill="#FF00FF" opacity="0.9" />
                       
-                      <!-- Edificio 4 -->
-                      <rect x="280" y="60" width="50" height="120" fill="#290066" />
-                      <rect x="285" y="65" width="40" height="8" fill="#00FFFF" opacity="0.7" />
-                      <rect x="285" y="78" width="40" height="8" fill="#FF00FF" opacity="0.7" />
-                      <rect x="285" y="91" width="40" height="8" fill="#00FFFF" opacity="0.7" />
-                      <rect x="285" y="104" width="40" height="8" fill="#FF00FF" opacity="0.7" />
-                      <rect x="285" y="117" width="40" height="8" fill="#00FFFF" opacity="0.7" />
-                      <rect x="285" y="130" width="40" height="8" fill="#FF00FF" opacity="0.7" />
-                      <rect x="285" y="143" width="40" height="8" fill="#00FFFF" opacity="0.7" />
-                      <rect x="285" y="156" width="40" height="8" fill="#FF00FF" opacity="0.7" />
-                      <rect x="285" y="169" width="40" height="8" fill="#00FFFF" opacity="0.7" />
+                      <!-- Building 4 (tallest) -->
+                      <rect x="380" y="10" width="70" height="190" fill="#290066" />
+                      <rect x="390" y="20" width="50" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="390" y="38" width="50" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="390" y="56" width="50" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="390" y="74" width="50" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="390" y="92" width="50" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="390" y="110" width="50" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="390" y="128" width="50" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="390" y="146" width="50" height="8" fill="#FF00FF" opacity="0.8" />
+                      <rect x="390" y="164" width="50" height="8" fill="#00FFFF" opacity="0.8" />
+                      <rect x="390" y="182" width="50" height="8" fill="#FF00FF" opacity="0.8" />
                       
-                      <!-- Edificio 5 -->
-                      <rect x="360" y="40" width="35" height="140" fill="#290066" />
-                      <rect x="365" y="45" width="25" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="365" y="57" width="25" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="365" y="69" width="25" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="365" y="81" width="25" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="365" y="93" width="25" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="365" y="105" width="25" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="365" y="117" width="25" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="365" y="129" width="25" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="365" y="141" width="25" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="365" y="153" width="25" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="365" y="165" width="25" height="7" fill="#FF00FF" opacity="0.8" />
+                      <!-- Building 5 -->
+                      <rect x="500" y="60" width="40" height="140" fill="#290066" />
+                      <rect x="505" y="70" width="30" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="505" y="88" width="30" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="505" y="106" width="30" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="505" y="124" width="30" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="505" y="142" width="30" height="8" fill="#FF00FF" opacity="0.7" />
+                      <rect x="505" y="160" width="30" height="8" fill="#00FFFF" opacity="0.7" />
+                      <rect x="505" y="178" width="30" height="8" fill="#FF00FF" opacity="0.7" />
                       
-                      <!-- Edificio 6 - Torre grande -->
-                      <rect x="430" y="10" width="70" height="170" fill="#290066" />
-                      <rect x="440" y="20" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="31" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="42" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="53" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="64" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="75" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="86" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="97" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="108" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="119" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="130" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="141" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="152" width="50" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="440" y="163" width="50" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="440" y="174" width="50" height="6" fill="#00FFFF" opacity="0.7" />
+                      <!-- Building 6 -->
+                      <rect x="600" y="40" width="60" height="160" fill="#290066" />
+                      <rect x="610" y="50" width="40" height="10" fill="#00FFFF" opacity="0.9" />
+                      <rect x="610" y="70" width="40" height="10" fill="#FF00FF" opacity="0.9" />
+                      <rect x="610" y="90" width="40" height="10" fill="#00FFFF" opacity="0.9" />
+                      <rect x="610" y="110" width="40" height="10" fill="#FF00FF" opacity="0.9" />
+                      <rect x="610" y="130" width="40" height="10" fill="#00FFFF" opacity="0.9" />
+                      <rect x="610" y="150" width="40" height="10" fill="#FF00FF" opacity="0.9" />
+                      <rect x="610" y="170" width="40" height="10" fill="#00FFFF" opacity="0.9" />
                       
-                      <!-- Edificios adicionales a la derecha -->
-                      <rect x="530" y="50" width="45" height="130" fill="#290066" />
-                      <rect x="535" y="55" width="35" height="6" fill="#FF00FF" opacity="0.9" />
-                      <rect x="535" y="66" width="35" height="6" fill="#00FFFF" opacity="0.9" />
-                      <rect x="535" y="77" width="35" height="6" fill="#FF00FF" opacity="0.9" />
-                      <rect x="535" y="88" width="35" height="6" fill="#00FFFF" opacity="0.9" />
-                      <rect x="535" y="99" width="35" height="6" fill="#FF00FF" opacity="0.9" />
-                      <rect x="535" y="110" width="35" height="6" fill="#00FFFF" opacity="0.9" />
-                      <rect x="535" y="121" width="35" height="6" fill="#FF00FF" opacity="0.9" />
-                      <rect x="535" y="132" width="35" height="6" fill="#00FFFF" opacity="0.9" />
-                      <rect x="535" y="143" width="35" height="6" fill="#FF00FF" opacity="0.9" />
-                      <rect x="535" y="154" width="35" height="6" fill="#00FFFF" opacity="0.9" />
-                      <rect x="535" y="165" width="35" height="6" fill="#FF00FF" opacity="0.9" />
-                      
-                      <rect x="610" y="30" width="60" height="150" fill="#290066" />
-                      <rect x="620" y="40" width="40" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="620" y="52" width="40" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="620" y="64" width="40" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="620" y="76" width="40" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="620" y="88" width="40" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="620" y="100" width="40" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="620" y="112" width="40" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="620" y="124" width="40" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="620" y="136" width="40" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="620" y="148" width="40" height="7" fill="#FF00FF" opacity="0.8" />
-                      <rect x="620" y="160" width="40" height="7" fill="#00FFFF" opacity="0.8" />
-                      <rect x="620" y="172" width="40" height="7" fill="#FF00FF" opacity="0.8" />
-                      
-                      <rect x="700" y="70" width="40" height="110" fill="#290066" />
-                      <rect x="705" y="75" width="30" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="705" y="86" width="30" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="705" y="97" width="30" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="705" y="108" width="30" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="705" y="119" width="30" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="705" y="130" width="30" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="705" y="141" width="30" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="705" y="152" width="30" height="6" fill="#00FFFF" opacity="0.7" />
-                      <rect x="705" y="163" width="30" height="6" fill="#FF00FF" opacity="0.7" />
-                      <rect x="705" y="174" width="30" height="6" fill="#00FFFF" opacity="0.7" />
-                      
-                      <rect x="770" y="50" width="55" height="130" fill="#290066" />
-                      <rect x="780" y="55" width="35" height="8" fill="#00FFFF" opacity="0.8" />
-                      <rect x="780" y="68" width="35" height="8" fill="#FF00FF" opacity="0.8" />
-                      <rect x="780" y="81" width="35" height="8" fill="#00FFFF" opacity="0.8" />
-                      <rect x="780" y="94" width="35" height="8" fill="#FF00FF" opacity="0.8" />
-                      <rect x="780" y="107" width="35" height="8" fill="#00FFFF" opacity="0.8" />
-                      <rect x="780" y="120" width="35" height="8" fill="#FF00FF" opacity="0.8" />
-                      <rect x="780" y="133" width="35" height="8" fill="#00FFFF" opacity="0.8" />
-                      <rect x="780" y="146" width="35" height="8" fill="#FF00FF" opacity="0.8" />
-                      <rect x="780" y="159" width="35" height="8" fill="#00FFFF" opacity="0.8" />
-                      <rect x="780" y="172" width="35" height="8" fill="#FF00FF" opacity="0.8" />
-                      
-                      <rect x="850" y="20" width="30" height="160" fill="#290066" />
-                      <rect x="855" y="25" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="35" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="45" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="55" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="65" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="75" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="85" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="95" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="105" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="115" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="125" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="135" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="145" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="155" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      <rect x="855" y="165" width="20" height="5" fill="#FF00FF" opacity="0.9" />
-                      <rect x="855" y="175" width="20" height="5" fill="#00FFFF" opacity="0.9" />
-                      
-                      <rect x="910" y="40" width="65" height="140" fill="#290066" />
-                      <rect x="920" y="50" width="45" height="7" fill="#00FFFF" opacity="0.7" />
-                      <rect x="920" y="62" width="45" height="7" fill="#FF00FF" opacity="0.7" />
-                      <rect x="920" y="74" width="45" height="7" fill="#00FFFF" opacity="0.7" />
-                      <rect x="920" y="86" width="45" height="7" fill="#FF00FF" opacity="0.7" />
-                      <rect x="920" y="98" width="45" height="7" fill="#00FFFF" opacity="0.7" />
-                      <rect x="920" y="110" width="45" height="7" fill="#FF00FF" opacity="0.7" />
-                      <rect x="920" y="122" width="45" height="7" fill="#00FFFF" opacity="0.7" />
-                      <rect x="920" y="134" width="45" height="7" fill="#FF00FF" opacity="0.7" />
-                      <rect x="920" y="146" width="45" height="7" fill="#00FFFF" opacity="0.7" />
-                      <rect x="920" y="158" width="45" height="7" fill="#FF00FF" opacity="0.7" />
-                      <rect x="920" y="170" width="45" height="7" fill="#00FFFF" opacity="0.7" />
-                      
-                      <rect x="1000" y="60" width="40" height="120" fill="#290066" />
-                      <rect x="1005" y="65" width="30" height="6" fill="#FF00FF" opacity="0.8" />
-                      <rect x="1005" y="76" width="30" height="6" fill="#00FFFF" opacity="0.8" />
-                      <rect x="1005" y="87" width="30" height="6" fill="#FF00FF" opacity="0.8" />
-                      <rect x="1005" y="98" width="30" height="6" fill="#00FFFF" opacity="0.8" />
-                      <rect x="1005" y="109" width="30" height="6" fill="#FF00FF" opacity="0.8" />
-                      <rect x="1005" y="120" width="30" height="6" fill="#00FFFF" opacity="0.8" />
-                      <rect x="1005" y="131" width="30" height="6" fill="#FF00FF" opacity="0.8" />
-                      <rect x="1005" y="142" width="30" height="6" fill="#00FFFF" opacity="0.8" />
-                      <rect x="1005" y="153" width="30" height="6" fill="#FF00FF" opacity="0.8" />
-                      <rect x="1005" y="164" width="30" height="6" fill="#00FFFF" opacity="0.8" />
-                      <rect x="1005" y="175" width="30" height="6" fill="#FF00FF" opacity="0.8" />
-                      
-                      <rect x="1070" y="30" width="50" height="150" fill="#290066" />
-                      <rect x="1080" y="40" width="30" height="7" fill="#00FFFF" opacity="0.9" />
-                      <rect x="1080" y="52" width="30" height="7" fill="#FF00FF" opacity="0.9" />
-                      <rect x="1080" y="64" width="30" height="7" fill="#00FFFF" opacity="0.9" />
-                      <rect x="1080" y="76" width="30" height="7" fill="#FF00FF" opacity="0.9" />
-                      <rect x="1080" y="88" width="30" height="7" fill="#00FFFF" opacity="0.9" />
-                      <rect x="1080" y="100" width="30" height="7" fill="#FF00FF" opacity="0.9" />
-                      <rect x="1080" y="112" width="30" height="7" fill="#00FFFF" opacity="0.9" />
-                      <rect x="1080" y="124" width="30" height="7" fill="#FF00FF" opacity="0.9" />
-                      <rect x="1080" y="136" width="30" height="7" fill="#00FFFF" opacity="0.9" />
-                      <rect x="1080" y="148" width="30" height="7" fill="#FF00FF" opacity="0.9" />
-                      <rect x="1080" y="160" width="30" height="7" fill="#00FFFF" opacity="0.9" />
-                      <rect x="1080" y="172" width="30" height="7" fill="#FF00FF" opacity="0.9" />
+                      <!-- Building 7 -->
+                      <rect x="700" y="70" width="50" height="130" fill="#290066" />
+                      <rect x="705" y="80" width="40" height="9" fill="#FF00FF" opacity="0.8" />
+                      <rect x="705" y="99" width="40" height="9" fill="#00FFFF" opacity="0.8" />
+                      <rect x="705" y="118" width="40" height="9" fill="#FF00FF" opacity="0.8" />
+                      <rect x="705" y="137" width="40" height="9" fill="#00FFFF" opacity="0.8" />
+                      <rect x="705" y="156" width="40" height="9" fill="#FF00FF" opacity="0.8" />
+                      <rect x="705" y="175" width="40" height="9" fill="#00FFFF" opacity="0.8" />
                     </g>
                     
-                    <!-- Elementos ciberpunk adicionales -->
+                    <!-- Tech circle -->
+                    <circle cx="700" cy="60" r="20" fill="#FF00FF" opacity="0.6" />
+                    <circle cx="700" cy="60" r="15" fill="#00FFFF" opacity="0.6" />
+                    <circle cx="700" cy="60" r="10" fill="#290066" opacity="0.9" />
+                    <circle cx="700" cy="60" r="5" fill="#00FFFF" opacity="0.7" />
                     
-                    <!-- Círculos tecnológicos en esquina superior -->
-                    <circle cx="1100" cy="40" r="20" fill="#FF00FF" opacity="0.6" />
-                    <circle cx="1100" cy="40" r="15" fill="#00FFFF" opacity="0.6" />
-                    <circle cx="1100" cy="40" r="10" fill="#290066" opacity="0.9" />
-                    <circle cx="1100" cy="40" r="5" fill="#00FFFF" opacity="0.7" />
-                    
-                    <!-- Líneas de circuito simuladas -->
-                    <path d="M20,20 L50,20 L50,40 L80,40 L80,30 L120,30" stroke="#00FFFF" stroke-width="2" fill="none" opacity="0.7" />
-                    <path d="M20,50 L40,50 L40,70 L60,70 L60,90 L100,90" stroke="#FF00FF" stroke-width="2" fill="none" opacity="0.7" />
-                    <path d="M1100,120 L1130,120 L1130,140 L1160,140 L1160,170 L1180,170" stroke="#00FFFF" stroke-width="2" fill="none" opacity="0.7" />
-                    <path d="M1080,90 L1100,90 L1100,70 L1140,70 L1140,40 L1160,40" stroke="#FF00FF" stroke-width="2" fill="none" opacity="0.7" />
-                    
-                    <!-- Píxeles brillantes dispersos (como estrellas ciberpunk) -->
-                    <g id="brightPixels">
-                      <rect x="30" y="30" width="3" height="3" fill="#00FFFF" />
-                      <rect x="130" y="20" width="3" height="3" fill="#FF00FF" />
-                      <rect x="200" y="15" width="3" height="3" fill="#00FFFF" />
-                      <rect x="350" y="25" width="3" height="3" fill="#FF00FF" />
-                      <rect x="450" y="18" width="3" height="3" fill="#00FFFF" />
-                      <rect x="550" y="22" width="3" height="3" fill="#FF00FF" />
-                      <rect x="650" y="16" width="3" height="3" fill="#00FFFF" />
-                      <rect x="750" y="24" width="3" height="3" fill="#FF00FF" />
-                      <rect x="850" y="14" width="3" height="3" fill="#00FFFF" />
-                      <rect x="950" y="28" width="3" height="3" fill="#FF00FF" />
-                      <rect x="1050" y="19" width="3" height="3" fill="#00FFFF" />
-                      <rect x="1150" y="23" width="3" height="3" fill="#FF00FF" />
-                      <rect x="80" y="40" width="3" height="3" fill="#00FFFF" />
-                      <rect x="180" y="35" width="3" height="3" fill="#FF00FF" />
-                      <rect x="280" y="45" width="3" height="3" fill="#00FFFF" />
-                      <rect x="380" y="38" width="3" height="3" fill="#FF00FF" />
-                      <rect x="480" y="42" width="3" height="3" fill="#00FFFF" />
-                      <rect x="580" y="36" width="3" height="3" fill="#FF00FF" />
-                      <rect x="680" y="44" width="3" height="3" fill="#00FFFF" />
-                      <rect x="780" y="37" width="3" height="3" fill="#FF00FF" />
-                      <rect x="880" y="41" width="3" height="3" fill="#00FFFF" />
-                      <rect x="980" y="34" width="3" height="3" fill="#FF00FF" />
-                      <rect x="1080" y="43" width="3" height="3" fill="#00FFFF" />
-                    </g>
-                    
-<!-- Texto de título ciberpunk -->
-<text x="600" y="145" font-family="Arial, sans-serif" font-size="45" fill="#00FFFF" text-anchor="middle" dominant-baseline="middle">PETCHAN</text>
-  
-<!-- Resplandor para el texto -->
-<filter id="glow">
-  <feGaussianBlur stdDeviation="2.5" result="blur" />
-  <feMerge>
-    <feMergeNode in="blur" />
-    <feMergeNode in="SourceGraphic" />
-  </feMerge>
-</filter>
-
-<!-- Aplicando el resplandor al texto duplicado -->
-<text x="600" y="145" font-family="Arial, sans-serif" font-size="45" fill="#00FFFF" text-anchor="middle" dominant-baseline="middle" filter="url(#glow)">PETCHAN</text>
-
-                    <!-- Luna digital -->
-                    <circle cx="900" cy="70" r="25" fill="#290066" />
-                    <circle cx="900" cy="70" r="20" fill="#1C0B36" />
-                    <circle cx="890" cy="65" r="3" fill="#00FFFF" opacity="0.7" />
-                    <circle cx="910" cy="60" r="2" fill="#00FFFF" opacity="0.5" />
-                    <circle cx="905" cy="80" r="4" fill="#00FFFF" opacity="0.6" />
-                    
-                    <!-- Líneas diagonales adicionales -->
-                    <line x1="0" y1="180" x2="100" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
-                    <line x1="200" y1="180" x2="300" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
-                    <line x1="400" y1="180" x2="500" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
-                    <line x1="600" y1="180" x2="700" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
-                    <line x1="800" y1="180" x2="900" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
-                    <line x1="1000" y1="180" x2="1100" y2="280" stroke="#FF00FF" stroke-width="1" opacity="0.5" />
+                    <!-- Circuit lines -->
+                    <path d="M30,30 L70,30 L70,60 L100,60" stroke="#00FFFF" stroke-width="2" fill="none" opacity="0.7" />
+                    <path d="M670,30 L710,30 L710,60 L750,60" stroke="#FF00FF" stroke-width="2" fill="none" opacity="0.7" />
                   </svg>
             </div>
             <div class="community-banner-overlay"></div>
@@ -341,8 +133,9 @@
             <div class="community-info">
                 <h1>Bienvenido a Pet-Foros</h1>
                 <div class="community-stats">
-                    <span><i class="fas fa-users"></i> <span id="total-users">1,238</span> miembros</span>
-                    <span><i class="fas fa-comments"></i> <span id="total-posts">3,542</span> publicaciones</span>
+                    <span><i class="fas fa-users"></i> <span id="total-users"><%= totalUsers %></span> miembros</span>
+                    <span><i class="fas fa-comments"></i> <span id="total-posts"><%= totalPosts %></span> publicaciones</span>
+                    <span><i class="fas fa-home"></i> <span id="total-communities"><%= totalCommunities %></span> comunidades</span>
                 </div>
                 <a href="/comunidad" class="btn-join-community">Unirse a una comunidad</a>
             </div>
@@ -671,7 +464,7 @@
             </section>
 
             <section class="mensajes">
-                <h2>Mensajes (<span id="contador"><%= mensajes.length %></span>)</h2>
+                <h2>Número total de publicaciones encontrados: (<span id="contador"><%= mensajes.length %></span>)</h2>
                 <div class="lista-mensajes">
                     <% if (mensajes.length === 0) { %>
                         <p class="no-mensajes">No hay mensajes aún. ¡Sé el primero en publicar!</p>
@@ -682,26 +475,38 @@
                             data-user-id="<%= mensaje.user_id %>" 
                             data-comunidad-id="<%= mensaje.comunidad_id || '' %>">
                             
+                            <!-- Cabecera con autor y botones de acción en la misma línea -->
                             <div class="mensaje-cabecera">
-                                <!-- Dentro del div "mensaje-cabecera" después del nombre del autor -->
                                 <span class="autor"><%= mensaje.autor %></span>
-                                <!-- Sección de rangos (ahora muestra para cualquier mensaje) -->
-                                <div class="rangos-wrapper">
-                                    <div class="rango-item"><span class="rango-valor"><%= mensaje.rango1 || 'Ninguno' %></span></div>
-                                    <div class="rango-item"><span class="rango-valor"><%= mensaje.rango2 || 'Ninguno' %></span></div>
-                                    <div class="rango-item"><span class="rango-valor"><%= mensaje.rango3 || 'Ninguno' %></span></div>
+                                <div class="mensaje-acciones">
+                                    <% if (mensaje.autor === username) { %>
+                                        <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
+                                    <% } %>
+                                    <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
                                 </div>
-                                <div class="etiquetas-container">
+                            </div>
+                            
+                            <div class="rangos-container">
+                                <div class="rangos-wrapper">
+                                    <div class="rango-item rango1 <%= mensaje.rango1 && mensaje.rango1 !== 'Ninguno' ? mensaje.rango1 : 'Ninguno' %>">
+                                        <span class="rango-valor"><%= mensaje.rango1 || 'Ninguno' %></span>
+                                    </div>
+                                    <div class="rango-item rango2 <%= mensaje.rango2 && mensaje.rango2 !== 'Ninguno' ? mensaje.rango2 : 'Ninguno' %>">
+                                        <span class="rango-valor"><%= mensaje.rango2 || 'Ninguno' %></span>
+                                    </div>
+                                    <div class="rango-item rango3 <%= mensaje.rango3 && mensaje.rango3 !== 'Ninguno' ? mensaje.rango3 : 'Ninguno' %>">
+                                        <span class="rango-valor"><%= mensaje.rango3 || 'Ninguno' %></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="etiquetas-container">
+                                <div class="etiquetas-wrapper">
                                     <% if (mensaje.etiqueta) { %>
                                         <span class="etiqueta principal" data-categoria="<%= mensaje.etiqueta %>">
-                                            <i class="fas fa-tag"></i> 
-                                        </span>
-                                    <% } %>
-                                    <% if (mensaje.etiqueta) { %>
-                                        <span class="etiqueta principal" 
-                                            data-categoria="<%= mensaje.etiqueta %>"
-                                            data-extrasubcategoria="<%= mensaje.etiqueta %>">
-                                            <%= mensaje.extrasubcategoria %>
+                                            <%= mensaje.etiqueta %>
                                         </span>
                                     <% } %>
                                     <% if (mensaje.subcategoria) { %>
@@ -711,7 +516,6 @@
                                             <%= mensaje.subcategoria %>
                                         </span>
                                     <% } %>
-                                    
                                     <% if (mensaje.extrasubcategoria) { %>
                                         <span class="subetiqueta extra" 
                                             data-categoria="<%= mensaje.etiqueta %>"
@@ -720,14 +524,6 @@
                                         </span>
                                     <% } %>
                                 </div>
-                                <div class="mensaje-acciones">
-                                    <% if (mensaje.autor === username) { %>
-                                        <button class="btn-editar" data-id="<%= mensaje.id %>"><i class="fas fa-edit"></i></button>
-                                        <button class="btn-eliminar" data-id="<%= mensaje.id %>"><i class="fas fa-trash"></i></button>
-                                    <% } %>
-                                    <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
-                                </div>
-                                
                             </div>
                             
                             <div class="mensaje-contenido"><%= mensaje.mensaje %></div>
@@ -743,20 +539,21 @@
                             <% } %>
                             
                             <div class="mensaje-pie">
-                                <span class="fecha"><%= mensaje.fechaStr %></span>
                                 <div class="ranking-container" data-mensaje-id="<%= mensaje.id %>">
                                     <button class="btn-votar upvote" data-valor="1">
-                                        &#x2191;  <!-- Flecha hacia arriba (Unicode) -->
+                                        &#x2191;
                                     </button>
                                     <span class="ranking-valor <%= mensaje.ranking < 0 ? 'negativo' : '' %>">
                                         <%= mensaje.ranking %>
                                     </span>
                                     <button class="btn-votar downvote" data-valor="-1">
-                                        &#x2193;  <!-- Flecha hacia abajo (Unicode) -->
+                                        &#x2193;
                                     </button>
                                 </div>
-                            </div>                                    
-                
+                                <span class="fecha mensaje-fecha-pie"><%= mensaje.fechaStr %></span>
+                            </div>
+                            
+                      
                             <!-- Sección de comentarios -->
                             <div class="comentarios-seccion">
                                 <div class="comentarios-lista">

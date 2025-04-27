@@ -1681,9 +1681,6 @@ if (comunidad_id) {
 
 
 
-
-
-
 // Ruta principal del foro
 app.get('/foro', requireLogin, async (req, res) => {
   try {
@@ -1726,6 +1723,18 @@ app.get('/foro', requireLogin, async (req, res) => {
     `, [req.session.userId]);
     const userCommunities = userCommunitiesResult.rows;
     
+    // Obtener el total de usuarios registrados
+    const totalUsersResult = await db.query('SELECT COUNT(*) as total FROM users');
+    const totalUsers = totalUsersResult.rows[0].total;
+    
+    // Obtener el total de comunidades
+    const totalCommunitiesResult = await db.query('SELECT COUNT(*) as total FROM comunidades');
+    const totalCommunities = totalCommunitiesResult.rows[0].total;
+    
+    // Obtener el total de publicaciones
+    const totalPostsResult = await db.query('SELECT COUNT(*) as total FROM forum_posts');
+    const totalPosts = totalPostsResult.rows[0].total;
+    
     res.render('foro', { 
       username: req.session.username,
       userId: req.session.userId,
@@ -1747,17 +1756,16 @@ app.get('/foro', requireLogin, async (req, res) => {
       userCommunities: userCommunities,
       filtros: {
         showAllCommunities: true
-      }
+      },
+      totalUsers: totalUsers,
+      totalCommunities: totalCommunities,
+      totalPosts: totalPosts
     });
   } catch (error) {
     console.error('Error rendering forum page:', error);
     res.status(500).send('Error loading forum page');
   }
 });
-
-
-
-
 
 
 
@@ -2265,12 +2273,28 @@ app.put('/actualizar-comentario/:mensajeId/:comentarioId', upload.array('imagene
       return res.status(400).json({ success: false, error: 'Datos incompletos' });
     }
     
+    // Encontrar índices (esto es lo que faltaba)
+    const mensajeIndex = mensajes.findIndex(m => m.id === mensajeId);
+    
+    if (mensajeIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
+    }
+    
+    const comentarioIndex = mensajes[mensajeIndex].comentarios.findIndex(c => c.id === comentarioId);
+    
+    if (comentarioIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
+    }
+    
+    // Fecha formateada para actualización
+    const fechaStr = new Date().toLocaleString() + ' (editado)';
+    
     // Actualizar en la base de datos incluyendo comunidad_id
     await db.query(`
       UPDATE forum_comments 
       SET autor = $1, comentario = $2, fecha_str = $3, comunidad_id = $4
       WHERE id = $5 AND post_id = $6
-    `, [autor, comentario, new Date().toLocaleString() + ' (editado)', comunidad_id || null, comentarioId, mensajeId]);
+    `, [autor, comentario, fechaStr, comunidad_id || null, comentarioId, mensajeId]);
     
     // Gestionar imágenes en la base de datos
     if (mantener_imagenes) {

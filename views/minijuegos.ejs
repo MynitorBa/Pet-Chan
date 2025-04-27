@@ -1,17 +1,23 @@
 <%- include("partials/header.ejs") %>
 
+
 <link rel="stylesheet" href="styles/minijuegos.css">
 
 <div id="contenedor-juego">
-    <h1 style="text-align: left;">Juego: nombre del juego</h1>
-
-    <div class="seccion-del_juego">
-
+    <h1 style="text-align: left;">Juego: <span id="nombre-juego">nombre del juego</span></h1>
+    
+    <!-- Selector de minijuegos -->
+    <div class="selector-minijuegos">
+        <label for="seleccion-juego">Selecciona un minijuego: </label>
+        <select id="seleccion-juego">
+            <option value="1">Minijuego 1</option>
+            <option value="2">Minijuego 2</option>
+        </select>
     </div>
 
-    <p style="text-align: right;">✧ Puntos ganados: <span>350</span></p>
-</div>
+    <div class="seccion-del_juego"></div>
 
+</div>
 
 <script src="scripts/minijuegos.js"></script>
 
