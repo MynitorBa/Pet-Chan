@@ -3,6 +3,13 @@ import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import { log } from 'console';
 
+
+/*agregar esto xd*/
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+/*agregar esto xd*/
+
+
 /*---------------------------importaciones necesarias para la base de datos------------------------------------------------ */
 /*necesario para la base de datos*/
 import pg from "pg";
@@ -26,6 +33,17 @@ app.use(express.static(__dirname + '/public'));
 
 app.set('view engine', 'ejs');
 
+
+
+/*agregar esto xd*/
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+/*agregar esto xd*/
 
 
 
@@ -265,6 +283,8 @@ app.get("/logout", (req, res) => {
     });
 })
 
+
+//Esto tambien hay que ponerlo en meme xd
 /*---------------------------creamos rutas generales------------------------------------------------*/
 
 
@@ -283,7 +303,7 @@ app.get('/minijuegomascota', requireLogin, async (req, res) => {
         }
 
         // Si no tiene mascota, seguimos con la lógica normal del juego
-        let indicesValidos = [1, 4, 7, 10, 11, 13, 16, 18, 21, 23, 27, 29, 32, 35, 37];
+        let indicesValidos = [1, 4, 7, 10, 11, 13, 16, 18, 21, 23, 27, 29, 32, 35, 37, 38];
         const indiceMascota = indicesValidos[Math.floor(Math.random() * indicesValidos.length)];
         const rutaImagen = `${rutaBase}${indiceMascota}.gif`;
         const especieDeMascota = especieMascotas[indiceMascota - 1];
@@ -311,70 +331,97 @@ app.get('/minijuegomascota', requireLogin, async (req, res) => {
 });
 
 
-
+//Esto hay que ponerlo en meme xd
 /*---------------------------creamos post de prueba necesario------------------------------------------------*/
 app.post('/NombreMascota', requireLogin, async (req, res) => {
-    const mascotaNombre = req.body.mascota;
-    const userId = req.session.userId;
-    const datos = req.session.mascotaPendiente;
+  const mascotaNombre = req.body.mascota;
+  const userId = req.session.userId;
+  const datos = req.session.mascotaPendiente;
 
-    if (!datos) {
-        return res.status(400).send("No hay datos de mascota pendiente en sesión.");
-    }
+  if (!datos) {
+      return res.status(400).send("No hay datos de mascota pendiente en sesión.");
+  }
 
-    let indice = Math.floor(Math.random() * 10); // número entre 0 y 9
-    const comida = comidasFavoritas[indice];
-    indice = Math.floor(Math.random() * 10); // número entre 0 y 9
-    const habilidad = habilidadesEspeciales[indice];
+  let indice = Math.floor(Math.random() * 10); // número entre 0 y 9
+  const comida = comidasFavoritas[indice];
+  indice = Math.floor(Math.random() * 10); // número entre 0 y 9
+  const habilidad = habilidadesEspeciales[indice];
 
-    try {
-        const result = await db.query(
-            `INSERT INTO pets ("petname", "genero", "indice", "nivelAmor", "nivelFelicidad", "nivelEnergia", "habilidad", "comidaFavorita", "id_users")
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-             RETURNING id`,
-            [
-                mascotaNombre,
-                datos.genero,
-                datos.indice,
-                0, // nivelAmor
-                50, // nivelFelicidad
-                50, // nivelEnergia
-                habilidad, // habilidad
-                comida, // comida favorita
-                userId
-            ]
-        );
+  try {
+      // Iniciar transacción
+      await db.query('BEGIN');
+      
+      // Crear mascota en la tabla pets (mascota activa)
+      const result = await db.query(
+          `INSERT INTO pets ("petname", "genero", "indice", "nivelAmor", "nivelFelicidad", "nivelEnergia", "habilidad", "comidaFavorita", "id_users")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id`,
+          [
+              mascotaNombre,
+              datos.genero,
+              datos.indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad, // habilidad
+              comida, // comida favorita
+              userId
+          ]
+      );
 
-        const idMascota = result.rows[0].id;
+      const idMascota = result.rows[0].id;
 
-        // 🧠 Guardamos en sesión la mascota actual para uso en otras vistas
-        req.session.mascotaActual = {
-            id: idMascota,
-            nombre: mascotaNombre,
-            genero: datos.genero,
-            especie: datos.especie,
-            indice: datos.indice,
-            rutaImagen: datos.rutaImagen,
-            pronombre: datos.genero === "macho" ? "el" : "la",
-            niveldeAmor: 0,
-            niveldeFelicidad: 50,
-            niveldeEnergia: 50,
-            habilidad: habilidad,
-            comidaFavorita: comida
-        };
+      // También guardar la mascota en la biblioteca (pets2)
+      await db.query(
+          `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", habilidad, "comidaFavorita", rareza, id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+              mascotaNombre,
+              datos.genero,
+              datos.indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad, // habilidad
+              comida, // comida favorita
+              'comun', // rareza por defecto para primera mascota
+              userId
+          ]
+      );
 
-        // Guardamos también el ID por separado si lo necesitas
-        req.session.idMascotaReciente = idMascota;
+      // Confirmar transacción
+      await db.query('COMMIT');
 
-        // Limpiamos la sesión temporal
-        delete req.session.mascotaPendiente;
+      // 🧠 Guardamos en sesión la mascota actual para uso en otras vistas
+      req.session.mascotaActual = {
+          id: idMascota,
+          nombre: mascotaNombre,
+          genero: datos.genero,
+          especie: datos.especie,
+          indice: datos.indice,
+          rutaImagen: datos.rutaImagen,
+          pronombre: datos.genero === "macho" ? "el" : "la",
+          niveldeAmor: 0,
+          niveldeFelicidad: 50,
+          niveldeEnergia: 50,
+          habilidad: habilidad,
+          comidaFavorita: comida
+      };
 
-        console.log(`Mascota creada con ID ${idMascota} y nombre ${mascotaNombre}`);
-        res.redirect('/inicio');
-    } catch (error) {
-        console.error('Error al crear mascota:', error);
-        res.status(500).send("Error al guardar la mascota");
-    }
+      // Guardamos también el ID por separado si lo necesitas
+      req.session.idMascotaReciente = idMascota;
+
+      // Limpiamos la sesión temporal
+      delete req.session.mascotaPendiente;
+
+      console.log(`Mascota creada con ID ${idMascota} y nombre ${mascotaNombre}`);
+      res.redirect('/inicio');
+  } catch (error) {
+      // Revertir transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error al crear mascota:', error);
+      res.status(500).send("Error al guardar la mascota");
+  }
 });
 
 
@@ -1782,6 +1829,373 @@ app.get('/foro', requireLogin, async (req, res) => {
 });
 
 
+
+
+
+// Ruta para cargar la biblioteca de mascotas Esto agregar a meme xd
+
+app.get('/biblioteca', requireLogin, async (req, res) => {
+  const userId = req.session.userId;
+  const mascotaActual = req.session.mascotaActual;
+
+  try {
+      // Verificar si la mascota activa ya está en pets2
+      if (mascotaActual) {
+          const mascotaEnBiblioteca = await db.query(`
+              SELECT * FROM pets2 
+              WHERE id_users = $1 AND indice = $2 AND petname = $3
+          `, [userId, mascotaActual.indice, mascotaActual.nombre]);
+
+          // Si no está en la biblioteca, añadirla
+          if (mascotaEnBiblioteca.rows.length === 0) {
+              await db.query(`
+                  INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                                   habilidad, "comidaFavorita", rareza, id_users)
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+              `, [
+                  mascotaActual.nombre,
+                  mascotaActual.genero,
+                  mascotaActual.indice,
+                  mascotaActual.niveldeAmor,
+                  mascotaActual.niveldeFelicidad,
+                  mascotaActual.niveldeEnergia,
+                  mascotaActual.habilidad,
+                  mascotaActual.comidaFavorita,
+                  'comun', // rareza por defecto
+                  userId
+              ]);
+              
+              console.log(`Mascota activa añadida a la biblioteca para el usuario ${userId}`);
+          }
+      }
+
+      // Continuar con el código original para obtener las mascotas
+      const mascotasResult = await db.query(
+          `SELECT * FROM pets2 WHERE id_users = $1`,
+          [userId]
+      );
+
+      // Obtener el ID de la mascota activa
+      const mascotaActivaResult = await db.query(
+          `SELECT id FROM pets WHERE id_users = $1 LIMIT 1`,
+          [userId]
+      );
+
+      const mascotaActivaId = mascotaActivaResult.rows.length > 0 ? mascotaActivaResult.rows[0].id : null;
+
+      res.render('biblioteca.ejs', {
+          rutaImagen: mascotaActual ? mascotaActual.rutaImagen : null,
+          accesorios: req.session.accesorios,
+          money: req.session.money,
+          mascotaActual: mascotaActual,
+          mascotas: mascotasResult.rows,
+          mascotaActiva: mascotaActivaId,
+          especieMascotas: especieMascotas
+      });
+  } catch (error) {
+      console.error('Error al cargar la biblioteca:', error);
+      res.status(500).send('Error al cargar la biblioteca de mascotas');
+  }
+});
+
+
+app.get('/biblioteca/detalle-mascota/:id', requireLogin, async (req, res) => {
+  const mascotaId = req.params.id;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar que la mascota pertenece al usuario
+      const mascotaResult = await db.query(
+          `SELECT * FROM pets2 WHERE id = $1 AND id_users = $2`,
+          [mascotaId, userId]
+      );
+
+      if (mascotaResult.rows.length === 0) {
+          return res.json({ success: false, mensaje: 'Mascota no encontrada' });
+      }
+
+      const mascota = mascotaResult.rows[0];
+      const especie = especieMascotas[mascota.indice - 1];
+
+      res.json({
+          success: true,
+          mascota: mascota,
+          especie: especie
+      });
+  } catch (error) {
+      console.error('Error al obtener detalles de la mascota:', error);
+      res.json({ success: false, mensaje: 'Error al obtener detalles' });
+  }
+});
+
+app.post('/biblioteca/activar-mascota', requireLogin, async (req, res) => {
+  const mascotaId = req.body.mascotaId;
+  const userId = req.session.userId;
+
+  try {
+      // Obtener los datos de la mascota seleccionada
+      const mascotaNuevaResult = await db.query(
+          `SELECT * FROM pets2 WHERE id = $1 AND id_users = $2`,
+          [mascotaId, userId]
+      );
+
+      if (mascotaNuevaResult.rows.length === 0) {
+          return res.json({ success: false, mensaje: 'Mascota no encontrada o no te pertenece' });
+      }
+
+      const mascotaNueva = mascotaNuevaResult.rows[0];
+
+      // Comenzar una transacción
+      await db.query('BEGIN');
+
+      // Eliminar mascota activa actual
+      await db.query('DELETE FROM pets WHERE id_users = $1', [userId]);
+
+      // Insertar la nueva mascota activa
+      const result = await db.query(
+          `INSERT INTO pets (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", habilidad, "comidaFavorita", id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id`,
+          [
+              mascotaNueva.petname,
+              mascotaNueva.genero,
+              mascotaNueva.indice,
+              mascotaNueva.nivelAmor,
+              mascotaNueva.nivelFelicidad,
+              mascotaNueva.nivelEnergia,
+              mascotaNueva.habilidad,
+              mascotaNueva.comidaFavorita,
+              userId
+          ]
+      );
+
+      // Confirmar la transacción
+      await db.query('COMMIT');
+
+      // Actualizar la sesión con la nueva mascota
+      const rutaImagen = `${rutaBase}${mascotaNueva.indice}.gif`;
+      const especieDeMascota = especieMascotas[mascotaNueva.indice - 1];
+      const pronombre = mascotaNueva.genero === "macho" ? "el" : "la";
+
+      req.session.mascotaActual = {
+          id: result.rows[0].id,
+          nombre: mascotaNueva.petname,
+          genero: mascotaNueva.genero,
+          especie: especieDeMascota,
+          indice: mascotaNueva.indice,
+          rutaImagen,
+          pronombre,
+          niveldeAmor: mascotaNueva.nivelAmor,
+          niveldeFelicidad: mascotaNueva.nivelFelicidad,
+          niveldeEnergia: mascotaNueva.nivelEnergia,
+          habilidad: mascotaNueva.habilidad,
+          comidaFavorita: mascotaNueva.comidaFavorita
+      };
+
+      res.json({ success: true, mensaje: 'Mascota activada correctamente' });
+  } catch (error) {
+      // Revertir la transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error al activar mascota:', error);
+      res.json({ success: false, mensaje: 'Error al activar la mascota' });
+  }
+});
+
+app.post('/biblioteca/comprar-sobre', requireLogin, async (req, res) => {
+  const { tipo, precio } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar si el usuario tiene suficiente dinero
+      const userResult = await db.query('SELECT money FROM users WHERE id = $1', [userId]);
+      const userMoney = userResult.rows[0].money;
+
+      if (userMoney < precio) {
+          return res.json({
+              success: false,
+              mensaje: 'No tienes suficientes monedas para comprar este sobre'
+          });
+      }
+
+      // Actualizar dinero del usuario
+      await db.query('UPDATE users SET money = money - $1 WHERE id = $2', [precio, userId]);
+      req.session.money = userMoney - precio;
+
+      // Obtener mascota aleatoria según el tipo de sobre
+      let rareza;
+      const random = Math.random() * 100;
+      
+      if (tipo === 'basico') {
+          // Sobre básico: 70% común, 25% raro, 5% épico
+          if (random < 70) {
+              rareza = 'comun';
+          } else if (random < 95) {
+              rareza = 'raro';
+          } else {
+              rareza = 'epico';
+          }
+      } else if (tipo === 'premium') {
+          // Sobre premium: 60% raro, 30% épico, 10% legendario
+          if (random < 60) {
+              rareza = 'raro';
+          } else if (random < 90) {
+              rareza = 'epico';
+          } else {
+              rareza = 'legendario';
+          }
+      }
+      
+      // Seleccionar un índice de mascota según la rareza
+      let indicesDisponibles;
+      
+      // Ejemplo de asignación de índices por rareza (ajusta según la distribución deseada)
+      const indicesComunes = [1, 4, 7, 10, 11];
+      const indicesRaros = [13, 16, 18, 21];
+      const indicesEpicos = [23, 27, 29, 32];
+      const indicesLegendarios = [35, 37, 38];
+      
+      switch (rareza) {
+          case 'comun':
+              indicesDisponibles = indicesComunes;
+              break;
+          case 'raro':
+              indicesDisponibles = indicesRaros;
+              break;
+          case 'epico':
+              indicesDisponibles = indicesEpicos;
+              break;
+          case 'legendario':
+              indicesDisponibles = indicesLegendarios;
+              break;
+      }
+      
+      // Seleccionar un índice aleatorio de la lista disponible
+      const indiceAleatorio = indicesDisponibles[Math.floor(Math.random() * indicesDisponibles.length)];
+      
+      // Determinar aleatoriamente el género
+      const genero = Math.random() < 0.5 ? "macho" : "hembra";
+      
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      res.json({
+          success: true,
+          moneyRestante: req.session.money,
+          mascota: {
+              indice: indiceAleatorio,
+              genero: genero,
+              rareza: rareza,
+              especie: especieMascotas[indiceAleatorio - 1],
+              habilidad: habilidad,
+              comidaFavorita: comidaFavorita
+          }
+      });
+  } catch (error) {
+      console.error('Error al comprar sobre:', error);
+      res.json({ success: false, mensaje: 'Error al procesar la compra' });
+  }
+});
+
+app.post('/biblioteca/guardar-mascota', requireLogin, async (req, res) => {
+  const { nombre, indice, genero, rareza } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar datos necesarios
+      if (!nombre || !indice || !genero || !rareza) {
+          return res.json({ success: false, mensaje: 'Datos incompletos' });
+      }
+
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      // Insertar la nueva mascota en pets2
+      await db.query(
+          `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", habilidad, "comidaFavorita", rareza, id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+              nombre,
+              genero,
+              indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad,
+              comidaFavorita,
+              rareza,
+              userId
+          ]
+      );
+
+      res.json({ success: true, mensaje: 'Mascota guardada correctamente' });
+  } catch (error) {
+      console.error('Error al guardar mascota:', error);
+      res.json({ success: false, mensaje: 'Error al guardar la mascota' });
+  }
+});
+
+
+
+
+
+
+
+app.get('/migracion-mascotas', requireLogin, async (req, res) => {
+  // Solo permitir al administrador ejecutar esta migración
+  if (req.session.rango3 !== 'Administrador') {
+      return res.status(403).send('Acceso denegado. Se requieren permisos de administrador.');
+  }
+
+  try {
+      // Obtener todas las mascotas activas que no están en pets2
+      const mascotasActivas = await db.query(`
+          SELECT p.* 
+          FROM pets p
+          WHERE NOT EXISTS (
+              SELECT 1 
+              FROM pets2 p2 
+              WHERE p2.id_users = p.id_users AND p2.indice = p.indice
+          )
+      `);
+
+      let mascotasMigradas = 0;
+
+      // Migrar cada mascota activa a pets2
+      for (const mascota of mascotasActivas.rows) {
+          await db.query(`
+              INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                               habilidad, "comidaFavorita", rareza, id_users)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          `, [
+              mascota.petname,
+              mascota.genero,
+              mascota.indice,
+              mascota.nivelAmor,
+              mascota.nivelFelicidad,
+              mascota.nivelEnergia,
+              mascota.habilidad,
+              mascota.comidaFavorita,
+              'comun', // rareza por defecto para mascotas migradas
+              mascota.id_users
+          ]);
+          
+          mascotasMigradas++;
+      }
+
+      res.send(`Migración completada. Se migraron ${mascotasMigradas} mascotas a la biblioteca.`);
+  } catch (error) {
+      console.error('Error en la migración de mascotas:', error);
+      res.status(500).send('Error en la migración: ' + error.message);
+  }
+});
 
 
 
@@ -5549,3 +5963,199 @@ async function initializeEventsTable() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*agregar esto xd*/
+// Configuración de rutas para el intercambio
+app.get('/intercambio-mascotas', (req, res) => {
+
+  res.render('intercambio-mascotas', { 
+    roomId: req.params.id,
+    username: req.session.username 
+  });
+});
+
+app.get('/sala-intercambio/:id', (req, res) => {
+
+  res.render('sala-intercambio', { 
+      roomId: req.params.id,
+      username: req.session.username 
+  });
+});
+
+// Estructuras para el intercambio
+const salasIntercambio = new Map(); // { roomId: { users: [], pets: [], confirmations: 0 } }
+
+// Función para generar códigos simples (4 letras mayúsculas)
+function generarCodigoSala() {
+  return Array(4).fill(0).map(() => 
+      String.fromCharCode(65 + Math.floor(Math.random() * 26))
+      .join(''));
+  
+}
+
+io.on('connection', (socket) => {
+  console.log('Usuario conectado:', socket.id);
+  
+  let currentRoomId = null;
+  let currentUsername = null;
+
+  // Manejo de sala de intercambio
+  socket.on('unirse-sala-intercambio', async (roomId, username) => {
+      try {
+          currentUsername = username;
+          
+          // Validar si ya está en una sala
+          if (currentRoomId) {
+              socket.emit('intercambio-error', 'Ya estás en una sala de intercambio');
+              return;
+          }
+          
+          // Crear sala si no existe
+          if (!salasIntercambio.has(roomId)) {
+              salasIntercambio.set(roomId, {
+                  users: [],
+                  pets: [],
+                  confirmations: 0
+              });
+          }
+          
+          const sala = salasIntercambio.get(roomId);
+          
+          // Limitar a 2 usuarios
+          if (sala.users.length >= 2) {
+              socket.emit('intercambio-error', 'La sala está llena (máximo 2 jugadores)');
+              return;
+          }
+          
+          // Obtener mascota principal del usuario (simulado)
+          const mascotaUsuario = {
+              id: ` pet_${username}`,
+              nombre: ` Mascota de ${username}`,
+              username: username
+          };
+          
+          // Agregar usuario a la sala
+          sala.users.push({
+              username: username,
+              socketId: socket.id
+          });
+          
+          sala.pets.push(mascotaUsuario);
+          
+          // Unirse al room
+          socket.join(roomId);
+          currentRoomId = roomId;
+          
+          // Notificar actualización
+          io.to(roomId).emit('actualizar-sala-intercambio', {
+              users: sala.users.map(u => u.username),
+              pets: sala.pets,
+              ready: sala.users.length === 2,
+              currentUser: username
+          });
+          
+          console.log(` ${username} unido a sala ${roomId}`);
+          
+      } catch (error) {
+          console.error('Error:', error);
+          socket.emit('intercambio-error', 'Error al unirse a la sala');
+      }
+  });
+  
+  // Crear nueva sala
+  socket.on('crear-sala-intercambio', (username) => {
+      let codigoSala;
+      do {
+          codigoSala = generarCodigoSala(); // Generar código único
+      } while (salasIntercambio.has(codigoSala));
+      
+      socket.emit('sala-creada', codigoSala);
+  });
+  
+  // Confirmar intercambio
+  socket.on('confirmar-intercambio', () => {
+      if (!currentRoomId) return;
+      
+      const sala = salasIntercambio.get(currentRoomId);
+      if (!sala || sala.users.length !== 2) {
+          socket.emit('intercambio-error', 'La sala no está lista');
+          return;
+      }
+      
+      // Incrementar confirmaciones
+      sala.confirmations += 1;
+      
+      // Notificar estado
+      io.to(currentRoomId).emit('intercambio-estado', {
+          confirmations: sala.confirmations,
+          total: 2,
+          currentUser: currentUsername
+      });
+      
+      // Si ambos confirmaron
+      if (sala.confirmations === 2) {
+          const [pet1, pet2] = sala.pets;
+          
+          // Aquí iría la lógica real de intercambio en la base de datos
+          console.log(` Intercambiando: ${pet1.nombre} (${pet1.username}) ↔ ${pet2.nombre} (${pet2.username})`);
+          
+          // Notificar éxito
+          io.to(currentRoomId).emit('intercambio-completado', {
+              success: true,
+              message: '¡Intercambio exitoso!'
+          });
+          
+          // Limpiar sala después
+          setTimeout(() => {
+              salasIntercambio.delete(currentRoomId);
+          }, 5000);
+      }
+  });
+  
+  // Manejar desconexión
+  socket.on('disconnect', () => {
+      if (!currentRoomId || !currentUsername) return;
+      
+      const sala = salasIntercambio.get(currentRoomId);
+      if (!sala) return;
+      
+      const userIndex = sala.users.findIndex(u => u.username === currentUsername);
+      if (userIndex !== -1) {
+          // Notificar al otro usuario si existe
+          if (sala.users.length > 1) {
+              const otroUser = sala.users[1 - userIndex];
+              io.to(otroUser.socketId).emit('intercambio-error', 
+                  ` ${currentUsername} abandonó la sala`);
+          }
+          
+          // Eliminar sala
+          salasIntercambio.delete(currentRoomId);
+      }
+    });
+});
+
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {  // Usar httpServer en lugar de app.listen
+    console.log(`Servidor en http://localhost:${PORT}`);
+});

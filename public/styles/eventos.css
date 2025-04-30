@@ -23,17 +23,18 @@ body {
 /* Sección Hero con Carrusel - Fondo oscurecido */
 .seccion-hero {
     position: relative;
-    padding: 60px 20px; /* Más espacio interno */
+    padding: 60px 20px;
     border-radius: 10px;
     margin-bottom: 20px;
     text-align: center;
     border: 2px solid #cf7cfc;
-    min-height: 400px; /* Altura más grande */
+    min-height: 400px;
     display: flex;
+    flex-direction: column; /* Cambiado a column para apilar los elementos verticalmente */
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.6); /* Fondo oscuro para mejorar el contraste */
+    background: rgba(0, 0, 0, 0.6);
 }
 
 .carrusel {
@@ -66,17 +67,19 @@ body {
     position: relative;
     z-index: 2;
     color: #ffb8ff;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff; /* Sombra más pronunciada */
-    font-size: 4rem; /* Tamaño más grande */
-    margin: 0;
-    padding: 20px 40px; /* Más espacio interno */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+    font-size: 4rem;
+    margin: 0 auto; /* Centrado horizontal */
+    padding: 20px 40px;
     border-radius: 15px;
-    background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente */
-    backdrop-filter: blur(5px); /* Efecto de desenfoque */
-    letter-spacing: 2px; /* Mayor separación entre letras */
-    font-weight: bold; /* Texto en negrita */
-    border: none; /* Eliminamos el borde */
-    animation: tituloBrillo 3s infinite alternate; /* Animación de brillo */
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    letter-spacing: 2px;
+    font-weight: bold;
+    border: none;
+    animation: tituloBrillo 3s infinite alternate;
+    text-align: center; /* Asegura que el texto esté centrado */
+    max-width: 80%; /* Limita el ancho para mejor responsividad */
 }
 
 .seccion-hero h2 {
@@ -85,6 +88,13 @@ body {
     color: #fff;
     margin-top: 20px;
     font-size: 1.5rem;
+    text-align: center; /* Asegura que el texto esté centrado */
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo semitransparente similar al h1 */
+    padding: 10px 20px;
+    border-radius: 8px;
+    max-width: 90%; /* Limita el ancho para mejor responsividad */
+    margin-left: auto; /* Centrado horizontal */
+    margin-right: auto; /* Centrado horizontal */
 }
 
 @keyframes tituloBrillo {

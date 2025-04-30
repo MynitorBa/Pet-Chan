@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intercambio de Mascotas</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Intercambio de Mascotas</h1>
+    
+    <div>
+        <button id="crear-sala">Crear Sala de Intercambio</button>
+        <div id="codigo-sala-container" style="display: none;">
+            <p>Tu código de sala: <span id="codigo-sala"></span></p>
+            <p>Comparte este código con otro usuario</p>
+        </div>
+    </div>
+    
+    <div>
+        <h2>Unirse a Sala Existente</h2>
+        <input type="text" id="codigo-sala" placeholder="Ej: ABCD" maxlength="4" 
+               style="text-transform: uppercase">
+        <button id="unirse-sala">Unirse</button>
+        <div id="mensaje-error" style="color: red; margin-top: 10px;"></div>
+    </div>
+    
+    <script>
+        const socket = io();
+        const username = '<%= username %>'; // Desde la sesión
+        
+        // Unirse a sala existente
+        document.getElementById('unirse-sala').addEventListener('click', function() {
+            const codigoInput = document.getElementById('codigo-sala');
+            const codigo = codigoInput.value.toUpperCase().trim();
+            const errorDiv = document.getElementById('mensaje-error');
+            
+            // Validación básica
+            if (codigo.length !== 4) {
+                errorDiv.textContent = 'El código debe tener exactamente 4 letras';
+                codigoInput.focus();
+                return;
+            }
+            
+            errorDiv.textContent = ''; // Limpiar mensajes anteriores
+            console.log(` Intentando unirse a sala ${codigo}`);
+            
+            // Deshabilitar botón temporalmente
+            this.disabled = true;
+            this.textContent = 'Conectando...';
+            
+            socket.emit('unirse-sala-intercambio', codigo, username, (response) => {
+                // Esta callback se ejecuta cuando el servidor responde
+                if (response.success) {
+                    window.location.href = ` /sala-intercambio/${codigo}`;
+                } else {
+                    errorDiv.textContent = response.message || 'Error al unirse a la sala';
+                    this.disabled = false;
+                    this.textContent = 'Unirse';
+                }
+            });
+        });
+        
+        // Permitir presionar Enter en el input
+        document.getElementById('codigo-sala').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('unirse-sala').click();
+            }
+        });
+        
+        // Escuchar eventos de error
+        socket.on('intercambio-error', (msg) => {
+            const errorDiv = document.getElementById('mensaje-error');
+            errorDiv.textContent = msg;
+            document.getElementById('unirse-sala').disabled = false;
+            document.getElementById('unirse-sala').textContent = 'Unirse';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sala de Intercambio - <%= roomId %></title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Sala de Intercambio: <%= roomId %></h1>
+    
+    <div id="estado-sala">
+        <p>Esperando otro usuario...</p>
+    </div>
+    
+    <div id="info-mascotas" style="display: none;">
+        <h2>Mascotas a intercambiar</h2>
+        <div id="mascota-usuario">
+            <h3>Tu mascota</h3>
+            <p id="nombre-mascota-usuario"></p>
+        </div>
+        <div id="mascota-otro">
+            <h3>Mascota del otro usuario</h3>
+            <p id="nombre-mascota-otro"></p>
+        </div>
+    </div>
+    
+    <button id="confirmar-intercambio" disabled>Confirmar Intercambio</button>
+    <div id="mensaje-confirmacion"></div>
+    <div id="resultado-intercambio"></div>
+
+    <script>
+        const socket = io();
+        const roomId = '<%= roomId %>';
+        const username = '<%= username %>';
+        
+        // Unirse a la sala al cargar
+        socket.emit('unirse-sala-intercambio', roomId, username);
+        
+        // Escuchar actualizaciones
+        socket.on('actualizar-sala-intercambio', (data) => {
+            // Mostrar información de los jugadores y mascotas
+        });
+        
+        // Confirmar intercambio
+        document.getElementById('confirmar').addEventListener('click', () => {
+            socket.emit('confirmar-intercambio');
+        });
+    </script>
+</body>
+</html>
