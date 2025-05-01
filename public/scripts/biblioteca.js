@@ -104,6 +104,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para activar una mascota
     function activarMascota(mascotaId) {
+        // Mostrar un indicador de carga o deshabilitar el botón para prevenir clics múltiples
+        const botonActivar = document.querySelector(`.btn-activar[data-id="${mascotaId}"]`);
+        if (botonActivar) {
+            botonActivar.disabled = true;
+            botonActivar.textContent = 'Activando...';
+        }
+        
         fetch('/biblioteca/activar-mascota', {
             method: 'POST',
             headers: {
@@ -114,18 +121,32 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                mostrarNotificacion('¡Mascota activada correctamente!', 'exito');
-                // Recargar la página después de 1.5 segundos
+                mostrarNotificacion('¡Mascota activada correctamente! La mascota anterior ha sido añadida a tu biblioteca.', 'exito');
+                
+                // Recargar la página para mostrar los cambios actualizados
+                // Usamos un pequeño retraso para que el usuario pueda ver la notificación
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
             } else {
                 mostrarNotificacion('Error: ' + data.mensaje, 'error');
+                
+                // Reactivar el botón en caso de error
+                if (botonActivar) {
+                    botonActivar.disabled = false;
+                    botonActivar.textContent = 'Activar';
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            mostrarNotificacion('Error al activar la mascota', 'error');
+            mostrarNotificacion('Error al activar la mascota. Por favor, intenta de nuevo.', 'error');
+            
+            // Reactivar el botón en caso de error
+            if (botonActivar) {
+                botonActivar.disabled = false;
+                botonActivar.textContent = 'Activar';
+            }
         });
     }
 
@@ -244,7 +265,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para comprar un sobre
     function comprarSobre(tipo, precio, boton) {
-        // Verificar si el user puede pagar el sobre
+        console.log(`Iniciando compra de sobre ${tipo} por ${precio} monedas`);
+        
+        // Verificar si el usuario puede pagar el sobre
         const dineroActual = parseInt(document.querySelector('.monedas-cantidad').textContent.replace(/[^\d]/g, ''));
         
         if (dineroActual < precio) {
@@ -268,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar clase de animación
         sobre.classList.add('abriendo');
         
+        // Realizar la petición al servidor con manejo de errores mejorado
         fetch('/biblioteca/comprar-sobre', {
             method: 'POST',
             headers: {
@@ -275,42 +299,106 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ tipo: tipo, precio: precio })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error de red: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Respuesta del servidor:', data);
+            
             if (data.success) {
-                // Actualizar el contador de monedas
-                document.querySelector('.monedas-cantidad').textContent = new Intl.NumberFormat().format(data.moneyRestante);
-                
-                // Llenar el modal de resultado
-                document.getElementById('nueva-mascota-img').src = `imagenes_de_mascotas/${data.mascota.indice}.gif`;
-                document.getElementById('especie-resultado').textContent = data.mascota.especie;
-                document.getElementById('indice-nueva-mascota').value = data.mascota.indice;
-                document.getElementById('genero-nueva-mascota').value = data.mascota.genero;
-                document.getElementById('rareza-nueva-mascota').value = data.mascota.rareza;
-                
-                // Configurar la clase de rareza en el banner
-                const rarezaBanner = document.getElementById('rareza-banner');
-                rarezaBanner.textContent = data.mascota.rareza.charAt(0).toUpperCase() + data.mascota.rareza.slice(1);
-                rarezaBanner.className = 'rareza-banner ' + data.mascota.rareza;
-                
-                // Crear efecto de confeti si es una rareza épica o legendaria
-                if (data.mascota.rareza === 'epico' || data.mascota.rareza === 'legendario') {
+                try {
+                    // Actualizar el contador de monedas
+                    document.querySelector('.monedas-cantidad').textContent = new Intl.NumberFormat().format(data.moneyRestante);
+                    
+                    // Asegurarse de que todos los datos necesarios estén presentes
+                    if (!data.mascota || !data.mascota.indice || !data.mascota.especie) {
+                        throw new Error('Datos de mascota incompletos en la respuesta');
+                    }
+                    
+                    // Llenar el modal de resultado
+                    const nuevaMascotaImg = document.getElementById('nueva-mascota-img');
+                    if (nuevaMascotaImg) {
+                        nuevaMascotaImg.src = `imagenes_de_mascotas/${data.mascota.indice}.gif`;
+                        // Opcional: precargar la imagen
+                        nuevaMascotaImg.onload = () => console.log('Imagen de mascota cargada correctamente');
+                        nuevaMascotaImg.onerror = (e) => {
+                            console.error('Error al cargar la imagen de la mascota:', e);
+                            nuevaMascotaImg.src = 'imagenes_y_gif/mascota_default.gif'; // Imagen por defecto
+                        };
+                    } else {
+                        console.error('Elemento nueva-mascota-img no encontrado');
+                    }
+                    
+                    const especieResultado = document.getElementById('especie-resultado');
+                    if (especieResultado) {
+                        especieResultado.textContent = data.mascota.especie;
+                    }
+                    
+                    // Asegurarse de que todos los campos ocultos estén correctamente configurados
+                    const indiceNuevaMascota = document.getElementById('indice-nueva-mascota');
+                    if (indiceNuevaMascota) {
+                        indiceNuevaMascota.value = data.mascota.indice;
+                    }
+                    
+                    const generoNuevaMascota = document.getElementById('genero-nueva-mascota');
+                    if (generoNuevaMascota) {
+                        generoNuevaMascota.value = data.mascota.genero;
+                    }
+                    
+                    const rarezaNuevaMascota = document.getElementById('rareza-nueva-mascota');
+                    if (rarezaNuevaMascota) {
+                        rarezaNuevaMascota.value = data.mascota.rareza;
+                    }
+                    
+                    // Configurar la clase de rareza en el banner
+                    const rarezaBanner = document.getElementById('rareza-banner');
+                    if (rarezaBanner) {
+                        rarezaBanner.textContent = data.mascota.rareza.charAt(0).toUpperCase() + data.mascota.rareza.slice(1);
+                        rarezaBanner.className = 'rareza-banner ' + data.mascota.rareza;
+                    }
+                    
+                    // Crear efecto de confeti si es una rareza épica o legendaria
+                    if (data.mascota.rareza === 'epico' || data.mascota.rareza === 'legendario') {
+                        setTimeout(() => {
+                            crearConfeti();
+                        }, 1500);
+                    }
+                    
+                    // Mostrar el modal de resultado después de completar la animación
+                    const modalResultadoSobre = document.getElementById('modal-resultado-sobre');
                     setTimeout(() => {
-                        crearConfeti();
-                    }, 1500);
-                }
-                
-                // Mostrar el modal de resultado después de completar la animación
-                setTimeout(() => {
+                        sobre.classList.remove('abriendo');
+                        if (modalResultadoSobre) {
+                            modalResultadoSobre.classList.add('mostrar');
+                            
+                            // Asegurarse de que el formulario esté limpio
+                            const nombreInput = document.getElementById('nombre-nueva-mascota');
+                            if (nombreInput) {
+                                nombreInput.value = '';
+                                nombreInput.focus();
+                            }
+                        } else {
+                            console.error('Elemento modal-resultado-sobre no encontrado');
+                            mostrarNotificacion('Error al mostrar el resultado', 'error');
+                        }
+                        // Resetear el botón
+                        boton.disabled = false;
+                        boton.textContent = `Comprar por ${precio} 💰`;
+                    }, 1800);
+                } catch (parseError) {
+                    console.error('Error al procesar la respuesta:', parseError);
                     sobre.classList.remove('abriendo');
-                    modalResultadoSobre.classList.add('mostrar');
+                    mostrarNotificacion('Error al procesar el resultado: ' + parseError.message, 'error');
                     // Resetear el botón
                     boton.disabled = false;
                     boton.textContent = `Comprar por ${precio} 💰`;
-                }, 1800);
+                }
             } else {
                 sobre.classList.remove('abriendo');
-                mostrarNotificacion('Error: ' + data.mensaje, 'error');
+                mostrarNotificacion('Error: ' + (data.mensaje || 'Error desconocido'), 'error');
                 // Resetear el botón
                 boton.disabled = false;
                 boton.textContent = `Comprar por ${precio} 💰`;
@@ -318,11 +406,69 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             sobre.classList.remove('abriendo');
-            console.error('Error:', error);
-            mostrarNotificacion('Error al procesar la compra', 'error');
+            console.error('Error en la petición:', error);
+            mostrarNotificacion('Error al procesar la compra: ' + error.message, 'error');
             // Resetear el botón
             boton.disabled = false;
             boton.textContent = `Comprar por ${precio} 💰`;
+        });
+    }
+    
+    // Mejorar la función que guarda la mascota
+    function guardarNuevaMascota() {
+        const btnGuardar = document.querySelector('.btn-guardar-mascota');
+        btnGuardar.disabled = true;
+        btnGuardar.textContent = 'Guardando...';
+        
+        const nombre = document.getElementById('nombre-nueva-mascota').value;
+        const indice = document.getElementById('indice-nueva-mascota').value;
+        const genero = document.getElementById('genero-nueva-mascota').value;
+        const rareza = document.getElementById('rareza-nueva-mascota').value;
+        
+        // Validación básica del lado del cliente
+        if (!nombre || nombre.trim() === '') {
+            mostrarNotificacion('Por favor, dale un nombre a tu mascota', 'error');
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = 'Guardar mascota';
+            return;
+        }
+        
+        fetch('/biblioteca/guardar-mascota', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: nombre,
+                indice: indice,
+                genero: genero,
+                rareza: rareza
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error de red: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                mostrarNotificacion('¡Mascota guardada correctamente!', 'exito');
+                // Recargar la página después de 1.5 segundos
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                mostrarNotificacion('Error: ' + (data.mensaje || 'Error desconocido'), 'error');
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = 'Guardar mascota';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al guardar la mascota: ' + error.message, 'error');
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = 'Guardar mascota';
         });
     }
 
