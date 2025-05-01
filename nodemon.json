@@ -1,0 +1,7 @@
+{
+    "watch": ["src", "routes", "views"],
+    "ignore": ["public", "uploads", "sessions", "logs"],
+    "ext": "js,ejs",
+    "exec": "node index.js"
+  }
+  

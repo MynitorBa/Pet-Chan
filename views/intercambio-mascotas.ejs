@@ -2,77 +2,73 @@
 <html>
 <head>
     <title>Intercambio de Mascotas</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/intercambio.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <h1>Intercambio de Mascotas</h1>
-    
-    <div>
-        <button id="crear-sala">Crear Sala de Intercambio</button>
-        <div id="codigo-sala-container" style="display: none;">
-            <p>Tu código de sala: <span id="codigo-sala"></span></p>
-            <p>Comparte este código con otro usuario</p>
+    <div class="intercambio-contenedor">
+        <div class="intercambio-banner">
+            <div class="pixel-decoracion pixel-esquina-1"></div>
+            <div class="pixel-decoracion pixel-esquina-2"></div>
+            <div class="pixel-decoracion pixel-esquina-3"></div>
+            <div class="pixel-decoracion pixel-esquina-4"></div>
+            <div class="efecto-brillo"></div>
+            
+            <h1>Intercambio de Mascotas</h1>
+            <p>Conecta con otros entrenadores y realiza intercambios increíbles</p>
+        </div>
+        
+        <div class="intercambio-opciones">
+            <!-- Formulario para CREAR sala -->
+            <div class="opcion-card crear-sala">
+                <div class="opcion-titulo">
+                    <h2>Crear nueva sala</h2>
+                </div>
+                <div class="opcion-contenido">
+                    <div class="opcion-icono">
+                        <span>+</span>
+                    </div>
+                    <p>Crea una sala nueva e invita a amigos a unirse con tu código</p>
+                    <form action="/intercambio/crear-sala" method="POST">
+                        <input type="hidden" name="userId" value="<%= userId %>">
+                        <button type="submit" class="intercambio-boton animacion-pulso">Crear sala nueva</button>
+                    </form>
+                </div>
+                <div class="efecto-brillo"></div>
+            </div>
+
+            <!-- Formulario para UNIRSE a sala existente -->
+            <div class="opcion-card unirse-sala">
+                <div class="opcion-titulo">
+                    <h2>Unirse a sala existente</h2>
+                </div>
+                <div class="opcion-contenido">
+                    <div class="opcion-icono">
+                        <span>→</span>
+                    </div>
+                    <p>Introduce el código de la sala a la que deseas unirte</p>
+                    <form action="/intercambio/unirse-sala" method="POST" class="form-unirse">
+                        <div class="input-container">
+                            <label for="codigoSala">Código de sala:</label>
+                            <input type="text" name="codigoSala" id="codigoSala" required class="codigo-input">
+                        </div>
+                        <input type="hidden" name="userId" value="<%= userId %>">
+                        <button type="submit" class="intercambio-boton">Unirse a sala</button>
+                    </form>
+                </div>
+                <div class="efecto-brillo"></div>
+            </div>
+        </div>
+        
+        <div class="particulas-container">
+            <div class="particula" style="--delay: 0s; --tamaño: 7px;"></div>
+            <div class="particula" style="--delay: 2s; --tamaño: 5px;"></div>
+            <div class="particula" style="--delay: 4s; --tamaño: 9px;"></div>
+            <div class="particula" style="--delay: 1s; --tamaño: 6px;"></div>
+            <div class="particula" style="--delay: 3s; --tamaño: 8px;"></div>
+            <div class="particula" style="--delay: 5s; --tamaño: 4px;"></div>
         </div>
     </div>
-    
-    <div>
-        <h2>Unirse a Sala Existente</h2>
-        <input type="text" id="codigo-sala" placeholder="Ej: ABCD" maxlength="4" 
-               style="text-transform: uppercase">
-        <button id="unirse-sala">Unirse</button>
-        <div id="mensaje-error" style="color: red; margin-top: 10px;"></div>
-    </div>
-    
-    <script>
-        const socket = io();
-        const username = '<%= username %>'; // Desde la sesión
-        
-        // Unirse a sala existente
-        document.getElementById('unirse-sala').addEventListener('click', function() {
-            const codigoInput = document.getElementById('codigo-sala');
-            const codigo = codigoInput.value.toUpperCase().trim();
-            const errorDiv = document.getElementById('mensaje-error');
-            
-            // Validación básica
-            if (codigo.length !== 4) {
-                errorDiv.textContent = 'El código debe tener exactamente 4 letras';
-                codigoInput.focus();
-                return;
-            }
-            
-            errorDiv.textContent = ''; // Limpiar mensajes anteriores
-            console.log(` Intentando unirse a sala ${codigo}`);
-            
-            // Deshabilitar botón temporalmente
-            this.disabled = true;
-            this.textContent = 'Conectando...';
-            
-            socket.emit('unirse-sala-intercambio', codigo, username, (response) => {
-                // Esta callback se ejecuta cuando el servidor responde
-                if (response.success) {
-                    window.location.href = ` /sala-intercambio/${codigo}`;
-                } else {
-                    errorDiv.textContent = response.message || 'Error al unirse a la sala';
-                    this.disabled = false;
-                    this.textContent = 'Unirse';
-                }
-            });
-        });
-        
-        // Permitir presionar Enter en el input
-        document.getElementById('codigo-sala').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('unirse-sala').click();
-            }
-        });
-        
-        // Escuchar eventos de error
-        socket.on('intercambio-error', (msg) => {
-            const errorDiv = document.getElementById('mensaje-error');
-            errorDiv.textContent = msg;
-            document.getElementById('unirse-sala').disabled = false;
-            document.getElementById('unirse-sala').textContent = 'Unirse';
-        });
-    </script>
 </body>
 </html>

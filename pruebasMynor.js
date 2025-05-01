@@ -53,8 +53,9 @@ const io = new Server(httpServer, {
 app.use(session({
     secret: 'Ayer_me_econtre_con_sabrina_corazoncitos',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
+      httpOnly: false,
         secure: false,
     }
 }));
@@ -1184,11 +1185,11 @@ app.get('/minijuego2', (req, res) => {
 /*---------------------------creamos rutas individuales para los juegos------------------------------------------------*/
 
 
-
+/*
 app.listen(3000, '0.0.0.0', () => {
     console.log('Server is running on port 3000');
 })
-
+*/
 
 
 
@@ -5985,177 +5986,269 @@ async function initializeEventsTable() {
 
 
 /*agregar esto xd*/
-// Configuración de rutas para el intercambio
-app.get('/intercambio-mascotas', (req, res) => {
+app.get("/intercambio", requireLogin, (req, res) => {
 
-  res.render('intercambio-mascotas', { 
-    roomId: req.params.id,
-    username: req.session.username 
+  res.render("intercambio-mascotas.ejs", {
+    userId: req.session.userId,
+    petId: req.session.mascotaActual.id
   });
 });
 
-app.get('/sala-intercambio/:id', (req, res) => {
 
-  res.render('sala-intercambio', { 
-      roomId: req.params.id,
-      username: req.session.username 
-  });
-});
 
-// Estructuras para el intercambio
-const salasIntercambio = new Map(); // { roomId: { users: [], pets: [], confirmations: 0 } }
-
-// Función para generar códigos simples (4 letras mayúsculas)
-function generarCodigoSala() {
-  return Array(4).fill(0).map(() => 
-      String.fromCharCode(65 + Math.floor(Math.random() * 26))
-      .join(''));
+// Ruta para crear nueva sala
+app.post("/intercambio/crear-sala", requireLogin, (req, res) => {
+  const { userId } = req.body;
+  const petId = req.session.mascotaActual.id;
+  const mascota = req.session.mascotaActual;
   
+  // Generar código aleatorio de 6 caracteres
+  const sala = Math.random().toString(36).substring(2, 8).toUpperCase();
+  
+  res.render("sala-intercambio.ejs", {
+      sala,
+      userId,
+      petId,
+      esCreador: true,  // Para identificar al creador de la sala
+      rutaImagen: mascota.rutaImagen,
+  });
+});
+
+// Ruta para unirse a sala existente
+app.post("/intercambio/unirse-sala", requireLogin, async (req, res) => {
+  const { codigoSala, userId } = req.body;
+  const petId = req.session.mascotaActual.id;
+  const mascota = req.session.mascotaActual;
+
+  // Verificar si la sala existe y tiene espacio
+  if (salasDeIntercambio[codigoSala] && salasDeIntercambio[codigoSala].length < 2) {
+      res.render("sala-intercambio.ejs", {
+          sala: codigoSala,
+          userId,
+          petId,
+          esCreador: false,
+          rutaImagen: mascota.rutaImagen,
+      });
+  } else {
+      res.status(400).send("Sala no encontrada o llena");
+  }
+});
+
+app.post("/actualizar-mascota", async (req, res) => {
+  const userId = req.session.userId;
+  if (!userId) return res.status(401).send("No autorizado");
+
+  try {
+      const petResult = await db.query('SELECT * FROM pets WHERE id_users = $1 LIMIT 1', [userId]);
+
+      if (petResult.rows.length > 0) {
+          const mascota = petResult.rows[0];
+          const rutaImagen = `${rutaBase}${mascota.indice}.gif`;
+          const especieDeMascota = especieMascotas[mascota.indice - 1];
+          const pronombre = mascota.genero === "macho" ? "el" : "la";
+
+          req.session.mascotaActual = {
+              id: mascota.id,
+              nombre: mascota.petname,
+              genero: mascota.genero,
+              especie: especieDeMascota,
+              indice: mascota.indice,
+              rutaImagen,
+              pronombre,
+              niveldeAmor: mascota.nivelAmor,
+              niveldeFelicidad: mascota.nivelFelicidad,
+              niveldeEnergia: mascota.nivelEnergia,
+              habilidad: mascota.habilidad,
+              comidaFavorita: mascota.comidaFavorita
+          };
+
+          return res.send("ok");
+      }
+
+      res.status(404).send("Mascota no encontrada");
+
+  } catch (err) {
+      console.error("❌ Error al actualizar sesión:", err);
+      res.status(500).send("Error interno");
+  }
+});
+
+//funcion para validar la propiedad de la mascota
+async function validarPropiedadMascota(userId, petId) {
+  try {
+      const result = await db.query(
+          'SELECT id FROM pets WHERE id = $1 AND id_users = $2',
+          [petId, userId]
+      );
+      return result.rows.length > 0;
+  } catch (err) {
+      console.error("Error validando propiedad:", err);
+      return false;
+  }
 }
 
-io.on('connection', (socket) => {
-  console.log('Usuario conectado:', socket.id);
-  
-  let currentRoomId = null;
-  let currentUsername = null;
 
-  // Manejo de sala de intercambio
-  socket.on('unirse-sala-intercambio', async (roomId, username) => {
-      try {
-          currentUsername = username;
-          
-          // Validar si ya está en una sala
-          if (currentRoomId) {
-              socket.emit('intercambio-error', 'Ya estás en una sala de intercambio');
-              return;
-          }
-          
-          // Crear sala si no existe
-          if (!salasIntercambio.has(roomId)) {
-              salasIntercambio.set(roomId, {
-                  users: [],
-                  pets: [],
-                  confirmations: 0
-              });
-          }
-          
-          const sala = salasIntercambio.get(roomId);
-          
-          // Limitar a 2 usuarios
-          if (sala.users.length >= 2) {
-              socket.emit('intercambio-error', 'La sala está llena (máximo 2 jugadores)');
-              return;
-          }
-          
-          // Obtener mascota principal del usuario (simulado)
-          const mascotaUsuario = {
-              id: ` pet_${username}`,
-              nombre: ` Mascota de ${username}`,
-              username: username
-          };
-          
-          // Agregar usuario a la sala
-          sala.users.push({
-              username: username,
-              socketId: socket.id
-          });
-          
-          sala.pets.push(mascotaUsuario);
-          
-          // Unirse al room
-          socket.join(roomId);
-          currentRoomId = roomId;
-          
-          // Notificar actualización
-          io.to(roomId).emit('actualizar-sala-intercambio', {
-              users: sala.users.map(u => u.username),
-              pets: sala.pets,
-              ready: sala.users.length === 2,
-              currentUser: username
-          });
-          
-          console.log(` ${username} unido a sala ${roomId}`);
-          
-      } catch (error) {
-          console.error('Error:', error);
-          socket.emit('intercambio-error', 'Error al unirse a la sala');
-      }
+const salasDeIntercambio = {}; // sala => [{ userId, petId, socketId, confirmado }]
+
+
+io.on("connection", (socket) => {
+  socket.on("connection_intercambio_pets", ({ sala, userId, petId }) => {
+    if (!sala || !userId || !petId) return;
+
+    socket.join(sala);
+    if (!salasDeIntercambio[sala]) salasDeIntercambio[sala] = [];
+
+    salasDeIntercambio[sala].push({ socketId: socket.id, userId, petId });
+
+    if (salasDeIntercambio[sala].length === 1) {
+      socket.emit("esperando_otro_usuario");
+    } else if (salasDeIntercambio[sala].length === 2) {
+      io.to(sala).emit("ambos_usuarios_conectados");
+    } else {
+      socket.leave(sala);
+      socket.emit("error_sala_llena");
+    }
   });
-  
-  // Crear nueva sala
-  socket.on('crear-sala-intercambio', (username) => {
-      let codigoSala;
-      do {
-          codigoSala = generarCodigoSala(); // Generar código único
-      } while (salasIntercambio.has(codigoSala));
+
+  socket.on("unirse_sala_intercambio_pets", async ({ sala, userId, petId }) => {
+    // Validar propiedad inmediatamente
+    const esValido = await validarPropiedadMascota(userId, petId);
+    if (!esValido) {
+        socket.emit("error_intercambio", "No tienes permiso para intercambiar esta mascota");
+        return;
+    }
+
+    // Verificar si el usuario ya está en alguna sala
+    for (const salaExistente in salasDeIntercambio) {
+        if (salasDeIntercambio[salaExistente].some(u => u.userId === userId)) {
+            socket.emit("error_usuario_en_otra_sala");
+            return;
+        }
+    }
+
+    // Si la sala no existe, solo permitir si el usuario es el primero
+    if (!salasDeIntercambio[sala]) {
+        salasDeIntercambio[sala] = [];
+    }
+
+    // Verificar si la sala está llena
+    if (salasDeIntercambio[sala].length >= 2) {
+        socket.emit("sala_llena_intercambio");
+        return;
+    }
+
+    socket.join(sala);
+    salasDeIntercambio[sala].push({
+        socketId: socket.id,
+        userId,
+        petId,
+        confirmado: false
+    });
+
+    // Notificar a los usuarios en la sala
+    io.to(sala).emit("usuarios_sala_intercambio", {
+        usuarios: salasDeIntercambio[sala].map(p => p.userId),
+        codigoSala: sala
+    });
+
+    // Si hay 2 usuarios, notificar
+    if (salasDeIntercambio[sala].length === 2) {
+        io.to(sala).emit("ambos_usuarios_conectados");
+    }
+
+     // Cuando hay 2 usuarios, enviar la info completa de ambas mascotas
+     if (salasDeIntercambio[sala]?.length === 2) {
+      const [usuario1, usuario2] = salasDeIntercambio[sala];
       
-      socket.emit('sala-creada', codigoSala);
-  });
-  
-  // Confirmar intercambio
-  socket.on('confirmar-intercambio', () => {
-      if (!currentRoomId) return;
+      // Obtener info completa de ambas mascotas
+      const mascota1 = await obtenerInfoMascota(usuario1.petId);
+      const mascota2 = await obtenerInfoMascota(usuario2.petId);
       
-      const sala = salasIntercambio.get(currentRoomId);
-      if (!sala || sala.users.length !== 2) {
-          socket.emit('intercambio-error', 'La sala no está lista');
-          return;
-      }
-      
-      // Incrementar confirmaciones
-      sala.confirmations += 1;
-      
-      // Notificar estado
-      io.to(currentRoomId).emit('intercambio-estado', {
-          confirmations: sala.confirmations,
-          total: 2,
-          currentUser: currentUsername
+      // Enviar a cada usuario la info de la mascota del otro
+      io.to(usuario1.socketId).emit("info_mascota_oponente", {
+          ...mascota2,
+          rutaImagen: `imagenes_de_mascotas/${mascota2.indice}.gif`
       });
       
-      // Si ambos confirmaron
-      if (sala.confirmations === 2) {
-          const [pet1, pet2] = sala.pets;
-          
-          // Aquí iría la lógica real de intercambio en la base de datos
-          console.log(` Intercambiando: ${pet1.nombre} (${pet1.username}) ↔ ${pet2.nombre} (${pet2.username})`);
-          
-          // Notificar éxito
-          io.to(currentRoomId).emit('intercambio-completado', {
-              success: true,
-              message: '¡Intercambio exitoso!'
-          });
-          
-          // Limpiar sala después
-          setTimeout(() => {
-              salasIntercambio.delete(currentRoomId);
-          }, 5000);
-      }
-  });
-  
-  // Manejar desconexión
-  socket.on('disconnect', () => {
-      if (!currentRoomId || !currentUsername) return;
-      
-      const sala = salasIntercambio.get(currentRoomId);
-      if (!sala) return;
-      
-      const userIndex = sala.users.findIndex(u => u.username === currentUsername);
-      if (userIndex !== -1) {
-          // Notificar al otro usuario si existe
-          if (sala.users.length > 1) {
-              const otroUser = sala.users[1 - userIndex];
-              io.to(otroUser.socketId).emit('intercambio-error', 
-                  ` ${currentUsername} abandonó la sala`);
-          }
-          
-          // Eliminar sala
-          salasIntercambio.delete(currentRoomId);
-      }
-    });
+      io.to(usuario2.socketId).emit("info_mascota_oponente", {
+          ...mascota1,
+          rutaImagen: `imagenes_de_mascotas/${mascota1.indice}.gif`
+      });
+  }
 });
 
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {  // Usar httpServer en lugar de app.listen
-    console.log(`Servidor en http://localhost:${PORT}`);
+socket.on("confirmar_intercambio_pets", async ({ sala }) => {
+  if (!salasDeIntercambio[sala] || salasDeIntercambio[sala].length !== 2) {
+      return socket.emit("error_intercambio", "Sala inválida");
+  }
+
+  const usuario = salasDeIntercambio[sala].find(p => p.socketId === socket.id);
+  if (!usuario) return;
+
+  // Validar que la mascota pertenece al usuario
+  const esPropietario = await validarPropiedadMascota(usuario.userId, usuario.petId);
+  if (!esPropietario) {
+      return socket.emit("error_intercambio", "No eres dueño de esta mascota");
+  }
+
+  usuario.confirmado = true;
+  const [p1, p2] = salasDeIntercambio[sala];
+
+  if (p1.confirmado && p2.confirmado) {
+      try {
+          // Validar nuevamente ANTES del intercambio
+          const validaciones = await Promise.all([
+              validarPropiedadMascota(p1.userId, p1.petId),
+              validarPropiedadMascota(p2.userId, p2.petId)
+          ]);
+
+          if (!validaciones.every(v => v)) {
+              throw new Error("Validación de propiedad falló");
+          }
+
+          /*cambio de mascota*/
+          await db.query("BEGIN");
+          await db.query(`UPDATE pets SET id_users = $1 WHERE id = $2`, [p2.userId, p1.petId]);
+          await db.query(`UPDATE pets SET id_users = $1 WHERE id = $2`, [p1.userId, p2.petId]);
+          await db.query("COMMIT");
+
+          io.to(sala).emit("intercambio_realizado");
+      } catch (err) {
+          await db.query("ROLLBACK");
+          console.error("❌ Error en intercambio:", err);
+          io.to(sala).emit("error_intercambio", "Error en el intercambio");
+      } finally {
+          delete salasDeIntercambio[sala];
+      }
+  }
+});
+
+
+      socket.on("disconnect", () => {
+        for (const sala in salasDeIntercambio) {
+            const index = salasDeIntercambio[sala].findIndex(p => p.socketId === socket.id);
+            if (index !== -1) {
+                salasDeIntercambio[sala].splice(index, 1);
+                io.to(sala).emit("usuarios_sala_intercambio", salasDeIntercambio[sala].map(p => p.userId));
+                break;
+            }
+        }
+      });
+});
+
+
+// Función auxiliar para obtener info completa de la mascota
+async function obtenerInfoMascota(petId) {
+  const result = await db.query(
+      `SELECT p.*, u.username as dueno 
+       FROM pets p 
+       JOIN users u ON p.id_users = u.id 
+       WHERE p.id = $1`,
+      [petId]
+  );
+  return result.rows[0];
+}
+
+httpServer.listen(3000, () => {
+  console.log("Servidor corriendo en http://192.168.0.21:3000");
 });
