@@ -1,0 +1,621 @@
+
+/* Estilos base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+body {
+    font-family: 'VT323', monospace;
+    background-color: #2a0042;
+    color: #fff;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(163, 4, 250, 0.3) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(211, 4, 197, 0.3) 0%, transparent 25%);
+    position: relative;
+}
+
+/* Estrellas flotantes */
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #cf7cfc;
+    border-radius: 50%;
+    opacity: 0.6;
+    z-index: 1;
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Encabezado */
+h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px #a304fa, 0 0 20px #a304fa;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    animation: glow 2s infinite alternate;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #fff;
+    text-shadow: 0 0 6px #a304fa;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+}
+
+/* Cajas de acción */
+.action-box {
+    background: rgba(98, 2, 150, 0.9);
+    border: 3px solid #d304c5;
+    border-radius: 15px;
+    padding: 25px;
+    margin: 25px 0;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.action-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(163, 4, 250, 0.7);
+}
+
+.action-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        60deg,
+        transparent,
+        rgba(211, 4, 197, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 6s infinite;
+    pointer-events: none;
+}
+
+/* Mi Mascota */
+.action-box img {
+    max-width: 150px;
+    border-radius: 15px;
+    border: 2px solid #d304c5;
+    box-shadow: 0 0 15px rgba(211, 4, 197, 0.6);
+    transition: transform 0.3s ease;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.action-box img:hover {
+    transform: scale(1.05);
+}
+
+.action-box p {
+    margin-top: 15px;
+    font-size: 1.3rem;
+    color: #cf7cfc;
+}
+
+.action-box p strong {
+    color: #fff;
+    text-shadow: 0 0 5px #a304fa;
+}
+
+/* Botones */
+button, input[type="submit"] {
+    padding: 12px 24px;
+    border: 2px solid #cf7cfc;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #a304fa 0%, #d304c5 100%);
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'VT323', monospace;
+    margin: 5px;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+}
+
+button:hover, input[type="submit"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(211, 4, 197, 0.7);
+}
+
+button:active, input[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+button::after, input[type="submit"]::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -100%;
+    width: 70%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(30deg);
+    transition: all 0.5s ease;
+}
+
+button:hover::after, input[type="submit"]:hover::after {
+    left: 100%;
+}
+
+/* Formulario */
+input[type="text"] {
+    padding: 12px;
+    border: 2px solid #a304fa;
+    border-radius: 8px;
+    background-color: rgba(20, 12, 12, 0.7);
+    color: #fff;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    margin-right: 10px;
+    width: 200px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(163, 4, 250, 0.5);
+    border-color: #d304c5;
+    width: 220px;
+}
+
+input[type="text"]::placeholder {
+    color: #cf7cfc;
+    opacity: 0.7;
+}
+
+/* Salas disponibles */
+#salas-disponibles {
+    margin-top: 30px;
+}
+
+.sala-item {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid #a304fa;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(163, 4, 250, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sala-item:hover {
+    transform: translateY(-3px);
+    border-color: #d304c5;
+    box-shadow: 0 0 15px rgba(211, 4, 197, 0.5);
+}
+
+.sala-item p {
+    margin: 5px 0;
+    font-size: 1.2rem;
+}
+
+.sala-item strong {
+    color: #feca57;
+    text-shadow: 0 0 5px rgba(254, 202, 87, 0.5);
+    letter-spacing: 1px;
+}
+
+.btn-unirse {
+    display: inline-block;
+    padding: 8px 18px;
+    margin-top: 8px;
+    background: linear-gradient(135deg, #a304fa 0%, #d304c5 100%);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid #cf7cfc;
+    font-size: 1.1rem;
+}
+
+.btn-unirse:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(211, 4, 197, 0.5);
+}
+
+/* Mensajes de error */
+.error-message {
+    color: #ff6b6b;
+    font-weight: bold;
+    margin-top: 10px;
+    text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Loader */
+.loading {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(207, 124, 252, 0.3);
+    border-radius: 50%;
+    border-top-color: #d304c5;
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 10px;
+    box-shadow: 0 0 5px rgba(211, 4, 197, 0.5);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Animaciones generales */
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px #a304fa, 0 0 20px #a304fa; }
+    50% { text-shadow: 0 0 15px #a304fa, 0 0 30px #a304fa, 0 0 40px #a304fa; }
+}
+
+@keyframes shine {
+    0% { left: -100%; opacity: 0; }
+    20% { opacity: 0.1; }
+    100% { left: 100%; opacity: 0; }
+}
+
+/* Efecto portal para botón crear sala */
+#btn-crear-sala {
+    position: relative;
+    z-index: 2;
+}
+
+#btn-crear-sala::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(163, 4, 250, 0.8) 0%, rgba(211, 4, 197, 0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+#btn-crear-sala:hover::before {
+    width: 150%;
+    height: 150%;
+    opacity: 0.5;
+}
+
+/* Animación para icono de espada */
+h1::before {
+    content: '⚔️';
+    display: inline-block;
+    animation: swing 2s infinite;
+    margin-right: 10px;
+}
+
+@keyframes swing {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .action-box {
+        padding: 20px;
+    }
+    
+    button, input[type="submit"] {
+        padding: 10px 20px;
+        font-size: 1.1rem;
+    }
+    
+    input[type="text"] {
+        width: 180px;
+    }
+    
+    input[type="text"]:focus {
+        width: 190px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    .action-box img {
+        max-width: 120px;
+    }
+    
+    .action-box p {
+        font-size: 1.1rem;
+    }
+    
+    button, input[type="submit"] {
+        padding: 8px 16px;
+        font-size: 1rem;
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+    
+    input[type="text"]:focus {
+        width: 100%;
+    }
+    
+    .sala-item p {
+        font-size: 1rem;
+    }
+    
+    .btn-unirse {
+        padding: 6px 14px;
+        font-size: 1rem;
+        display: block;
+        margin: 8px auto 0;
+    }
+    
+    #formulario-unirse {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* Efecto de fondo dinámico */
+.bg-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(163, 4, 250, 0.3) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(211, 4, 197, 0.3) 0%, transparent 25%);
+    filter: blur(20px);
+    opacity: 0.5;
+    z-index: -1;
+    animation: bgMove 20s infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes bgMove {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Efecto de bordes brillantes */
+.glowing-border {
+    position: relative;
+}
+
+.glowing-border::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #a304fa, #d304c5, #a304fa);
+    border-radius: 17px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.glowing-border:hover::after {
+    opacity: 1;
+    animation: borderGlow 1.5s infinite alternate;
+}
+
+@keyframes borderGlow {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Efecto de nivel en la mascota */
+.nivel-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(135deg, #feca57, #ff9f43);
+    color: #2a0042;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 0 10px rgba(254, 202, 87, 0.7);
+    animation: float 3s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Efecto para notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(98, 2, 150, 0.9);
+    border: 2px solid #d304c5;
+    border-radius: 10px;
+    padding: 15px;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(163, 4, 250, 0.6);
+    transform: translateX(120%);
+    transition: transform 0.5s ease;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+/* Mejora visual para las salas */
+.sala-contador {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.9rem;
+    color: #feca57;
+}
+
+.sala-estado {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #4cd137;
+    margin-right: 5px;
+    animation: pulse 1.5s infinite;
+}
+
+/* Efecto de aparecer para las salas */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sala-item {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Ajuste para que las salas aparezcan en secuencia */
+.sala-item:nth-child(1) { animation-delay: 0.1s; }
+.sala-item:nth-child(2) { animation-delay: 0.2s; }
+.sala-item:nth-child(3) { animation-delay: 0.3s; }
+.sala-item:nth-child(4) { animation-delay: 0.4s; }
+.sala-item:nth-child(5) { animation-delay: 0.5s; }
+
+/* Mejora para el contenedor de mascota */
+.mascota-container {
+    position: relative;
+    display: inline-block;
+    margin: 10px auto;
+}
+
+.mascota-info {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    display: inline-block;
+}
+
+/* Mejoras para la imagen de la mascota */
+.mascota-container {
+    position: relative;
+    display: inline-block;
+    margin: 15px auto;
+    /* Aumenta el espacio alrededor de la mascota */
+    padding: 10px;
+}
+
+.mascota-container img {
+    max-width: 180px; /* Aumenta el tamaño máximo */
+    width: 120px;
+    height: 120px;
+    border-radius: 15px;
+    border: 3px solid #d304c5;
+    box-shadow: 0 0 20px rgba(211, 4, 197, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    image-rendering: auto; /* Cambia a 'auto' para eliminar el pixelado */
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+    /* Crea un borde brillante alrededor de la imagen */
+    outline: 1px solid rgba(211, 4, 197, 0.3);
+    /* Elimina ruido */
+    -webkit-filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.mascota-container img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(211, 4, 197, 0.8);
+}
+
+/* Responsive para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    .mascota-container img {
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mascota-container img {
+        max-width: 140px;
+    }
+}
+
+/* Agrega un filtro suave para mejorar la calidad visual */
+.accion-box img {
+    filter: brightness(1.05) contrast(1.05);
+}
+
+.mascota-imagen{
+    image-rendering: pixelated !important;
+    image-rendering: crisp-edges !important;
+}
+
