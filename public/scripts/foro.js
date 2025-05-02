@@ -28,28 +28,29 @@ document.addEventListener('DOMContentLoaded', function() {
   const currentUsername = document.querySelector('meta[name="username"]')?.content || 'usuario';
 
   // Inicialización del modal de imagen si no existe
-  let modalImagen = document.getElementById('modal-imagen');
-  let modalImagenContenido = document.getElementById('modal-imagen-contenido');
-  let cerrarModalImagen = document.getElementById('cerrar-modal-imagen');
+let modalImagen = document.getElementById('modal-imagen');
+let modalImagenContenido = document.getElementById('modal-imagen-contenido');
+let cerrarModalImagen = document.getElementById('cerrar-modal-imagen');
 
-  if (!modalImagen) {
-    const modalHTML = `
-      <div id="modal-imagen" class="modal-imagen">
-        <div id="modal-imagen-contenido" class="modal-imagen-contenido">
-          <button id="cerrar-modal-imagen" class="cerrar-modal-imagen"><i class="fas fa-times"></i></button>
-        </div>
+if (!modalImagen) {
+  const modalHTML = `
+    <div id="modal-imagen" class="modal-imagen">
+      <div id="modal-imagen-contenido" class="modal-imagen-contenido">
       </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    modalImagen = document.getElementById('modal-imagen');
-    modalImagenContenido = document.getElementById('modal-imagen-contenido');
-    cerrarModalImagen = document.getElementById('cerrar-modal-imagen');
-    
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  modalImagen = document.getElementById('modal-imagen');
+  modalImagenContenido = document.getElementById('modal-imagen-contenido');
+  cerrarModalImagen = document.getElementById('cerrar-modal-imagen');
+  
+  if (cerrarModalImagen) {
     cerrarModalImagen.addEventListener('click', function() {
       modalImagen.classList.remove('activo');
     });
   }
+}
 
   // Configuración inicial - use logged in username instead of hardcoded "meme"
   autorInput.value = currentUsername;
@@ -80,14 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
     isSubmitting = false;
   }
 
-  // Función para expandir una imagen
-  function expandirImagen(src) {
-    const imgElement = document.createElement('img');
-    imgElement.src = src;
-    modalImagenContenido.innerHTML = '';
-    modalImagenContenido.appendChild(imgElement);
-    modalImagen.classList.add('activo');
-  }
 
   // Event listener para cerrar el modal al hacer clic fuera
   modalImagen.addEventListener('click', function(e) {
@@ -324,19 +317,19 @@ function showOverlayNotification(message, type = 'warning') {
   });
 }
 
-  // Configuración de eventos para imágenes en mensajes existentes
-  function setupImageClickEvents() {
-    document.querySelectorAll('.mensaje').forEach(mensaje => {
-      const imagenes = mensaje.querySelectorAll('.imagen-mensaje-celda img, .imagen-mensaje img');
-      
-      imagenes.forEach(img => {
-        img.addEventListener('click', function(e) {
-          e.stopPropagation();
-          expandirImagen(this.src);
+    // Configuración de eventos para imágenes en mensajes existentes
+    function setupImageClickEvents() {
+      document.querySelectorAll('.mensaje').forEach(mensaje => {
+        const imagenes = mensaje.querySelectorAll('.imagen-mensaje-celda img, .imagen-mensaje img');
+        
+        imagenes.forEach(img => {
+          img.addEventListener('click', function(e) {
+            e.stopPropagation();
+            expandirImagen(this.src);
+          });
         });
       });
-    });
-  }
+    }
 
   // Inicializar eventos de imágenes al cargar la página
   setupImageClickEvents();
@@ -445,7 +438,6 @@ if (!contadorContainer) {
   contadorContainer.style.color = '#666';
   contadorContainer.style.padding = '2px 5px';
   contadorContainer.style.borderRadius = '3px';
-  contadorContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)'; // Semi-transparent background
   contadorContainer.style.zIndex = '5'; // Ensure it appears above other elements
   
   contadorContainer.innerHTML = `
@@ -626,61 +618,61 @@ document.getElementById('mensaje-form').addEventListener('submit', function(even
   }
 });
 
+function cargarMensajesFiltrados(params) {
+  const listaMensajes = document.querySelector('.lista-mensajes');
+  const contador = document.getElementById('contador');
 
-    function cargarMensajesFiltrados(params) {
-    const listaMensajes = document.querySelector('.lista-mensajes');
-    const contador = document.getElementById('contador');
-    
-    if (listaMensajes) {
-      listaMensajes.innerHTML = '<p class="cargando">Cargando mensajes...</p>';
-    }
-    
-    const currentUser = document.getElementById('autor')?.value || 'anonymous';
-    
-    if (params.get('tipo') === 'mios') {
-      params.set('autor', currentUser);
-    }
-    
-    let apiUrl = '/filtrar?';
-    
-    for (let [key, value] of params.entries()) {
-      apiUrl += `${key}=${encodeURIComponent(value)}&`;
-    }
-    
-    if (apiUrl.endsWith('&')) {
-      apiUrl = apiUrl.slice(0, -1);
-    }
-    
-    if (apiUrl === '/filtrar?') {
-      apiUrl = '/filtrar';
-    }
-    
-    fetch(apiUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Server responded with status ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (contador) {
-          contador.textContent = data.mensajes ? data.mensajes.length : 0;
-        }
-        
-        if (data.mensajes && data.mensajes.length > 0) {
-          actualizarListaMensajes(data.mensajes);
-        } else {
-          listaMensajes.innerHTML = '<p class="no-mensajes">No se encontraron mensajes con los filtros seleccionados.</p>';
-        }
-      })
-      .catch(error => {
-        listaMensajes.innerHTML = `<p class="error">Error al cargar los mensajes: ${error.message}. Por favor, intenta de nuevo.</p>`;
-        
-        if (contador) {
-          contador.textContent = "0";
-        }
-      });
+  if (listaMensajes) {
+    listaMensajes.innerHTML = '<p class="cargando">Cargando mensajes...</p>';
   }
+
+  const currentUser = document.getElementById('autor')?.value || 'anonymous';
+
+  if (params.get('tipo') === 'mios') {
+    params.set('autor', currentUser);
+  }
+
+  let apiUrl = '/filtrar?';
+  for (let [key, value] of params.entries()) {
+    apiUrl += `${key}=${encodeURIComponent(value)}&`;
+  }
+
+  if (apiUrl.endsWith('&')) {
+    apiUrl = apiUrl.slice(0, -1);
+  }
+
+  if (apiUrl === '/filtrar?') {
+    apiUrl = '/filtrar';
+  }
+
+  fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (contador) {
+        contador.textContent = data.mensajes ? data.mensajes.length : 0;
+      }
+
+      if (data.mensajes && data.mensajes.length > 0) {
+        listaMensajes.classList.remove('no-hay-mensajes'); // ✅ QUITAR clase de centrado
+        actualizarListaMensajes(data.mensajes);
+      } else {
+        listaMensajes.classList.add('no-hay-mensajes');
+        listaMensajes.innerHTML = '<p class="no-mensajes">No se encontraron mensajes con los filtros seleccionados.</p>';
+      }
+    })
+    .catch(error => {
+      listaMensajes.innerHTML = `<p class="error">Error al cargar los mensajes: ${error.message}. Por favor, intenta de nuevo.</p>`;
+
+      if (contador) {
+        contador.textContent = "0";
+      }
+    });
+}
 
   function actualizarListaMensajes(mensajes) {
     const listaMensajes = document.querySelector('.lista-mensajes');
@@ -746,11 +738,11 @@ document.getElementById('mensaje-form').addEventListener('submit', function(even
       
       // Preparar los rangos HTML
       const rangosHTML = `
-        <div class="rangos-wrapper">
-          <div class="rango-item"><span class="rango-valor">${mensaje.rango1 || 'Ninguno'}</span></div>
-          <div class="rango-item"><span class="rango-valor">${mensaje.rango2 || 'Ninguno'}</span></div>
-          <div class="rango-item"><span class="rango-valor">${mensaje.rango3 || 'Ninguno'}</span></div>
-        </div>
+   <div class="rangos-wrapper">
+                                <div class="rango-item"><span class="rango-valor">${mensaje.rango1 || 'Novato'}</span></div>
+                                <div class="rango-item ${!mensaje.rango2 ? 'rango-vacio' : ''}"><span class="rango-valor">${mensaje.rango2 || ''}</span></div>
+                                <div class="rango-item ${!mensaje.rango3 ? 'rango-vacio' : ''}"><span class="rango-valor">${mensaje.rango3 || ''}</span></div>
+                              </div>
       `;
       
       mensajeElement.innerHTML = `
@@ -944,31 +936,31 @@ document.getElementById('mensaje-form').addEventListener('submit', function(even
         </button>
       </div>
     `;
-  
-    // Preparar HTML para los rangos del comentario
-    const rangosComentarioHTML = `
-      <div class="rangos-wrapper">
-        <div class="rango-item"><span class="rango-valor">${comentario.rango1 || 'Ninguno'}</span></div>
-        <div class="rango-item"><span class="rango-valor">${comentario.rango2 || 'Ninguno'}</span></div>
-        <div class="rango-item"><span class="rango-valor">${comentario.rango3 || 'Ninguno'}</span></div>
-      </div>
-    `;
-  
-    // Estructura HTML del comentario
-    comentarioElement.innerHTML = `
-      <div class="comentario-cabecera">
-        <span class="comentario-autor">${comentario.autor}</span>
-        ${rangosComentarioHTML}
-        ${comentarioAcciones}
-      </div>
-      <div class="comentario-contenido">${comentario.comentario}</div>
-      ${imagenesHTML}
-      <div class="comentario-pie">
-        <span class="comentario-fecha">${comentario.fechaStr || comentario.fecha}</span>
-        ${votacionHTML}
-      </div>
-    `;
-  
+ // Preparar HTML para los rangos del comentario
+const rangosComentarioHTML = `
+<div class="rangos-wrapper">
+  <div class="rango-item"><span class="rango-valor">${comentario.rango1 || 'Novato'}</span></div>
+  <div class="rango-item ${!comentario.rango2 ? 'rango-vacio' : ''}"><span class="rango-valor">${comentario.rango2 || ''}</span></div>
+  <div class="rango-item ${!comentario.rango3 ? 'rango-vacio' : ''}"><span class="rango-valor">${comentario.rango3 || ''}</span></div>
+</div>
+`;
+
+// Estructura HTML del comentario
+comentarioElement.innerHTML = `
+<div class="comentario-cabecera">
+  <span class="comentario-autor">${comentario.autor}</span>
+  <div class="rangos-container">
+    ${rangosComentarioHTML}
+  </div>
+  ${comentarioAcciones}
+</div>
+<div class="comentario-contenido">${comentario.contenido || comentario.comentario}</div>
+${imagenesHTML}
+<div class="comentario-pie">
+  <span class="comentario-fecha">${comentario.fechaStr || comentario.fecha}</span>
+  ${votacionHTML}
+</div>
+`;
     // Marcar botones de voto activos si ya hay un voto previo
     const votoGuardadoComentario = localStorage.getItem(`voto_comentario_${comentario.id}`);
     if (votoGuardadoComentario) {
@@ -1572,7 +1564,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
- // Manejar el click en el botón de editar comentario
+// Modificación del interfaz de selección de imágenes
+// Reemplaza el código actual de la zona de arrastrar y soltar con un botón simple
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Cambios para el formulario de edición de comentarios
 document.addEventListener('click', async (e) => {
   const editButton = e.target.closest('.btn-editar-comentario');
   
@@ -1624,54 +1649,66 @@ document.addEventListener('click', async (e) => {
         // Botón de cerrar
         const closeEditButton = document.createElement('div');
         closeEditButton.classList.add('close-edit-overlay');
-        closeEditButton.innerHTML = '<i class="fas fa-times"></i>';
 
         // Primero insertamos el título al formulario
         editForm.appendChild(formTitle);
         
         // Estructura básica del formulario con el div para autor (sin incluir el input todavía)
         editForm.innerHTML += `
-          <div class="form-group author-field" id="autor-container">
-            <div class="field-label">Autor:</div>
-            <div class="autor-display">${comentario.autor}</div>
-          </div>
-          <div class="form-group">
-            <div class="field-label">Mensaje:</div>
-            <div class="textarea-container" style="position: relative;">
-              <textarea id="comentario-edit" name="comentario" required class="textarea-comentario" maxlength="391">${comentario.comentario}</textarea>
-<div class="contador-caracteres" style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: #666; padding: 2px 5px; border-radius: 3px;">
-                <span id="contador-actual">0</span>/<span id="contador-maximo">391</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <div class="imagen-upload-container">
-              <button type="button" class="btn-seleccionar-imagenes">
-                <i class="fas fa-image"></i> Seleccionar imágenes
-              </button>
-              <input type="file" id="nuevas-imagenes" name="imagenes" multiple accept="image/*" style="display: none;">
-            </div>
-            <p class="limite-imagenes">Máximo 4 imágenes por comentario</p>
-            <div class="todas-imagenes">
-              ${comentario.imagenes && comentario.imagenes.length > 0 ? 
-                comentario.imagenes.map(img => `
-                  <div class="imagen-container imagen-actual-container" data-imagen-id="${img.id}">
-                    <img src="${img.url}" alt="Imagen actual" class="imagen-actual">
-                    <button type="button" class="btn-eliminar-imagen" data-imagen-id="${img.id}">
-                      <i class="fas fa-times"></i>
-                    </button>
-                    <input type="hidden" name="mantener_imagenes" value="${img.id}" class="mantener-imagen">
-                  </div>
-                `).join('') : ''
-              }
-            </div>
-          </div>
-          
-          <div class="form-botones">
-            <button type="submit" class="btn-actualizar-comentario">Actualizar Comentario</button>
-            <button type="button" class="btn-cancelar-edicion">Cancelar</button>
-          </div>
+<div class="form-group author-field" id="autor-container" style="margin-bottom: 15px;">
+  <div class="autor-container">
+    <span class="autor-label">Autor:</span>
+    <span class="autor-username">${comentario.autor}</span>
+  </div>
+</div>
+
+
+<div class="form-group" style="margin-bottom: 15px;">
+  <div class="field-label" style="font-weight: bold; margin-bottom: 5px; color: white;">Mensaje:</div>
+  <div class="textarea-container" style="position: relative;">
+    <textarea id="comentario-edit" name="comentario" required class="textarea-comentario" maxlength="391" style="width: 100%; background-color: #4d2c75; border: none; border-radius: 8px; padding: 15px; color: white; resize: none; height: 130px; font-size: 14px;">${comentario.comentario}</textarea>
+    <div class="contador-caracteres" style="position: absolute; bottom: 10px; right: 10px; font-size: 12px; color: #ccc;">
+      <span id="contador-actual">0</span>/<span id="contador-maximo">391</span>
+    </div>
+  </div>
+</div>
+
+<div class="form-group" style="margin-top: -20px; margin-bottom: 15px;">
+  <div class="imagenes-input-container">
+<button type="button" class="btn-seleccionar-imagenes" style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; background-color: rgb(49, 40, 40); color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px; transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s, color 0.3s; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); font-weight: bold; font-family: 'Comic Sans MS', cursive, sans-serif;"
+  onmouseover="this.style.backgroundColor='rgb(55, 27, 62)'; this.style.color='rgb(148, 115, 148)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 3px 8px rgba(0, 0, 0, 0.3)';"
+  onmouseout="this.style.backgroundColor='rgb(49, 40, 40)'; this.style.color='white'; this.style.transform='none'; this.style.boxShadow='0 2px 6px rgba(0, 0, 0, 0.2)';">
+  <i class="far fa-image" style="margin-right: 10px;"></i> Seleccionar imágenes
+</button>
+
+
+
+   <input type="file" id="imagenes-edit-comentario" name="imagenes" multiple accept="image/*" style="display: none;">
+<div id="imagenes-preview-container-edit" class="imagenes-preview-container"></div>
+
+<div class="contador-imagenes" style="display: none; margin-bottom: 20px;"></div>
+
+<p style="color: #ccc; font-size: 13px; margin-top: 0; margin-bottom: 15px;">Máximo 9 imágenes por mensaje</p>
+
+
+<div class="form-buttons" style="display: flex; gap: 16px; justify-content: flex-end;">
+  <button type="submit" class="btn-actualizar-comentario" style="padding: 12px 24px; background-color: var(--color-primary); color: white; border: none; border-radius: var(--border-radius); cursor: pointer; font-size: 16px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 10px; width: 100%; max-width: 100%; box-sizing: border-box; transition: var(--transition);"
+    onmouseover="this.style.backgroundColor='var(--color-primary-hover)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.3)';"
+    onmouseout="this.style.backgroundColor='var(--color-primary)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 6px rgba(154, 55, 55, 0.2)';">
+    Actualizar Comentario
+  </button>
+
+  <button type="button" class="btn-cancelar-edicion" id="cancel-btn" style="padding: 12px 24px; background-color: var(--color-danger); color: white; border: none; border-radius: var(--border-radius); cursor: pointer; font-size: 16px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 10px; width: 100%; max-width: 100%; box-sizing: border-box; transition: var(--transition);"
+    onmouseover="this.style.backgroundColor='#d32f2f'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.3)';"
+    onmouseout="this.style.backgroundColor='var(--color-danger)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 6px rgba(154, 55, 55, 0.2)';">
+    Cancelar
+  </button>
+</div>
+
+
+
+
+
         `;
         
         // SOLUCIÓN PARA CARACTERES ESPECIALES: Crear el input del autor separadamente
@@ -1695,19 +1732,9 @@ document.addEventListener('click', async (e) => {
         editCommentOverlay.classList.add('active');
         
         // Estilos adicionales para el textarea y contador
-// Find this code section in your JavaScript that creates the counter
-const textareaContainer = editForm.querySelector('.textarea-container');
-const comentarioTextarea = editForm.querySelector('#comentario-edit');
-comentarioTextarea.style.height = '150px'; // Puedes ajustar este valor según lo que necesites
-
-// Modify the position of the counter by adjusting the bottom value
-const contadorCaracteres = editForm.querySelector('.contador-caracteres');
-if (contadorCaracteres) {
-  contadorCaracteres.style.bottom = '10px'; // Changed from 5px to 10px
-}
-
-// Make sure there's enough padding at the bottom of the textarea
-comentarioTextarea.style.paddingBottom = '30px'; // Increased from 25px to 30px
+        const comentarioTextarea = editForm.querySelector('#comentario-edit');
+        comentarioTextarea.style.height = '150px';
+        comentarioTextarea.style.paddingBottom = '30px';
         
         // Configurar contador de caracteres
         const contadorActual = editForm.querySelector('#contador-actual');
@@ -1740,102 +1767,258 @@ comentarioTextarea.style.paddingBottom = '30px'; // Increased from 25px to 30px
             contadorActual.textContent = 391;
           }
         });
-        
-        // Manejar la selección de imágenes
+
+        // === IMPLEMENTACIÓN SIMPLIFICADA DE VISTA PREVIA DE IMÁGENES ===
+        const inputImagenes = editForm.querySelector('#imagenes-edit-comentario');
+        const previewContainer = editForm.querySelector('#imagenes-preview-container-edit');
         const btnSeleccionarImagenes = editForm.querySelector('.btn-seleccionar-imagenes');
-        const inputImagenes = editForm.querySelector('#nuevas-imagenes');
-        const todasImagenes = editForm.querySelector('.todas-imagenes');
+        const contadorImagenes = editForm.querySelector('.contador-imagenes');
         
-        btnSeleccionarImagenes.addEventListener('click', () => {
-          inputImagenes.click();
-        });
+        // Identificador único para este input
+        const inputId = `imagenes-edit-comentario-${comentarioId}`;
+        inputImagenes.id = inputId;
         
-        // Función para contar todas las imágenes (actuales + nuevas)
-        const contarTodasLasImagenes = () => {
-          return todasImagenes.querySelectorAll('.imagen-container').length;
-        };
+        // Inicializar fileStorage para este input si no existe
+        if (!window.fileStorage) {
+            window.fileStorage = {};
+        }
+        if (!window.fileStorage[inputId]) {
+            window.fileStorage[inputId] = [];
+        }
         
-        // Controlar el límite de imágenes (máximo 4)
-        inputImagenes.addEventListener('change', (e) => {
-          // Contar imágenes actuales
-          const totalImagenesActuales = contarTodasLasImagenes();
-          
-          // Si el usuario selecciona más de 4 imágenes en total, mostrar notificación y no procesar ninguna
-          if (totalImagenesActuales + e.target.files.length > 4) {
-            showOverlayNotification('Solo puedes seleccionar un máximo de 4 imágenes en total. Por favor, elimina algunas imágenes antes de añadir más.', 'warning');
+        // Configurar contenedor de vista previa
+        previewContainer.classList.add('imagenes-grid-container');
+        previewContainer.style.display = 'none';
+        
+        // Cargar imágenes actuales del comentario
+        if (comentario.imagenes && comentario.imagenes.length > 0) {
+            const dataTransfer = new DataTransfer();
             
-            // Limpiar el input de archivos para que no se procese ninguna imagen
-            inputImagenes.value = "";
-            return; // Salir de la función sin procesar imágenes
-          }
-          
-          // Calcular cuántas imágenes nuevas podemos añadir
-          const maxNuevasImagenes = 4 - totalImagenesActuales;
-          
-          if (maxNuevasImagenes <= 0) {
-            return; // No procesamos más imágenes si ya tenemos el máximo
-          }
-          
-          const nuevasImagenes = Array.from(e.target.files).slice(0, maxNuevasImagenes);
-          
-          // Crear un nuevo FileList con solo las imágenes que vamos a usar
-          const dt = new DataTransfer();
-          for (let i = 0; i < nuevasImagenes.length; i++) {
-            dt.items.add(nuevasImagenes[i]);
-          }
-          inputImagenes.files = dt.files;
-          
-          // Mostrar las nuevas imágenes
-          for (const file of nuevasImagenes) {
-            const previewContainer = document.createElement('div');
-            previewContainer.classList.add('imagen-container', 'imagen-preview-container');
-            
-            const img = document.createElement('img');
-            img.classList.add('imagen-preview');
-            img.src = URL.createObjectURL(file);
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.classList.add('btn-remover-imagen');
-            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-            removeBtn.addEventListener('click', () => {
-              // Eliminar esta imagen del FileList
-              const dt = new DataTransfer();
-              const files = inputImagenes.files;
-              
-              for (let i = 0; i < files.length; i++) {
-                if (files[i] !== file) {
-                  dt.items.add(files[i]);
+            // Función para convertir URL a File (simulado)
+            const cargarImagenesActuales = async () => {
+                previewContainer.style.display = 'grid';
+                
+                for (const img of comentario.imagenes) {
+                    try {
+                        // Crear un elemento de vista previa para la imagen existente
+                        const previewCell = document.createElement('div');
+                        previewCell.className = 'imagen-preview-celda';
+                        previewCell.dataset.imagenId = img.id;
+                        
+                        const preview = document.createElement('img');
+                        preview.src = img.url;
+                        preview.className = 'imagen-preview';
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-image-btn';
+                        removeBtn.style.position = 'absolute';
+                        removeBtn.style.top = '5px';
+                        removeBtn.style.right = '5px';
+                        removeBtn.style.backgroundColor = 'rgba(226, 50, 31, 0.7)';
+                        removeBtn.style.color = 'white';
+                        removeBtn.style.border = 'none';
+                        removeBtn.style.borderRadius = '50%';
+                        removeBtn.style.width = '24px';
+                        removeBtn.style.height = '24px';
+                        removeBtn.style.padding = '0';
+                        removeBtn.style.display = 'flex';
+                        removeBtn.style.alignItems = 'center';
+                        removeBtn.style.justifyContent = 'center';
+                        removeBtn.style.cursor = 'pointer';
+                        removeBtn.style.zIndex = '5';
+                        removeBtn.style.fontSize = '12px';
+                        removeBtn.style.lineHeight = '1px';
+                        
+                        // Agregar input hidden para mantener esta imagen
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'mantener_imagenes';
+                        hiddenInput.value = img.id;
+                        hiddenInput.className = 'mantener-imagen';
+                        
+                        // Evento para eliminar imagen
+                        removeBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Eliminar la celda de vista previa
+                            previewCell.remove();
+                            
+                            // Marcar que esta imagen debe eliminarse
+                            hiddenInput.value = '';
+                            
+                            // Asegurar que el input hidden siga enviándose
+                            if (!hiddenInput.parentElement) {
+                                editForm.appendChild(hiddenInput);
+                            }
+                            
+                            // Ocultar contenedor si está vacío
+                            if (previewContainer.children.length === 0) {
+                                previewContainer.style.display = 'none';
+                            }
+                            
+                            // Actualizar contador
+                            updateImageCounter(contadorImagenes, previewContainer.querySelectorAll('.imagen-preview-celda').length);
+                        });
+                        
+                        previewCell.appendChild(preview);
+                        previewCell.appendChild(removeBtn);
+                        previewCell.appendChild(hiddenInput);
+                        previewContainer.appendChild(previewCell);
+                    } catch (error) {
+                        console.error('Error al cargar imagen existente:', error);
+                    }
                 }
-              }
-              
-              inputImagenes.files = dt.files;
-              
-              // Eliminar el contenedor de vista previa
-              previewContainer.remove();
+                
+                // Actualizar contador
+                updateImageCounter(contadorImagenes, previewContainer.querySelectorAll('.imagen-preview-celda').length);
+            };
+            
+            cargarImagenesActuales();
+        }
+        
+        // Configurar evento de cambio para el input de archivos
+        inputImagenes.addEventListener('change', function() {
+            // Permitir hasta 9 imágenes como máximo
+            const maxImages = 9;
+            
+            // Contar cuántas imágenes ya tenemos (previews existentes)
+            const existingImages = previewContainer.querySelectorAll('.imagen-preview-celda').length;
+            
+            // Verificar si agregar nuevas imágenes excedería el límite
+            if (existingImages + this.files.length > maxImages) {
+                showOverlayNotification(`No se pueden subir más de 9 imágenes. Ya tienes ${existingImages} imágenes seleccionadas.`, 'warning');
+                return;
+            }
+            
+            // Crear un nuevo DataTransfer para gestionar archivos
+            const dataTransfer = new DataTransfer();
+            
+            // Obtener archivos actuales de fileStorage
+            const currentFiles = window.fileStorage[inputId] || [];
+            
+            // Agregar archivos existentes primero
+            currentFiles.forEach(file => {
+                dataTransfer.items.add(file);
             });
             
-            previewContainer.appendChild(img);
-            previewContainer.appendChild(removeBtn);
-            todasImagenes.appendChild(previewContainer);
-          }
+            // Agregar nuevos archivos de esta selección
+            Array.from(this.files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    dataTransfer.items.add(file);
+                    
+                    // También agregar a nuestro almacenamiento
+                    if (!currentFiles.find(f => f.name === file.name && f.size === file.size)) {
+                        currentFiles.push(file);
+                    }
+                }
+            });
+            
+            // Actualizar almacenamiento
+            window.fileStorage[inputId] = Array.from(dataTransfer.files);
+            
+            // Actualizar archivos del input
+            this.files = dataTransfer.files;
+            
+            // Mostrar contenedor solo si hay archivos para previsualizar
+            if (dataTransfer.files.length > 0) {
+                previewContainer.style.display = 'grid';
+            } else {
+                previewContainer.style.display = 'none';
+            }
+            
+            // Limpiar vistas previas anteriores de archivos nuevos (no las de imágenes existentes)
+            Array.from(previewContainer.querySelectorAll('.imagen-preview-celda:not([data-imagen-id])')).forEach(
+                el => el.remove()
+            );
+            
+            // Crear vistas previas para todos los archivos
+            Array.from(dataTransfer.files).forEach((file, index) => {
+                if (!file.type.startsWith('image/')) return;
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const previewCell = document.createElement('div');
+                    previewCell.className = 'imagen-preview-celda';
+                    
+                    const preview = document.createElement('img');
+                    preview.src = e.target.result;
+                    preview.className = 'imagen-preview';
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-image-btn';
+                    removeBtn.style.position = 'absolute';
+                    removeBtn.style.top = '5px';
+                    removeBtn.style.right = '5px';
+                    removeBtn.style.backgroundColor = 'rgba(226, 50, 31, 0.7)';
+                    removeBtn.style.color = 'white';
+                    removeBtn.style.border = 'none';
+                    removeBtn.style.borderRadius = '50%';
+                    removeBtn.style.width = '24px';
+                    removeBtn.style.height = '24px';
+                    removeBtn.style.padding = '0';
+                    removeBtn.style.display = 'flex';
+                    removeBtn.style.alignItems = 'center';
+                    removeBtn.style.justifyContent = 'center';
+                    removeBtn.style.cursor = 'pointer';
+                    removeBtn.style.zIndex = '5';
+                    removeBtn.style.fontSize = '12px';
+                    removeBtn.style.lineHeight = '1px';
+                    
+                    removeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Eliminar la celda de vista previa
+                        previewCell.remove();
+                        
+                        // Eliminar el archivo de nuestro almacenamiento
+                        const fileIndex = window.fileStorage[inputId].findIndex(
+                            f => f.name === file.name && f.size === file.size
+                        );
+                        if (fileIndex !== -1) {
+                            window.fileStorage[inputId].splice(fileIndex, 1);
+                        }
+                        
+                        // Crear un nuevo FileList sin este archivo
+                        const updatedDataTransfer = new DataTransfer();
+                        window.fileStorage[inputId].forEach(f => {
+                            updatedDataTransfer.items.add(f);
+                        });
+                        
+                        // Actualizar los archivos del input
+                        inputImagenes.files = updatedDataTransfer.files;
+                        
+                        // Ocultar contenedor si está vacío
+                        const totalPreviews = previewContainer.querySelectorAll('.imagen-preview-celda').length;
+                        if (totalPreviews === 0) {
+                            previewContainer.style.display = 'none';
+                        }
+                        
+                        // Actualizar contador
+                        updateImageCounter(contadorImagenes, totalPreviews);
+                    });
+                    
+                    previewCell.appendChild(preview);
+                    previewCell.appendChild(removeBtn);
+                    previewContainer.appendChild(previewCell);
+                    
+                    // Actualizar contador
+                    updateImageCounter(contadorImagenes, previewContainer.querySelectorAll('.imagen-preview-celda').length);
+                };
+                
+                reader.readAsDataURL(file);
+            });
         });
         
-        // Manejar eliminación de imágenes existentes
-        editForm.querySelectorAll('.btn-eliminar-imagen').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const container = btn.closest('.imagen-actual-container');
-            const input = container.querySelector('.mantener-imagen');
-            
-            // Marcar para eliminar e iconos visuales
-            container.remove();
-            input.value = '';
-            
-            // Añadir el input hidden al formulario para que se envíe aún después de quitar el contenedor
-            if (!input.parentElement) {
-              editForm.appendChild(input);
-            }
-          });
+        // Configurar botón para seleccionar imágenes
+        btnSeleccionarImagenes.addEventListener('click', () => {
+            inputImagenes.click();
         });
+        
+        // Configurar expansión de imágenes
+        setupImageExpansionForEdit(editForm);
         
         // Manejar envío del formulario
         editForm.addEventListener('submit', async (e) => {
@@ -1849,6 +2032,21 @@ comentarioTextarea.style.paddingBottom = '30px'; // Increased from 25px to 30px
           }
           
           const formData = new FormData(editForm);
+          
+          // Agregar las imágenes nuevas al FormData
+          if (window.fileStorage[inputId] && window.fileStorage[inputId].length > 0) {
+            // Eliminar archivos anteriores que puedan estar en el formData con el mismo nombre
+            for (const pair of formData.entries()) {
+              if (pair[0] === 'imagenes') {
+                formData.delete('imagenes');
+              }
+            }
+            
+            // Agregar todos los archivos del storage
+            window.fileStorage[inputId].forEach(file => {
+              formData.append('imagenes', file);
+            });
+          }
           
           try {
             const updateResponse = await fetch(`/actualizar-comentario/${mensajeId}/${comentarioId}`, {
@@ -1869,11 +2067,11 @@ comentarioTextarea.style.paddingBottom = '30px'; // Increased from 25px to 30px
               
               window.location.reload();
             } else {
-              showNotification('Error: ' + (updateResult.error || 'No se pudo actualizar el comentario'), 'error');
+              showOverlayNotification('Error: ' + (updateResult.error || 'No se pudo actualizar el comentario'), 'error');
             }
           } catch (error) {
             console.error('Error al actualizar comentario:', error);
-            showNotification('Error al actualizar el comentario', 'error');
+            showOverlayNotification('Error al actualizar el comentario', 'error');
           }
         });
         
@@ -1897,47 +2095,349 @@ if (cancelButton) {
     if (newMessageTrigger) {
       newMessageTrigger.style.display = 'flex';
     }
-
-    // Recargar la página al cancelar
+    
+    // Añadir esta línea para recargar la página al cancelar
     window.location.reload();
   });
 }
-
       } else {
-        showNotification('Error: ' + (result.error || 'No se pudo obtener los datos del comentario'), 'error');
+        showOverlayNotification('Error: ' + (result.error || 'No se pudo obtener los datos del comentario'), 'error');
       }
     } catch (error) {
       console.error('Error al obtener datos del comentario:', error);
-      showNotification('Error al actualizar el comentario', 'error');
+      showOverlayNotification('Error al actualizar el comentario', 'error');
     }
   }
 });
 
-  // Función para mostrar notificaciones
-  function showNotification(message, type) {
-    // Crear elemento de notificación si no existe
-    let notification = document.getElementById('notification');
-    if (!notification) {
-      notification = document.createElement('div');
-      notification.id = 'notification';
-      document.body.appendChild(notification);
+// Función de contador de imágenes
+function updateImageCounter(counterElement, count) {
+  const total = 9; // Máximo de 9 imágenes
+  
+  // Actualizar el contador existente
+  if (counterElement) {
+    counterElement.textContent = `${count}/${total} imágenes`;
+    
+    // Mostrar contador solo si hay imágenes
+    if (count > 0) {
+      counterElement.style.display = 'block';
+    } else {
+      counterElement.style.display = 'none';
+    }
+  }
+}
+
+// Función para configurar la expansión de imágenes para el editor
+function setupImageExpansionForEdit(formElement) {
+  formElement.addEventListener('click', function(event) {
+    // Verificar si el elemento clickeado es una imagen que queremos expandir
+    if (event.target && (
+        event.target.classList.contains('imagen-preview') ||
+        event.target.closest('.imagen-preview-celda')
+    )) {
+      const img = event.target.tagName === 'IMG' ? event.target : event.target.querySelector('img');
+      if (img) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleImageExpansion(img);
+      }
+    }
+  });
+}
+
+// Función para mostrar notificaciones overlay
+function showOverlayNotification(message, type = 'warning') {
+  // Crear contenedor principal
+  const notificationOverlay = document.createElement('div');
+  notificationOverlay.classList.add('notification-overlay');
+  
+  // Crear contenedor de notificación
+  const notificationContainer = document.createElement('div');
+  notificationContainer.classList.add('notification-container', `notification-${type}`);
+  
+  // Crear contenido de notificación
+  const notificationContent = document.createElement('div');
+  notificationContent.classList.add('notification-content');
+  
+  // Ícono basado en el tipo de notificación
+  let icon = 'exclamation-triangle';
+  if (type === 'success') icon = 'check-circle';
+  if (type === 'error') icon = 'times-circle';
+  if (type === 'info') icon = 'info-circle';
+  
+  // Agregar ícono y mensaje
+  notificationContent.innerHTML = `
+    <div class="notification-icon">
+      <i class="fas fa-${icon}"></i>
+    </div>
+    <div class="notification-message">${message}</div>
+  `;
+  
+  // Botón de cerrar
+  const closeButton = document.createElement('button');
+  closeButton.classList.add('notification-close');
+  closeButton.innerHTML = 'Entendido';
+  closeButton.addEventListener('click', () => {
+    document.body.removeChild(notificationOverlay);
+  });
+  
+  // Ensamblar todos los elementos
+  notificationContainer.appendChild(notificationContent);
+  notificationContainer.appendChild(closeButton);
+  notificationOverlay.appendChild(notificationContainer);
+  
+  // Agregar al body
+  document.body.appendChild(notificationOverlay);
+  
+  // Agregar evento para cerrar al hacer clic fuera
+  notificationOverlay.addEventListener('click', (e) => {
+    if (e.target === notificationOverlay) {
+      document.body.removeChild(notificationOverlay);
+    }
+  });
+  
+  // Cerrar automáticamente después de 5 segundos
+  setTimeout(() => {
+    if (document.body.contains(notificationOverlay)) {
+      document.body.removeChild(notificationOverlay);
+    }
+  }, 5000);
+}
+
+// Función para manejar la expansión de imágenes
+function toggleImageExpansion(imageElement) {
+  // Check if image is already expanded
+  const existingOverlay = document.querySelector('.expanded-image-overlay');
+  if (existingOverlay) {
+    // Si hacemos clic en la misma imagen que ya está expandida, no hacemos nada
+    // Solo cerraremos si es explícitamente el botón de cerrar el que se clickea
+    if (existingOverlay.querySelector('img').src === imageElement.src) {
+      return;
     }
     
-    // Establecer contenido y estilo de la notificación
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    
-    // Mostrar notificación
-    notification.classList.add('show');
-    
-    // Ocultar después de 3 segundos
-    setTimeout(() => {
-      notification.classList.remove('show');
-    }, 3000);
+    // Si es una imagen diferente, cerramos la actual y abrimos la nueva
+    existingOverlay.remove();
+    document.body.style.overflow = '';
   }
+  
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'expanded-image-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '9999';
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity 0.3s ease';
+  
+  // Create expanded image container
+  const expandedContainer = document.createElement('div');
+  expandedContainer.className = 'expanded-image-container';
+  expandedContainer.style.maxWidth = '90%';
+  expandedContainer.style.maxHeight = '90%';
+  expandedContainer.style.position = 'relative';
+  
+  // Create expanded image
+  const expandedImg = document.createElement('img');
+  expandedImg.src = imageElement.src;
+  expandedImg.className = 'expanded-image';
+  expandedImg.style.maxWidth = '100%';
+  expandedImg.style.maxHeight = '90vh';
+  expandedImg.style.objectFit = 'contain';
+  expandedImg.style.border = '2px solid white';
+  expandedImg.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)';
+  
+  // Create close button
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '×';
+  closeBtn.style.position = 'absolute';
+  closeBtn.style.top = '-15px';
+  closeBtn.style.right = '-15px';
+  closeBtn.style.width = '30px';
+  closeBtn.style.height = '30px';
+  closeBtn.style.borderRadius = '50%';
+  closeBtn.style.backgroundColor = 'white';
+  closeBtn.style.color = 'black';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.style.border = 'none';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.display = 'flex';
+  closeBtn.style.justifyContent = 'center';
+  closeBtn.style.alignItems = 'center';
+  closeBtn.style.lineHeight = '1';
+  
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeExpandedImage(overlay);
+  });
+  
+  // Assemble everything
+  expandedContainer.appendChild(expandedImg);
+  expandedContainer.appendChild(closeBtn);
+  overlay.appendChild(expandedContainer);
+  document.body.appendChild(overlay);
+  
+  // Prevent scrolling on body when overlay is open
+  document.body.style.overflow = 'hidden';
+  
+  // Animate the overlay appearance
+  setTimeout(() => {
+    overlay.style.opacity = '1';
+  }, 10);
+}
+
+function closeExpandedImage(overlay) {
+  overlay.style.opacity = '0';
+  
+  // Wait for fade out animation to complete before removing
+  setTimeout(() => {
+    overlay.remove();
+    document.body.style.overflow = '';
+  }, 300);
+}
 });
 
-//New message and comment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   // Create the floating button
   const triggerButton = document.createElement('div');
@@ -1960,7 +2460,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Create close button
   const closeButton = document.createElement('div');
   closeButton.classList.add('close-overlay');
-  closeButton.innerHTML = '<i class="fas fa-times"></i>';
 
   // Assemble overlay
   newContentContainer.appendChild(messageFormContainer);
@@ -1998,7 +2497,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButton = document.querySelector('.close-overlay');
     const overlay = document.querySelector('.new-message-overlay');
   
-    function switchFormType(type) {
+    function switchFormType(type, isEdit = false) {
       const messageForm = document.querySelector('.nuevo-mensaje-section');
       const commentForm = document.querySelector('.nuevo-comentario-section');
       const formTitle = document.getElementById('form-title');
@@ -2010,7 +2509,21 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (type === 'message') {
         messageForm.style.display = 'block';
-        formTitle.textContent = 'Nuevo Mensaje';
+        formTitle.textContent = isEdit ? 'Editar Mensaje' : 'Nuevo Mensaje';
+        
+        // Ocultar contador de caracteres cuando es edición
+        if (isEdit) {
+          const characterCounters = messageForm.querySelectorAll('.contador-caracteres');
+          characterCounters.forEach(counter => {
+            counter.style.display = 'none';
+          });
+        } else {
+          // Restaurar visibilidad de contadores si no es edición
+          const characterCounters = messageForm.querySelectorAll('.contador-caracteres');
+          characterCounters.forEach(counter => {
+            counter.style.display = '';
+          });
+        }
       } else if (type === 'comment') {
         commentForm.style.display = 'block';
         commentFormTitle.textContent = 'Nuevo Comentario';
@@ -2025,6 +2538,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentForm = document.querySelector('.nuevo-comentario-section');
         messageForm.style.display = 'block';
         commentForm.style.display = 'none';
+        
+        // Restaurar visibilidad de contadores
+        const characterCounters = document.querySelectorAll('.contador-caracteres');
+        characterCounters.forEach(counter => {
+          counter.style.display = '';
+        });
         
         overlay.classList.remove('active');
         window.location.reload();
@@ -2069,13 +2588,20 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // Edit button logic
     if (editButton) {
-      // Explicitly set to message form type when editing
-      switchFormType('message');
+      // Explicitly set to message form type when editing with isEdit flag
+      switchFormType('message', true);
+      overlay.classList.add('active');
     }
   });
 
   // Close overlay with reload - X button
   closeButton.addEventListener('click', () => {
+    // Restaurar visibilidad de contadores
+    const characterCounters = document.querySelectorAll('.contador-caracteres');
+    characterCounters.forEach(counter => {
+      counter.style.display = '';
+    });
+    
     overlay.classList.remove('active');
     window.location.reload();
   });
@@ -2083,6 +2609,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close buttons for both forms with reload
   document.getElementById('cancel-btn').addEventListener('click', (e) => {
     e.preventDefault();
+    
+    // Restaurar visibilidad de contadores
+    const characterCounters = document.querySelectorAll('.contador-caracteres');
+    characterCounters.forEach(counter => {
+      counter.style.display = '';
+    });
+    
     overlay.classList.remove('active');
     window.location.reload();
   });
@@ -2150,6 +2683,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
 document.addEventListener('DOMContentLoaded', () => {
   // Create a comments popup overlay
   const commentsPopup = document.createElement('div');
@@ -2213,7 +2747,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Función para actualizar los comentarios en el popup (añadida para completitud)
+// Función para actualizar los comentarios en el popup
 function updateCommentsPopup(messageId) {
   // Obtener todos los comentarios para este mensaje
   fetch(`/obtener-comentarios/${messageId}`)
@@ -2241,10 +2775,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (commentImageInput) {
     // Add change event listener to monitor file selection
     commentImageInput.addEventListener('change', function(e) {
-      // Check if more than 4 files are selected
-      if (this.files.length > 4) {
+      // Check if more than 9 files are selected (for 3x3 grid)
+      if (this.files.length > 9) {
         // Show notification
-        showOverlayNotification('No se pueden subir más de 4 imágenes por comentario. Por favor, selecciona un máximo de 4 archivos.', 'warning');
+        showOverlayNotification('No se pueden subir más de 9 imágenes por comentario. Por favor, selecciona un máximo de 9 archivos.', 'warning');
         
         // Reset the file input to clear selection
         this.value = '';
@@ -2257,69 +2791,296 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (nuevoComentarioImageInput) {
     nuevoComentarioImageInput.addEventListener('change', function(e) {
-      if (this.files.length > 4) {
-        showOverlayNotification('No se pueden subir más de 4 imágenes por comentario. Por favor, selecciona un máximo de 4 archivos.', 'warning');
+      if (this.files.length > 9) {
+        showOverlayNotification('No se pueden subir más de 9 imágenes por comentario. Por favor, selecciona un máximo de 9 archivos.', 'warning');
         this.value = '';
-      }
-    });
-  }
-  
-  // Function for displaying overlay notifications
-  function showOverlayNotification(message, type = 'warning') {
-    // Create main container
-    const notificationOverlay = document.createElement('div');
-    notificationOverlay.classList.add('notification-overlay');
-    
-    // Create notification container
-    const notificationContainer = document.createElement('div');
-    notificationContainer.classList.add('notification-container', `notification-${type}`);
-    
-    // Create notification content
-    const notificationContent = document.createElement('div');
-    notificationContent.classList.add('notification-content');
-    
-    // Icon based on notification type
-    let icon = 'exclamation-triangle';
-    if (type === 'success') icon = 'check-circle';
-    if (type === 'error') icon = 'times-circle';
-    if (type === 'info') icon = 'info-circle';
-    
-    // Add icon and message
-    notificationContent.innerHTML = `
-      <div class="notification-icon">
-        <i class="fas fa-${icon}"></i>
-      </div>
-      <div class="notification-message">${message}</div>
-    `;
-    
-    // Close button
-    const closeButton = document.createElement('button');
-    closeButton.classList.add('notification-close');
-    closeButton.innerHTML = 'Entendido';
-    closeButton.addEventListener('click', () => {
-      document.body.removeChild(notificationOverlay);
-    });
-    
-    // Assemble all elements
-    notificationContainer.appendChild(notificationContent);
-    notificationContainer.appendChild(closeButton);
-    notificationOverlay.appendChild(notificationContainer);
-    
-    // Add to body
-    document.body.appendChild(notificationOverlay);
-    
-    // Add event to close when clicking outside
-    notificationOverlay.addEventListener('click', (e) => {
-      if (e.target === notificationOverlay) {
-        document.body.removeChild(notificationOverlay);
       }
     });
   }
 });
 
-// Image dropzone functionality
+// Storage object to track files across change events
+const fileStorage = {};
+
+// Function to set up image preview logic for any element using the provided CSS
+function setupImagePreviewForElement(input, container) {
+  // Initialize storage for this input if not already done
+  const inputId = input.id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  if (!input.id) input.id = inputId;
+  if (!fileStorage[inputId]) fileStorage[inputId] = [];
+  
+  // Set up the container as a grid with the specified CSS classes
+  container.classList.add('imagenes-grid-container');
+  
+  // Initially hide the preview container until images are selected
+  container.style.display = 'none';
+  
+  input.addEventListener('change', function() {
+    // Allow up to 9 images (3x3 grid as per CSS)
+    const maxImages = 9;
+    
+    // Get all currently stored files for this inputstandardizeExistingRemoveButtons
+    const currentFiles = fileStorage[inputId] || [];
+    const currentCount = currentFiles.length;
+    
+    // Check if adding new files would exceed the limit
+    if (currentCount + this.files.length > maxImages) {
+      // Show notification
+      showOverlayNotification(`No se pueden subir más de 9 imágenes. Ya tienes ${currentCount} imágenes seleccionadas.`, 'warning');
+      
+      // Don't modify the existing selection
+      return;
+    }
+    
+    // Create a new DataTransfer object to manage files
+    const dataTransfer = new DataTransfer();
+    
+    // Add existing stored files first
+    currentFiles.forEach(file => {
+      dataTransfer.items.add(file);
+    });
+    
+    // Add new files from this selection
+    Array.from(this.files).forEach(file => {
+      if (file.type.startsWith('image/')) {
+        dataTransfer.items.add(file);
+        
+        // Also add to our storage
+        if (!currentFiles.find(f => f.name === file.name && f.size === file.size)) {
+          currentFiles.push(file);
+        }
+      }
+    });
+    
+    // Update our storage
+    fileStorage[inputId] = Array.from(dataTransfer.files);
+    
+    // Update input's files
+    this.files = dataTransfer.files;
+    
+    // Clear previous previews
+    container.innerHTML = '';
+    
+    // Show container only if there are files to preview
+    if (dataTransfer.files.length > 0) {
+      container.style.display = 'grid';
+    } else {
+      container.style.display = 'none';
+    }
+    
+    // Create previews for all files
+    Array.from(dataTransfer.files).forEach((file, index) => {
+      if (!file.type.startsWith('image/')) return;
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const previewCell = document.createElement('div');
+        previewCell.className = 'imagen-preview-celda';
+        
+        const preview = document.createElement('img');
+        preview.src = e.target.result;
+        preview.className = 'imagen-preview';
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-image-btn';
+        removeBtn.style.position = 'absolute';
+        removeBtn.style.top = '5px';
+        removeBtn.style.right = '5px';
+        removeBtn.style.backgroundColor = 'rgba(226, 50, 31, 0.7)';  // Rojo con 50% de opacidad
+
+        removeBtn.style.color = 'white';
+        removeBtn.style.border = 'none';
+        removeBtn.style.borderRadius = '50%';   // Fuerza el círculo
+        removeBtn.style.width = '24px';         // Tamaño pequeño pero más visible
+        removeBtn.style.height = '24px';        // Igual al width para mantener la forma circular
+        removeBtn.style.padding = '0';         // Evita padding extra que pueda distorsionar la forma
+        removeBtn.style.display = 'flex';
+        removeBtn.style.alignItems = 'center';
+        removeBtn.style.justifyContent = 'center';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.zIndex = '5';
+        removeBtn.style.fontSize = '12px';      // Ícono más visible pero proporcionalmente pequeño
+        removeBtn.style.lineHeight = '1px';    // Asegura que el ícono esté centrado
+        removeBtn.textContent = '×';
+
+        
+        removeBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          previewCell.remove();
+          
+          // Remove the file from our storage
+          const fileIndex = fileStorage[inputId].findIndex(
+            f => f.name === file.name && f.size === file.size
+          );
+          if (fileIndex !== -1) {
+            fileStorage[inputId].splice(fileIndex, 1);
+          }
+          
+          // Create a new FileList without this file
+          const updatedDataTransfer = new DataTransfer();
+          fileStorage[inputId].forEach(f => {
+            updatedDataTransfer.items.add(f);
+          });
+          
+          // Update the input's files
+          input.files = updatedDataTransfer.files;
+          
+          // Hide container if empty
+          if (container.children.length === 0) {
+            container.style.display = 'none';
+          }
+          
+          // Update counter if exists
+          updateImageCounter(container, input.files.length);
+        });
+        
+        previewCell.appendChild(preview);
+        previewCell.appendChild(removeBtn);
+        container.appendChild(previewCell);
+        
+        // Update counter if needed
+        updateImageCounter(container, input.files.length);
+      };
+      
+      reader.readAsDataURL(file);
+    });
+  });
+}
+
+// Function to handle drag and drop for the drop zone
+function setupDropZoneForElement(dropZone, input) {
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+  });
+  
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => {
+      dropZone.classList.add('highlight');
+    });
+  });
+  
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => {
+      dropZone.classList.remove('highlight');
+    });
+  });
+  
+  dropZone.addEventListener('drop', function(e) {
+    const maxImages = 9; // Máximo de 9 imágenes para grid 3x3 según el CSS proporcionado
+    const dt = e.dataTransfer;
+    const droppedFiles = dt.files;
+    
+    // Get input ID for storage reference
+    const inputId = input.id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    if (!input.id) input.id = inputId;
+    if (!fileStorage[inputId]) fileStorage[inputId] = [];
+    
+    // Check if adding the dropped files would exceed the limit
+    if (fileStorage[inputId].length + droppedFiles.length > maxImages) {
+      showOverlayNotification(`No se pueden subir más de 9 imágenes. Ya tienes ${fileStorage[inputId].length} imágenes seleccionadas.`, 'warning');
+      return;
+    }
+    
+    // Create a new FileList combining existing stored files and new files
+    const dataTransfer = new DataTransfer();
+    
+    // First add existing files from our storage
+    fileStorage[inputId].forEach(file => {
+      dataTransfer.items.add(file);
+    });
+    
+    // Then add new dropped files
+    Array.from(droppedFiles).forEach(file => {
+      if (file.type.startsWith('image/')) {
+        dataTransfer.items.add(file);
+        
+        // Also add to our storage
+        if (!fileStorage[inputId].find(f => f.name === file.name && f.size === file.size)) {
+          fileStorage[inputId].push(file);
+        }
+      }
+    });
+    
+    // Update storage to match what's in dataTransfer
+    fileStorage[inputId] = Array.from(dataTransfer.files);
+    
+    // Update input files with combined collection
+    input.files = dataTransfer.files;
+    
+    // Trigger change event to update preview
+    const event = new Event('change');
+    input.dispatchEvent(event);
+  });
+}
+
+// Function to show overlay notifications
+function showOverlayNotification(message, type = 'warning') {
+  // Create main container
+  const notificationOverlay = document.createElement('div');
+  notificationOverlay.classList.add('notification-overlay');
+  
+  // Create notification container
+  const notificationContainer = document.createElement('div');
+  notificationContainer.classList.add('notification-container', `notification-${type}`);
+  
+  // Create notification content
+  const notificationContent = document.createElement('div');
+  notificationContent.classList.add('notification-content');
+  
+  // Icon based on notification type
+  let icon = 'exclamation-triangle';
+  if (type === 'success') icon = 'check-circle';
+  if (type === 'error') icon = 'times-circle';
+  if (type === 'info') icon = 'info-circle';
+  
+  // Add icon and message
+  notificationContent.innerHTML = `
+    <div class="notification-icon">
+      <i class="fas fa-${icon}"></i>
+    </div>
+    <div class="notification-message">${message}</div>
+  `;
+  
+  // Close button
+  const closeButton = document.createElement('button');
+  closeButton.classList.add('notification-close');
+  closeButton.innerHTML = 'Entendido';
+  closeButton.addEventListener('click', () => {
+    document.body.removeChild(notificationOverlay);
+  });
+  
+  // Assemble all elements
+  notificationContainer.appendChild(notificationContent);
+  notificationContainer.appendChild(closeButton);
+  notificationOverlay.appendChild(notificationContainer);
+  
+  // Add to body
+  document.body.appendChild(notificationOverlay);
+  
+  // Add event to close when clicking outside
+  notificationOverlay.addEventListener('click', (e) => {
+    if (e.target === notificationOverlay) {
+      document.body.removeChild(notificationOverlay);
+    }
+  });
+  
+  // Auto-close after 5 seconds
+  setTimeout(() => {
+    if (document.body.contains(notificationOverlay)) {
+      document.body.removeChild(notificationOverlay);
+    }
+  }, 5000);
+}
+
+// Implementación de imagen con el CSS proporcionado
 document.addEventListener('DOMContentLoaded', () => {
-  // Setup image preview and dropzone (your existing code)
+  // Setup image preview and dropzone
   setupImagePreview('imagenes-input-comentario', 'imagenes-preview-container-comentario');
   setupDropZone('drop-zone-comentario', 'imagenes-input-comentario');
   
@@ -2353,65 +3114,30 @@ function setupImagePreview(inputId, containerId) {
   }
 }
 
-// Function to set up image preview logic for any element
-function setupImagePreviewForElement(input, container) {
-  input.addEventListener('change', function() {
-    container.innerHTML = ''; // Clear previous previews
-    
-    const maxImages = input.closest('.nuevo-comentario-section') ? 4 : 9;
-    const files = Array.from(this.files).slice(0, maxImages);
-    
-    if (files.length > 0) {
-      container.style.display = 'grid';
-    }
-    
-    files.forEach(file => {
-      if (!file.type.startsWith('image/')) return;
-      
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        const previewWrapper = document.createElement('div');
-        previewWrapper.className = 'image-preview-wrapper';
-        
-        const preview = document.createElement('img');
-        preview.src = e.target.result;
-        preview.className = 'image-preview';
-        
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove-image-btn';
-        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        removeBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          previewWrapper.remove();
-          
-          // Create a new FileList without this file
-          const dataTransfer = new DataTransfer();
-          const currentFiles = Array.from(input.files);
-          currentFiles.forEach(f => {
-            if (f !== file) {
-              dataTransfer.items.add(f);
-            }
-          });
-          input.files = dataTransfer.files;
-          
-          // Hide container if empty
-          if (container.children.length === 0) {
-            container.style.display = 'none';
-          }
-        });
-        
-        previewWrapper.appendChild(preview);
-        previewWrapper.appendChild(removeBtn);
-        container.appendChild(previewWrapper);
-      };
-      
-      reader.readAsDataURL(file);
-    });
-  });
+
+
+// Function to update image counter
+function updateImageCounter(container, count) {
+  let counterElement = container.nextElementSibling;
+  
+  if (!counterElement || !counterElement.classList.contains('contador-imagenes')) {
+    counterElement = document.createElement('div');
+    counterElement.classList.add('contador-imagenes');
+    container.parentNode.insertBefore(counterElement, container.nextSibling);
+  }
+  
+  const total = 9; // Asumiendo que el total es 9, ajusta según necesites
+  counterElement.textContent = `${count}/${total} imágenes`;
+  
+  // Only show counter if count > 0
+  if (count > 0) {
+    counterElement.style.display = 'block';
+  } else {
+    counterElement.style.display = 'none';
+  }
 }
 
-// Function to set up drop zone for a specific element
+// Setup drop zone using provided CSS
 function setupDropZone(dropZoneId, inputId) {
   const dropZone = document.getElementById(dropZoneId);
   const input = document.getElementById(inputId);
@@ -2421,72 +3147,23 @@ function setupDropZone(dropZoneId, inputId) {
   }
 }
 
-// Function to set up drop zone functionality for any element
-function setupDropZoneForElement(dropZone, input) {
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
-  });
-  
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => {
-      dropZone.classList.add('highlight');
-    });
-  });
-  
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => {
-      dropZone.classList.remove('highlight');
-    });
-  });
-  
-  dropZone.addEventListener('drop', function(e) {
-    const maxImages = input.closest('.nuevo-comentario-section') ? 4 : 9;
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    
-    // Create a new FileList with max allowed images
-    const dataTransfer = new DataTransfer();
-    // Add existing files first
-    if (input.files) {
-      Array.from(input.files).slice(0, maxImages).forEach(file => {
-        dataTransfer.items.add(file);
-      });
-    }
-    
-    // Add new files up to the max limit
-    const remainingSlots = maxImages - (input.files ? input.files.length : 0);
-    Array.from(files).slice(0, remainingSlots).forEach(file => {
-      if (file.type.startsWith('image/')) {
-        dataTransfer.items.add(file);
-      }
-    });
-    
-    input.files = dataTransfer.files;
-    
-    // Trigger change event to update preview
-    const event = new Event('change');
-    input.dispatchEvent(event);
-  });
-}
 
-// Modify the setupImageExpansion function to include the edit preview images
+// Función para configurar la expansión de imágenes
 function setupImageExpansion() {
   // Use event delegation to handle all possible image clicks
   document.addEventListener('click', function(event) {
     // Check if the clicked element is any type of image we want to expand
     if (event.target && (
-        event.target.classList.contains('image-preview') ||
+        event.target.classList.contains('imagen-preview') ||
         event.target.classList.contains('comentario-imagen') || 
         event.target.classList.contains('mensaje-imagen') ||
-        event.target.classList.contains('imagen-preview') ||  // Added for edit form preview
-        event.target.classList.contains('imagen-actual')      // Added for existing images in edit form
+        event.target.closest('.imagen-preview-celda') ||
+        event.target.closest('.imagen-mensaje-celda')
     )) {
-      toggleImageExpansion(event.target);
+      const img = event.target.tagName === 'IMG' ? event.target : event.target.querySelector('img');
+      if (img) {
+        toggleImageExpansion(img);
+      }
     }
   });
   
@@ -2522,18 +3199,63 @@ function toggleImageExpansion(imageElement) {
   // Create overlay
   const overlay = document.createElement('div');
   overlay.className = 'expanded-image-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '9999';
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity 0.3s ease';
   
   // Create expanded image container
   const expandedContainer = document.createElement('div');
   expandedContainer.className = 'expanded-image-container';
+  expandedContainer.style.maxWidth = '90%';
+  expandedContainer.style.maxHeight = '90%';
+  expandedContainer.style.position = 'relative';
   
   // Create expanded image
   const expandedImg = document.createElement('img');
   expandedImg.src = imageElement.src;
   expandedImg.className = 'expanded-image';
+  expandedImg.style.maxWidth = '100%';
+  expandedImg.style.maxHeight = '90vh';
+  expandedImg.style.objectFit = 'contain';
+  expandedImg.style.border = '2px solid white';
+  expandedImg.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.5)';
+  
+  // Create close button
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '×';
+  closeBtn.style.position = 'absolute';
+  closeBtn.style.top = '-15px';
+  closeBtn.style.right = '-15px';
+  closeBtn.style.width = '30px';
+  closeBtn.style.height = '30px';
+  closeBtn.style.borderRadius = '50%';
+  closeBtn.style.backgroundColor = 'white';
+  closeBtn.style.color = 'black';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.style.border = 'none';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.display = 'flex';
+  closeBtn.style.justifyContent = 'center';
+  closeBtn.style.alignItems = 'center';
+  closeBtn.style.lineHeight = '1';
+  
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeExpandedImage(overlay);
+  });
   
   // Assemble everything
   expandedContainer.appendChild(expandedImg);
+  expandedContainer.appendChild(closeBtn);
   overlay.appendChild(expandedContainer);
   document.body.appendChild(overlay);
   
@@ -3672,20 +4394,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', async () => {
   // Get the community ID from various possible sources
   let comunidadId = getCommunityId();
@@ -3748,14 +4456,494 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('community-posts').textContent = stats.posts;
 
     // Check if user is member
-    const isMember = await fetch(`/api/comunidad/${c.id}/is-member`).then(r => r.json()).then(d => d.isMember).catch(() => false);
+    const userId = parseInt(document.querySelector('meta[name="userid"]')?.getAttribute('content'));
+    
+    // Verificar membresía y rol en la comunidad
+    const membershipInfo = await fetch(`/api/comunidad/${c.id}/is-member`)
+      .then(r => r.json())
+      .catch(() => ({ isMember: false, isCreator: false }));
+    
+    const isMember = membershipInfo.isMember;
+    const isCreator = c.creador_id === userId || membershipInfo.isCreator;
+    
     const joinBtn = document.getElementById('btn-join-community');
     if (joinBtn) {
-      joinBtn.textContent = isMember ? 'Miembro' : 'Unirse a la comunidad';
-      joinBtn.classList.toggle('is-member', isMember);
-      joinBtn.disabled = isMember;
-      if (!isMember) joinBtn.onclick = () => joinCommunity(c.id);
+      if (isMember) {
+        joinBtn.textContent = 'Abandonar comunidad';
+        joinBtn.classList.add('is-member');
+        if (isCreator) {
+          joinBtn.disabled = true; // El creador no puede abandonar directamente
+          joinBtn.title = "No puedes abandonar una comunidad que has creado. Debes transferir la propiedad primero.";
+        } else {
+          joinBtn.disabled = false;
+          joinBtn.onclick = () => showLeaveConfirmation(c.id);
+        }
+      } else {
+        joinBtn.textContent = 'Unirse a la comunidad';
+        joinBtn.classList.remove('is-member');
+        joinBtn.disabled = false;
+        joinBtn.onclick = () => joinCommunity(c.id);
+      }
     }
+
+
+// Función para cargar la lista de miembros
+function loadMembersList(communityId) {
+  fetch(`/api/comunidad/${communityId}/members`)
+    .then(response => response.json())
+    .then(data => {
+      const loadingElement = document.getElementById('loading-members');
+      const membersListElement = document.getElementById('members-list');
+      const noMembersElement = document.getElementById('no-members-message');
+      
+      // Ocultar el mensaje de carga
+      loadingElement.style.display = 'none';
+      
+      // Filtrar al usuario actual y a todos los administradores
+      const currentUserId = parseInt(document.querySelector('meta[name="userid"]')?.getAttribute('content'));
+      
+      // Mostrar solo los miembros regulares (no administradores y no el usuario actual)
+      const eligibleMembers = data.members.filter(member => 
+        member.id !== currentUserId && // No incluir al usuario actual
+        member.rol !== 'administrador' // No incluir a administradores
+      );
+      
+      if (eligibleMembers.length === 0) {
+        // Mostrar mensaje de que no hay miembros elegibles
+        noMembersElement.style.display = 'block';
+        // Actualizar el mensaje para aclarar que se necesitan miembros regulares
+        noMembersElement.innerHTML = `
+          <p>No hay miembros regulares en la comunidad a quienes transferir la propiedad. 
+          Solo puedes transferir la propiedad a miembros que no sean administradores. 
+          No puedes transferirla a otros administradores ni a ti mismo.</p>
+        `;
+        return;
+      }
+      
+      // Mostrar la lista de miembros
+      membersListElement.style.display = 'block';
+      
+      // Crear la lista de miembros con botones para transferir
+      let membersHTML = '<ul style="list-style: none; padding: 0; margin: 0;">';
+      
+      eligibleMembers.forEach(member => {
+        // Escapar caracteres HTML para prevenir XSS y asegurar correcto rendering
+        const escapedUsername = escapeHtml(member.username);
+        
+        membersHTML += `
+          <li style="padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div>
+              <span style="font-weight: bold;">${escapedUsername}</span>
+              <span style="margin-left: 5px; color: #aaa;">(${member.rol})</span>
+            </div>
+            <button 
+              class="notification-button notification-button-confirm" 
+              style="padding: 5px 10px;"
+              onclick="transferOwnership(${communityId}, ${member.id})">
+              Transferir propiedad
+            </button>
+          </li>
+        `;
+      });
+      
+      membersHTML += '</ul>';
+      membersListElement.innerHTML = membersHTML;
+    })
+    .catch(error => {
+      console.error('Error al cargar miembros:', error);
+      document.getElementById('loading-members').innerHTML = '<p>Error al cargar la lista de miembros.</p>';
+    });
+}
+
+// Función para escapar caracteres HTML
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Exponer la función globalmente para que pueda ser llamada desde el atributo onclick
+window.transferOwnership = function(communityId, newOwnerId) {
+  // Obtener el nombre de usuario directamente desde el servidor
+  fetch(`/api/users/${newOwnerId}`)
+    .then(response => response.json())
+    .then(userData => {
+      const newOwnerUsername = userData.username;
+      
+      // Mostrar confirmación antes de transferir
+      const confirmOverlay = document.createElement('div');
+      confirmOverlay.classList.add('notification-overlay');
+      
+      const confirmContainer = document.createElement('div');
+      confirmContainer.classList.add('notification-container', 'notification-warning');
+      
+      const confirmContent = document.createElement('div');
+      confirmContent.classList.add('notification-content');
+      
+      confirmContent.innerHTML = `
+        <h3>Confirmar transferencia</h3>
+        <p>¿Estás seguro de que deseas transferir la propiedad de esta comunidad a <strong>${escapeHtml(newOwnerUsername)}</strong>?</p>
+        <p>Esta acción no se puede deshacer y perderás tus privilegios de administrador.</p>
+      `;
+      
+      const confirmButtons = document.createElement('div');
+      confirmButtons.classList.add('notification-buttons');
+      
+      const cancelButton = document.createElement('button');
+      cancelButton.classList.add('notification-button', 'notification-button-cancel');
+      cancelButton.innerHTML = 'Cancelar';
+      cancelButton.addEventListener('click', () => {
+        document.body.removeChild(confirmOverlay);
+      });
+      
+      const confirmButton = document.createElement('button');
+      confirmButton.classList.add('notification-button', 'notification-button-confirm');
+      confirmButton.innerHTML = 'Confirmar transferencia';
+      confirmButton.addEventListener('click', () => {
+        // Realizar la transferencia
+        fetch(`/api/comunidad/${communityId}/transfer-ownership`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newOwnerId })
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Cerrar todos los diálogos
+          document.querySelectorAll('.notification-overlay').forEach(overlay => {
+            document.body.removeChild(overlay);
+          });
+          
+          if (data.success) {
+            showOverlayNotification('Propiedad transferida correctamente. Tu rol ahora es: miembro.', 'success');
+            
+            // Actualizar la UI si es necesario
+            const joinBtn = document.getElementById('btn-join-community');
+            if (joinBtn) {
+              joinBtn.textContent = 'Abandonar comunidad';
+              joinBtn.classList.add('is-member');
+              joinBtn.disabled = false;
+              joinBtn.onclick = () => showNormalLeaveConfirmation(communityId);
+            }
+            
+            // Recargar la página después de un breve retraso para mostrar los cambios
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            showOverlayNotification(data.mensaje || 'Error al transferir la propiedad.', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.body.removeChild(confirmOverlay);
+          showOverlayNotification('Error al procesar la transferencia.', 'error');
+        });
+      });
+      
+      confirmButtons.appendChild(cancelButton);
+      confirmButtons.appendChild(confirmButton);
+      confirmContainer.appendChild(confirmContent);
+      confirmContainer.appendChild(confirmButtons);
+      confirmOverlay.appendChild(confirmContainer);
+      
+      document.body.appendChild(confirmOverlay);
+    })
+    .catch(error => {
+      console.error('Error al obtener información del usuario:', error);
+      showOverlayNotification('Error al obtener información del usuario.', 'error');
+    });
+};
+
+// Función modificada para manejar el error de "Como administrador no puedes abandonar..."
+function leaveCommunity(id) {
+  fetch(`/api/comunidad/${id}/leave`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const btn = document.getElementById('btn-join-community');
+        btn.textContent = 'Unirse a la comunidad';
+        btn.classList.remove('is-member');
+        btn.onclick = () => joinCommunity(id);
+
+        const count = document.getElementById('community-members');
+        count.textContent = Math.max(0, parseInt(count.textContent) - 1);
+
+        const comunidadNombre = document.getElementById(`comunidad-nombre-${id}`);
+        if (comunidadNombre) {
+          comunidadNombre.classList.remove('joined');
+        }
+
+        showOverlayNotification('Has abandonado la comunidad correctamente', 'success');
+      } else {
+        // Si el error es porque es el creador, mostrar directamente el panel de transferencia
+        if (data.mensaje && data.mensaje.includes('Como administrador no puedes abandonar')) {
+          // Cerrar cualquier notificación existente primero
+          document.querySelectorAll('.notification-overlay').forEach(overlay => {
+            document.body.removeChild(overlay);
+          });
+          // Mostrar directamente el panel de transferencia
+          showTransferOwnershipDialog(id);
+        } else {
+          showOverlayNotification(data.mensaje || 'No se pudo abandonar la comunidad.', 'error');
+        }
+      }
+    })
+    .catch(() => showOverlayNotification('No se pudo abandonar la comunidad.', 'error'));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Función para mostrar el diálogo de confirmación de abandonar/transferir
+function showLeaveConfirmation(id) {
+  // Verificar si el usuario es el creador de la comunidad
+  fetch(`/api/comunidad/${id}`).then(r => r.json())
+  .then(comunidad => {
+    const userId = parseInt(document.querySelector('meta[name="userid"]')?.getAttribute('content'));
+    
+    // Si el usuario es el creador, mostrar diálogo de transferencia
+    if (comunidad.creador_id === userId) {
+      showTransferOwnershipDialog(id);
+    } else {
+      // Si no es el creador, mostrar el diálogo normal de abandono
+      showNormalLeaveConfirmation(id);
+    }
+  })
+  .catch(() => {
+    showOverlayNotification('No se pudo verificar la propiedad de la comunidad.', 'error');
+  });
+}
+
+// Función para mostrar el diálogo de transferencia de propiedad
+function showTransferOwnershipDialog(id) {
+  // Crear el contenedor principal
+  const notificationOverlay = document.createElement('div');
+  notificationOverlay.classList.add('notification-overlay');
+  
+  // Crear el contenedor de la notificación
+  const notificationContainer = document.createElement('div');
+  notificationContainer.classList.add('notification-container', 'notification-warning', 'transfer-ownership-dialog');
+  notificationContainer.style.width = '500px';
+  notificationContainer.style.maxWidth = '95%';
+  
+  // Crear el contenido de la notificación
+  const notificationContent = document.createElement('div');
+  notificationContent.classList.add('notification-content');
+  
+  // Agregar mensaje inicial mientras se cargan los miembros
+  notificationContent.innerHTML = `
+    <h3>Transferir propiedad de la comunidad</h3>
+    <p>Como creador de la comunidad, no puedes abandonarla directamente. 
+    Primero debes transferir la propiedad a otro miembro.</p>
+    <div id="loading-members" style="text-align: center; padding: 10px;">
+      <p>Cargando miembros...</p>
+    </div>
+    <div id="members-list" style="display: none; max-height: 250px; overflow-y: auto; margin: 15px 0;"></div>
+    <div id="no-members-message" style="display: none; padding: 10px; background-color: rgba(255,255,255,0.1); border-radius: 5px; margin: 15px 0;">
+      <p>No hay otros miembros en la comunidad. No puedes abandonar la comunidad hasta que al menos otro usuario se una y puedas transferir la propiedad.</p>
+    </div>
+  `;
+  
+  // Contenedor para botones
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.classList.add('notification-buttons');
+  
+  // Botón para cerrar
+  const closeButton = document.createElement('button');
+  closeButton.classList.add('notification-button', 'notification-button-cancel');
+  closeButton.innerHTML = 'Cerrar';
+  closeButton.addEventListener('click', () => {
+    document.body.removeChild(notificationOverlay);
+  });
+  
+  buttonsContainer.appendChild(closeButton);
+  notificationContainer.appendChild(notificationContent);
+  notificationContainer.appendChild(buttonsContainer);
+  notificationOverlay.appendChild(notificationContainer);
+  
+  // Agregar al body
+  document.body.appendChild(notificationOverlay);
+  
+  // Añadir evento para cerrar al hacer clic fuera
+  notificationOverlay.addEventListener('click', (e) => {
+    if (e.target === notificationOverlay) {
+      document.body.removeChild(notificationOverlay);
+    }
+  });
+  
+  // Cargar la lista de miembros
+  loadMembersList(id);
+}
+
+
+// Función para mostrar el diálogo normal de abandono para miembros regulares
+function showNormalLeaveConfirmation(id) {
+  // Crear el contenedor principal
+  const notificationOverlay = document.createElement('div');
+  notificationOverlay.classList.add('notification-overlay');
+  
+  // Crear el contenedor de la notificación
+  const notificationContainer = document.createElement('div');
+  notificationContainer.classList.add('notification-container', 'notification-warning');
+  
+  // Crear el contenido de la notificación
+  const notificationContent = document.createElement('div');
+  notificationContent.classList.add('notification-content');
+  
+  //// Agregar mensaje de confirmación
+notificationContent.innerHTML = `
+<h3>Confirmar acción</h3>
+<p>¿Estás seguro de que deseas abandonar esta comunidad? 
+Ten en cuenta que, si la comunidad es privada, no podrás volver a unirte por tu cuenta en el futuro.</p>
+`;
+
+// Contenedor para botones
+const buttonsContainer = document.createElement('div');
+buttonsContainer.classList.add('notification-buttons');
+
+  // Botón para cancelar
+  const cancelButton = document.createElement('button');
+  cancelButton.classList.add('notification-button', 'notification-button-cancel');
+  cancelButton.innerHTML = 'Cancelar';
+  cancelButton.addEventListener('click', () => {
+    document.body.removeChild(notificationOverlay);
+  });
+  
+  // Botón para confirmar
+  const confirmButton = document.createElement('button');
+  confirmButton.classList.add('notification-button', 'notification-button-confirm');
+  confirmButton.innerHTML = 'Sí, abandonar';
+  confirmButton.addEventListener('click', () => {
+    document.body.removeChild(notificationOverlay);
+    leaveCommunity(id);
+  });
+  
+  // Ensamblar todos los elementos
+  buttonsContainer.appendChild(cancelButton);
+  buttonsContainer.appendChild(confirmButton);
+  notificationContainer.appendChild(notificationContent);
+  notificationContainer.appendChild(buttonsContainer);
+  notificationOverlay.appendChild(notificationContainer);
+  
+  // Agregar al body
+  document.body.appendChild(notificationOverlay);
+  
+  // Añadir evento para cerrar al hacer clic fuera
+  notificationOverlay.addEventListener('click', (e) => {
+    if (e.target === notificationOverlay) {
+      document.body.removeChild(notificationOverlay);
+    }
+  });
+}
+
+// Función para mostrar notificaciones
+function showOverlayNotification(message, type = 'info') {
+  const notificationOverlay = document.createElement('div');
+  notificationOverlay.classList.add('notification-overlay');
+  notificationOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+  
+  const notificationContainer = document.createElement('div');
+  notificationContainer.classList.add('notification-container', `notification-${type}`);
+  
+  const notificationContent = document.createElement('div');
+  notificationContent.classList.add('notification-content');
+  notificationContent.innerHTML = `<p>${message}</p>`;
+  
+  const closeButton = document.createElement('button');
+  closeButton.classList.add('notification-button', 'notification-button-cancel');
+  
+  // Si el mensaje contiene "Como administrador no puedes abandonar", mostrar botón para transferir propiedad
+  if (message.includes('Como administrador no puedes abandonar')) {
+    closeButton.innerHTML = 'Transferir propiedad';
+    closeButton.addEventListener('click', () => {
+      document.body.removeChild(notificationOverlay);
+      showTransferOwnershipDialog(id); // Aquí necesitamos el ID de la comunidad
+    });
+  } else {
+    closeButton.innerHTML = 'Cerrar';
+    closeButton.addEventListener('click', () => {
+      document.body.removeChild(notificationOverlay);
+    });
+  }
+  
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.classList.add('notification-buttons');
+  buttonsContainer.appendChild(closeButton);
+  
+  notificationContainer.appendChild(notificationContent);
+  notificationContainer.appendChild(buttonsContainer);
+  notificationOverlay.appendChild(notificationContainer);
+  
+  document.body.appendChild(notificationOverlay);
+  
+  // Auto-cerrar después de 4 segundos solo si no es el mensaje de transferencia
+  if (!message.includes('Como administrador no puedes abandonar')) {
+    setTimeout(() => {
+      if (document.body.contains(notificationOverlay)) {
+        document.body.removeChild(notificationOverlay);
+      }
+    }, 4000);
+  }
+}
+
+// Actualizar la función joinCommunity
+function joinCommunity(id) {
+  fetch(`/api/comunidad/${id}/join`, { 
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json' } 
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const btn = document.getElementById('btn-join-community');
+        btn.textContent = 'Abandonar comunidad';
+        btn.classList.add('is-member');
+        // Cambiamos la funcionalidad del botón para permitir abandonar la comunidad
+        btn.disabled = false;
+        btn.onclick = () => showLeaveConfirmation(id); // Cambiado para usar la nueva función
+        
+        const count = document.getElementById('community-members');
+        count.textContent = parseInt(count.textContent) + 1;
+        
+        // Mostrar un mensaje de éxito
+        showOverlayNotification('Te has unido a la comunidad correctamente', 'success');
+        
+        // Recargar la página después de un breve retraso para mostrar los cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        showOverlayNotification(data.mensaje || 'No se pudo unir a la comunidad.', 'error');
+      }
+    })
+    .catch(() => showOverlayNotification('No se pudo unir a la comunidad.', 'error'));
+}
 
     // Add community parameter to all internal links
     addCommunityParamToLinks(c.id);
@@ -3874,21 +5062,7 @@ function createSVGBackground(id) {
   return `<svg class="svg-bg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad${id}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3d0099;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#6f42ff;stop-opacity:0.6"/></linearGradient><pattern id="pat${id}" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="12" fill="rgba(0,234,255,0.15)"/></pattern></defs><rect width="100%" height="100%" fill="url(#grad${id})"/><rect width="100%" height="100%" fill="url(#pat${id})"/></svg>`;
 }
 
-function joinCommunity(id) {
-  fetch(`/api/comunidad/${id}/join`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        const btn = document.getElementById('btn-join-community');
-        btn.textContent = 'Miembro';
-        btn.classList.add('is-member');
-        btn.disabled = true;
-        const count = document.getElementById('community-members');
-        count.textContent = parseInt(count.textContent) + 1;
-      }
-    })
-    .catch(() => alert('No se pudo unir a la comunidad.'));
-}
+
 
 function preSelectOptions(comunidad) {
   // Si estamos en la página de crear nuevo post, preseleccionamos las categorías según la comunidad
@@ -4733,6 +5907,24 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Estilos para las imágenes circulares y la expansión
 const style = document.createElement('style');
 style.textContent = `
@@ -4740,12 +5932,11 @@ style.textContent = `
 .imagen-comentario img {
     width: 100%;
     height: 100%;
-    border-radius: 2%; /* Borde ligeramente redondeado */
+    border-radius: 2%; 
     object-fit: cover;
     background-color: white;
     border: 2px solid white;
 }
-
 .imagen-comentario {
     width: 100px;
     height: 100px;
@@ -4755,89 +5946,131 @@ style.textContent = `
     margin: 5px;
     background-color: white;
 }
-
 /* Estilo para la imagen expandida */
-.modal-imagen {
+.expanded-image-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999999;
-    cursor: pointer;
-    display: none;
-    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
-
-.imagen-expandida-contenedor {
-    border-radius: 4px;
-    overflow: hidden;
-    border: 2px solid white;
-    background-color: white;
+.expanded-image-container {
     max-width: 90%;
-    max-height: 90vh;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    max-height: 90%;
+    position: relative;
 }
-
-.imagen-expandida {
-    display: block;
+.expanded-image {
     max-width: 100%;
     max-height: 90vh;
-    object-fit: contain; /* Cambiado a contain para mostrar la imagen completa */
-    background-color: white;
+    object-fit: contain;
+    border: 2px solid white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 `;
 document.head.appendChild(style);
 
-// Crear el modal para la imagen expandida
-const modal = document.createElement('div');
-modal.className = 'modal-imagen';
-modal.innerHTML = '<div class="imagen-expandida-contenedor"><img class="imagen-expandida" src="" alt="Imagen expandida"></div>';
-document.body.appendChild(modal);
-
-// Función para cerrar el modal al hacer clic
-modal.addEventListener('click', function(e) {
-    // Solo cerrar si se hace clic fuera de la imagen
-    if (e.target === modal) {
-        this.style.display = 'none';
+// Función para manejar la expansión de imágenes
+function toggleImageExpansion(imageElement) {
+    // Comprobar si ya hay una imagen expandida
+    const existingOverlay = document.querySelector('.expanded-image-overlay');
+    if (existingOverlay) {
+        // Si hacemos clic en la misma imagen que ya está expandida, no hacemos nada
+        if (existingOverlay.querySelector('img').src === imageElement.src) {
+            return;
+        }
+        
+        // Si es una imagen diferente, cerramos la actual y abrimos la nueva
+        closeExpandedImage(existingOverlay);
     }
-});
+    
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'expanded-image-overlay';
+    
+    // Crear contenedor de imagen expandida
+    const expandedContainer = document.createElement('div');
+    expandedContainer.className = 'expanded-image-container';
+    
+    // Crear imagen expandida
+    const expandedImg = document.createElement('img');
+    expandedImg.src = imageElement.src;
+    expandedImg.className = 'expanded-image';
+    
+    // Crear botón de cierre
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '-15px';
+    closeBtn.style.right = '-15px';
+    closeBtn.style.width = '30px';
+    closeBtn.style.height = '30px';
+    closeBtn.style.borderRadius = '50%';
+    closeBtn.style.backgroundColor = 'white';
+    closeBtn.style.color = 'black';
+    closeBtn.style.fontSize = '20px';
+    closeBtn.style.border = 'none';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.display = 'flex';
+    closeBtn.style.justifyContent = 'center';
+    closeBtn.style.alignItems = 'center';
+    closeBtn.style.lineHeight = '1';
+    
+    closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeExpandedImage(overlay);
+    });
+    
+    // Ensamblar todo
+    expandedContainer.appendChild(expandedImg);
+    expandedContainer.appendChild(closeBtn);
+    overlay.appendChild(expandedContainer);
+    document.body.appendChild(overlay);
+    
+    // Prevenir desplazamiento en el body cuando el overlay está abierto
+    document.body.style.overflow = 'hidden';
+    
+    // Animar la aparición del overlay
+    setTimeout(() => {
+        overlay.style.opacity = '1';
+    }, 10);
+}
 
-// Evitar que los clics en la imagen cierren el modal
-document.querySelector('.imagen-expandida-contenedor').addEventListener('click', function(e) {
-    e.stopPropagation();
-});
+function closeExpandedImage(overlay) {
+    overlay.style.opacity = '0';
+    
+    // Esperar a que se complete la animación de desvanecimiento antes de eliminar
+    setTimeout(() => {
+        overlay.remove();
+        document.body.style.overflow = '';
+    }, 300);
+}
 
 // Agregar evento a todas las imágenes de comentarios
 document.addEventListener('click', function(e) {
     if (e.target && e.target.matches('.imagen-comentario img')) {
         // Prevenir comportamiento predeterminado
+        e.preventDefault();
         e.stopPropagation();
         
-        // Obtener la URL de la imagen
-        const imagenSrc = e.target.src;
-        
-        // Establecer la imagen expandida
-        document.querySelector('.imagen-expandida').src = imagenSrc;
-        
-        // Mostrar el modal
-        modal.style.display = 'flex';
+        // Expandir la imagen
+        toggleImageExpansion(e.target);
     }
 });
 
-
-
-
-
-
-
-
-
-
-
+// Cerrar la imagen expandida al hacer clic en el overlay
+document.addEventListener('click', function(e) {
+    const overlay = document.querySelector('.expanded-image-overlay');
+    if (overlay && e.target === overlay) {
+        closeExpandedImage(overlay);
+    }
+});
 
 
 

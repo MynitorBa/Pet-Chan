@@ -1,509 +1,908 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Datos iniciales de comentarios
-    const comentariosIniciales = [
-        {
-            id: 1,
-            avatar: 'https://i.pinimg.com/474x/c3/b9/c6/c3b9c65ed0c48f8a6b9a88b1e4ade9d3.jpg',
-            autor: 'Lillie',
-            texto: '¡Me encanta esta comunidad!',
-            fecha: 'Hace 2 horas',
-            likes: 24,
-            compartido: 5,
-            comentarios: 3,
-            liked: false,
-            shared: false,
-            imagen: 'https://media0.giphy.com/media/6Cd73g46Wj2ztqQUFd/giphy.gif?cid=6c09b952uf8f8z8uhvx513tabxvgmvszwlsgj1szdhv2gyq8&ep=v1_gifs_search&rid=giphy.gif&ct=g'
-        },
-        {
-            id: 2,
-            avatar: 'https://i.pinimg.com/236x/ab/96/6a/ab966ad001bc6e83e0a688b80c737c64.jpg',
-            autor: 'Miku',
-            texto: '¿Alguien quiere jugar con mi mascota virtual?',
-            fecha: 'Hace 5 horas',
-            likes: 42,
-            compartido: 12,
-            comentarios: 8,
-            liked: false,
-            shared: false,
-            imagen: 'https://i.pinimg.com/originals/7b/0b/81/7b0b8158c64bbf2854f1bdc7729afa8d.gif'
-        },
+document.addEventListener('DOMContentLoaded', () => {
+    // Cargar publicaciones
+    cargarPublicaciones();
+    
+    // Cargar comunidades
+    cargarComunidades();
 
-        {
-            id: 3,
-            avatar: 'https://i.pinimg.com/564x/cc/65/fd/cc65fdc6496b1f27c23e118108ea1ea0.jpg',
-            autor: 'Tifa',
-            texto: 'Estoy buscando un compañero de aventuras',
-            fecha: 'Hace 15 horas',
-            likes: 62,
-            compartido: 22,
-            comentarios: 38,
-            liked: false,
-            shared: false,
-            imagen: false
-        }
-    ];
-
-    // Datos iniciales de foros
-    const forosIniciales = [
-        {
-            id: 1,
-            votos: 156,
-            titulo: 'Guía completa: Cómo derrotar a Moon Lord',
-            autor: 'MoonLordSlayer',
-            actividad: 'alta',
-            badge: 'Experto',
-            contenido: 'Después de más de 500 horas de juego, he desarrollado la estrategia perfecta para derrotar al Moon Lord...',
-            etiquetas: ['Guía', 'Boss Fight', 'End Game'],
-            destacado: true,
-            votado: null
-        },
-        {
-            id: 2,
-            votos: 145,
-            titulo: 'Guía de pesca definitiva 2024',
-            autor: 'FishingMaster',
-            actividad: 'alta',
-            badge: 'Experto',
-            contenido: 'Todo lo que necesitas saber sobre pesca: mejores cebos, potenciadores, clima, tiempo, biomas y recompensas...',
-            etiquetas: ['Guía', 'Pesca', 'Actualizado'],
-            destacado: true,
-            votado: null
-        },
-        {
-            id: 3,
-            votos: 92,
-            titulo: 'La mejor granja de Soul of Light',
-            autor: 'FarmKing99',
-            actividad: 'media',
-            badge: 'Veterano',
-            contenido: 'He optimizado la granja definitiva para Soul of Light. Usando hoiks y trampas de lava...',
-            imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUOL9umLPrnFDzpuDusgiA6e2qe7cC6XvuaQ&s',
-            etiquetas: ['Farming', 'Tutorial', 'Hardmode'],
-            destacado: false,
-            votado: null
-        },
-        {
-            id: 4,
-            votos: 110,
-            titulo: 'The Legend of Zelda: Breath of the Wild - Guía de Juegos',
-            autor: 'ZeldaMaster',
-            actividad: 'media',
-            badge: 'Veterano',
-            contenido: 'Logré clonar las flechas ancestrales en Kakariko...',
-            imagen: 'https://rukminim2.flixcart.com/image/850/1000/kyvvtzk0/poster/r/j/j/medium-zelda-breath-of-the-wild-hyrule-landscape-video-game-original-imagbygdfjcpvmrg.jpeg?q=20&crop=false',
-            etiquetas: ['Adventure', 'Legend', 'Fantasy'],
-            destacado: false,
-            votado: null
-        }
-    ];
-
-    // Elementos del DOM
-    const listaComentarios = document.querySelector('.lista-comentarios');
-    const gridMensajes = document.querySelector('.grid-mensajes');
-    const botonPublicar = document.querySelector('.boton-publicar');
-    const entradaPublicacion = document.querySelector('.entrada-publicacion');
-    const subirImagen = document.getElementById('subir-imagen');
-    const previewImagen = document.getElementById('preview-imagen');
-    let imagenSeleccionada = null;
-
-    // Función para optimizar tamaño de imagen
-    function optimizarImagen(src, callback) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Tamaño máximo deseado
-            const MAX_WIDTH = 800;
-            const MAX_HEIGHT = 600;
-            let width = img.width;
-            let height = img.height;
-            
-            // Redimensionar si es necesario
-            if (width > height) {
-                if (width > MAX_WIDTH) {
-                    height *= MAX_WIDTH / width;
-                    width = MAX_WIDTH;
-                }
-            } else {
-                if (height > MAX_HEIGHT) {
-                    width *= MAX_HEIGHT / height;
-                    height = MAX_HEIGHT;
-                }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            callback(canvas.toDataURL('image/jpeg', 0.7));
-        };
-        img.src = src;
-    }
-
-    // Función para renderizar comentarios
-    function renderizarComentarios(comentarios) {
-        listaComentarios.innerHTML = '';
-        comentarios.forEach(comentario => {
-            const elementoComentario = document.createElement('div');
-            elementoComentario.className = 'comentario';
-            elementoComentario.dataset.id = comentario.id;
-            
-            let imagenHTML = '';
-            if (comentario.imagen) {
-                imagenHTML = `
-                    <div class="imagen-comentario-container">
-                        <div class="marco-dorado">
-                            <img src="${comentario.imagen}" alt="Imagen del comentario" 
-                                 class="imagen-comentario"
-                                 onload="this.style.opacity=1; this.parentElement.classList.add('cargado')"
-                                 style="opacity:0;transition:opacity 0.3s">
-                        </div>
-                    </div>
-                `;
-            }
-
-            elementoComentario.innerHTML = `
-                <img src="${comentario.avatar}" alt="Avatar de ${comentario.autor}" class="avatar-comentario">
-                <div class="contenido-comentario">
-                    <p class="autor-comentario">${comentario.autor} <span class="fecha-comentario">${comentario.fecha}</span></p>
-                    <p class="texto-comentario">${comentario.texto}</p>
-                    ${imagenHTML}
-                    <div class="acciones-comentario">
-                        <div class="accion-comentario ${comentario.liked ? 'activo' : ''}" data-action="like">
-                            <i class="fas fa-heart"></i>
-                            <span class="contador-likes">${comentario.likes}</span>
-                        </div>
-                        <div class="accion-comentario" data-action="comment">
-                            <i class="fas fa-comment"></i>
-                            <span>${comentario.comentarios}</span>
-                        </div>
-                        <div class="accion-comentario ${comentario.shared ? 'activo' : ''}" data-action="share">
-                            <i class="fas fa-share"></i>
-                            <span>${comentario.compartido}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            listaComentarios.prepend(elementoComentario);
-        });
-
-        // Agregar eventos a las acciones de comentarios
-        document.querySelectorAll('.accion-comentario').forEach(accion => {
-            accion.addEventListener('click', function() {
-                const accionTipo = this.dataset.action;
-                const comentarioId = parseInt(this.closest('.comentario').dataset.id);
-                const comentario = comentariosIniciales.find(c => c.id === comentarioId);
-                
-                switch(accionTipo) {
-                    case 'like':
-                        comentario.liked = !comentario.liked;
-                        comentario.likes += comentario.liked ? 1 : -1;
-                        break;
-                    case 'share':
-                        comentario.shared = true;
-                        comentario.compartido += 1;
-                        if (navigator.share) {
-                            navigator.share({
-                                title: `Comentario de ${comentario.autor}`,
-                                text: comentario.texto,
-                                url: window.location.href
-                            }).catch(err => {
-                                console.log('Error al compartir:', err);
-                                mostrarFeedback('¡Comentario compartido!');
-                            });
-                        } else {
-                            mostrarFeedback('¡Comentario compartido!');
-                        }
-                        break;
-                    case 'comment':
-                        const respuesta = prompt("Escribe tu respuesta:");
-                        if (respuesta && respuesta.trim()) {
-                            mostrarFeedback('¡Respuesta enviada!');
-                            comentario.comentarios += 1;
-                        }
-                        break;
-                }
-                
-                renderizarComentarios(comentariosIniciales);
-            });
-        });
-
-        // Agregar evento para imágenes de comentarios
-        document.querySelectorAll('.imagen-comentario').forEach(img => {
-            img.addEventListener('click', function() {
-                mostrarImagenAmpliada(this.src);
-            });
-        });
-    }
-
-    // Función para mostrar feedback al usuario
-    function mostrarFeedback(mensaje) {
-        const feedback = document.createElement('div');
-        feedback.className = 'feedback';
-        feedback.textContent = mensaje;
-        document.body.appendChild(feedback);
-        
-        setTimeout(() => {
-            feedback.classList.add('mostrar');
-        }, 10);
-        
-        setTimeout(() => {
-            feedback.classList.remove('mostrar');
-            setTimeout(() => feedback.remove(), 300);
-        }, 3000);
-    }
-
-    // Función para renderizar foros
-    function renderizarForos(foros) {
-        gridMensajes.innerHTML = '';
-        foros.forEach(foro => {
-            const elementoForo = document.createElement('div');
-            elementoForo.className = `mensaje-foro ${foro.destacado ? 'mensaje-destacado' : ''}`;
-            elementoForo.dataset.id = foro.id;
-
-            let imagenHTML = '';
-            if (foro.imagen) {
-                imagenHTML = `
-                    <div class="imagen-foro-container">
-                        <div class="marco-dorado">
-                            <img src="${foro.imagen}" alt="${foro.titulo}" 
-                                 class="imagen-foro"
-                                 onload="this.style.opacity=1; this.parentElement.classList.add('cargado')"
-                                 style="opacity:0;transition:opacity 0.3s">
-                        </div>
-                    </div>
-                `;
-            }
-
-            elementoForo.innerHTML = `
-                <div class="votos">
-                    <button class="btn-voto btn-voto-up ${foro.votado === 'up' ? 'activo' : ''}" 
-                            title="Votar positivo" ${foro.votado === 'up' ? 'disabled' : ''}>↑</button>
-                    <span class="contador-votos">${foro.votos}</span>
-                    <button class="btn-voto btn-voto-down ${foro.votado === 'down' ? 'activo' : ''}" 
-                            title="Votar negativo" ${foro.votado === 'down' ? 'disabled' : ''}>↓</button>
-                </div>
-                <h3 class="titulo-mensaje">${foro.titulo}</h3>
-                <p class="autor-mensaje">
-                    <span class="indicador-actividad actividad-${foro.actividad}"></span>
-                    <span>${foro.autor}</span>
-                    <span class="autor-badge">${foro.badge}</span>
-                </p>
-                <p class="contenido-mensaje">${foro.contenido}</p>
-                ${imagenHTML}
-                <div class="etiquetas">
-                    ${foro.etiquetas.map(etiqueta => `<span class="etiqueta">${etiqueta}</span>`).join('')}
-                </div>
-                <div class="acciones-mensaje">
-                    <button class="btn-accion"><i class="fas fa-comment"></i> Comentar</button>
-                    <button class="btn-accion"><i class="fas fa-bookmark"></i> Guardar</button>
-                    <button class="btn-accion"><i class="fas fa-share"></i> Compartir</button>
-                </div>
-            `;
-            gridMensajes.appendChild(elementoForo);
-        });
-
-        // Agregar eventos a los botones de votación
-        document.querySelectorAll('.btn-voto-up').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const foroId = parseInt(this.closest('.mensaje-foro').dataset.id);
-                const foro = forosIniciales.find(f => f.id === foroId);
-                
-                const incremento = foro.votado === 'down' ? 2 : 1;
-                foro.votos += incremento;
-                foro.votado = 'up';
-                
-                renderizarForos(forosIniciales);
-                mostrarFeedback('¡Voto positivo registrado!');
-            });
-        });
-
-        document.querySelectorAll('.btn-voto-down').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const foroId = parseInt(this.closest('.mensaje-foro').dataset.id);
-                const foro = forosIniciales.find(f => f.id === foroId);
-                
-                const decremento = foro.votado === 'up' ? 2 : 1;
-                foro.votos -= decremento;
-                foro.votado = 'down';
-                
-                renderizarForos(forosIniciales);
-                mostrarFeedback('¡Voto negativo registrado!');
-            });
-        });
-
-        // Agregar evento para imágenes de foros
-        document.querySelectorAll('.imagen-foro').forEach(img => {
-            img.addEventListener('click', function() {
-                mostrarImagenAmpliada(this.src);
-            });
-        });
-
-        // Agregar eventos a los botones de acciones
-        document.querySelectorAll('.btn-accion').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const accion = this.querySelector('i').className;
-                const foroId = parseInt(this.closest('.mensaje-foro').dataset.id);
-                const foro = forosIniciales.find(f => f.id === foroId);
-                
-                if (accion.includes('fa-comment')) {
-                    const comentario = prompt(`Responder a "${foro.titulo}":`);
-                    if (comentario && comentario.trim()) {
-                        mostrarFeedback('¡Comentario enviado!');
-                    }
-                } else if (accion.includes('fa-bookmark')) {
-                    mostrarFeedback(`Foro "${foro.titulo}" guardado`);
-                } else if (accion.includes('fa-share')) {
-                    if (navigator.share) {
-                        navigator.share({
-                            title: foro.titulo,
-                            text: foro.contenido.substring(0, 100) + '...',
-                            url: window.location.href
-                        }).catch(err => {
-                            console.log('Error al compartir:', err);
-                            mostrarFeedback('¡Foro compartido!');
-                        });
-                    } else {
-                        mostrarFeedback('¡Foro compartido!');
-                    }
-                }
-            });
-        });
-    }
-
-    // Función para mostrar imagen ampliada
-    function mostrarImagenAmpliada(src) {
-        const modal = document.createElement('div');
-        modal.className = 'modal-imagen';
-        modal.innerHTML = `
-            <span class="cerrar-modal">&times;</span>
-            <div class="marco-dorado marco-modal">
-                <img src="${src}" class="modal-contenido">
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        modal.style.display = 'flex';
-        
-        modal.querySelector('.cerrar-modal').addEventListener('click', function() {
-            modal.style.display = 'none';
-            setTimeout(() => modal.remove(), 300);
-        });
-        
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                setTimeout(() => modal.remove(), 300);
-            }
-        });
-    }
-
-    // Subir imagen
-    subirImagen.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // Validar tamaño (máximo 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                mostrarFeedback('La imagen es demasiado grande (máximo 5MB)');
-                return;
-            }
-            
-            // Validar tipo de archivo
-            if (!file.type.match('image.*')) {
-                mostrarFeedback('Por favor, sube solo imágenes');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                optimizarImagen(event.target.result, function(imagenOptimizada) {
-                    imagenSeleccionada = imagenOptimizada;
-                    
-                    const img = new Image();
-                    img.onload = function() {
-                        previewImagen.innerHTML = `
-                            <div class="marco-dorado">
-                                <img src="${imagenSeleccionada}" alt="Previsualización" 
-                                     style="max-width:100%;max-height:300px;display:block;margin:0 auto;opacity:0;transition:opacity 0.3s"
-                                     onload="this.style.opacity=1; this.parentElement.classList.add('cargado')">
-                                <button class="eliminar-imagen">&times;</button>
-                            </div>
-                        `;
-                        previewImagen.style.display = 'block';
-                        
-                        previewImagen.querySelector('.eliminar-imagen').addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            imagenSeleccionada = null;
-                            previewImagen.style.display = 'none';
-                            subirImagen.value = '';
-                        });
-                    };
-                    img.src = imagenOptimizada;
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Función para agregar un nuevo comentario
-    function agregarComentario(texto) {
-        if (!texto.trim() && !imagenSeleccionada) {
-            mostrarFeedback('Por favor, escribe algo o sube una imagen');
-            return;
-        }
-        
-        const nuevoComentario = {
-            id: Date.now(),
-            avatar: 'https://th.bing.com/th/id/OIP.rIsI3TvodysyTi_2VOGK3gHaHa?rs=1&pid=ImgDetMain',
-            autor: sessionStorage.getItem('username') || 'Usuario',
-
-            texto: texto || '',
-            fecha: 'Hace unos momentos',
-            likes: 0,
-            compartido: 0,
-            comentarios: 0,
-            liked: false,
-            shared: false,
-            imagen: imagenSeleccionada || null
-        };
-        
-        comentariosIniciales.unshift(nuevoComentario);
-        renderizarComentarios(comentariosIniciales);
-        
-        // Resetear el formulario
-        entradaPublicacion.value = '';
-        imagenSeleccionada = null;
-        previewImagen.style.display = 'none';
-        subirImagen.value = '';
-        
-        mostrarFeedback('¡Publicación creada con éxito!');
-    }
-
-    // Evento para publicar comentario
-    botonPublicar.addEventListener('click', function() {
-        agregarComentario(entradaPublicacion.value);
-    });
-
-    // Evento para publicar con Enter
-    entradaPublicacion.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            agregarComentario(entradaPublicacion.value);
-        }
-    });
-
-    // Inicializar la página
-    renderizarComentarios(comentariosIniciales);
-    renderizarForos(forosIniciales);
-
-    // Efecto especial para foros destacados
-    setInterval(() => {
-        document.querySelectorAll('.mensaje-destacado').forEach(foro => {
-            foro.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.7)';
-            setTimeout(() => {
-                foro.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.3)';
-            }, 1000);
-        });
-    }, 3000);
+    // Animación sutil de entrada para los elementos
+    setTimeout(() => {
+        document.querySelector('.banner-principal').classList.add('visible');
+    }, 100);
 });
+
+// Función para cargar las publicaciones desde el servidor
+async function cargarPublicaciones() {
+    try {
+        const response = await fetch('/api/posts');
+        if (!response.ok) {
+            throw new Error('Error al obtener publicaciones');
+        }
+        
+        const posts = await response.json();
+        // Ordenar por ranking (votos) y limitar a 8
+        const postsDestacados = posts
+            .sort((a, b) => b.ranking - a.ranking)
+            .slice(0, 8);
+            
+        renderizarPublicaciones(postsDestacados);
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('publicaciones-container').innerHTML = 
+            '<div class="error-mensaje">Error al cargar publicaciones. Intenta nuevamente más tarde.</div>';
+    }
+}
+
+function renderizarPublicaciones(posts) {
+    const container = document.getElementById('publicaciones-container');
+    container.innerHTML = ''; // Limpiar contenedor
+    
+    // Contenedor para título y botón ver todos
+    const headerContainer = document.createElement('div');
+    headerContainer.classList.add('seccion-header');
+    
+    // Agregar título
+    const titulo = document.createElement('h2');
+    titulo.classList.add('titulo-seccion');
+    titulo.innerHTML = `<i class="fas fa-fire"></i> Publicaciones destacadas`;
+    headerContainer.appendChild(titulo);
+    
+    // Agregar botón ver todos
+    const verTodosBtn = document.createElement('a');
+    verTodosBtn.classList.add('ver-todos-btn');
+    verTodosBtn.href = '/foro';
+    verTodosBtn.innerHTML = 'Ver todas <i class="fas fa-arrow-right"></i>';
+    headerContainer.appendChild(verTodosBtn);
+    
+    container.appendChild(headerContainer);
+    
+    // Contenedor de tarjetas
+    const cardsGrid = document.createElement('div');
+    cardsGrid.classList.add('cards-grid');
+    container.appendChild(cardsGrid);
+    
+    posts.forEach((post, index) => {
+        const postCard = document.createElement('div');
+        postCard.classList.add('publicacion-card');
+        postCard.dataset.ranking = post.ranking; // Para aplicar estilos según ranking
+        
+        // Añadir clases de destacado según posición
+        if (index === 0) {
+            postCard.classList.add('destacado-oro', 'glowing-effect');
+        } else if (index === 1) {
+            postCard.classList.add('destacado-oro');
+        } else if (index === 2) {
+            postCard.classList.add('destacado-plata');
+        } else if (index === 3) {
+            postCard.classList.add('destacado-plata');
+        } else if (index < 8) {
+            postCard.classList.add('destacado-bronce');
+        }
+        
+        // Agregar SVG de fondo para todas las publicaciones
+        const backgroundContainer = document.createElement('div');
+        backgroundContainer.classList.add('publicacion-background');
+        
+        // Crear SVG para el fondo de la publicación
+        const svg = crearSVGFondo(index, post.id || index);
+        backgroundContainer.appendChild(svg);
+        postCard.appendChild(backgroundContainer);
+        
+        // Acortar mensaje si es muy largo
+        const mensajeCorto = post.mensaje.length > 100 
+            ? post.mensaje.substring(0, 100) + '...' 
+            : post.mensaje;
+        
+        // Crear elementos para el autor y mensaje con clases específicas para manejar overflow
+        const autorSpan = document.createElement('span');
+        autorSpan.classList.add('publicacion-autor', 'texto-ellipsis');
+        autorSpan.textContent = post.autor_nombre || post.autor;
+        
+        const mensajeDiv = document.createElement('div');
+        mensajeDiv.classList.add('publicacion-mensaje', 'texto-ellipsis');
+        mensajeDiv.textContent = mensajeCorto;
+        
+        // Header con autor
+        const headerDiv = document.createElement('div');
+        headerDiv.classList.add('publicacion-header');
+        headerDiv.appendChild(autorSpan);
+        
+        // Contenido con mensaje y ranking
+        const contenidoDiv = document.createElement('div');
+        contenidoDiv.classList.add('publicacion-contenido');
+        
+        // Agregar el mensaje al contenido
+        contenidoDiv.appendChild(mensajeDiv);
+        
+        // Crear y agregar el elemento de ranking
+        const rankingDiv = document.createElement('div');
+        rankingDiv.classList.add('publicacion-ranking');
+        rankingDiv.innerHTML = `<i class="fas fa-star"></i> ${post.ranking || 0}`;
+        contenidoDiv.appendChild(rankingDiv);
+        
+        // Footer con etiquetas y comunidad
+        const footerDiv = document.createElement('div');
+        footerDiv.classList.add('publicacion-footer');
+        
+        // Contenedor de etiquetas
+        const etiquetasDiv = document.createElement('div');
+        etiquetasDiv.classList.add('etiquetas-container');
+        
+        // Agregar etiquetas si existen
+        if (post.etiqueta) {
+            const etiquetaSpan = document.createElement('span');
+            etiquetaSpan.classList.add('etiqueta', 'texto-ellipsis');
+            etiquetaSpan.textContent = post.etiqueta;
+            etiquetasDiv.appendChild(etiquetaSpan);
+        }
+        
+        if (post.subcategoria && post.subcategoria !== 'Ninguna') {
+            const subcategoriaSpan = document.createElement('span');
+            subcategoriaSpan.classList.add('etiqueta', 'texto-ellipsis');
+            subcategoriaSpan.textContent = post.subcategoria;
+            etiquetasDiv.appendChild(subcategoriaSpan);
+        }
+        
+        footerDiv.appendChild(etiquetasDiv);
+        
+        // Agregar badge de comunidad si existe
+        if (post.comunidad_nombre) {
+            const comunidadDiv = document.createElement('div');
+            comunidadDiv.classList.add('comunidad-badge', 'texto-ellipsis');
+            comunidadDiv.textContent = post.comunidad_nombre;
+            footerDiv.appendChild(comunidadDiv);
+        }
+        
+        // Añadir medallas o cintas según posición
+        if (index === 0) {
+            const cintaDiv = document.createElement('div');
+            cintaDiv.classList.add('cinta-top', 'oro');
+            cintaDiv.textContent = 'TOP #1';
+            postCard.appendChild(cintaDiv);
+            
+            const medallaDiv = document.createElement('div');
+            medallaDiv.classList.add('medalla-badge', 'medalla-oro');
+            medallaDiv.innerHTML = '<i class="fas fa-trophy"></i>';
+            postCard.appendChild(medallaDiv);
+        } else if (index === 1) {
+            const medallaDiv = document.createElement('div');
+            medallaDiv.classList.add('medalla-badge', 'medalla-oro');
+            medallaDiv.innerHTML = '<i class="fas fa-trophy"></i>';
+            postCard.appendChild(medallaDiv);
+        } else if (index === 2) {
+            const medallaDiv = document.createElement('div');
+            medallaDiv.classList.add('medalla-badge', 'medalla-plata');
+            medallaDiv.innerHTML = '<i class="fas fa-medal"></i>';
+            postCard.appendChild(medallaDiv);
+        } else if (index === 3) {
+            const medallaDiv = document.createElement('div');
+            medallaDiv.classList.add('medalla-badge', 'medalla-plata');
+            medallaDiv.innerHTML = '<i class="fas fa-medal"></i>';
+            postCard.appendChild(medallaDiv);
+        } else if (index < 8) {
+            const medallaDiv = document.createElement('div');
+            medallaDiv.classList.add('medalla-badge', 'medalla-bronce');
+            medallaDiv.innerHTML = '<i class="fas fa-award"></i>';
+            postCard.appendChild(medallaDiv);
+        }
+        
+        // Ensamblar la tarjeta
+        postCard.appendChild(headerDiv);
+        postCard.appendChild(contenidoDiv);
+        postCard.appendChild(footerDiv);
+        
+        // CAMBIO: Hacer que la tarjeta sea clickeable y redirija a la página de foro
+        postCard.style.cursor = 'pointer';
+        postCard.addEventListener('click', () => {
+            window.location.href = '/foro';
+        });
+        
+        cardsGrid.appendChild(postCard);
+    });
+    
+    // Agregar animaciones después de renderizar
+    setTimeout(() => {
+        const cards = document.querySelectorAll('.publicacion-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.4s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }, index * 100);
+        });
+    }, 200);
+}
+
+// Función para crear SVGs personalizados según la posición - Versión Mejorada
+function crearSVGFondo(index, postId) {
+    // Crear un elemento SVG
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add('publicacion-svg-fondo');
+    svg.setAttribute('viewBox', '0 0 300 150');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    
+    // Colores y configuraciones basadas en la posición
+    const configs = {
+        0: { // TOP #1 Oro - Efecto premium
+            colors: {
+                primary: '#FFD700',
+                secondary: '#FFA500',
+                accent1: '#FFEB3B',
+                accent2: '#FF6F00',
+                glow: 'rgba(255, 215, 0, 0.8)'
+            },
+            pattern: {
+                size: 15,
+                opacity: 0.3,
+                shape: 'hex' // hexágono para el número 1
+            },
+            effects: {
+                bubbles: true, 
+                shine: true,
+                starfield: true,
+                radialGlow: true
+            },
+            waves: {
+                count: 3,
+                amplitude: 20,
+                thickness: 8,
+                opacity: 0.4
+            }
+        },
+        1: { // #2 Oro
+            colors: {
+                primary: '#FFC107',
+                secondary: '#FF9800',
+                accent1: '#FFE082',
+                accent2: '#F57C00',
+                glow: 'rgba(255, 193, 7, 0.6)'
+            },
+            pattern: {
+                size: 12,
+                opacity: 0.25,
+                shape: 'diamond'
+            },
+            effects: {
+                bubbles: true,
+                shine: true,
+                starfield: true
+            },
+            waves: {
+                count: 2,
+                amplitude: 15,
+                thickness: 6,
+                opacity: 0.35
+            }
+        },
+        2: { // #3 Plata
+            colors: {
+                primary: '#C0C0C0',
+                secondary: '#A0A0A0',
+                accent1: '#E0E0E0',
+                accent2: '#757575',
+                glow: 'rgba(192, 192, 192, 0.5)'
+            },
+            pattern: {
+                size: 10,
+                opacity: 0.2,
+                shape: 'triangle'
+            },
+            effects: {
+                bubbles: true,
+                shine: true
+            },
+            waves: {
+                count: 2,
+                amplitude: 12,
+                thickness: 5,
+                opacity: 0.3
+            }
+        },
+        3: { // #4 Plata
+            colors: {
+                primary: '#BDBDBD',
+                secondary: '#9E9E9E',
+                accent1: '#E0E0E0',
+                accent2: '#616161',
+                glow: 'rgba(189, 189, 189, 0.4)'
+            },
+            pattern: {
+                size: 8,
+                opacity: 0.2,
+                shape: 'square'
+            },
+            effects: {
+                bubbles: true
+            },
+            waves: {
+                count: 1,
+                amplitude: 10,
+                thickness: 5,
+                opacity: 0.25
+            }
+        },
+        default: { // Bronce para posiciones 5-8
+            colors: {
+                primary: '#CD7F32',
+                secondary: '#A05A2C',
+                accent1: '#E8A068',
+                accent2: '#884400',
+                glow: 'rgba(205, 127, 50, 0.3)'
+            },
+            pattern: {
+                size: 6,
+                opacity: 0.15,
+                shape: 'dot'
+            },
+            effects: {
+                bubbles: false
+            },
+            waves: {
+                count: 1,
+                amplitude: 8,
+                thickness: 4,
+                opacity: 0.2
+            }
+        }
+    };
+    
+    // Obtener configuración según índice
+    const config = index < 4 ? configs[index] : configs.default;
+    
+    // Crear definiciones (defs) para gradientes, patrones y efectos
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    
+    // Crear gradiente principal
+    const mainGradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+    mainGradient.setAttribute('id', `grad-post-main-${postId}`);
+    mainGradient.setAttribute('x1', '0%');
+    mainGradient.setAttribute('y1', '0%');
+    mainGradient.setAttribute('x2', '100%');
+    mainGradient.setAttribute('y2', '100%');
+    
+    const mainStop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    mainStop1.setAttribute('offset', '0%');
+    mainStop1.setAttribute('stop-color', config.colors.primary);
+    mainStop1.setAttribute('stop-opacity', '0.4');
+    
+    const mainStop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    mainStop2.setAttribute('offset', '100%');
+    mainStop2.setAttribute('stop-color', config.colors.secondary);
+    mainStop2.setAttribute('stop-opacity', '0.2');
+    
+    mainGradient.appendChild(mainStop1);
+    mainGradient.appendChild(mainStop2);
+    defs.appendChild(mainGradient);
+    
+    // Gradiente radial para efecto de resplandor (solo para top posiciones)
+    if (config.effects.radialGlow) {
+        const radialGradient = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+        radialGradient.setAttribute('id', `grad-post-radial-${postId}`);
+        radialGradient.setAttribute('cx', '50%');
+        radialGradient.setAttribute('cy', '50%');
+        radialGradient.setAttribute('r', '70%');
+        radialGradient.setAttribute('fx', '50%');
+        radialGradient.setAttribute('fy', '50%');
+        
+        const radialStop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        radialStop1.setAttribute('offset', '0%');
+        radialStop1.setAttribute('stop-color', config.colors.glow);
+        radialStop1.setAttribute('stop-opacity', '0.7');
+        
+        const radialStop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        radialStop2.setAttribute('offset', '70%');
+        radialStop2.setAttribute('stop-color', config.colors.glow);
+        radialStop2.setAttribute('stop-opacity', '0.2');
+        
+        const radialStop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        radialStop3.setAttribute('offset', '100%');
+        radialStop3.setAttribute('stop-color', config.colors.glow);
+        radialStop3.setAttribute('stop-opacity', '0');
+        
+        radialGradient.appendChild(radialStop1);
+        radialGradient.appendChild(radialStop2);
+        radialGradient.appendChild(radialStop3);
+        defs.appendChild(radialGradient);
+    }
+    
+    // Crear filtros para efectos de iluminación
+    if (config.effects.shine) {
+        const filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+        filter.setAttribute('id', `shine-${postId}`);
+        filter.setAttribute('x', '-50%');
+        filter.setAttribute('y', '-50%');
+        filter.setAttribute('width', '200%');
+        filter.setAttribute('height', '200%');
+        
+        // Añadir efectos de brillo
+        const feSpecularLighting = document.createElementNS("http://www.w3.org/2000/svg", "feSpecularLighting");
+        feSpecularLighting.setAttribute('result', 'specOut');
+        feSpecularLighting.setAttribute('specularExponent', '20');
+        feSpecularLighting.setAttribute('lighting-color', 'white');
+        
+        const fePointLight = document.createElementNS("http://www.w3.org/2000/svg", "fePointLight");
+        fePointLight.setAttribute('x', '150');
+        fePointLight.setAttribute('y', '60');
+        fePointLight.setAttribute('z', '20');
+        
+        feSpecularLighting.appendChild(fePointLight);
+        filter.appendChild(feSpecularLighting);
+        
+        const feComposite = document.createElementNS("http://www.w3.org/2000/svg", "feComposite");
+        feComposite.setAttribute('in', 'specOut');
+        feComposite.setAttribute('in2', 'SourceGraphic');
+        feComposite.setAttribute('operator', 'arithmetic');
+        feComposite.setAttribute('k1', '0');
+        feComposite.setAttribute('k2', '1');
+        feComposite.setAttribute('k3', '1');
+        feComposite.setAttribute('k4', '0');
+        
+        filter.appendChild(feComposite);
+        defs.appendChild(filter);
+    }
+    
+    // Crear patrones según la forma configurada
+    const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+    pattern.setAttribute('id', `pattern-post-${postId}`);
+    pattern.setAttribute('width', config.pattern.size * 2);
+    pattern.setAttribute('height', config.pattern.size * 2);
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    pattern.setAttribute('patternTransform', 'rotate(45)');
+    
+    // Crear forma según configuración
+    switch(config.pattern.shape) {
+        case 'hex':
+            const hex = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            const size = config.pattern.size;
+            hex.setAttribute('points', `
+                ${size},${size/2} 
+                ${size*0.75},${size*0.93} 
+                ${size*0.25},${size*0.93} 
+                ${0},${size/2} 
+                ${size*0.25},${size*0.07} 
+                ${size*0.75},${size*0.07}
+            `);
+            hex.setAttribute('fill', config.colors.accent1);
+            hex.setAttribute('fill-opacity', config.pattern.opacity);
+            pattern.appendChild(hex);
+            break;
+            
+        case 'diamond':
+            const diamond = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            const dSize = config.pattern.size;
+            diamond.setAttribute('points', `
+                ${dSize},0 
+                ${dSize*2},${dSize} 
+                ${dSize},${dSize*2} 
+                0,${dSize}
+            `);
+            diamond.setAttribute('fill', config.colors.accent1);
+            diamond.setAttribute('fill-opacity', config.pattern.opacity);
+            pattern.appendChild(diamond);
+            break;
+            
+        case 'triangle':
+            const triangle = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            const tSize = config.pattern.size;
+            triangle.setAttribute('points', `
+                ${tSize},0 
+                ${tSize*2},${tSize*1.732} 
+                0,${tSize*1.732}
+            `);
+            triangle.setAttribute('fill', config.colors.accent1);
+            triangle.setAttribute('fill-opacity', config.pattern.opacity);
+            pattern.appendChild(triangle);
+            break;
+            
+        case 'square':
+            const square = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            square.setAttribute('x', config.pattern.size * 0.2);
+            square.setAttribute('y', config.pattern.size * 0.2);
+            square.setAttribute('width', config.pattern.size * 0.6);
+            square.setAttribute('height', config.pattern.size * 0.6);
+            square.setAttribute('fill', config.colors.accent1);
+            square.setAttribute('fill-opacity', config.pattern.opacity);
+            pattern.appendChild(square);
+            break;
+            
+        case 'dot':
+        default:
+            const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dot.setAttribute('cx', config.pattern.size);
+            dot.setAttribute('cy', config.pattern.size);
+            dot.setAttribute('r', config.pattern.size * 0.3);
+            dot.setAttribute('fill', config.colors.accent1);
+            dot.setAttribute('fill-opacity', config.pattern.opacity);
+            pattern.appendChild(dot);
+            break;
+    }
+    
+    defs.appendChild(pattern);
+    svg.appendChild(defs);
+    
+    // Crear el fondo base con el gradiente principal
+    const baseRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    baseRect.setAttribute('width', '100%');
+    baseRect.setAttribute('height', '100%');
+    baseRect.setAttribute('fill', `url(#grad-post-main-${postId})`);
+    svg.appendChild(baseRect);
+    
+    // Añadir efecto de resplandor radial para top posiciones
+    if (config.effects.radialGlow) {
+        const glowRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        glowRect.setAttribute('width', '100%');
+        glowRect.setAttribute('height', '100%');
+        glowRect.setAttribute('fill', `url(#grad-post-radial-${postId})`);
+        svg.appendChild(glowRect);
+    }
+    
+    // Añadir el patrón como capa
+    const patternRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    patternRect.setAttribute('width', '100%');
+    patternRect.setAttribute('height', '100%');
+    patternRect.setAttribute('fill', `url(#pattern-post-${postId})`);
+    svg.appendChild(patternRect);
+    
+    // Añadir ondas decorativas con efecto de animación
+    for (let i = 0; i < config.waves.count; i++) {
+        const wave = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const amp = config.waves.amplitude * (1 - i * 0.2); // Amplitud decreciente
+        const yOffset = 75 + i * 20; // Posición Y variable
+        
+        // Crear una onda sinusoidal
+        wave.setAttribute('d', `M0,${yOffset} Q75,${yOffset-amp} 150,${yOffset} T300,${yOffset}`);
+        wave.setAttribute('stroke', config.colors.accent1);
+        wave.setAttribute('stroke-width', config.waves.thickness - i);
+        wave.setAttribute('fill', 'none');
+        wave.setAttribute('stroke-opacity', config.waves.opacity);
+        
+        // Añadir efecto de brillo si está configurado
+        if (config.effects.shine) {
+            wave.setAttribute('filter', `url(#shine-${postId})`);
+        }
+        
+        svg.appendChild(wave);
+    }
+    
+    // Añadir círculos decorativos (burbujas)
+    if (config.effects.bubbles) {
+        // Círculos grandes decorativos con gradiente
+        const circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle1.setAttribute('cx', '50');
+        circle1.setAttribute('cy', '30');
+        circle1.setAttribute('r', index === 0 ? '45' : '35');
+        circle1.setAttribute('fill', config.colors.accent1);
+        circle1.setAttribute('fill-opacity', '0.2');
+        svg.appendChild(circle1);
+        
+        const circle2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle2.setAttribute('cx', '250');
+        circle2.setAttribute('cy', '100');
+        circle2.setAttribute('r', index === 0 ? '50' : '40');
+        circle2.setAttribute('fill', config.colors.accent2);
+        circle2.setAttribute('fill-opacity', '0.15');
+        svg.appendChild(circle2);
+        
+        // Añadir pequeñas burbujas adicionales
+        const bubblesCount = index === 0 ? 12 : index < 3 ? 8 : 5;
+        for (let i = 0; i < bubblesCount; i++) {
+            const bubble = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            const bubbleX = Math.random() * 280 + 10; // Posición X aleatoria
+            const bubbleY = Math.random() * 130 + 10; // Posición Y aleatoria
+            const bubbleSize = Math.random() * 5 + 2; // Tamaño aleatorio
+            
+            bubble.setAttribute('cx', bubbleX);
+            bubble.setAttribute('cy', bubbleY);
+            bubble.setAttribute('r', bubbleSize);
+            bubble.setAttribute('fill', i % 2 === 0 ? config.colors.accent1 : config.colors.accent2);
+            bubble.setAttribute('fill-opacity', '0.3');
+            svg.appendChild(bubble);
+        }
+    }
+    
+    // Añadir campo de estrellas para top posiciones
+    if (config.effects.starfield) {
+        const starsCount = index === 0 ? 15 : index === 1 ? 10 : 5;
+        for (let i = 0; i < starsCount; i++) {
+            const star = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            const starX = Math.random() * 280 + 10;
+            const starY = Math.random() * 130 + 10;
+            const starSize = index === 0 ? Math.random() * 4 + 3 : Math.random() * 3 + 2;
+            
+            // Crear estrella con puntas
+            star.setAttribute('points', `
+                ${starX},${starY-starSize} 
+                ${starX+starSize/4},${starY-starSize/4} 
+                ${starX+starSize},${starY} 
+                ${starX+starSize/4},${starY+starSize/4} 
+                ${starX},${starY+starSize} 
+                ${starX-starSize/4},${starY+starSize/4} 
+                ${starX-starSize},${starY} 
+                ${starX-starSize/4},${starY-starSize/4}
+            `);
+            star.setAttribute('fill', 'white');
+            star.setAttribute('fill-opacity', Math.random() * 0.3 + 0.4);
+            svg.appendChild(star);
+        }
+    }
+    
+    // Para el TOP #1, añadir elementos especiales adicionales
+    if (index === 0) {
+        // Destellos especiales
+        for (let i = 0; i < 4; i++) {
+            const destello = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            const destelloX = 30 + i * 80;
+            const destelloY = 30 + (i % 2) * 90;
+            const destelloSize = Math.random() * 8 + 8;
+            
+            destello.setAttribute('points', `
+                ${destelloX},${destelloY-destelloSize} 
+                ${destelloX+destelloSize/3},${destelloY-destelloSize/3} 
+                ${destelloX+destelloSize},${destelloY} 
+                ${destelloX+destelloSize/3},${destelloY+destelloSize/3} 
+                ${destelloX},${destelloY+destelloSize} 
+                ${destelloX-destelloSize/3},${destelloY+destelloSize/3} 
+                ${destelloX-destelloSize},${destelloY} 
+                ${destelloX-destelloSize/3},${destelloY-destelloSize/3}
+            `);
+            destello.setAttribute('fill', 'white');
+            destello.setAttribute('fill-opacity', '0.8');
+            svg.appendChild(destello);
+        }
+    }
+    
+    return svg;
+}
+
+// Esta función ha sido eliminada ya que los estilos se incluyen en un archivo CSS separado
+
+// Ejecutar esta función cuando el DOM esté cargado
+document.addEventListener('DOMContentLoaded', () => {
+    // El código existente sin inyectar los estilos CSS
+    cargarPublicaciones();
+    cargarComunidades();
+    
+    setTimeout(() => {
+        document.querySelector('.banner-principal').classList.add('visible');
+    }, 100);
+});
+
+// Función para cargar las comunidades desde el servidor
+async function cargarComunidades() {
+    try {
+        const response = await fetch('/api/comunidades');
+        if (!response.ok) {
+            throw new Error('Error al obtener comunidades');
+        }
+        
+        const comunidades = await response.json();
+        
+        // Primero ordenamos por total_miembros y luego por total_posts
+        const comunidadesOrdenadas = comunidades
+            .sort((a, b) => b.total_miembros - a.total_miembros || b.total_posts - a.total_posts)
+            .slice(0, 6); // Limitar a 6 comunidades destacadas
+            
+        renderizarComunidades(comunidadesOrdenadas);
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('comunidades-container').innerHTML = 
+            '<div class="error-mensaje">Error al cargar comunidades. Intenta nuevamente más tarde.</div>';
+    }
+}
+
+
+// De manera similar modificar la función renderizarComunidades
+function renderizarComunidades(comunidades) {
+    const container = document.getElementById('comunidades-container');
+    container.innerHTML = ''; // Limpiar contenedor
+    
+    // Contenedor para título y botón ver todos
+    const headerContainer = document.createElement('div');
+    headerContainer.classList.add('seccion-header');
+    
+    // Agregar título
+    const titulo = document.createElement('h2');
+    titulo.classList.add('titulo-seccion');
+    titulo.innerHTML = `<i class="fas fa-users"></i> Comunidades populares`;
+    headerContainer.appendChild(titulo);
+    
+    // Agregar botón ver todos
+    const verTodosBtn = document.createElement('a');
+    verTodosBtn.classList.add('ver-todos-btn');
+    verTodosBtn.href = '/comunidad';
+    verTodosBtn.innerHTML = 'Ver todas <i class="fas fa-arrow-right"></i>';
+    headerContainer.appendChild(verTodosBtn);
+    
+    container.appendChild(headerContainer);
+    
+    // Contenedor de tarjetas
+    const cardsGrid = document.createElement('div');
+    cardsGrid.classList.add('cards-grid', 'comunidades-grid');
+    container.appendChild(cardsGrid);
+    
+    comunidades.forEach((comunidad, index) => {
+        const comunidadCard = document.createElement('div');
+        comunidadCard.classList.add('comunidad-card');
+        
+        // Aplicar clases de destacado según posición
+        if (index === 0) {
+            comunidadCard.classList.add('destacado-oro', 'glowing-effect');
+        } else if (index === 1) {
+            comunidadCard.classList.add('destacado-oro');
+        } else if (index === 2) {
+            comunidadCard.classList.add('destacado-plata');
+        } else if (index === 3) {
+            comunidadCard.classList.add('destacado-plata');
+        } else if (index < 6) {
+            comunidadCard.classList.add('destacado-bronce');
+        }
+        
+        // Acortar descripción
+        const descripcionCorta = comunidad.descripcion?.length > 80 
+            ? comunidad.descripcion.substring(0, 80) + '...' 
+            : comunidad.descripcion || '';
+
+        // Crear contenedor para la imagen
+        const imagenContainer = document.createElement('div');
+        imagenContainer.classList.add('comunidad-imagen-container');
+        
+        // Añadir cinta Top #1 para la primera comunidad
+        if (index === 0) {
+            const cintaTop = document.createElement('div');
+            cintaTop.classList.add('cinta-top', 'oro');
+            cintaTop.textContent = 'TOP #1';
+            comunidadCard.appendChild(cintaTop);
+        }
+        
+        // Si la comunidad no tiene imagen, mostrar SVG
+        if (!comunidad.imagen_url) {
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.classList.add('tarjeta-comunidad-imagen');
+            svg.setAttribute('viewBox', '0 0 800 500');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+            
+            // Crear los elementos SVG (defs, gradientes, etc.)
+            svg.innerHTML = `
+                <defs>
+                    <linearGradient id="grad${comunidad.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3d0099;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#6f42ff;stop-opacity:0.6" />
+                    </linearGradient>
+                    <pattern id="pattern${comunidad.id}" width="50" height="50" patternUnits="userSpaceOnUse">
+                        <circle cx="25" cy="25" r="12" fill="rgba(0, 234, 255, 0.15)" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grad${comunidad.id})" />
+                <rect width="100%" height="100%" fill="url(#pattern${comunidad.id})" />
+            
+                <circle cx="150" cy="100" r="80" fill="rgba(111, 66, 255, 0.3)" />
+                <circle cx="650" cy="400" r="120" fill="rgba(0, 178, 255, 0.2)" />
+                <path d="M0,250 Q200,150 400,250 T800,250" stroke="rgba(0, 234, 255, 0.3)" stroke-width="20" fill="none" />
+            
+                <g transform="translate(400, 250) scale(0.8)">
+                    <circle cx="0" cy="0" r="50" fill="rgba(255, 255, 255, 0.1)" />
+                    <circle cx="-20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                    <circle cx="20" cy="-15" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                    <circle cx="0" cy="20" r="15" fill="rgba(255, 255, 255, 0.2)" />
+                </g>
+            `;
+            
+            imagenContainer.appendChild(svg);
+        } else {
+            // Si la comunidad tiene imagen, mostrarla
+            const img = document.createElement('img');
+            img.src = comunidad.imagen_url;
+            img.alt = comunidad.nombre;
+            img.classList.add('comunidad-img');
+            imagenContainer.appendChild(img);
+        }
+        
+        // Agregar la medalla según posición
+        imagenContainer.appendChild(getBadgeElement(index));
+        comunidadCard.appendChild(imagenContainer);
+        
+        // Crear el contenedor de información
+        const infoContainer = document.createElement('div');
+        infoContainer.classList.add('comunidad-info');
+        
+        // Nombre de la comunidad
+        const nombreH3 = document.createElement('h3');
+        nombreH3.classList.add('comunidad-nombre', 'texto-ellipsis');
+        nombreH3.textContent = comunidad.nombre;
+        infoContainer.appendChild(nombreH3);
+        
+        // Descripción
+        const descripcionP = document.createElement('p');
+        descripcionP.classList.add('comunidad-descripcion', 'texto-ellipsis-multiple');
+        descripcionP.textContent = descripcionCorta;
+        infoContainer.appendChild(descripcionP);
+        
+        // Estadísticas
+        const statsDiv = document.createElement('div');
+        statsDiv.classList.add('comunidad-stats');
+        
+        // Posts
+        const postsSpan = document.createElement('span');
+        postsSpan.classList.add('texto-ellipsis');
+        postsSpan.innerHTML = `<i class="fas fa-file-alt"></i> ${comunidad.total_posts || 0} posts`;
+        statsDiv.appendChild(postsSpan);
+        
+        // Miembros
+        const miembrosSpan = document.createElement('span');
+        miembrosSpan.classList.add('texto-ellipsis');
+        miembrosSpan.innerHTML = `<i class="fas fa-users"></i> ${comunidad.total_miembros || 0} miembros`;
+        statsDiv.appendChild(miembrosSpan);
+        
+        // Badge de privacidad
+        const privacidadSpan = document.createElement('span');
+        privacidadSpan.classList.add('privacidad-badge', comunidad.es_privada ? 'privada' : 'publica');
+        privacidadSpan.innerHTML = `<i class="fas ${comunidad.es_privada ? 'fa-lock' : 'fa-lock-open'}"></i>`;
+        statsDiv.appendChild(privacidadSpan);
+        
+        infoContainer.appendChild(statsDiv);
+        comunidadCard.appendChild(infoContainer);
+        
+        // CAMBIO: Hacer que la tarjeta sea clickeable y redirija a la página de comunidades
+        comunidadCard.style.cursor = 'pointer';
+        comunidadCard.addEventListener('click', () => {
+            window.location.href = '/comunidad';
+        });
+        
+        cardsGrid.appendChild(comunidadCard);
+    });
+    
+    // Agregar animaciones después de renderizar
+    setTimeout(() => {
+        const cards = document.querySelectorAll('.comunidad-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.4s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }, index * 100);
+        });
+    }, 200);
+}
+
+// Función auxiliar para obtener el elemento de medalla según posición
+function getBadgeElement(index) {
+    const badgeDiv = document.createElement('div');
+    
+    if (index === 0) {
+        badgeDiv.classList.add('medalla-badge', 'medalla-oro');
+        badgeDiv.innerHTML = '<i class="fas fa-trophy"></i>';
+    } else if (index === 1) {
+        badgeDiv.classList.add('medalla-badge', 'medalla-oro');
+        badgeDiv.innerHTML = '<i class="fas fa-trophy"></i>';
+    } else if (index === 2 || index === 3) {
+        badgeDiv.classList.add('medalla-badge', 'medalla-plata');
+        badgeDiv.innerHTML = '<i class="fas fa-medal"></i>';
+    } else if (index < 6) {
+        badgeDiv.classList.add('medalla-badge', 'medalla-bronce');
+        badgeDiv.innerHTML = '<i class="fas fa-award"></i>';
+    }
+    
+    return badgeDiv;
+}
+
+
+
+
+
+
+
+
+
+
+
+

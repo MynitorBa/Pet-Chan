@@ -85,14 +85,21 @@
     padding: 10px 0;
     border-bottom: 1px solid #3d0099;
     color: #b8c5ff;
+    overflow: hidden; /* asegura que el contenido no sobresalga */
 }
 
+/* Estilo fijo para los enlaces */
 .lista-destacados li a {
     color: #b8c5ff;
     text-decoration: none;
     transition: color 0.2s ease;
     display: block;
     padding: 5px 0;
+
+    width: 230px;          /* ancho fijo */
+    white-space: nowrap;   /* sin saltos de línea */
+    overflow: hidden;      /* oculta desbordes */
+    text-overflow: ellipsis; /* agrega "..." al final si es muy largo */
 }
 
 .lista-destacados li a:hover {
@@ -181,6 +188,16 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
+.tarjeta-comunidad-encabezado h3 {
+    white-space: nowrap;       /* Evita saltos de línea */
+    overflow: hidden;          /* Oculta el exceso de texto */
+    text-overflow: ellipsis;   /* Agrega puntos suspensivos al desbordar */
+    max-width: 150px;          /* Ajusta el ancho máximo al tamaño que desees (reduce más el contenedor) */
+    font-size: 14px;           /* Reduce el tamaño de la fuente */
+    line-height: 1.2;          /* Reduce la altura de línea para que ocupe menos espacio vertical */
+    margin: 0;                 /* Elimina cualquier margen innecesario */
+}
+
 
 /* Cambiar la estructura de la tarjeta para la nueva organización */
 .tarjeta-comunidad {
@@ -329,8 +346,6 @@
     }
 }
 
-
-
 .miembro {
     background-color: #6f42ff;
 }
@@ -339,30 +354,38 @@
     background-color: #5a35d9;
 }
 
-/* Modal de creación */
 .formulario-modal {
     display: none;
     position: fixed;
-    z-index: 1000;
-    left: 0;
+    z-index: 10000;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(11, 0, 51, 0.9);
-    overflow-y: auto;
     backdrop-filter: blur(4px);
+    overflow: hidden;
 }
 
+/* Posición manual del modal */
 .contenido-modal {
+    position: absolute;
+    top: 35px;       /* Distancia desde el top */
+    left: 50%;
+    transform: translateX(-50%);
+    
     background-color: #1a0059;
-    margin: 5% auto;
     padding: 30px;
     border-radius: 12px;
-    width: 80%;
-    max-width: 800px;
+    width: 1000px;
+    max-width: 90%;
+    max-height: 90vh;
     color: #ffffff;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    z-index: 10001;
 }
+
 
 .cerrar-modal {
     color: #00eaff;
@@ -371,6 +394,9 @@
     font-weight: bold;
     cursor: pointer;
     transition: color 0.2s ease;
+    position: absolute;
+    top: 15px;
+    right: 20px;
 }
 
 .cerrar-modal:hover {
@@ -383,6 +409,7 @@
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #3d0099;
+    padding-right: 40px; /* Espacio para el botón de cerrar */
 }
 
 .formulario-grupo {
@@ -482,6 +509,13 @@
     .filtro-grupo > * {
         width: 100%;
     }
+
+    .contenido-modal {
+        width: 95%;
+        margin: 10px auto;
+        padding: 20px;
+        max-height: 85vh;
+    }
 }
 
 @media (max-width: 576px) {
@@ -492,13 +526,24 @@
     .tarjeta-comunidad {
         height: 220px;
     }
+
+    .contenido-modal {
+        width: 98%;
+        margin: 5px auto;
+        padding: 15px;
+        max-height: 90vh;
+    }
 }
 
-/* Estilos para las pestañas administrativas */
+/* Estilos para las pestañas administrativas - CORREGIDO */
 .pestanas-admin {
     display: flex;
     margin-bottom: 20px;
     border-bottom: 2px solid #3d0099;
+    top: 0;
+    background-color: #1a0059;
+    padding-top: 10px;
+    padding-bottom: 0;
 }
 
 .pestana-admin {
@@ -528,27 +573,36 @@
 /* Estilos para los paneles administrativos */
 .panel-admin {
     display: block;
+    padding-bottom: 10px;
 }
 
 .panel-admin.oculto {
     display: none;
 }
 
-/* Estilos para la lista de categorías */
+/* Estilos para la lista de categorías - CORREGIDO */
 .lista-categorias {
     margin-top: 20px;
     border: 1px solid #3d0099;
     border-radius: 8px;
     padding: 15px;
     background-color: #2a0080;
-    max-height: 300px;
+    max-height: 250px;
     overflow-y: auto;
+    margin-bottom: 15px;
+    position: relative; /* Para que los elementos hijos puedan posicionarse relativamente a este */
 }
 
 .lista-categorias h3 {
     color: #00eaff;
     margin-bottom: 10px;
     font-size: 18px;
+    position: sticky;
+    top: 0;
+    background-color: #2a0080;
+    padding: 5px 0;
+    z-index: 40;
+    margin-top: 0;
 }
 
 .categoria-item {
@@ -569,37 +623,88 @@
     gap: 8px;
 }
 
-.-editar-categoria,
+/* Estilo base para todos los botones */
+.btn-editar-categoria,
 .btn-eliminar-categoria,
 .btn-editar-subcategoria,
 .btn-eliminar-subcategoria {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background-color 0.25s, color 0.25s;
+    font-size: 1rem;
 }
 
+/* Colores suaves para editar */
 .btn-editar-categoria,
 .btn-editar-subcategoria {
-    color: #00b2ff;
-}
-
-.btn-eliminar-categoria,
-.btn-eliminar-subcategoria {
-    color: #ff3d6e;
+    color: #4da6ff; /* Azul más suave */
 }
 
 .btn-editar-categoria:hover,
 .btn-editar-subcategoria:hover {
-    background-color: rgba(0, 178, 255, 0.1);
+    background-color: rgba(77, 166, 255, 0.12);
+    color: #1a8cff; /* Azul un poco más fuerte al hacer hover */
+}
+
+/* Colores suaves para eliminar */
+.btn-eliminar-categoria,
+.btn-eliminar-subcategoria {
+    color: #ff809f; /* Rosa suave */
 }
 
 .btn-eliminar-categoria:hover,
 .btn-eliminar-subcategoria:hover {
-    background-color: rgba(255, 61, 110, 0.1);
+    background-color: rgba(255, 128, 159, 0.12);
+    color: #ff4d6b; /* Rosa más intenso al hacer hover */
 }
+
+/* Scroll personalizado para la lista de categorías */
+.lista-categorias::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lista-categorias::-webkit-scrollbar-track {
+    background: #1a0059;
+    border-radius: 4px;
+}
+
+.lista-categorias::-webkit-scrollbar-thumb {
+    background: #3d0099;
+    border-radius: 4px;
+}
+
+.lista-categorias::-webkit-scrollbar-thumb:hover {
+    background: #4a00b3;
+}
+
+/* Scroll personalizado para todo el modal */
+.contenido-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.contenido-modal::-webkit-scrollbar-track {
+    background: #1a0059;
+    border-radius: 4px;
+}
+
+.contenido-modal::-webkit-scrollbar-thumb {
+    background: #3d0099;
+    border-radius: 4px;
+}
+
+.contenido-modal::-webkit-scrollbar-thumb:hover {
+    background: #4a00b3;
+}
+
+
+
+
+
+
+
 
 /* Estilos para las notificaciones */
 .notificacion {
@@ -614,15 +719,33 @@
     transition: all 0.3s ease;
     opacity: 0;
     transform: translateY(-20px);
-    z-index: 1000;
+    z-index: 20000; /* Muy por encima de cualquier otro contenido */
     max-width: 300px;
+    pointer-events: none; /* Opcional: evita que interfiera con clics */
 }
 
+/* Clase para hacerla visible */
 .notificacion.visible {
     opacity: 1;
     transform: translateY(0);
+    pointer-events: auto;
 }
 
+/* Tipos de notificación */
+.notificacion.exito {
+    background-color: #4CAF50;
+    border-left: 5px solid #2E7D32;
+}
+
+.notificacion.error {
+    background-color: #F44336;
+    border-left: 5px solid #B71C1C;
+}
+
+.notificacion.info {
+    background-color: #2196F3;
+    border-left: 5px solid #0D47A1;
+}
 
 /* Estilos mejorados para descripción y reglas */
 .descripcion-contenedor, .reglas-contenedor {
@@ -684,20 +807,7 @@
     -webkit-mask-image: none;
 }
 
-.notificacion.exito {
-    background-color: #4CAF50;
-    border-left: 5px solid #2E7D32;
-}
 
-.notificacion.error {
-    background-color: #F44336;
-    border-left: 5px solid #B71C1C;
-}
-
-.notificacion.info {
-    background-color: #2196F3;
-    border-left: 5px solid #0D47A1;
-}
 
 
 
@@ -928,6 +1038,30 @@ html, body {
     position: sticky;
     top: 15px;
 }
+.btn-eliminar-comunidad {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #7b4bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: 500;
+}
+
+.btn-eliminar-comunidad:hover {
+    background-color: #6a3ae0;
+    transform: translateY(-2px);
+}
+
+.btn-eliminar-comunidad i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+
 
 /* Panel de comunidades más compacto */
 .panel-comunidades {
@@ -1034,6 +1168,16 @@ html, body {
     max-width: 100%;
     width: 100%;
     padding: 10px;
+}
+.btn-cerrar-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
 }
 
 /* Para tablets y móviles */
@@ -1205,7 +1349,6 @@ html, body {
     margin-right: 8px;
     font-size: 16px;
 }
-
 /* Estilos para la lista de solicitudes */
 .lista-solicitudes,
 .lista-solicitudes-admin {
@@ -1216,32 +1359,33 @@ html, body {
 
 .solicitud-item,
 .solicitud-admin-item {
-    background-color: #2a1a5e;
+    background-color: #f9f9f9; /* Fondo suave similar al fondo de los controles */
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
     border-left: 4px solid transparent;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
     transition: all 0.2s ease;
 }
 
 .solicitud-item:hover,
 .solicitud-admin-item:hover {
-    background-color: #352270;
+    background-color: #e6e6e6; /* Fondo más oscuro para hover, coherente con la interfaz */
 }
 
+/* Colores de estado coherentes */
 .solicitud-item[data-status="pendiente"] {
-    border-left-color: #ffc107;
+    border-left-color: #ffc107; /* Color amarillo para "pendiente" */
 }
 
 .solicitud-item[data-status="aceptada"] {
-    border-left-color: #28a745;
+    border-left-color: #28a745; /* Color verde para "aceptada" */
 }
 
 .solicitud-item[data-status="rechazada"] {
-    border-left-color: #dc3545;
+    border-left-color: #dc3545; /* Color rojo para "rechazada" */
 }
 
 .solicitud-info,
@@ -1251,11 +1395,12 @@ html, body {
 
 .solicitud-info h3,
 .solicitud-admin-header h3 {
-    color: #fff;
+    color: #333; /* Color de texto oscuro para encabezados */
     margin: 0 0 8px 0;
     font-size: 18px;
 }
 
+/* Estado de la solicitud con colores coherentes */
 .estado-solicitud {
     display: inline-flex;
     align-items: center;
@@ -1266,56 +1411,60 @@ html, body {
     margin-bottom: 10px;
 }
 
+/* Iconos de estado */
 .estado-solicitud i {
     margin-right: 5px;
 }
 
 .estado-solicitud.pendiente {
-    background-color: rgba(255, 193, 7, 0.2);
+    background-color: rgba(255, 193, 7, 0.2); /* Amarillo suave */
     color: #ffc107;
 }
 
 .estado-solicitud.aceptada {
-    background-color: rgba(40, 167, 69, 0.2);
-    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.2); /* Verde suave */
+    color: #000000;
 }
 
 .estado-solicitud.rechazada {
-    background-color: rgba(220, 53, 69, 0.2);
+    background-color: rgba(220, 53, 69, 0.2); /* Rojo suave */
     color: #dc3545;
 }
 
 .fecha-solicitud,
 .fecha-respuesta {
     font-size: 13px;
-    color: #a8a8a8;
+    color: #000000; /* Gris suave */
     margin: 4px 0;
 }
 
+/* Contenedor de respuestas y mensajes */
 .respuesta-contenedor,
 .mensaje-contenedor {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.1); /* Fondo oscuro suave */
     border-radius: 6px;
     padding: 10px;
     margin: 10px 0;
 }
 
+/* Títulos dentro de respuestas y mensajes */
 .respuesta-titulo,
 .mensaje-titulo {
     font-weight: 500;
     margin: 0 0 5px 0;
-    color: #b8b8b8;
+    color: #000000; /* Gris claro */
     font-size: 14px;
 }
 
 .respuesta-texto,
 .mensaje-texto {
     margin: 0;
-    color: #fff;
+    color: #333; /* Texto oscuro para mayor legibilidad */
     font-size: 14px;
     line-height: 1.4;
 }
 
+/* Botones con colores coherentes */
 .btn-cancelar-solicitud,
 .btn-ver-comunidad,
 .btn-aceptar-solicitud,
@@ -1334,21 +1483,22 @@ html, body {
     text-decoration: none;
 }
 
+/* Botones de acción con colores unificados */
 .btn-cancelar-solicitud {
-    background-color: #6c757d;
+    background-color: #6c757d; /* Gris suave */
 }
 
 .btn-ver-comunidad {
-    background-color: #6f42ff;
+    background-color: #6f42ff; /* Violeta */
 }
 
 .btn-aceptar-solicitud {
-    background-color: #28a745;
+    background-color: #28a745; /* Verde */
     margin-right: 10px;
 }
 
 .btn-rechazar-solicitud {
-    background-color: #dc3545;
+    background-color: #dc3545; /* Rojo */
 }
 
 .btn-cancelar-solicitud:hover,
@@ -1359,13 +1509,15 @@ html, body {
     transform: translateY(-2px);
 }
 
+/* Mensaje cuando no hay solicitudes */
 .sin-solicitudes {
     text-align: center;
-    color: #a8a8a8;
+    color: #a8a8a8; /* Gris claro */
     font-style: italic;
     padding: 20px;
 }
 
+/* Contenedor de acciones de la solicitud */
 .acciones-solicitud {
     display: flex;
     justify-content: flex-end;
@@ -1376,16 +1528,68 @@ html, body {
     margin-right: 5px;
 }
 
-/* Selector de comunidad */
-.selector-comunidad {
-    margin-bottom: 15px;
-}
 
-.selector-comunidad label {
+/* Contenedor del selector */
+.selector-comunidad {
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #1a0033, #290066); /* Gradiente oscuro */
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+    transition: background 0.3s ease;
+  }
+  
+  .selector-comunidad:hover {
+    background: linear-gradient(135deg, #22004d, #3a0080);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  }
+  
+  /* Etiqueta */
+  .selector-comunidad label {
     display: block;
-    margin-bottom: 5px;
-    color: #b8b8b8;
-}
+    margin-bottom: 6px;
+    color: #00eaff;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+  
+  /* Select */
+  .formulario-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #00bfff;
+    border-radius: 8px;
+    background-color: #0f0124;
+    font-size: 1rem;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s;
+  }
+  
+  .formulario-control:hover {
+    border-color: #00eaff;
+    background-color: #1b013c;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  }
+  
+  .formulario-control:focus {
+    border-color: #00ffff;
+    background-color: #22005c;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+  }
+  
+  /* Primera opción estilo tenue */
+  .formulario-control option:first-child {
+    color: #aaa;
+    font-style: italic;
+  }
+  
+  /* Opciones dentro del select */
+  .formulario-control option {
+    background-color: #15002b;
+    color: #ffffff;
+  }
+  
 
 /* Formulario de respuesta */
 .formulario-respuesta {
@@ -1431,20 +1635,25 @@ html, body {
 /* Modal de comunidad privada */
 .modal-privada-contenido {
     text-align: center;
-    padding: 10px;
+    padding: 15px; /* Reducción de padding para mejor ajuste */
+    max-width: 400px; /* Reducción del ancho máximo para que no se estire tanto */
+    margin: 0 auto;
 }
 
+/* Icono de la comunidad privada */
 .modal-privada-icono {
-    font-size: 48px;
+    font-size: 36px; /* Tamaño de icono reducido para que no sea tan grande */
     color: #ffc107;
-    margin-bottom: 15px;
+    margin-bottom: 10px; /* Menos espacio debajo del icono */
 }
 
+/* Botones dentro del modal */
 .botones-privada {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 10px; /* Espacio entre botones ajustado */
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 /* Estilos responsivos */
@@ -1459,3 +1668,155 @@ html, body {
     }
 }
 
+
+
+/* Modal fondo oscuro translúcido */
+.modal-eliminar-comunidad {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+/* Contenedor del modal */
+.modal-contenido-eliminar {
+    background-color: #1a0f2b;
+    margin: 80px auto;
+    padding: 40px 30px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+    position: relative;
+    color: white;
+    border-top: 4px solid #ffd000;
+    text-align: center;
+}
+
+/* Botón cerrar */
+.cerrar-modal-eliminar {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 26px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.cerrar-modal-eliminar:hover {
+    color: #fff;
+}
+
+/* Título del modal */
+.modal-eliminar-comunidad h2 {
+    font-size: 22px;
+    color: #ffd000;
+    margin-bottom: 20px;
+}
+
+.modal-eliminar-comunidad h2 i {
+    color: #e74c3c;
+    margin-right: 10px;
+}
+
+/* Contenedor del nombre del grupo expandido y estilizado */
+.comunidad-item {
+    background-color: #2e103c; /* morado oscuro */
+    border-radius: 12px;
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
+}
+.comunidad-nombre {
+    font-weight: bold;
+    font-size: 18px;
+    color: #00eaff;
+    background-color: #1a0f2b;
+    padding: 10px 16px;
+    border-radius: 10px;
+    width: 230px;          /* ancho fijo */
+    white-space: nowrap;   /* evita salto de línea */
+    overflow: hidden;      /* oculta lo que se salga */
+    text-overflow: ellipsis; /* pone "..." si el texto no cabe */
+}
+
+
+/* Botón eliminar */
+.btn-eliminar {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #c0392b;
+}
+
+/* Botones de confirmación */
+.btns-confirmacion {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-cancelar,
+.btn-confirmar {
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-cancelar {
+    background-color: #6c63ff;
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background-color: #5548d9;
+}
+
+.btn-confirmar {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-confirmar:hover {
+    background-color: #c0392b;
+}
+
+/* Mensajes */
+.mensaje-resultado {
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.mensaje-exito {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.mensaje-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}

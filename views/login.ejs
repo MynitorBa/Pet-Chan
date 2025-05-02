@@ -33,10 +33,17 @@
             
             </form>
 
-                <p style="text-align: center; background-color: aliceblue; padding: 10px; border-radius: 10px; margin-top: 20px;">
-                    <a href="/register"> aun no tienes cuenta? Registrate aqui</a>
-                </p>
-
+            <p style="text-align: center; margin-top: 20px; background: linear-gradient(135deg, rgba(163, 4, 250, 0.2) 0%, rgba(211, 4, 197, 0.3) 100%); border: 2px solid #cf7cfc; border-radius: 8px; box-shadow: 0 0 10px rgba(211, 4, 197, 0.4), inset 0 0 5px rgba(163, 4, 250, 0.5); position: relative; overflow: hidden; transition: all 0.4s ease; animation: pulseBox 3s infinite alternate; padding: 0;">
+                <a href="/register" style="display: block; padding: 15px; color: #fff; font-size: 1.2rem; text-decoration: none; letter-spacing: 1px; text-shadow: 0 0 5px #d304c5, 0 0 10px #a304fa;">✧ ¿Aún no tienes cuenta? Regístrate aquí ✧</a>
+            </p>
+            
+            <!-- Necesitarás añadir esta animación en un bloque <style> en tu <head> -->
+            <style>
+            @keyframes pulseBox {
+                0% { box-shadow: 0 0 10px rgba(211, 4, 197, 0.4), inset 0 0 5px rgba(163, 4, 250, 0.5); }
+                100% { box-shadow: 0 0 15px rgba(211, 4, 197, 0.7), inset 0 0 8px rgba(163, 4, 250, 0.7); }
+            }
+            </style>
 
             <% if (error) { %>
                 <div class="error-message">

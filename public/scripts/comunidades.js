@@ -278,11 +278,12 @@ function filtrarComunidades() {
         }
     });
     
-    // La función no reordena, eso lo hará ordenarComunidadesPorRangos después
 
- 
- // Llamar a la función de ordenamiento después de cargar las comunidades
- ordenarComunidadesPorRangos();
+    ordenarComunidades();
+    ordenarPorPublicaciones();
+ ordenarPorMiembros();
+
+
  
  // También ordenar después de filtrar
  const filtroCategoria = document.getElementById('filtro-categoria');
@@ -293,22 +294,25 @@ function filtrarComunidades() {
      filtroCategoria.addEventListener('change', function() {
          // Llamar al filtro original y luego reordenar
          filtrarComunidades();
-         ordenarComunidadesPorRangos();
-     });
+         ordenarComunidades();
+         ordenarPorPublicaciones();
+      ordenarPorMiembros();  });
  }
  
  if (filtroSubcategoria) {
      filtroSubcategoria.addEventListener('change', function() {
          filtrarComunidades();
-         ordenarComunidadesPorRangos();
-     });
+         ordenarComunidades();
+         ordenarPorPublicaciones();
+      ordenarPorMiembros(); });
  }
  
  if (buscarComunidad) {
      buscarComunidad.addEventListener('input', function() {
          filtrarComunidades();
-         ordenarComunidadesPorRangos();
-     });
+         ordenarComunidades();
+         ordenarPorPublicaciones();
+      ordenarPorMiembros();  });
  }
         
         tarjetasComunidad.forEach(tarjeta => {
@@ -794,68 +798,70 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Función para ordenar comunidades por rangos
-function ordenarComunidadesPorRangos() {
+// Función para ordenar comunidades por número de miembros y publicaciones
+function ordenarComunidades() {
     const container = document.querySelector('.comunidades-grid');
     if (!container) return;
     
     const tarjetas = Array.from(container.querySelectorAll('.tarjeta-comunidad'));
     
-    // Definir el orden de prioridad para cada rango
-    const prioridadRango3 = {
-        'Premium': 6,
-        'Administrador': 5,
-        'VIP': 4,
-        'Fundador': 3,
-        'Moderador': 2,
-        'Ninguno': 1
-    };
-    
-    const prioridadRango2 = {
-        'Experto': 6,
-        'Crítico': 5,
-        'Escritor': 4,
-        'Artista': 3,
-        'Colaborador': 2,
-        'Ninguno': 1
-    };
-    
-    const prioridadRango1 = {
-        'Maestro': 6,
-        'Veterano': 5,
-        'Experimentado': 4,
-        'Aprendiz': 3,
-        'Novato': 2,
-        'Ninguno': 1
-    };
-    
-    // Ordenar las tarjetas según la jerarquía de rangos
+    // Ordenar las tarjetas por total de miembros (principal) y total de publicaciones (secundario)
     tarjetas.sort((a, b) => {
-        // Obtener rangos de cada tarjeta
-        const rangoA3 = a.getAttribute('data-rango3') || 'Ninguno';
-        const rangoB3 = b.getAttribute('data-rango3') || 'Ninguno';
+        // Obtener total de miembros y publicaciones de cada tarjeta
+        const miembrosA = parseInt(a.getAttribute('data-miembros') || '0');
+        const miembrosB = parseInt(b.getAttribute('data-miembros') || '0');
         
-        const rangoA2 = a.getAttribute('data-rango2') || 'Ninguno';
-        const rangoB2 = b.getAttribute('data-rango2') || 'Ninguno';
+        const publicacionesA = parseInt(a.getAttribute('data-publicaciones') || '0');
+        const publicacionesB = parseInt(b.getAttribute('data-publicaciones') || '0');
         
-        const rangoA1 = a.getAttribute('data-rango1') || 'Ninguno';
-        const rangoB1 = b.getAttribute('data-rango1') || 'Ninguno';
-        
-        // Comparar primero por rango3
-        if (prioridadRango3[rangoA3] !== prioridadRango3[rangoB3]) {
-            return prioridadRango3[rangoB3] - prioridadRango3[rangoA3]; // Orden descendente
+        // Comparar primero por número de miembros (orden descendente)
+        if (miembrosA !== miembrosB) {
+            return miembrosB - miembrosA;
         }
         
-        // Si rango3 es igual, comparar por rango2
-        if (prioridadRango2[rangoA2] !== prioridadRango2[rangoB2]) {
-            return prioridadRango2[rangoB2] - prioridadRango2[rangoA2]; // Orden descendente
-        }
-        
-        // Si rango2 es igual, comparar por rango1
-        return prioridadRango1[rangoB1] - prioridadRango1[rangoA1]; // Orden descendente
+        // Si tienen el mismo número de miembros, comparar por número de publicaciones
+        return publicacionesB - publicacionesA;
     });
     
     // Volver a insertar las tarjetas en el orden correcto
+    tarjetas.forEach(tarjeta => {
+        container.appendChild(tarjeta);
+    });
+}
+
+// Ejecutar la función cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', ordenarComunidades);
+
+// También permitir ordenar bajo demanda si es necesario
+function ordenarPorMiembros() {
+    const container = document.querySelector('.comunidades-grid');
+    if (!container) return;
+    
+    const tarjetas = Array.from(container.querySelectorAll('.tarjeta-comunidad'));
+    
+    tarjetas.sort((a, b) => {
+        const miembrosA = parseInt(a.getAttribute('data-miembros') || '0');
+        const miembrosB = parseInt(b.getAttribute('data-miembros') || '0');
+        return miembrosB - miembrosA;
+    });
+    
+    tarjetas.forEach(tarjeta => {
+        container.appendChild(tarjeta);
+    });
+}
+
+function ordenarPorPublicaciones() {
+    const container = document.querySelector('.comunidades-grid');
+    if (!container) return;
+    
+    const tarjetas = Array.from(container.querySelectorAll('.tarjeta-comunidad'));
+    
+    tarjetas.sort((a, b) => {
+        const publicacionesA = parseInt(a.getAttribute('data-publicaciones') || '0');
+        const publicacionesB = parseInt(b.getAttribute('data-publicaciones') || '0');
+        return publicacionesB - publicacionesA;
+    });
+    
     tarjetas.forEach(tarjeta => {
         container.appendChild(tarjeta);
     });
@@ -896,108 +902,7 @@ function ordenarComunidadesPorRangos() {
 
 
 
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Referencia al formulario y al campo de reglas
-    const formCrearComunidad = document.querySelector('#modal-crear-comunidad form');
-    const reglasInput = document.getElementById('reglas');
-    
-    if (reglasInput) {
-        // Función para validar el número de saltos de línea consecutivos
-        function validarSaltosDeLinea(texto) {
-            // Buscar más de 5 saltos de línea consecutivos
-            const demasiadosSaltos = /(\n\s*){5,}/.test(texto);
-            return !demasiadosSaltos;
-        }
-        
-        // Validar mientras el usuario escribe
-        reglasInput.addEventListener('input', function() {
-            const toggleBar = document.querySelector('.toggle-bar'); // Ajusta el selector según sea necesario
-            
-            // Remover clases de error previas
-            this.classList.remove('campo-error');
-            const errorTextPrevio = this.parentNode.querySelector('.texto-error');
-            if (errorTextPrevio) {
-                errorTextPrevio.remove();
-            }
-            
-            // Validar los saltos de línea
-            if (!validarSaltosDeLinea(this.value)) {
-                // Mostrar error
-                this.classList.add('campo-error');
-                
-                // Añadir mensaje de error
-                const errorText = document.createElement('p');
-                errorText.className = 'texto-error';
-                errorText.textContent = 'No se permiten más de 5 saltos de línea consecutivos';
-                this.parentNode.appendChild(errorText);
-                
-                // Desactivar toggle bar si existe
-                if (toggleBar) {
-                    toggleBar.classList.add('desactivado');
-                    toggleBar.disabled = true;
-                }
-            } else {
-                // Reactivar toggle bar si existe
-                if (toggleBar) {
-                    toggleBar.classList.remove('desactivado');
-                    toggleBar.disabled = false;
-                }
-            }
-            
-            // Verificar longitud
-            if (this.value.length > 391) {
-                // Truncar el texto a 391 caracteres
-                this.value = this.value.substring(0, 391);
-                
-                // Mostrar notificación
-                mostrarNotificacion('El texto no puede superar los 391 caracteres', 'error');
-            }
-        });
-    }
-    
-    // Agregar validación al submit del formulario
-    if (formCrearComunidad) {
-        const submitOriginal = formCrearComunidad.onsubmit;
-        
-        formCrearComunidad.addEventListener('submit', function(e) {
-            // Si no hay campo de reglas, continuamos normalmente
-            if (!reglasInput) return true;
-            
-            // Validar los saltos de línea antes de enviar
-            if (!validarSaltosDeLinea(reglasInput.value)) {
-                e.preventDefault(); // Prevenir el envío del formulario
-                mostrarNotificacion('No se permiten más de 5 saltos de línea consecutivos', 'error');
-                reglasInput.focus();
-                return false;
-            }
-            
-            // Verificar longitud
-            if (reglasInput.value.length > 391) {
-                e.preventDefault();
-                mostrarNotificacion('El texto no puede superar los 391 caracteres', 'error');
-                reglasInput.focus();
-                return false;
-            }
-            
-            // Si todo está bien, continuar con la validación original si existe
-            return true;
-        }, true); // Usar true para que se ejecute antes que otros event listeners
-    }
-    
-    // Añadir estilos adicionales para el toggle bar desactivado
-    const styleToggle = document.createElement('style');
-    styleToggle.textContent = `
-        .toggle-bar.desactivado {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    `;
-    document.head.appendChild(styleToggle);
-});
-
+// Parte 1: Front-end - Carga de categorías y subcategorías al crear una comunidad
 
 document.addEventListener('DOMContentLoaded', function() {
     // Referencia al formulario de crear comunidad
@@ -1059,6 +964,144 @@ document.addEventListener('DOMContentLoaded', function() {
                     errorText.remove();
                 }
             });
+        }
+
+        // Cargar categorías administradas
+        cargarCategorias();
+    }
+    
+    // Variables para almacenar todas las subcategorías
+    let todasLasSubcategorias = [];
+    
+    // Función para cargar categorías desde la API
+    function cargarCategorias() {
+        fetch('/api/categorias')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const selectCategoria = document.getElementById('categoria');
+                    if (selectCategoria) {
+                        // Limpiar opciones existentes
+                        selectCategoria.innerHTML = '<option value="">Selecciona una categoría</option>';
+                        
+                        // Añadir nuevas opciones
+                        data.categorias.forEach(categoria => {
+                            const option = document.createElement('option');
+                            option.value = categoria.nombre;
+                            option.textContent = categoria.nombre;
+                            selectCategoria.appendChild(option);
+                        });
+                        
+                        // Configurar evento para cargar subcategorías al cambiar la categoría
+                        selectCategoria.addEventListener('change', function() {
+                            if (this.value) {
+                                cargarSubcategorias(this.value);
+                            } else {
+                                // Limpiar subcategorías si no hay categoría seleccionada
+                                const selectSubcategoria = document.getElementById('subcategoria');
+                                const selectExtraSubcategoria = document.getElementById('subcategoria-extra');
+                                
+                                if (selectSubcategoria) {
+                                    selectSubcategoria.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+                                    selectSubcategoria.disabled = true;
+                                }
+                                
+                                if (selectExtraSubcategoria) {
+                                    selectExtraSubcategoria.innerHTML = '<option value="">Selecciona una sub-etiqueta extra</option>';
+                                    selectExtraSubcategoria.disabled = true;
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    console.error('Error al cargar categorías:', data.mensaje);
+                    mostrarNotificacion('Error al cargar categorías', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar categorías:', error);
+                mostrarNotificacion('Error al cargar categorías', 'error');
+            });
+    }
+    
+    // Función para cargar subcategorías basadas en la categoría seleccionada
+    function cargarSubcategorias(categoria) {
+        fetch(`/api/subcategorias?categoria=${encodeURIComponent(categoria)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Guardar todas las subcategorías
+                    todasLasSubcategorias = data.subcategorias;
+                    
+                    const selectSubcategoria = document.getElementById('subcategoria');
+                    const selectExtraSubcategoria = document.getElementById('subcategoria-extra');
+                    
+                    if (selectSubcategoria) {
+                        // Limpiar opciones existentes
+                        selectSubcategoria.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+                        
+                        // Añadir nuevas opciones
+                        todasLasSubcategorias.forEach(subcategoria => {
+                            const option = document.createElement('option');
+                            option.value = subcategoria.nombre;
+                            option.textContent = subcategoria.nombre;
+                            selectSubcategoria.appendChild(option);
+                        });
+                        
+                        // Habilitar el selector de subcategorías
+                        selectSubcategoria.disabled = false;
+                        
+                        // Configurar evento para actualizar las subcategorías extras
+                        selectSubcategoria.addEventListener('change', function() {
+                            actualizarExtraSubcategorias(this.value);
+                        });
+                    }
+                    
+                    // Limpiar y deshabilitar el selector de subcategorías extra
+                    if (selectExtraSubcategoria) {
+                        selectExtraSubcategoria.innerHTML = '<option value="">Selecciona una sub-etiqueta extra</option>';
+                        selectExtraSubcategoria.disabled = true;
+                    }
+                } else {
+                    console.error('Error al cargar subcategorías:', data.mensaje);
+                    mostrarNotificacion('Error al cargar subcategorías', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar subcategorías:', error);
+                mostrarNotificacion('Error al cargar subcategorías', 'error');
+            });
+    }
+    
+    // Función para actualizar las subcategorías extras basadas en la subcategoría seleccionada
+    function actualizarExtraSubcategorias(subcategoriaSeleccionada) {
+        const selectExtraSubcategoria = document.getElementById('subcategoria-extra');
+        
+        if (selectExtraSubcategoria) {
+            // Limpiar opciones existentes
+            selectExtraSubcategoria.innerHTML = '<option value="">Selecciona una sub-etiqueta extra</option>';
+            
+            // Si hay una subcategoría seleccionada, mostrar las demás como opciones
+            if (subcategoriaSeleccionada) {
+                // Filtrar para mostrar solo las subcategorías que no son la seleccionada
+                const subcategoriasRestantes = todasLasSubcategorias.filter(
+                    subcategoria => subcategoria.nombre !== subcategoriaSeleccionada
+                );
+                
+                // Añadir opciones filtradas
+                subcategoriasRestantes.forEach(subcategoria => {
+                    const option = document.createElement('option');
+                    option.value = subcategoria.nombre;
+                    option.textContent = subcategoria.nombre;
+                    selectExtraSubcategoria.appendChild(option);
+                });
+                
+                // Habilitar el selector si hay opciones disponibles
+                selectExtraSubcategoria.disabled = subcategoriasRestantes.length === 0;
+            } else {
+                // Si no hay subcategoría seleccionada, deshabilitar el selector
+                selectExtraSubcategoria.disabled = true;
+            }
         }
     }
     
@@ -1139,10 +1182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const textosLargos = document.querySelectorAll('.descripcion-texto.truncado, .reglas-texto.truncado');
         
         textosLargos.forEach(texto => {
-            if (texto.scrollHeight > texto.clientHeight) {
-                const contenedor = texto.parentElement;
-                const tarjeta = contenedor.closest('.tarjeta-comunidad');
-                
+         
                 if (!contenedor.querySelector('.btn-expandir')) {
                     const boton = document.createElement('button');
                     boton.className = 'btn-expandir';
@@ -1163,7 +1203,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     contenedor.appendChild(boton);
                 }
-            }
+            
         });
     }
     
@@ -1308,7 +1348,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         }, 500);
                         
                         // Scroll to form
-                        document.getElementById('form-extrasubcategoria').scrollIntoView();
                     } else {
                         alert('Error: ' + data.mensaje);
                     }
@@ -1418,54 +1457,264 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-// Añadir botón para mostrar/ocultar panel lateral en móviles
 document.addEventListener('DOMContentLoaded', function() {
-    // Solo crear el botón si estamos en dispositivo móvil
-    if (window.innerWidth <= 768) {
-        // Crear botón toggle para panel lateral
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'btn-toggle-panel';
-        toggleBtn.innerHTML = '<i class="fas fa-bars"></i> Menú';
+    // Elementos del DOM
+    const btnEliminarComunidad = document.getElementById('btn-eliminar-comunidad');
+    let modalEliminar = null;
+    let comunidadSeleccionada = null;
+
+    // Crear el modal solo cuando se necesite (lazy loading)
+    function crearModalEliminarComunidad() {
+        // Si ya existe el modal, no lo creamos de nuevo
+        if (document.querySelector('.modal-eliminar-comunidad')) {
+            return document.querySelector('.modal-eliminar-comunidad');
+        }
+
+        // Crear el modal
+        const modal = document.createElement('div');
+        modal.className = 'modal-eliminar-comunidad';
+        modal.innerHTML = `
+            <div class="modal-contenido-eliminar">
+                <span class="cerrar-modal-eliminar">&times;</span>
+                <h2><i class="fas fa-trash"></i> Eliminar Comunidad</h2>
+                
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                
+                <div class="lista-comunidades">
+                    <!-- Aquí se cargarán las comunidades -->
+                </div>
+                
+                <div class="confirmacion-eliminar">
+                    <p>¿Estás seguro de que deseas eliminar esta comunidad? Esta acción no se puede deshacer.</p>
+                    <div class="btns-confirmacion">
+                        <button class="btn-cancelar">Cancelar</button>
+                        <button class="btn-confirmar">Eliminar</button>
+                    </div>
+                </div>
+                
+                <div class="mensaje-resultado"></div>
+            </div>
+        `;
         
-        // Insertar el botón al inicio del contenedor principal
-        const container = document.querySelector('.contenedor-principal');
-        const panelLateral = document.querySelector('.panel-lateral');
-        container.insertBefore(toggleBtn, container.firstChild);
+        document.body.appendChild(modal);
         
-        // Ocultar panel lateral por defecto en móvil
-        panelLateral.style.display = 'none';
+        // Agregar eventos al modal
+        const cerrarModal = modal.querySelector('.cerrar-modal-eliminar');
+        cerrarModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+            // Recargar la página al cerrar el modal
+            window.location.reload();
+        });
         
-        // Añadir funcionalidad de toggle
-        toggleBtn.addEventListener('click', function() {
-            if (panelLateral.style.display === 'none') {
-                panelLateral.style.display = 'flex';
-                toggleBtn.innerHTML = '<i class="fas fa-times"></i> Cerrar';
-            } else {
-                panelLateral.style.display = 'none';
-                toggleBtn.innerHTML = '<i class="fas fa-bars"></i> Menú';
+        // Cerrar modal al hacer clic fuera del contenido
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                // Recargar la página al cerrar el modal
+                window.location.reload();
             }
         });
+        
+        // Eventos para los botones de confirmación
+        const btnCancelar = modal.querySelector('.btn-cancelar');
+        btnCancelar.addEventListener('click', () => {
+            modal.querySelector('.confirmacion-eliminar').style.display = 'none';
+            comunidadSeleccionada = null;
+            // Recargar la página al cancelar
+            window.location.reload();
+        });
+        
+        const btnConfirmar = modal.querySelector('.btn-confirmar');
+        btnConfirmar.addEventListener('click', () => {
+            if (comunidadSeleccionada) {
+                eliminarComunidad(comunidadSeleccionada);
+            }
+        });
+        
+        return modal;
     }
-    
-    // Evitar desplazamiento horizontal indeseado
-    document.body.addEventListener('touchmove', function(e) {
-        if (document.body.scrollWidth > window.innerWidth) {
-            e.preventDefault();
+
+    // Cargar las comunidades del usuario
+    async function cargarComunidadesUsuario() {
+        const listaComunidades = modalEliminar.querySelector('.lista-comunidades');
+        const loadingSpinner = modalEliminar.querySelector('.loading-spinner');
+        const mensajeResultado = modalEliminar.querySelector('.mensaje-resultado');
+        
+        // Ocultar mensajes previos
+        mensajeResultado.style.display = 'none';
+        mensajeResultado.className = 'mensaje-resultado';
+        
+        // Mostrar spinner de carga
+        loadingSpinner.style.display = 'block';
+        listaComunidades.innerHTML = '';
+        
+        try {
+            console.log('Cargando comunidades administradas...');
+            const response = await fetch('/api/comunidades/administradas', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin' // Asegura que se envíen las cookies de sesión
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al cargar las comunidades');
+            }
+            
+            const data = await response.json();
+            console.log('Comunidades cargadas:', data);
+            
+            // Ocultar spinner
+            loadingSpinner.style.display = 'none';
+            
+            if (data.error) {
+                listaComunidades.innerHTML = `
+                    <div class="sin-comunidades">
+                        <p>${data.mensaje || 'Ocurrió un error al cargar las comunidades'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (!data.comunidades || data.comunidades.length === 0) {
+                listaComunidades.innerHTML = `
+                    <div class="sin-comunidades">
+                        <p>No administras ninguna comunidad que puedas eliminar</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Mostrar las comunidades - solo con el nombre como solicitaste
+            let html = '';
+            data.comunidades.forEach(comunidad => {
+                html += `
+                    <div class="comunidad-item" data-id="${comunidad.id}">
+                        <div class="comunidad-info">
+                            <div class="comunidad-nombre">${comunidad.nombre}</div>
+                        </div>
+                        <button class="btn-eliminar" data-id="${comunidad.id}">
+<i class="fas fa-check"></i> Seleccionar
+                        </button>
+                    </div>
+                `;
+            });
+            
+            listaComunidades.innerHTML = html;
+            
+            // Agregar eventos a los botones de eliminar
+            const btnsEliminar = listaComunidades.querySelectorAll('.btn-eliminar');
+            btnsEliminar.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const comunidadId = btn.getAttribute('data-id');
+                    const confirmacion = modalEliminar.querySelector('.confirmacion-eliminar');
+                    
+                    // Guardar el ID de la comunidad seleccionada
+                    comunidadSeleccionada = comunidadId;
+                    
+                    // Mostrar la confirmación
+                    confirmacion.style.display = 'block';
+                    
+                    // Hacer scroll hasta la confirmación
+                    confirmacion.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+        } catch (error) {
+            console.error('Error:', error);
+            loadingSpinner.style.display = 'none';
+            listaComunidades.innerHTML = `
+                <div class="sin-comunidades">
+                    <p>Ocurrió un error al cargar las comunidades. Por favor, inténtalo de nuevo más tarde.</p>
+                    <p class="error-detalle" style="font-size: 0.8rem; color: #e74c3c; margin-top: 10px;">Error técnico: ${error.message}</p>
+                </div>
+            `;
         }
-    }, { passive: false });
+    }
+
+   // Función modificada para recargar la página después de eliminar
+   async function eliminarComunidad(comunidadId) {
+        const confirmacion = modalEliminar.querySelector('.confirmacion-eliminar');
+        const loadingSpinner = modalEliminar.querySelector('.loading-spinner');
+        const mensajeResultado = modalEliminar.querySelector('.mensaje-resultado');
+        
+        // Ocultar confirmación y mostrar spinner
+        confirmacion.style.display = 'none';
+        loadingSpinner.style.display = 'block';
+        mensajeResultado.style.display = 'none';
+        
+        try {
+            console.log('Eliminando comunidad con ID:', comunidadId);
+            
+            const response = await fetch(`/api/comunidades/${comunidadId}/eliminar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin' // Asegura que se envíen las cookies de sesión
+            });
+            
+            console.log('Respuesta recibida:', response);
+            
+            let data;
+            try {
+                data = await response.json();
+                console.log('Datos de respuesta:', data);
+            } catch (jsonError) {
+                console.error('Error al procesar JSON:', jsonError);
+                throw new Error('Respuesta no válida del servidor');
+            }
+            
+            // Ocultar spinner
+            loadingSpinner.style.display = 'none';
+            
+            if (data.error) {
+                // Mostrar mensaje de error
+                mensajeResultado.className = 'mensaje-resultado mensaje-error';
+                mensajeResultado.style.display = 'block';
+                mensajeResultado.textContent = data.mensaje || 'Error al eliminar la comunidad';
+            } else {
+                // Mostrar mensaje de éxito (opcional, si no se recarga antes de que el usuario lo vea)
+                mensajeResultado.className = 'mensaje-resultado mensaje-exito';
+                mensajeResultado.style.display = 'block';
+                mensajeResultado.textContent = data.mensaje || 'Comunidad eliminada correctamente';
+            
+                // Recargar la página inmediatamente
+                window.location.reload();
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            loadingSpinner.style.display = 'none';
+            mensajeResultado.className = 'mensaje-resultado mensaje-error';
+            mensajeResultado.style.display = 'block';
+            mensajeResultado.textContent = 'Ocurrió un error al eliminar la comunidad';
+        }
+    }
+
+    // Evento para abrir el modal
+    if (btnEliminarComunidad) {
+        btnEliminarComunidad.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Crear el modal si no existe
+            if (!modalEliminar) {
+                modalEliminar = crearModalEliminarComunidad();
+            }
+            
+            // Mostrar el modal
+            modalEliminar.style.display = 'block';
+            
+            // Cargar las comunidades
+            cargarComunidadesUsuario();
+        });
+    }
 });
+
 
 
 // Existing code in comunidades.js remains the same
@@ -1774,31 +2023,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Responder a una solicitud (aceptar/rechazar)
-    function responderSolicitud(solicitudId, estado, respuesta) {
-        fetch('/solicitudes/responder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                solicitudId: solicitudId,
-                estado: estado,
-                respuesta: respuesta
-            })
+   // Responder a una solicitud (aceptar/rechazar)
+function responderSolicitud(solicitudId, estado, respuesta) {
+    fetch('/solicitudes/responder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            solicitudId: solicitudId,
+            estado: estado,
+            respuesta: respuesta
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Eliminar la solicitud del DOM
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            mostrarNotificacion(`Solicitud ${estado === 'aceptada' ? 'aceptada' : 'rechazada'} correctamente`, 'exito');
+            
+            // Si fue aceptada, recargar la página automáticamente
+            if (estado === 'aceptada') {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500); // Recargar después de 1.5 segundos para que se vea la notificación
+            } else {
+                // Si fue rechazada, solo eliminar la solicitud del DOM
                 const solicitudElement = document.querySelector(`.solicitud-admin-item[data-id="${solicitudId}"]`);
                 if (solicitudElement) {
                     solicitudElement.remove();
                 }
-                
-                // Mostrar mensaje de éxito
-                mostrarNotificacion(`Solicitud ${estado === 'aceptada' ? 'aceptada' : 'rechazada'} correctamente`, 'exito');
                 
                 // Si no quedan solicitudes, mostrar mensaje
                 const listaSolicitudes = document.querySelector('.lista-solicitudes-admin');
@@ -1808,15 +2063,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Si se filtra y no quedan solicitudes visibles
                 actualizarVisibilidadMensajeSinSolicitudes();
-            } else {
-                mostrarNotificacion('Error al procesar la solicitud: ' + data.mensaje, 'error');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarNotificacion('Error al procesar la solicitud', 'error');
-        });
-    }
+        } else {
+            mostrarNotificacion('Error al procesar la solicitud: ' + data.mensaje, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al procesar la solicitud', 'error');
+    });
+}
     
     // Verificar si el usuario puede acceder a una comunidad privada
     function verificarAccesoComunidadPrivada(comunidadId, url) {
@@ -1845,38 +2101,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Enviar solicitud para unirse a comunidad privada
-    function enviarSolicitudPrivada(comunidadId, mensaje) {
-        fetch(`/comunidad/${comunidadId}/unirse`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                mensaje: mensaje
-            })
+   // Enviar solicitud para unirse a comunidad privada
+function enviarSolicitudPrivada(comunidadId, mensaje) {
+    fetch(`/comunidad/${comunidadId}/unirse`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            mensaje: mensaje
         })
-        .then(response => response.json())
-        .then(data => {
-            // Ocultar modal
-            modalComunidadPrivada.style.display = 'none';
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Ocultar modal
+        modalComunidadPrivada.style.display = 'none';
+        
+        if (data.success) {
+            mostrarNotificacion(data.mensaje, 'exito');
             
-            if (data.success) {
-                mostrarNotificacion(data.mensaje, 'exito');
-                
-                // Limpiar el formulario
-                document.getElementById('mensaje-solicitud').value = '';
-            } else {
-                mostrarNotificacion(data.mensaje, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarNotificacion('Error al enviar la solicitud', 'error');
-            modalComunidadPrivada.style.display = 'none';
-        });
-    }
+            // Limpiar el formulario
+            document.getElementById('mensaje-solicitud').value = '';
+            
+            // Recargar la página después de un breve retraso
+            setTimeout(() => {
+                window.location.reload();
+            }, 500); // Recargar después de 1.5 segundos para que se vea la notificación
+        } else {
+            mostrarNotificacion(data.mensaje, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al enviar la solicitud', 'error');
+        modalComunidadPrivada.style.display = 'none';
+    });
+}
     
     // Mostrar modal para enviar solicitud a comunidad privada
     function mostrarModalSolicitudPrivada(comunidadId) {
@@ -1988,9 +2249,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const btnAbrir = document.getElementById("btn-admin-categorias");
+    const modal = document.getElementById("modal-categorias");
+    const btnCerrar = document.getElementById("cerrar-modal-categorias");
 
+    // Abrir modal
+    btnAbrir.addEventListener("click", function (e) {
+        e.preventDefault();
+        modal.classList.add("activo");
+    });
 
+    // Cerrar modal
+    btnCerrar.addEventListener("click", function () {
+        modal.classList.remove("activo");
+    });
 
-
-
-
+    // Cerrar al hacer clic fuera del contenido
+    modal.addEventListener("click", function (e) {
+        if (e.target === modal) {
+            modal.classList.remove("activo");
+        }
+    });
+});

@@ -462,73 +462,32 @@
     transition: none !important;
 }
 
-/* Añadir estos estilos a tu archivo perfil_personalizado.css */
-
-/* Estilos para la sección de rangos */
-.rangos-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+   /* Estilos para mensajes de validación */
+   .mensaje-validacion {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    height: 1.2em;
+    color: #ff6b97;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
 }
 
-.rango-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.mensaje-validacion.valido {
+    color: #81ff9a;
 }
 
-.rango-item label {
-    font-weight: bold;
-    color: #bbb8c5;
+/* Estilos para campos con error */
+input.error {
+    border: 2px solid #ff6b97 !important;
+    box-shadow: 0 0 5px #ff6b97;
 }
 
-.rango-item select {
-    padding: 8px;
-    border: 2px solid #cf7cfc;
-    border-radius: 4px;
-    background-color: #1f1535;
-    color: #fff;
-    font-family: 'Pixel', sans-serif;
+input.valid {
+    border: 2px solid #81ff9a !important;
 }
 
-.rangos-preview {
-    margin-top: 15px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 2px solid #cf7cfc;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-.rangos-preview h4 {
-    margin: 0 0 10px 0;
-    color: #feca57;
-    text-align: center;
-}
-
-.rangos-usuario-preview {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.rango-usuario {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-.rango-1 {
-    background-color: #4b0082; /* Índigo oscuro */
-    color: #fff;
-}
-
-.rango-2 {
-    background-color: #a304fa; /* Púrpura */
-    color: #fff;
-}
-
-.rango-3 {
-    background-color: #d304c5; /* Rosa */
-    color: #fff;
+/* Estilo para deshabilitar botones */
+.Boton.deshabilitado {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.7);
 }

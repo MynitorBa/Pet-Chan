@@ -53,181 +53,410 @@ function crearConfeti() {
 // Gestión de accesorios
 const accesoriosSeleccionados = [];
 
-document.querySelectorAll('.accesorio').forEach(accesorio => {
-    accesorio.addEventListener('click', function() {
-        const tipoAccesorio = this.getAttribute('data-accesorio');
-        
-        // Toggle selección visual
-        this.classList.toggle('seleccionado');
-        
-        // Actualizar lista de accesorios
-        if (this.classList.contains('seleccionado')) {
-            // Añadir accesorio
-            accesoriosSeleccionados.push(tipoAccesorio);
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicialización de accesorios
+    document.querySelectorAll('.accesorio').forEach(accesorio => {
+        accesorio.addEventListener('click', function() {
+            const tipoAccesorio = this.getAttribute('data-accesorio');
             
-            // Crear elemento visual para la mascota
-            const accesorioElement = document.createElement('div');
-            accesorioElement.classList.add('accesorio-equipado');
-            accesorioElement.classList.add('no-transition');
-            accesorioElement.id = 'accesorio-' + tipoAccesorio;
+            // Toggle selección visual
+            this.classList.toggle('seleccionado');
             
-            // Crear imagen dentro del contenedor
-            const accesorioImg = document.createElement('img');
-            accesorioImg.src = this.querySelector('img').src;
-            accesorioImg.classList.add('pixeleado');
-            accesorioElement.appendChild(accesorioImg);
-            
-            // Estilos del contenedor del accesorio
-            accesorioElement.style.position = 'absolute';
-            accesorioElement.style.zIndex = '2';
-            accesorioElement.style.pointerEvents = 'none';
-            
-            // Tamaño del accesorio
-            accesorioElement.style.width = '40px';
-            accesorioElement.style.height = '40px';
-            
-            // Reemplaza el switch por esto:
-            accesorioElement.style.scale = '4';
-            accesorioElement.style.imageRendering = 'pixelated';
-            accesorioElement.style.transform = 'translateX(-10%) translateY(50%)';
-            
-            // Añadir el accesorio como hijo del escenario (no de la mascota)
-            document.getElementById('escenario').appendChild(accesorioElement);
-            
-            // Crear efecto de confeti
-            crearConfeti();
-        } else {
-            // Eliminar accesorio
-            const index = accesoriosSeleccionados.indexOf(tipoAccesorio);
-            if (index > -1) {
-                accesoriosSeleccionados.splice(index, 1);
+            // Actualizar lista de accesorios
+            if (this.classList.contains('seleccionado')) {
+                // Añadir accesorio
+                accesoriosSeleccionados.push(tipoAccesorio);
+                
+                // Crear elemento visual para la mascota
+                const accesorioElement = document.createElement('div');
+                accesorioElement.classList.add('accesorio-equipado');
+                accesorioElement.classList.add('no-transition');
+                accesorioElement.id = 'accesorio-' + tipoAccesorio;
+                
+                // Crear imagen dentro del contenedor
+                const accesorioImg = document.createElement('img');
+                accesorioImg.src = this.querySelector('img').src;
+                accesorioImg.classList.add('pixeleado');
+                accesorioElement.appendChild(accesorioImg);
+                
+                // Estilos del contenedor del accesorio
+                accesorioElement.style.position = 'absolute';
+                accesorioElement.style.zIndex = '2';
+                accesorioElement.style.pointerEvents = 'none';
+                
+                // Tamaño del accesorio
+                accesorioElement.style.width = '40px';
+                accesorioElement.style.height = '40px';
+                
+                accesorioElement.style.scale = '4';
+                accesorioElement.style.imageRendering = 'pixelated';
+                accesorioElement.style.transform = 'translateX(-10%) translateY(50%)';
+                
+                // Añadir el accesorio como hijo del escenario (no de la mascota)
+                document.getElementById('escenario').appendChild(accesorioElement);
+                
+                // Crear efecto de confeti
+                crearConfeti();
+            } else {
+                // Eliminar accesorio
+                const index = accesoriosSeleccionados.indexOf(tipoAccesorio);
+                if (index > -1) {
+                    accesoriosSeleccionados.splice(index, 1);
+                }
+                
+                // Eliminar elemento visual
+                const accesorioElement = document.getElementById('accesorio-' + tipoAccesorio);
+                if (accesorioElement) {
+                    accesorioElement.remove();
+                }
             }
             
-            // Eliminar elemento visual
-            const accesorioElement = document.getElementById('accesorio-' + tipoAccesorio);
-            if (accesorioElement) {
-                accesorioElement.remove();
+            // Actualizar campo de formulario
+            if (accesoriosSeleccionados.length === 0) {
+                document.getElementById('accesorio-mascota').value = 'Ninguno';
+            } else {
+                document.getElementById('accesorio-mascota').value = accesoriosSeleccionados.map(tipo => {
+                    // Encontrar el nombre del accesorio por su tipo
+                    const elem = document.querySelector(`.accesorio[data-accesorio="${tipo}"]`);
+                    return elem ? elem.querySelector('span').textContent : tipo;
+                }).join(', ');
             }
-        }
-        
-        // Actualizar campo de formulario
-        if (accesoriosSeleccionados.length === 0) {
-            document.getElementById('accesorio-mascota').value = 'Ninguno';
-        } else {
-            document.getElementById('accesorio-mascota').value = accesoriosSeleccionados.map(tipo => {
-                // Encontrar el nombre del accesorio por su tipo
-                const elem = document.querySelector(`.accesorio[data-accesorio="${tipo}"]`);
-                return elem ? elem.querySelector('span').textContent : tipo;
-            }).join(', ');
-        }
+        });
     });
-});
 
-// Animación para mover los accesorios junto con la mascota
-function animarAccesorios() {
-    const mascota = document.getElementById('mascota-preview');
-    const mascotaRect = mascota.getBoundingClientRect();
-    const escenarioRect = document.getElementById('escenario').getBoundingClientRect();
-    
-    // Calcular posición relativa de la mascota dentro del escenario
-    const mascotaX = mascotaRect.left - escenarioRect.left;
-    const mascotaY = mascotaRect.top - escenarioRect.top;
-    
-    // Mover cada accesorio
-    accesoriosSeleccionados.forEach(tipo => {
-        const accesorio = document.getElementById('accesorio-' + tipo);
-        if (accesorio) {
-            // Aplicar transformación basada en la posición de la mascota
-            const transform = window.getComputedStyle(accesorio).transform;
-            const originalTransform = transform === 'none' ? '' : transform;
-            
-            // Calcular nueva posición
-            let left = mascotaX + mascotaRect.width / 2;
-            let top = mascotaY;
-            
-            accesorio.style.left = `${left}px`;
-            accesorio.style.top = `${top}px`;
-            accesorio.style.transform = originalTransform;
-        }
-    });
-    
+    // Animación para mover los accesorios junto con la mascota
+    function animarAccesorios() {
+        const mascota = document.getElementById('mascota-preview');
+        const mascotaRect = mascota.getBoundingClientRect();
+        const escenarioRect = document.getElementById('escenario').getBoundingClientRect();
+        
+        // Calcular posición relativa de la mascota dentro del escenario
+        const mascotaX = mascotaRect.left - escenarioRect.left;
+        const mascotaY = mascotaRect.top - escenarioRect.top;
+        
+        // Mover cada accesorio
+        accesoriosSeleccionados.forEach(tipo => {
+            const accesorio = document.getElementById('accesorio-' + tipo);
+            if (accesorio) {
+                // Aplicar transformación basada en la posición de la mascota
+                const transform = window.getComputedStyle(accesorio).transform;
+                const originalTransform = transform === 'none' ? '' : transform;
+                
+                // Calcular nueva posición
+                let left = mascotaX + mascotaRect.width / 2;
+                let top = mascotaY;
+                
+                accesorio.style.left = `${left}px`;
+                accesorio.style.top = `${top}px`;
+                accesorio.style.transform = originalTransform;
+            }
+        });
+        
+        requestAnimationFrame(animarAccesorios);
+    }
+
+    // Iniciar la animación de los accesorios
     requestAnimationFrame(animarAccesorios);
-}
 
-// Iniciar la animación de los accesorios
-requestAnimationFrame(animarAccesorios);
+    // Aplicar accesorios activos
+    if (typeof accesoriosActivos !== 'undefined' && accesoriosActivos) {
+        const indicesActivos = accesoriosActivos.map(acc => acc.indice.toString());
 
-window.addEventListener('DOMContentLoaded', () => {
-    const indicesActivos = accesoriosActivos.map(acc => acc.indice.toString());
+        document.querySelectorAll('.accesorio').forEach(accesorioElem => {
+            const indice = accesorioElem.getAttribute('data-accesorio');
 
-    document.querySelectorAll('.accesorio').forEach(accesorioElem => {
-        const indice = accesorioElem.getAttribute('data-accesorio');
+            if (indicesActivos.includes(indice)) {
+                accesorioElem.click(); // Simula el clic para marcarlo como seleccionado y mostrarlo
+            }
+        });
+    }
 
-        if (indicesActivos.includes(indice)) {
-            accesorioElem.click(); // Simula el clic para marcarlo como seleccionado y mostrarlo
-        }
+    // FIX: Configuración correcta de los botones de cancelar
+    const botonesDeCancel = document.querySelectorAll('.boton.cancelar');
+    console.log("Botones de cancelar encontrados:", botonesDeCancel.length);
+    
+    botonesDeCancel.forEach(boton => {
+        boton.addEventListener('click', function(e) {
+            console.log("Botón cancelar clickeado");
+            e.preventDefault(); // Prevenir cualquier acción por defecto
+            window.location.href = window.location.href; // Recargar la página actual
+        });
     });
+
+    // Referencias a elementos
+    const usernameInput = document.getElementById('nombre-usuario');
+    const mascotaInput = document.getElementById('nombre-mascota');
+    const passwordActual = document.getElementById('password-actual');
+    const passwordNueva = document.getElementById('password-nueva');
+    const passwordConfirmar = document.getElementById('password-confirmar');
     
-    // Agregar funcionalidad para la vista previa de rangos
-    const rango1 = document.getElementById('rango1');
-    const rango2 = document.getElementById('rango2');
-    const rango3 = document.getElementById('rango3');
+    // Referencias a mensajes
+    const mensajeUsuario = document.getElementById('mensaje-usuario');
+    const mensajeMascota = document.getElementById('mensaje-mascota');
+    const mensajePasswordActual = document.getElementById('mensaje-password-actual');
+    const mensajePassword = document.getElementById('mensaje-password');
+    const mensajePasswordConfirmar = document.getElementById('mensaje-password-confirmar');
     
-    const previewRango1 = document.getElementById('preview-rango1');
-    const previewRango2 = document.getElementById('preview-rango2');
-    const previewRango3 = document.getElementById('preview-rango3');
+    // Referencias a botones
+    const btnActualizarPerfil = document.getElementById('btn-actualizar-perfil');
+    const btnGuardarMascota = document.getElementById('btn-guardar-mascota');
+    const btnCambiarPassword = document.getElementById('btn-cambiar-password');
     
-    function actualizarPreviewRangos() {
-        previewRango1.textContent = rango1.value !== 'Ninguno' ? rango1.value : '';
-        previewRango2.textContent = rango2.value !== 'Ninguno' ? rango2.value : '';
-        previewRango3.textContent = rango3.value !== 'Ninguno' ? rango3.value : '';
+    // Validación de nombre de usuario
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            validarUsername();
+        });
+    }
+    
+    // Validación de nombre de mascota
+    if (mascotaInput) {
+        mascotaInput.addEventListener('input', function() {
+            validarMascota();
+        });
+    }
+    
+    // Validaciones de contraseñas
+    if (passwordNueva) {
+        passwordNueva.addEventListener('input', function() {
+            validarNuevaPassword();
+            if (passwordConfirmar && passwordConfirmar.value) {
+                validarConfirmarPassword();
+            }
+        });
+    }
+    
+    if (passwordConfirmar) {
+        passwordConfirmar.addEventListener('input', function() {
+            validarConfirmarPassword();
+        });
+    }
+    
+    if (passwordActual) {
+        passwordActual.addEventListener('input', function() {
+            validarPasswordActual();
+        });
+    }
+    
+    // Función para validar el nombre de usuario
+    function validarUsername() {
+        if (!usernameInput || !mensajeUsuario) return false;
         
-        // Aplicar clases específicas para los estilos
-        previewRango1.className = 'rango-usuario rango-1';
-        previewRango2.className = 'rango-usuario rango-2';
-        previewRango3.className = 'rango-usuario rango-3';
+        const username = usernameInput.value.trim();
         
-        if (rango1.value !== 'Ninguno') {
-            previewRango1.classList.add('rango-' + rango1.value.toLowerCase());
-        }
+        // Limpiar estilos previos
+        usernameInput.classList.remove('error', 'valid');
+        mensajeUsuario.classList.remove('valido');
+        mensajeUsuario.textContent = '';
         
-        if (rango2.value !== 'Ninguno') {
-            previewRango2.classList.add('rango-' + rango2.value.toLowerCase());
-        }
-        
-        if (rango3.value !== 'Ninguno') {
-            previewRango3.classList.add('rango-' + rango3.value.toLowerCase());
+        if (username.length < 5) {
+            usernameInput.classList.add('error');
+            mensajeUsuario.textContent = '⚠️ Mínimo 5 caracteres';
+            if (btnActualizarPerfil) btnActualizarPerfil.classList.add('deshabilitado');
+            return false;
+        } else if (username.length > 12) {
+            usernameInput.classList.add('error');
+            mensajeUsuario.textContent = '⚠️ Máximo 12 caracteres';
+            if (btnActualizarPerfil) btnActualizarPerfil.classList.add('deshabilitado');
+            return false;
+        } else {
+            usernameInput.classList.add('valid');
+            mensajeUsuario.classList.add('valido');
+            mensajeUsuario.textContent = '✓ Nombre válido';
+            if (btnActualizarPerfil) btnActualizarPerfil.classList.remove('deshabilitado');
+            return true;
         }
     }
     
-    // Eventos para actualizar la vista previa cuando cambian los rangos
-    rango1.addEventListener('change', actualizarPreviewRangos);
-    rango2.addEventListener('change', actualizarPreviewRangos);
-    rango3.addEventListener('change', actualizarPreviewRangos);
+    // Función para validar el nombre de la mascota
+    function validarMascota() {
+        if (!mascotaInput || !mensajeMascota) return false;
+        
+        const mascota = mascotaInput.value.trim();
+        
+        // Limpiar estilos previos
+        mascotaInput.classList.remove('error', 'valid');
+        mensajeMascota.classList.remove('valido');
+        mensajeMascota.textContent = '';
+        
+        if (mascota.length < 3) {
+            mascotaInput.classList.add('error');
+            mensajeMascota.textContent = '⚠️ Mínimo 3 caracteres';
+            if (btnGuardarMascota) btnGuardarMascota.classList.add('deshabilitado');
+            return false;
+        } else if (mascota.length > 12) {
+            mascotaInput.classList.add('error');
+            mensajeMascota.textContent = '⚠️ Máximo 12 caracteres';
+            if (btnGuardarMascota) btnGuardarMascota.classList.add('deshabilitado');
+            return false;
+        } else {
+            mascotaInput.classList.add('valid');
+            mensajeMascota.classList.add('valido');
+            mensajeMascota.textContent = '✓ Nombre válido';
+            if (btnGuardarMascota) btnGuardarMascota.classList.remove('deshabilitado');
+            return true;
+        }
+    }
     
-    // Inicializar la vista previa
-    actualizarPreviewRangos();
+    // Función para validar contraseña actual
+    function validarPasswordActual() {
+        if (!passwordActual || !mensajePasswordActual) return false;
+        
+        if (!passwordActual.value) {
+            mensajePasswordActual.textContent = '⚠️ Ingresa tu contraseña actual';
+            passwordActual.classList.add('error');
+            return false;
+        } else {
+            mensajePasswordActual.textContent = '';
+            passwordActual.classList.remove('error');
+            return true;
+        }
+    }
+    
+    // Función para validar nueva contraseña
+    function validarNuevaPassword() {
+        if (!passwordNueva || !mensajePassword) return false;
+        
+        const password = passwordNueva.value;
+        
+        // Limpiar estilos previos
+        passwordNueva.classList.remove('error', 'valid');
+        mensajePassword.classList.remove('valido');
+        mensajePassword.textContent = '';
+        
+        if (password.length < 8) {
+            passwordNueva.classList.add('error');
+            mensajePassword.textContent = '⚠️ Mínimo 8 caracteres';
+            return false;
+        } else if (!/[A-Z]/.test(password)) {
+            passwordNueva.classList.add('error');
+            mensajePassword.textContent = '⚠️ Incluye al menos una mayúscula';
+            return false;
+        } else if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+            passwordNueva.classList.add('error');
+            mensajePassword.textContent = '⚠️ Incluye al menos un símbolo';
+            return false;
+        } else {
+            passwordNueva.classList.add('valid');
+            mensajePassword.classList.add('valido');
+            mensajePassword.textContent = '✓ Contraseña válida';
+            return true;
+        }
+    }
+    
+    // Función para validar confirmación de contraseña
+    function validarConfirmarPassword() {
+        if (!passwordConfirmar || !mensajePasswordConfirmar || !passwordNueva) return false;
+        
+        const password1 = passwordNueva.value;
+        const password2 = passwordConfirmar.value;
+        
+        // Limpiar estilos previos
+        passwordConfirmar.classList.remove('error', 'valid');
+        mensajePasswordConfirmar.classList.remove('valido');
+        mensajePasswordConfirmar.textContent = '';
+        
+        if (!password2) {
+            passwordConfirmar.classList.add('error');
+            mensajePasswordConfirmar.textContent = '⚠️ Confirma tu contraseña';
+            return false;
+        } else if (password1 !== password2) {
+            passwordConfirmar.classList.add('error');
+            mensajePasswordConfirmar.textContent = '⚠️ Las contraseñas no coinciden';
+            return false;
+        } else {
+            passwordConfirmar.classList.add('valid');
+            mensajePasswordConfirmar.classList.add('valido');
+            mensajePasswordConfirmar.textContent = '✓ Contraseñas coinciden';
+            return true;
+        }
+    }
+    
+    // Validar formularios al enviar
+    const formPersonal = document.getElementById('modificar-info-personal');
+    if (formPersonal) {
+        formPersonal.addEventListener('submit', function(e) {
+            if (!validarUsername()) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    const formMascota = document.getElementById('form-mascota');
+    if (formMascota) {
+        formMascota.addEventListener('submit', function(e) {
+            if (!validarMascota()) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    const formPassword = document.getElementById('form-password');
+    if (formPassword) {
+        formPassword.addEventListener('submit', function(e) {
+            const validPassword = validarPasswordActual() && validarNuevaPassword() && validarConfirmarPassword();
+            if (!validPassword) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // Ejecutar validaciones iniciales si los elementos existen
+    if (usernameInput) validarUsername();
+    if (mascotaInput) validarMascota();
 });
 
-// Botones de cancelar
-document.querySelectorAll('.Boton.cancelar').forEach(boton => {
-    boton.addEventListener('click', function() {
-        const form = this.closest('form');
-        form.reset();
+
+
+// Solución inmediata para los botones de cancelar
+document.addEventListener('DOMContentLoaded', function() {
+    // Enfoque directo: reemplazar todos los botones de cancelar por nuevos botones
+    const botonesCancel = document.querySelectorAll('.boton.cancelar');
+    
+    botonesCancel.forEach(botonOriginal => {
+        // Crear un nuevo botón con las mismas características
+        const nuevoBoton = document.createElement('button');
+        nuevoBoton.textContent = botonOriginal.textContent;
+        nuevoBoton.className = botonOriginal.className;
+        nuevoBoton.type = 'button';
         
-        // Si es el formulario de rangos, actualizar la vista previa
-        if (form.id === 'form-rangos') {
-            const rango1 = document.getElementById('rango1');
-            const rango2 = document.getElementById('rango2');
-            const rango3 = document.getElementById('rango3');
-            
-            const previewRango1 = document.getElementById('preview-rango1');
-            const previewRango2 = document.getElementById('preview-rango2');
-            const previewRango3 = document.getElementById('preview-rango3');
-            
-            previewRango1.textContent = rango1.value !== 'Ninguno' ? rango1.value : '';
-            previewRango2.textContent = rango2.value !== 'Ninguno' ? rango2.value : '';
-            previewRango3.textContent = rango3.value !== 'Ninguno' ? rango3.value : '';
+        // Agregar el evento de manera directa y explícita
+        nuevoBoton.onclick = function() {
+            console.log("Botón cancelar clickeado (nuevo botón)");
+            // Usar varios métodos para asegurar la recarga
+            try {
+                window.location = window.location.href;
+            } catch(e) {
+                try {
+                    window.location.replace(window.location.href);
+                } catch(e2) {
+                    try {
+                        window.location.reload(true);
+                    } catch(e3) {
+                        alert("No se pudo recargar la página. Por favor, recárgala manualmente.");
+                    }
+                }
+            }
+            return false; // Prevenir cualquier propagación
+        };
+        
+        // Reemplazar el botón original con el nuevo
+        if (botonOriginal.parentNode) {
+            botonOriginal.parentNode.replaceChild(nuevoBoton, botonOriginal);
+        }
+    });
+    
+    // Alternativa: Agregar un evento global para detectar clics en botones cancelar
+    document.body.addEventListener('click', function(event) {
+        if (event.target && (
+            event.target.classList.contains('cancelar') || 
+            (event.target.parentElement && event.target.parentElement.classList.contains('cancelar'))
+        )) {
+            console.log("Botón cancelar detectado por delegación de eventos");
+            event.preventDefault();
+            event.stopPropagation();
+            window.location.reload(true);
+            return false;
         }
     });
 });

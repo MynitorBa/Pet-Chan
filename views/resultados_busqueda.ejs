@@ -1,0 +1,252 @@
+<%- include("partials/header.ejs") %>
+<link rel="stylesheet" href="styles/resultados_busqueda.css">
+
+<div class="resultados-contenedor">
+  <div class="resultados-header">
+    <h1>Resultados para "<span class="query-texto"><%= query %></span>"</h1>
+    <div class="acciones-rapidas">
+      <% menuItems.forEach(item => { %>
+        <a href="<%= item.path %>" class="boton-accion">
+          <i class="<%= item.icon %>"></i> <%= item.text %>
+        </a>
+      <% }); %>
+    </div>
+  </div>
+
+  <div class="resultados-grid">
+    <!-- COMUNIDADES -->
+    <section class="resultado-seccion comunidades-seccion">
+      <div class="seccion-header">
+        <h2><i class="fas fa-users"></i> Comunidades</h2>
+        <a href="/comunidad" class="ver-todos">Ver todas</a>
+      </div>
+      
+      <% if (comunidades.length) { %>
+        <div class="tarjetas-contenedor">
+          <% comunidades.forEach(c => { %>
+            <div class="tarjeta-item">
+              <div class="tarjeta-imagen">
+                <img src="<%= c.imagen_url || '/imagenes_y_gif/default_comunidad.png' %>" alt="<%= c.nombre %>">
+              </div>
+              <div class="tarjeta-contenido">
+                <h3><%= c.nombre %></h3>
+                <p class="tarjeta-descripcion"><%= c.descripcion %></p>
+                <div class="tarjeta-meta">
+                  <span class="meta-item"><i class="fas fa-tag"></i> <%= c.categoria %></span>
+                  <% if (c.subcategoria && c.subcategoria !== 'Ninguna') { %>
+                    <span class="meta-item"><i class="fas fa-bookmark"></i> <%= c.subcategoria %></span>
+                  <% } %>
+                  <span class="meta-item"><i class="fas fa-users"></i> <%= c.miembros %> miembros</span>
+                </div>
+                <a href="/comunidad/<%= c.id %>" class="boton-explorar">Explorar</a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="sin-resultados">
+          <p>No se encontraron comunidades para "<%= query %>"</p>
+          <div class="ejemplos-contenedor">
+            <h4>Comunidades populares</h4>
+            <div class="ejemplos-lista">
+              <% ejemplos.comunidades.forEach(c => { %>
+                <a href="/comunidad/<%= c.id %>" class="ejemplo-item">
+                  <%= c.nombre %> <span class="ejemplo-meta"><%= c.miembros %> miembros</span>
+                </a>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- MASCOTAS -->
+    <section class="resultado-seccion mascotas-seccion">
+      <div class="seccion-header">
+        <h2><i class="fas fa-paw"></i> Mascotas</h2>
+        <a href="/corral_mascota" class="ver-todos">Ver todas</a>
+      </div>
+      
+      <% if (mascotas.length) { %>
+        <div class="tarjetas-contenedor">
+          <% mascotas.forEach(p => { %>
+            <div class="tarjeta-item">
+              <div class="tarjeta-imagen mascota-imagen">
+                <i class="fas fa-paw mascota-icono"></i>
+              </div>
+              <div class="tarjeta-contenido">
+                <h3><%= p.petname %></h3>
+                <p class="tarjeta-descripcion">Habilidad: <%= p.habilidad %></p>
+                <div class="tarjeta-meta">
+                  <span class="meta-item"><i class="fas fa-heart"></i> Amor: <%= p.nivelAmor %></span>
+                  <span class="meta-item"><i class="fas fa-smile"></i> Felicidad: <%= p.nivelFelicidad %></span>
+                  <span class="meta-item"><i class="fas fa-user"></i> Dueño: <%= p.dueno %></span>
+                </div>
+                <a href="/perfil/<%= p.dueno_id %>" class="boton-explorar">Ver dueño</a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="sin-resultados">
+          <p>No se encontraron mascotas para "<%= query %>"</p>
+          <div class="ejemplos-contenedor">
+            <h4>Mascotas destacadas</h4>
+            <div class="ejemplos-lista">
+              <% ejemplos.mascotas.forEach(p => { %>
+                <div class="ejemplo-item">
+                  <%= p.petname %> <span class="ejemplo-meta"><%= p.habilidad %></span>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- EVENTOS -->
+    <section class="resultado-seccion eventos-seccion">
+      <div class="seccion-header">
+        <h2><i class="fas fa-calendar"></i> Eventos</h2>
+        <a href="/eventos" class="ver-todos">Ver todos</a>
+      </div>
+      
+      <% if (eventos && eventos.length) { %>
+        <div class="eventos-lista">
+          <% eventos.forEach(evento => { %>
+            <div class="evento-item <%= evento.es_especial ? 'evento-especial' : '' %>">
+              <div class="evento-imagen">
+                <% if (evento.imagen) { %>
+                  <img src="<%= evento.imagen %>" alt="<%= evento.titulo %>">
+                <% } else { %>
+                  <i class="fas fa-calendar-day"></i>
+                <% } %>
+                <% if (evento.popular) { %>
+                  <span class="evento-popular"><i class="fas fa-star"></i> Popular</span>
+                <% } %>
+              </div>
+              <div class="evento-contenido">
+                <h3><%= evento.titulo %></h3>
+                <p class="evento-descripcion"><%= evento.descripcion.length > 100 ? evento.descripcion.substring(0, 100) + '...' : evento.descripcion %></p>
+                <div class="evento-detalles">
+                  <span><i class="fas fa-clock"></i> <%= evento.fecha ? new Date(evento.fecha).toLocaleDateString('es-ES', {day: '2-digit', month: 'short', year: 'numeric'}) : '' %> - <%= evento.hora %></span>
+                  <span><i class="fas fa-map-marker-alt"></i> <%= evento.plataforma %></span>
+                  <% if (evento.organizador) { %>
+                    <span><i class="fas fa-user"></i> <%= evento.organizador %></span>
+                  <% } %>
+                </div>
+                <a href="/eventos/<%= evento.id %>" class="boton-explorar">Ver evento</a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="sin-resultados">
+          <p>No se encontraron eventos para "<%= query %>"</p>
+          <div class="ejemplos-contenedor">
+            <h4>Eventos próximos</h4>
+            <div class="ejemplos-lista">
+              <% if (ejemplos.eventos && ejemplos.eventos.length) { %>
+                <% ejemplos.eventos.forEach(e => { %>
+                  <a href="/eventos/<%= e.id %>" class="ejemplo-item">
+                    <%= e.titulo %> <span class="ejemplo-meta"><%= new Date(e.fecha).toLocaleDateString('es-ES', {day: '2-digit', month: 'short'}) %></span>
+                  </a>
+                <% }) %>
+              <% } else { %>
+                <a href="/eventos" class="ejemplo-item">Ver todos los eventos</a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- PUBLICACIONES -->
+    <section class="resultado-seccion posts-seccion">
+      <div class="seccion-header">
+        <h2><i class="fas fa-comments"></i> Publicaciones</h2>
+        <a href="/foro" class="ver-todos">Ver todas</a>
+      </div>
+      
+      <% if (posts.length) { %>
+        <div class="posts-lista">
+          <% posts.forEach(post => { %>
+            <div class="post-item">
+              <div class="post-cabecera">
+                <h3><%= post.autor %></h3>
+                <span class="post-fecha"><%= new Date(post.fecha).toLocaleDateString('es-ES', {day: '2-digit', month: 'short', year: 'numeric'}) %></span>
+              </div>
+              <div class="post-contenido">
+                <p><%= post.mensaje.length > 150 ? post.mensaje.substring(0, 150) + '...' : post.mensaje %></p>
+              </div>
+              <div class="post-meta">
+                <span class="etiqueta"><%= post.etiqueta %></span>
+                <span class="votos"><i class="fas fa-arrow-up"></i> <%= post.ranking || 0 %></span>
+              </div>
+              <a href="/foro/post/<%= post.id %>" class="boton-leer">Leer más</a>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="sin-resultados">
+          <p>No se encontraron publicaciones para "<%= query %>"</p>
+          <div class="ejemplos-contenedor">
+            <h4>Publicaciones populares</h4>
+            <div class="ejemplos-lista">
+              <% ejemplos.posts.forEach(post => { %>
+                <a href="/foro/post/<%= post.id %>" class="ejemplo-item">
+                  <%= post.mensaje.substring(0, 50) %>... <span class="ejemplo-meta"><%= post.autor %></span>
+                </a>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- COMENTARIOS -->
+    <% if (comentarios && comentarios.length) { %>
+    <section class="resultado-seccion comentarios-seccion">
+      <div class="seccion-header">
+        <h2><i class="fas fa-reply"></i> Comentarios</h2>
+      </div>
+      
+      <div class="comentarios-lista">
+        <% comentarios.forEach(com => { %>
+          <div class="comentario-item">
+            <div class="comentario-cabecera">
+              <h4><%= com.autor %></h4>
+              <span class="comentario-fecha"><%= new Date(com.fecha).toLocaleDateString('es-ES', {day: '2-digit', month: 'short'}) %></span>
+            </div>
+            <p><%= com.comentario.length > 100 ? com.comentario.substring(0, 100) + '...' : com.comentario %></p>
+            <a href="/foro/post/<%= com.post_id %>#comentario-<%= com.id %>" class="boton-ir">Ver en contexto</a>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
+    <!-- Si no hay resultados en ninguna categoría -->
+    <% if ((!comunidades || !comunidades.length) && (!mascotas || !mascotas.length) && (!eventos || !eventos.length) && (!posts || !posts.length) && (!comentarios || !comentarios.length)) { %>
+      <div class="sin-resultados-global">
+        <div class="mensaje-sin-resultados">
+          <i class="fas fa-search"></i>
+          <h2>No se encontraron resultados para "<%= query %>"</h2>
+          <p>Intenta con términos más generales o revisa la ortografía.</p>
+        </div>
+        
+        <div class="sugerencias">
+          <h3>Explora lo más popular</h3>
+          <div class="botones-sugerencias">
+            <a href="/foro" class="boton-sugerencia"><i class="fas fa-comments"></i> Foros</a>
+            <a href="/comunidad" class="boton-sugerencia"><i class="fas fa-users"></i> Comunidades</a>
+            <a href="/eventos" class="boton-sugerencia"><i class="fas fa-calendar"></i> Eventos</a>
+            <a href="/corral_mascota" class="boton-sugerencia"><i class="fas fa-paw"></i> Mascotas</a>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>

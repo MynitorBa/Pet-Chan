@@ -12,6 +12,7 @@
 <body>
     <%- include("partials/header.ejs") %>
 
+
     <!-- Main Forum Welcome Banner (only shown when not in a community view) -->
     <div class="community-header" id="main-forum-header">
         <div class="community-banner">
@@ -225,10 +226,15 @@
                         <% } %>
                         
                         <div class="form-group author-field">
-                            <div class="field-label">Autor:</div>
-                            <div class="autor-display"><%= username %></div>
+                            <div class="autor-container">
+                                <span class="autor-label">Autor:</span> 
+                                <span class="autor-username"><%= username %></span>
+                            </div>
                             <input type="hidden" id="autor" name="autor" value="<%= username %>">
                         </div>
+                        
+                        
+                        
                         <div class="form-group">
                             <div class="field-label">Mensaje:</div>
                             <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
@@ -283,13 +289,19 @@
                     <form action="/publicar-comentario" method="POST" id="comentario-form" enctype="multipart/form-data">
                         <input type="hidden" id="mensaje-padre-id" name="mensaje_padre_id" value="">
                         <div class="form-group author-field">
-                            <div class="field-label">Autor:</div>
-                            <div class="autor-display"><%= username %></div>
-                            <input type="hidden" id="autor-comentario" name="autor" value="<%= username %>">
+                            <div class="autor-container">
+                                <span class="autor-label">Autor:</span> 
+                                <span class="autor-username"><%= username %></span>
+                            </div>
+                            <input type="hidden" id="autor" name="autor" value="<%= username %>">
                         </div>
+                        
+                        
+                        
+                        
                         <div class="form-group">
                             <div class="field-label">Comentario:</div>
-                            <textarea id="comentario" name="comentario" rows="4" required></textarea>
+                            <textarea id="comentario" name="comentario" rows="9" required></textarea>
                         </div>
                         
                         <div class="form-group imagenes-input-container">
@@ -300,7 +312,7 @@
                             </div>
                             <input type="file" id="imagenes-input-comentario" name="imagenes" class="imagenes-input" accept="image/*" multiple>
                             <div id="imagenes-preview-container-comentario"></div>
-                            <p class="hint-text">Máximo 4 imágenes por comentario</p>
+                            <p class="hint-text">Máximo 9 imágenes por comentario</p>
                         </div>
                         
                         <div class="form-buttons">
@@ -353,21 +365,6 @@
                                 <% }); %>
                             <% } else { %>
                                 <p class="filtro-mensaje">No perteneces a ninguna comunidad todavía</p>
-                            <% } %>
-                        </div>
-                        
-                        <div class="filtros-separator">Todas las comunidades disponibles</div>
-                        
-                        <!-- Listado de todas las comunidades -->
-                        <div class="filtros-grid">
-                            <% if (locals.communities && communities.length > 0) { %>
-                                <% communities.forEach(comunidad => { %>
-                                    <div class="filtro-item">
-                                        <input type="radio" id="comunidad-global-<%= comunidad.id %>" name="comunidad_id" value="<%= comunidad.id %>" 
-                                            <%= (locals.filtros && filtros.comunidadId == comunidad.id && !filtros.misComunidades) ? 'checked' : '' %>>
-                                        <label for="comunidad-global-<%= comunidad.id %>"><%= comunidad.nombre %></label>
-                                    </div>
-                                <% }); %>
                             <% } %>
                         </div>
                     </div>
@@ -486,22 +483,13 @@
                                     <button class="btn-comentar" data-id="<%= mensaje.id %>"><i class="fas fa-comment"></i></button>
                                 </div>
                             </div>
-                            
-                            <div class="rangos-container">
-                                <div class="rangos-wrapper">
-                                    <div class="rango-item rango1 <%= mensaje.rango1 && mensaje.rango1 !== 'Ninguno' ? mensaje.rango1 : 'Ninguno' %>">
-                                        <span class="rango-valor"><%= mensaje.rango1 || 'Ninguno' %></span>
-                                    </div>
-                                    <div class="rango-item rango2 <%= mensaje.rango2 && mensaje.rango2 !== 'Ninguno' ? mensaje.rango2 : 'Ninguno' %>">
-                                        <span class="rango-valor"><%= mensaje.rango2 || 'Ninguno' %></span>
-                                    </div>
-                                    <div class="rango-item rango3 <%= mensaje.rango3 && mensaje.rango3 !== 'Ninguno' ? mensaje.rango3 : 'Ninguno' %>">
-                                        <span class="rango-valor"><%= mensaje.rango3 || 'Ninguno' %></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            
+                            <div class="rangos-wrapper">
+                                <div class="rango-item"><span class="rango-valor">${mensaje.rango1 || 'Novato'}</span></div>
+                                <div class="rango-item ${!mensaje.rango2 ? 'rango-vacio' : ''}"><span class="rango-valor">${mensaje.rango2 || ''}</span></div>
+                                <div class="rango-item ${!mensaje.rango3 ? 'rango-vacio' : ''}"><span class="rango-valor">${mensaje.rango3 || ''}</span></div>
+                              </div>
+                              
+                              
                             <div class="etiquetas-container">
                                 <div class="etiquetas-wrapper">
                                     <% if (mensaje.etiqueta) { %>
@@ -627,7 +615,7 @@
                                                 accept="image/*" 
                                                 multiple>
                                             <div class="imagenes-preview-container"></div>
-                                            <p class="hint-text">Máximo 4 imágenes por comentario</p>
+                                            <p class="hint-text">Máximo 9 imágenes por comentario</p>
                                         </div>
                                         <div class="form-actions">
                                             <button type="submit" class="btn-publicar">Publicar comentario</button>
@@ -669,15 +657,19 @@
       </div>
     </div>
   </div>
-                
-                <!-- Modal para imagen ampliada -->
-                <div id="modal-imagen" class="modal-imagen">
-                    <div id="modal-imagen-contenido" class="modal-imagen-contenido">
-                        <button id="cerrar-modal-imagen" class="cerrar-modal-imagen"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
+        
                 
                 <script src="/scripts/foro.js"></script>
+
+                <script>
+                    window.addEventListener('load', function () {
+                      const boton = document.getElementById('aplicar-filtros');
+                      if (boton) {
+                        boton.click();
+                      }
+                    });
+                  </script>
+                  
                 <%- include("partials/footer.ejs") %>
                 </body>
                 </html>

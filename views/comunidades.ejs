@@ -3,7 +3,7 @@
 <meta name="user-rango3" content="<%= userRangos.rango3 %>">
 
 <div class="contenedor-principal">
-    <div class="panel-lateral">
+<div class="panel-lateral">
         <a href="#" class="btn-crear-comunidad" id="btn-abrir-modal">
             <i class="fas fa-plus"></i> Crear Comunidad
         </a>
@@ -15,11 +15,13 @@
             <i class="fas fa-user-clock"></i> Solicitudes en espera
         </a>
         
-        <% if (userRangos.rango3 === 'Moderador' || userRangos.rango3 === 'Administrador') { %>
         <a href="#" class="btn-admin-solicitudes" id="btn-admin-solicitudes">
             <i class="fas fa-users-cog"></i> Solicitudes de seguidores
         </a>
-        <% } %>
+        
+    <a href="#" class="btn-eliminar-comunidad" id="btn-eliminar-comunidad">
+        <i class="fas fa-trash"></i> Eliminar Comunidad
+    </a>    
         
         <div class="seccion">
             <h2>Destacados</h2>
@@ -315,6 +317,15 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
+
+
 <!-- Modal para crear comunidad -->
 <div id="modal-crear-comunidad" class="formulario-modal">
     <div class="contenido-modal">
@@ -323,12 +334,15 @@
         <form action="/comunidad/crear" method="POST" enctype="multipart/form-data">
             <div class="formulario-grupo">
                 <label for="nombre">Nombre de la comunidad</label>
-                <input type="text" id="nombre" name="nombre" required maxlength="100">
+                <input type="text" id="nombre" name="nombre" required maxlength="44">
+                <small id="nombre-ayuda" class="form-text text-muted">Máximo 44 caracteres, incluyendo espacios.</small>
             </div>
             <div class="formulario-grupo">
                 <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3" required></textarea>
+                <textarea id="descripcion" name="descripcion" rows="3" required maxlength="391"></textarea>
+                <small id="descripcion-ayuda" class="form-text text-muted">Máximo 391 caracteres, incluyendo espacios.</small>
             </div>
+
             <div class="formulario-grupo">
                 <label for="categoria">Categoría *</label>
                 <select id="categoria" name="categoria" required>

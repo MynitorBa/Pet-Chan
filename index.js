@@ -15,6 +15,7 @@ import { hashPassword, verifyPassword } from "cryptography-password-js";
 
 
 
+
 import { especieMascotas, comidasFavoritas, habilidadesEspeciales, accesorios, juguetes, corralesDisponibles } from './informacion/informacion.js'; //exportamos las especies de mascotas
 
 import { preciosJuguetes, preciosAccesorios, preciosComidas, preciosCorrales } from './informacion/precios.js';
@@ -111,81 +112,133 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
     res.render('login.ejs', { error: null });
 })
-
-// Modifica también la ruta de login para cargar los rangos del usuario en la sesión
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-      const userResult = await db.query('SELECT * FROM users WHERE username = $1', [username]);
-      if (userResult.rows.length === 0) {
-          return res.render("login.ejs", { error: "Usuario no encontrado" });
-      }
+    const userResult = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+    if (userResult.rows.length === 0) {
+      return res.render("login.ejs", { error: "Usuario no encontrado" });
+    }
 
-      const user = userResult.rows[0];
-      const isPasswordValid = await verifyPassword(password, user.password);
+    const user = userResult.rows[0];
+    const isPasswordValid = await verifyPassword(password, user.password);
 
-      if (!isPasswordValid) {
-          return res.render("login.ejs", { error: "Contraseña incorrecta" });
-      }
+    if (!isPasswordValid) {
+      return res.render("login.ejs", { error: "Contraseña incorrecta" });
+    }
 
-      // ✅ Guardamos los datos del usuario en sesión, incluyendo rangos
-      req.session.userId = user.id;
-      req.session.username = user.username;
-      req.session.descripcion = user.description;
-      req.session.money = user.money;
-      req.session.corral = user.corral;
+    // Obtener tiempos de login y calcular diferencia
+    const lastLoginTime = user.last_login_time ? new Date(user.last_login_time) : null;
+    const currentLoginTime = new Date();
+    
+    // Debugging para ver tiempos exactos
+    console.log("Last login time:", lastLoginTime);
+    console.log("Current login time:", currentLoginTime);
+
+    const petResult = await db.query('SELECT * FROM pets WHERE "id_users" = $1 LIMIT 1', [user.id]);
+
+    // Calcular diferencia de tiempo en milisegundos
+    const diferenciaDeTiempo = lastLoginTime ? (currentLoginTime - lastLoginTime) : 0;
+    console.log("Diferencia de tiempo (ms):", diferenciaDeTiempo);
+
+    // Actualizar el tiempo de inicio de sesión inmediatamente
+    await db.query(
+      'UPDATE users SET last_login_time = $1 WHERE id = $2',
+      [currentLoginTime, user.id]
+    );
+
+    req.session.lastLoginTime = lastLoginTime;
+    req.session.currentLoginTime = currentLoginTime;
+
+    req.session.userId = user.id;
+    req.session.username = user.username;
+    req.session.descripcion = user.description;
+    req.session.money = user.money;
+    req.session.corral = user.corral;
+    req.session.rango1 = user.rango1 || 'Novato';
+    req.session.rango2 = user.rango2 || '';
+    req.session.rango3 = user.rango3 || '';
+
+    if (petResult.rows.length === 0) {
+      return res.redirect("/minijuegomascota");
+    }
+
+    const mascota = petResult.rows[0];
+    console.log("Estado inicial de la mascota:", {
+      felicidad: mascota.nivelFelicidad,
+      energia: mascota.nivelEnergia
+    });
+
+    // Aplicar la lógica de reducción solo si hay diferencia de tiempo
+    if (diferenciaDeTiempo > 0) {
+      // Convertir la diferencia de tiempo de milisegundos a horas
+      const horasTranscurridas = diferenciaDeTiempo / (1000 * 60 * 60);
+      console.log(`Tiempo real transcurrido: ${horasTranscurridas.toFixed(2)} horas`);
       
-      // Añadir los rangos a la sesión
-      req.session.rango1 = user.rango1 || 'Ninguno';
-      req.session.rango2 = user.rango2 || 'Ninguno';
-      req.session.rango3 = user.rango3 || 'Ninguno';
+      // Calcular cuántos intervalos completos de 2 horas han pasado
+      const intervalos2Horas = Math.floor(horasTranscurridas / 2);
+      console.log(`Intervalos completos de 2 horas: ${intervalos2Horas}`);
+      
+      // Calcular reducción exacta: 5 puntos por cada intervalo completo de 2 horas
+      let reduccionFelicidad = intervalos2Horas * 5;
+      let reduccionEnergia = intervalos2Horas * 5;
+      
+      console.log(`Reducción calculada: ${reduccionFelicidad} puntos por ${intervalos2Horas} intervalos`);
+      
+      // Aplicar reducción con límite inferior de 0
+      let nuevoNivelFelicidad = Math.max(mascota.nivelFelicidad - reduccionFelicidad, 0);
+      let nuevoNivelEnergia = Math.max(mascota.nivelEnergia - reduccionEnergia, 0);
 
-      // ✅ Buscamos si el usuario ya tiene una mascota
-      const petResult = await db.query('SELECT * FROM pets WHERE "id_users" = $1 LIMIT 1', [user.id]);
+      console.log(`Nivel Felicidad: ${mascota.nivelFelicidad} → ${nuevoNivelFelicidad} (-${reduccionFelicidad})`);
+      console.log(`Nivel Energía: ${mascota.nivelEnergia} → ${nuevoNivelEnergia} (-${reduccionEnergia})`);
 
-      if (petResult.rows.length === 0) {
-          return res.redirect("/minijuegomascota");
-      }
+      // Actualizar niveles en la base de datos
+      await db.query(
+        'UPDATE pets SET "nivelFelicidad" = $1, "nivelEnergia" = $2 WHERE id = $3',
+        [nuevoNivelFelicidad, nuevoNivelEnergia, mascota.id]
+      );
 
-      if (petResult.rows.length > 0) {
-          const mascota = petResult.rows[0];
-          const rutaImagen = `${rutaBase}${mascota.indice}.gif`;
-          const especieDeMascota = especieMascotas[mascota.indice - 1];
-          const pronombre = mascota.genero === "macho" ? "el" : "la";
+      // Actualizar los valores en el objeto mascota
+      mascota.nivelFelicidad = nuevoNivelFelicidad;
+      mascota.nivelEnergia = nuevoNivelEnergia;
+    }
 
-          // Guardamos la mascota en sesión
-          req.session.mascotaActual = {
-              id: mascota.id,
-              nombre: mascota.petname,
-              genero: mascota.genero,
-              especie: especieDeMascota,
-              indice: mascota.indice,
-              rutaImagen,
-              pronombre,
-              niveldeAmor: mascota.nivelAmor,
-              niveldeFelicidad: mascota.nivelFelicidad,
-              niveldeEnergia: mascota.nivelEnergia,
-              habilidad: mascota.habilidad,
-              comidaFavorita: mascota.comidaFavorita
-          };
-      }
+    const rutaImagen = `${rutaBase}${mascota.indice}.gif`;
+    const especieDeMascota = especieMascotas[mascota.indice - 1];
+    const pronombre = mascota.genero === "macho" ? "el" : "la";
 
-      //vamos a hacer un array con todos los accesorios del usuario
-      const accesoriosResult = await db.query('SELECT * FROM accesorios WHERE "id_users" = $1', [user.id]);
+    req.session.mascotaActual = {
+      id: mascota.id,
+      nombre: mascota.petname,
+      genero: mascota.genero,
+      especie: especieDeMascota,
+      indice: mascota.indice,
+      rutaImagen,
+      pronombre,
+      niveldeAmor: mascota.nivelAmor,
+      niveldeFelicidad: mascota.nivelFelicidad,
+      niveldeEnergia: mascota.nivelEnergia,
+      habilidad: mascota.habilidad,
+      comidaFavorita: mascota.comidaFavorita
+    };
 
-      if (accesoriosResult.rows.length > 0) {
-          req.session.accesorios = accesoriosResult.rows;
-      } else {
-          req.session.accesorios = null;
-      }
+    const accesoriosResult = await db.query('SELECT * FROM accesorios WHERE "id_users" = $1', [user.id]);
 
-      res.redirect("/inicio");
+    if (accesoriosResult.rows.length > 0) {
+      req.session.accesorios = accesoriosResult.rows;
+    } else {
+      req.session.accesorios = null;
+    }
+
+    res.redirect("/inicio");
   } catch (error) {
-      console.error("Error en login:", error);
-      res.status(500).render("login.ejs", { error: "Error al iniciar sesión" });
+    console.error("Error en login:", error);
+    res.status(500).render("login.ejs", { error: "Error al iniciar sesión" });
   }
 });
+
+
 app.post('/register', async (req, res) => {
   const { username, password, confirmPassword } = req.body;
 
@@ -228,12 +281,14 @@ app.post('/register', async (req, res) => {
           maxmem: 64 * 1024 * 1024,
       });
 
-      // Modificamos la consulta para incluir los rangos por defecto
+      // Configura el tiempo actual para last_login_time
+      const currentTime = new Date();
+
       const result = await db.query(
-          'INSERT INTO users (username, password, description, money, rango1, rango2, rango3) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, username',
-          [username, hashedPassword, "Descripción del usuario", 0, 'Ninguno', 'Ninguno', 'Ninguno']
+        'INSERT INTO users (username, password, description, money, rango1, rango2, rango3, last_login_time) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, username',
+        [username, hashedPassword, "Descripción del usuario", 0, 'Novato', null, null, currentTime]
       );
-      
+    
       const newUser = result.rows[0];
       req.session.userId = newUser.id;
       req.session.username = newUser.username;
@@ -242,9 +297,13 @@ app.post('/register', async (req, res) => {
       req.session.corral = null;
       
       // Inicializar rangos en la sesión
-      req.session.rango1 = 'Ninguno';
-      req.session.rango2 = 'Ninguno';
-      req.session.rango3 = 'Ninguno';
+      req.session.rango1 = 'Novato';
+      req.session.rango2 = 'Ninguna';
+      req.session.rango3 = 'Ninguna';
+      
+      // Inicializar tiempos de login en la sesión
+      req.session.lastLoginTime = null;
+      req.session.currentLoginTime = currentTime;
 
       // vamos a poner los accesorios en null
       req.session.accesorios = null;
@@ -256,14 +315,30 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.get("/logout", (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            console.error(err);
-        }
-        res.redirect("/login");
-    });
-})
+app.get("/logout", async (req, res) => {
+  try {
+      // Si hay un usuario en sesión, actualiza su last_login_time antes de cerrar sesión
+      if (req.session.userId) {
+          const currentTime = new Date();
+          await db.query(
+              'UPDATE users SET last_login_time = $1 WHERE id = $2',
+              [currentTime, req.session.userId]
+          );
+          console.log(`Usuario ${req.session.username} cerró sesión. Last login time actualizado: ${currentTime}`);
+      }
+      
+      // Destruye la sesión
+      req.session.destroy(err => {
+          if (err) {
+              console.error("Error al cerrar sesión:", err);
+          }
+          res.redirect("/login");
+      });
+  } catch (error) {
+      console.error("Error en logout:", error);
+      res.redirect("/login");
+  }
+}); 
 
 /*---------------------------creamos rutas generales------------------------------------------------*/
 
@@ -379,27 +454,111 @@ app.post('/NombreMascota', requireLogin, async (req, res) => {
 
 
 
-app.post('/modificarPerfil', requireLogin, async (req, res) => {
-    const nuevoUsername = req.body['nombre-usuario'];
-    const nuevaDescripcion = req.body['biografia'];
-    const userId = req.session.userId;
 
-    try {
-        await db.query(
-            `UPDATE users SET username = $1, description = $2 WHERE id = $3`,
-            [nuevoUsername, nuevaDescripcion, userId]
-        );
 
-        // Actualizamos la sesión si cambió el username
-        req.session.username = nuevoUsername;
-        req.session.descripcion = nuevaDescripcion;
 
-        console.log('Perfil actualizado:', nuevoUsername);
-        res.redirect('/perfil_personalizado');
-    } catch (error) {
-        console.error('Error al modificar perfil:', error);
-        res.status(500).send('Error al actualizar el perfil');
+
+
+
+
+
+
+
+
+
+// Ruta para mostrar el perfil personalizado
+app.get('/perfil_personalizado', requireLogin, async (req, res) => {
+  const mascota = req.session.mascotaActual;
+  const mensaje = req.session.mensajeDeContra || '';
+  delete req.session.mensajeDeContra;
+
+  try {
+    // Obtener información del usuario
+    const userResult = await db.query(
+      `SELECT username, description FROM users WHERE id = $1`,
+      [req.session.userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).send('Usuario no encontrado');
     }
+
+    const user = userResult.rows[0];
+
+    // Obtener items del usuario para los accesorios
+    let items;
+    try {
+      items = await db.query(`SELECT * FROM items WHERE id_users = $1 ORDER BY indice`, [req.session.userId]);
+    } catch (error) {
+      console.error('Error al obtener los items:', error);
+      return res.status(500).send('Error al obtener los items');
+    }
+
+    // Filtrar accesorios disponibles
+    let accesoriosdiponibles = null;
+    if (items.rows.length > 0) {
+      accesoriosdiponibles = items.rows.filter(item => item.categoria === 'accesorios');
+    }
+
+    res.render('perfil_personalizado.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios,
+      mascotaNombre: mascota.nombre,
+      usuario: user.username,
+      mensajeDeContra: mensaje,
+      descripcion: user.description,
+      Nombresaccesorios: accesorios,
+      itemsaccesorios: accesoriosdiponibles,
+      mensajeError: req.session.mensajeError || '' // Para mostrar errores de username duplicado
+    });
+    
+    // Limpiar el mensaje de error después de usarlo
+    delete req.session.mensajeError;
+    
+  } catch (error) {
+    console.error('Error al obtener datos del perfil:', error);
+    return res.status(500).send('Error al cargar el perfil');
+  }
+});
+
+app.post('/modificarPerfil', requireLogin, async (req, res) => {
+  const nuevoUsername = req.body['nombre-usuario'];
+  const nuevaDescripcion = req.body['biografia'];
+  const userId = req.session.userId;
+
+  try {
+      // Verificar si el nuevo nombre de usuario ya existe (excluyendo el usuario actual)
+      const existeUsuario = await db.query(
+          `SELECT id FROM users WHERE username = $1 AND id != $2`,
+          [nuevoUsername, userId]
+      );
+
+      if (existeUsuario.rows.length > 0) {
+          // El nombre de usuario ya existe
+          req.session.mensajeError = `⚠️ El nombre "${nuevoUsername}" ya está en uso. Por favor elige otro.`;
+          return res.redirect('/perfil_personalizado');
+      }
+
+      // Si no existe, actualizar el perfil
+      await db.query(
+          `UPDATE users SET username = $1, description = $2 WHERE id = $3`,
+          [nuevoUsername, nuevaDescripcion, userId]
+      );
+
+      // Actualizamos la sesión si cambió el username
+      req.session.username = nuevoUsername;
+      req.session.descripcion = nuevaDescripcion;
+      
+      // Eliminar mensaje de error si la actualización fue exitosa
+      delete req.session.mensajeError;
+
+      console.log('Perfil actualizado:', nuevoUsername);
+      res.redirect('/perfil_personalizado');
+  } catch (error) {
+      console.error('Error al modificar perfil:', error);
+      req.session.mensajeError = 'Error al actualizar el perfil. Inténtalo de nuevo.';
+      res.redirect('/perfil_personalizado');
+  }
 });
 
 //este post nos ayudara a modificar las mascotas y sus accesorios
@@ -866,23 +1025,249 @@ app.post('/corral/guardar', requireLogin, async (req, res) => {
 
 /*---------------------------creamos post de prueba necesario------------------------------------------------*/
 
-app.get('/inicio', requireLogin, (req, res) => {
+// Actualizar la ruta de inicio para servir datos de posts y comunidades de manera segura
+app.get('/inicio', requireLogin, async (req, res) => {
+  try {
+      const mascota = req.session.mascotaActual;
+      
+      // Datos predeterminados en caso de error
+      let posts = [];
+      let comunidades = [];
+      
+      try {
+          // Obtener publicaciones de la base de datos con todos los campos requeridos
+          const queryPosts = `
+              SELECT fp.id, fp.user_id, fp.autor, fp.mensaje, fp.etiqueta, 
+                     fp.subcategoria, fp.extrasubcategoria, fp.fecha, fp.fecha_str, 
+                     fp.ranking, fp.comunidad_id, u.username as autor_nombre, 
+                     c.nombre as comunidad_nombre 
+              FROM forum_posts fp
+              LEFT JOIN users u ON fp.user_id = u.id
+              LEFT JOIN comunidades c ON fp.comunidad_id = c.id
+              ORDER BY fp.fecha DESC
+          `;
+          const resultPosts = await db.query(queryPosts);
+          posts = resultPosts.rows;
+          
+          // Obtener comunidades de la base de datos con todos los campos requeridos y conteo de miembros
+          const queryComunidades = `
+              SELECT c.id, c.nombre, c.descripcion, c.categoria, c.subcategoria, 
+                     c.subcategoria_extra, c.imagen_url, c.creador_id, c.fecha_creacion, 
+                     c.reglas, c.es_privada, u.username as creador_nombre, 
+                     (SELECT COUNT(*) FROM forum_posts WHERE comunidad_id = c.id) as total_posts,
+                     (SELECT COUNT(*) FROM comunidades_usuarios WHERE comunidad_id = c.id) as total_miembros
+              FROM comunidades c
+              LEFT JOIN users u ON c.creador_id = u.id
+              ORDER BY total_posts DESC
+          `;
+          const resultComunidades = await db.query(queryComunidades);
+          comunidades = resultComunidades.rows;
+      } catch (dbError) {
+          console.error('Error al consultar la base de datos:', dbError);
+          return res.status(500).send('Error al cargar datos de la base de datos');
+      }
+      
+      res.render('inicio.ejs', { 
+          posts: posts,
+          comunidades: comunidades,
+          rutaImagen: mascota?.rutaImagen,
+          accesorios: req.session.accesorios
+      });
+  } catch (error) {
+      console.error('Error al cargar la página de inicio:', error);
+      res.status(500).send('Error al cargar la página de inicio');
+  }
+});
 
-    const mascota = req.session.mascotaActual;
+
+// Agregar redirección de /foros a /foro para compatibilidad con el código anterior
+app.get('/foros', requireLogin, (req, res) => {
+  res.redirect('/foro');
+});
+
+// Agregar redirección de /comunidades a /comunidad para compatibilidad
+app.get('/comunidades', requireLogin, (req, res) => {
+  res.redirect('/comunidad');
+});
 
 
-        //Create a mensaje object with the data you need
-        const mensaje = {
-            imagenesUrl: [] // Empty array or populate with actual image URLs
-        };
-        
-        res.render('inicio.ejs', {
-            mensaje,
-            rutaImagen: mascota.rutaImagen,
-            accesorios: req.session.accesorios
-        });
-    
-    });
+// API para obtener datos de posts
+app.get('/api/posts', requireLogin, async (req, res) => {
+  try {
+      const queryPosts = `
+          SELECT fp.id, fp.user_id, fp.autor, fp.mensaje, fp.etiqueta, 
+                 fp.subcategoria, fp.extrasubcategoria, fp.fecha, fp.fecha_str, 
+                 fp.ranking, fp.comunidad_id, u.username as autor_nombre, 
+                 c.nombre as comunidad_nombre 
+          FROM forum_posts fp
+          LEFT JOIN users u ON fp.user_id = u.id
+          LEFT JOIN comunidades c ON fp.comunidad_id = c.id
+          ORDER BY fp.fecha DESC
+      `;
+      const resultPosts = await db.query(queryPosts);
+      res.json(resultPosts.rows);
+  } catch (error) {
+      console.error('Error al obtener publicaciones:', error);
+      res.status(500).json({ error: 'Error al obtener publicaciones de la base de datos' });
+  }
+});
+
+// API para obtener datos de comunidades
+app.get('/api/comunidades', requireLogin, async (req, res) => {
+  try {
+      const queryComunidades = `
+          SELECT c.id, c.nombre, c.descripcion, c.categoria, c.subcategoria, 
+                 c.subcategoria_extra, c.imagen_url, c.creador_id, c.fecha_creacion, 
+                 c.reglas, c.es_privada, u.username as creador_nombre, 
+                 (SELECT COUNT(*) FROM forum_posts WHERE comunidad_id = c.id) as total_posts,
+                 (SELECT COUNT(*) FROM comunidades_usuarios WHERE comunidad_id = c.id) as total_miembros
+          FROM comunidades c
+          LEFT JOIN users u ON c.creador_id = u.id
+          ORDER BY total_posts DESC
+      `;
+      const resultComunidades = await db.query(queryComunidades);
+      res.json(resultComunidades.rows);
+  } catch (error) {
+      console.error('Error al obtener comunidades:', error);
+      res.status(500).json({ error: 'Error al obtener comunidades de la base de datos' });
+  }
+});
+
+
+
+// Rutas adicionales para redirección desde botones de "Ver todos"
+app.get('/foros', requireLogin, async (req, res) => {
+  try {
+      const mascota = req.session.mascotaActual;
+      
+      const queryPosts = `
+          SELECT fp.id, fp.user_id, fp.autor, fp.mensaje, fp.etiqueta, 
+                 fp.subcategoria, fp.extrasubcategoria, fp.fecha, fp.fecha_str, 
+                 fp.ranking, fp.comunidad_id, u.username as autor_nombre, 
+                 c.nombre as comunidad_nombre,
+                 (SELECT COUNT(*) FROM post_likes WHERE post_id = fp.id) as total_likes
+          FROM forum_posts fp
+          LEFT JOIN users u ON fp.user_id = u.id
+          LEFT JOIN comunidades c ON fp.comunidad_id = c.id
+          ORDER BY fp.fecha DESC
+      `;
+      const resultPosts = await db.query(queryPosts);
+      
+      res.render('foros.ejs', { 
+          posts: resultPosts.rows,
+          rutaImagen: mascota?.rutaImagen,
+          accesorios: req.session.accesorios
+      });
+  } catch (error) {
+      console.error('Error al cargar la página de foros:', error);
+      res.status(500).send('Error al cargar la página de foros');
+  }
+});
+
+app.get('/comunidades', requireLogin, async (req, res) => {
+  try {
+      const mascota = req.session.mascotaActual;
+      
+      const queryComunidades = `
+          SELECT c.id, c.nombre, c.descripcion, c.categoria, c.subcategoria, 
+                 c.subcategoria_extra, c.imagen_url, c.creador_id, c.fecha_creacion, 
+                 c.reglas, c.es_privada, u.username as creador_nombre, 
+                 (SELECT COUNT(*) FROM forum_posts WHERE comunidad_id = c.id) as total_posts,
+                 (SELECT COUNT(*) FROM comunidades_usuarios WHERE comunidad_id = c.id) as total_miembros
+          FROM comunidades c
+          LEFT JOIN users u ON c.creador_id = u.id
+          ORDER BY c.nombre ASC
+      `;
+      const resultComunidades = await db.query(queryComunidades);
+      
+      res.render('comunidades.ejs', { 
+          comunidades: resultComunidades.rows,
+          rutaImagen: mascota?.rutaImagen,
+          accesorios: req.session.accesorios
+      });
+  } catch (error) {
+      console.error('Error al cargar la página de comunidades:', error);
+      res.status(500).send('Error al cargar la página de comunidades');
+  }
+});
+
+// Ruta para ver una comunidad específica
+app.get('/comunidad/:id', requireLogin, async (req, res) => {
+  try {
+      const comunidadId = req.params.id;
+      const mascota = req.session.mascotaActual;
+      
+      const queryComunidad = `
+          SELECT c.*, u.username as creador_nombre, 
+                 (SELECT COUNT(*) FROM forum_posts WHERE comunidad_id = c.id) as total_posts,
+                 (SELECT COUNT(*) FROM comunidades_usuarios WHERE comunidad_id = c.id) as total_miembros
+          FROM comunidades c
+          LEFT JOIN users u ON c.creador_id = u.id
+          WHERE c.id = $1
+      `;
+      const resultComunidad = await db.query(queryComunidad, [comunidadId]);
+      
+      if (resultComunidad.rows.length === 0) {
+          return res.status(404).send('Comunidad no encontrada');
+      }
+      
+      // Obtener posts de la comunidad
+      const queryPosts = `
+          SELECT fp.*, u.username as autor_nombre
+          FROM forum_posts fp
+          LEFT JOIN users u ON fp.user_id = u.id
+          WHERE fp.comunidad_id = $1
+          ORDER BY fp.fecha DESC
+      `;
+      const resultPosts = await db.query(queryPosts, [comunidadId]);
+      
+      res.render('comunidad.ejs', { 
+          comunidad: resultComunidad.rows[0],
+          posts: resultPosts.rows,
+          rutaImagen: mascota?.rutaImagen,
+          accesorios: req.session.accesorios
+      });
+  } catch (error) {
+      console.error('Error al cargar la comunidad:', error);
+      res.status(500).send('Error al cargar la comunidad');
+  }
+});
+
+
+// Ruta para ver un post específico
+app.get('/post/:id', requireLogin, async (req, res) => {
+  try {
+      const postId = req.params.id;
+      const mascota = req.session.mascotaActual;
+      
+      const queryPost = `
+          SELECT fp.*, u.username as autor_nombre, c.nombre as comunidad_nombre
+          FROM forum_posts fp
+          LEFT JOIN users u ON fp.user_id = u.id
+          LEFT JOIN comunidades c ON fp.comunidad_id = c.id
+          WHERE fp.id = $1
+      `;
+      const resultPost = await db.query(queryPost, [postId]);
+      
+      if (resultPost.rows.length === 0) {
+          return res.status(404).send('Publicación no encontrada');
+      }
+      
+      res.render('post.ejs', { 
+          post: resultPost.rows[0],
+          rutaImagen: mascota?.rutaImagen,
+          accesorios: req.session.accesorios
+      });
+  } catch (error) {
+      console.error('Error al cargar la publicación:', error);
+      res.status(500).send('Error al cargar la publicación');
+  }
+});
+
+
+
+
+
 
     app.get('/eventos', requireLogin, async (req, res) => {
       try {
@@ -922,91 +1307,56 @@ app.get('/formularioSoporte', requireLogin, (req, res) => {
         accesorios: req.session.accesorios
     });
 });
-
-app.get('/perfil',  requireLogin, (req, res) => {
-
-
-    const mascota = req.session.mascotaActual;
-
-    
-    res.render('perfil.ejs', {
-      rutaImagen: mascota.rutaImagen,
-      accesorios: req.session.accesorios,
-      mascotaNombre: mascota.nombre,
-      usuario: req.session.username,
-      especieDeMascota: mascota.especie,
-      pronombre: mascota.pronombre,
-      nivelAmor: mascota.niveldeAmor,
-      nivelEnergia: mascota.niveldeEnergia,
-      nivelFelicidad: mascota.niveldeFelicidad,
-      comidaFavorita: mascota.comidaFavorita,
-      habilidadesEspeciales: mascota.habilidad,
-      descripcion: req.session.descripcion,
-      // Añadimos los rangos desde la sesión
-      rango1: req.session.rango1,
-      rango2: req.session.rango2,
-      rango3: req.session.rango3
-  });
-});
-
-// Modificar la ruta '/perfil_personalizado' para obtener rangos directamente de la tabla users
-app.get('/perfil_personalizado', requireLogin, async (req, res) => {
-  const mascota = req.session.mascotaActual;
-  const mensaje = req.session.mensajeDeContra || '';
-  delete req.session.mensajeDeContra;
-
+app.get('/perfil', requireLogin, async (req, res) => {
   try {
-    // Obtener información del usuario incluyendo rangos directamente de la tabla users
-    const userResult = await db.query(
-      `SELECT username, description, rango1, rango2, rango3 FROM users WHERE id = $1`,
-      [req.session.userId]
-    );
-
-    if (userResult.rows.length === 0) {
-      return res.status(404).send('Usuario no encontrado');
-    }
-
-    const user = userResult.rows[0];
-    
-    // Si los rangos son NULL, establecerlos como 'Ninguno' por defecto
-    const userRangos = {
-      rango1: user.rango1 || 'Ninguno',
-      rango2: user.rango2 || 'Ninguno',
-      rango3: user.rango3 || 'Ninguno'
-    };
-
-    // Obtener items del usuario para los accesorios
-    let items;
-    try {
-      items = await db.query(`SELECT * FROM items WHERE id_users = $1 ORDER BY indice`, [req.session.userId]);
-    } catch (error) {
-      console.error('Error al obtener los items:', error);
-      return res.status(500).send('Error al obtener los items');
-    }
-
-    // Filtrar accesorios disponibles
-    let accesoriosdiponibles = null;
-    if (items.rows.length > 0) {
-      accesoriosdiponibles = items.rows.filter(item => item.categoria === 'accesorios');
-    }
-
-    res.render('perfil_personalizado.ejs', {
-      rutaImagen: mascota.rutaImagen,
-      accesorios: req.session.accesorios,
-      mascotaNombre: mascota.nombre,
-      usuario: user.username,
-      mensajeDeContra: mensaje,
-      descripcion: user.description,
-      Nombresaccesorios: accesorios,
-      itemsaccesorios: accesoriosdiponibles,
-      userRangos: userRangos
-    });
-    
+      const mascota = req.session.mascotaActual;
+      const userId = req.session.userId;
+      
+      // Obtener el conteo total de publicaciones del usuario
+      const postsResult = await db.query('SELECT COUNT(*) FROM forum_posts WHERE user_id = $1', [userId]);
+      const postCount = parseInt(postsResult.rows[0].count);
+      
+      // Obtener el conteo total de comentarios del usuario
+      const commentsResult = await db.query('SELECT COUNT(*) FROM forum_comments WHERE user_id = $1', [userId]);
+      const commentCount = parseInt(commentsResult.rows[0].count);
+      
+      // Sumar ambos para obtener el total de actividad
+      const totalPublicaciones = postCount + commentCount;
+      
+      // Obtener información del usuario, incluyendo last_login_time
+      const userResult = await db.query('SELECT last_login_time FROM users WHERE id = $1', [userId]);
+      
+      // Si el usuario tiene last_login_time en la base de datos y NO tiene fecha guardada en la sesión
+      if (userResult.rows.length > 0 && userResult.rows[0].last_login_time && !req.session.membresia_date) {
+          // Guardamos la fecha en la sesión como fecha de membresía (solo la primera vez)
+          req.session.membresia_date = userResult.rows[0].last_login_time;
+      }
+      
+      res.render('perfil.ejs', {
+          rutaImagen: mascota.rutaImagen,
+          accesorios: req.session.accesorios,
+          mascotaNombre: mascota.nombre,
+          usuario: req.session.username,
+          especieDeMascota: mascota.especie,
+          pronombre: mascota.pronombre,
+          nivelAmor: mascota.niveldeAmor,
+          nivelEnergia: mascota.niveldeEnergia,
+          nivelFelicidad: mascota.niveldeFelicidad,
+          comidaFavorita: mascota.comidaFavorita,
+          habilidadesEspeciales: mascota.habilidad,
+          descripcion: req.session.descripcion,
+          rango1: req.session.rango1,
+          rango2: req.session.rango2,
+          rango3: req.session.rango3,
+          totalPublicaciones: totalPublicaciones,
+          fechaMembresia: req.session.membresia_date ? new Date(req.session.membresia_date).toLocaleDateString() : "2024"
+      });
   } catch (error) {
-    console.error('Error al obtener datos del perfil:', error);
-    return res.status(500).send('Error al cargar el perfil');
+      console.error('Error al obtener datos para el perfil:', error);
+      res.status(500).send('Error al cargar el perfil');
   }
 });
+
 
 // Implementar la ruta para guardar rangos directamente en la tabla users
 app.post('/guardarRangos', requireLogin, async (req, res) => {
@@ -1591,7 +1941,481 @@ if (comunidadId !== null) {
 });
 
 
-// Modificación para la ruta de publicar post
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Variables para rastrear la actividad de los usuarios
+let userActivityCounts = {}; // Almacenará conteos de posts/comentarios para cada usuario
+let userVoteCounts = {}; // Almacenará conteos de votos para cada usuario
+/**
+ * Actualiza los rangos de un usuario basado en sus publicaciones
+ * @param {number} userId - ID del usuario
+ * @returns {Object} - Objeto con los rangos actualizados
+ */
+async function updateUserRanks(userId) {
+  try {
+    // 1. Contar el total de publicaciones del usuario
+    const postCountResult = await db.query(
+      `SELECT COUNT(*) as total_posts FROM forum_posts WHERE user_id = $1`,
+      [userId]
+    );
+    
+    const totalPosts = parseInt(postCountResult.rows[0].total_posts, 10);
+    
+    // 2. Determinar el rango1 basado en el total de publicaciones
+    let rango1 = 'Ninguno'; // Valor predeterminado alineado con lo definido en la DB
+    
+    if (totalPosts >= 100000) {
+      rango1 = 'Maestro';
+    } else if (totalPosts >= 10000) {
+      rango1 = 'Veterano';
+    } else if (totalPosts >= 1000) {
+      rango1 = 'Experimentado';
+    } else if (totalPosts >= 100) {
+      rango1 = 'Aprendiz';
+    } else if (totalPosts >= 10) {
+      rango1 = 'Novato';
+    } else if (totalPosts > 0) {
+      rango1 = 'Principiante';
+    }
+    
+    // 3. Obtener la subcategoría más utilizada por el usuario
+    const subcategoriaResult = await db.query(
+      `SELECT subcategoria, COUNT(*) as count 
+       FROM forum_posts 
+       WHERE user_id = $1 AND subcategoria IS NOT NULL AND subcategoria != 'Ninguna'
+       GROUP BY subcategoria 
+       ORDER BY count DESC 
+       LIMIT 1`,
+      [userId]
+    );
+    
+    // Si no hay subcategoría con más publicaciones, será 'Ninguno'
+    let rango2 = 'Ninguno';
+    if (subcategoriaResult.rows.length > 0) {
+      rango2 = subcategoriaResult.rows[0].subcategoria;
+    }
+    
+    // 4. Obtener la extra-subcategoría más utilizada por el usuario
+    const extraSubcategoriaResult = await db.query(
+      `SELECT extrasubcategoria, COUNT(*) as count 
+       FROM forum_posts 
+       WHERE user_id = $1 AND extrasubcategoria IS NOT NULL AND extrasubcategoria != 'Ninguna'
+       GROUP BY extrasubcategoria 
+       ORDER BY count DESC 
+       LIMIT 1`,
+      [userId]
+    );
+    
+    // Si no hay extra-subcategoría con más publicaciones, será 'Ninguno'
+    let rango3 = 'Ninguno';
+    if (extraSubcategoriaResult.rows.length > 0) {
+      rango3 = extraSubcategoriaResult.rows[0].extrasubcategoria;
+    }
+    
+    console.log(`Actualizando rangos para usuario ${userId}: Rango1=${rango1}, Rango2=${rango2}, Rango3=${rango3}`);
+    
+    // 5. Actualizar los rangos del usuario en la base de datos
+    try {
+      const updateResult = await db.query(
+        `UPDATE users 
+         SET rango1 = $1, rango2 = $2, rango3 = $3 
+         WHERE id = $4
+         RETURNING rango1, rango2, rango3`,
+        [rango1, rango2, rango3, userId]
+      );
+      
+      if (updateResult.rows.length > 0) {
+        console.log(`Rangos actualizados correctamente para usuario ${userId}`);
+      } else {
+        console.warn(`No se encontró usuario con ID ${userId} para actualizar rangos`);
+      }
+    } catch (dbError) {
+      console.error('Error al actualizar rangos del usuario en la base de datos:', dbError);
+      throw dbError;
+    }
+    
+    // 6. Devolver los rangos actualizados
+    return {
+      rango1,
+      rango2,
+      rango3,
+      totalPosts
+    };
+  } catch (error) {
+    console.error('Error al actualizar rangos del usuario:', error);
+    throw error;
+  }
+}
+
+/**
+ * Función para verificar y otorgar recompensas por publicaciones y comentarios y actualizar rangos
+ * @param {number} userId - ID del usuario
+ * @param {string} username - Nombre del usuario
+ * @param {string} type - Tipo de actividad (post, comment)
+ * @param {object} req - Objeto request
+ * @returns {Object} - Resultado de la operación
+ */
+async function checkAndAwardCoins(userId, username, type, req) {
+  try {
+    // Inicializar seguimiento de actividad del usuario si es necesario
+    if (!userActivityCounts[userId]) {
+      userActivityCounts[userId] = {
+        postCount: 0,
+        commentCount: 0,
+        lastPostAwardedAt: 0,
+        lastCommentAwardedAt: 0,
+        lastPostBonusAwardedAt: 0,
+        lastCommentBonusAwardedAt: 0
+      };
+      
+      // Cargar conteos existentes desde la base de datos
+      const postCountQuery = await db.query(
+        `SELECT COUNT(*) as post_count FROM forum_posts WHERE user_id = $1`,
+        [userId]
+      );
+      
+      const commentCountQuery = await db.query(
+        `SELECT COUNT(*) as comment_count FROM forum_comments WHERE user_id = $1`,
+        [userId]
+      );
+      
+      userActivityCounts[userId].postCount = parseInt(postCountQuery.rows[0].post_count);
+      userActivityCounts[userId].commentCount = parseInt(commentCountQuery.rows[0].comment_count);
+    }
+    
+    // Determinar qué contador incrementar basado en el tipo
+    let currentCount, lastAwardedAt, lastBonusAwardedAt;
+    
+    if (type === 'post') {
+      // Incrementar contador de publicaciones
+      userActivityCounts[userId].postCount++;
+      currentCount = userActivityCounts[userId].postCount;
+      lastAwardedAt = userActivityCounts[userId].lastPostAwardedAt;
+      lastBonusAwardedAt = userActivityCounts[userId].lastPostBonusAwardedAt || 0;
+    } else if (type === 'comment') {
+      // Incrementar contador de comentarios
+      userActivityCounts[userId].commentCount++;
+      currentCount = userActivityCounts[userId].commentCount;
+      lastAwardedAt = userActivityCounts[userId].lastCommentAwardedAt;
+      lastBonusAwardedAt = userActivityCounts[userId].lastCommentBonusAwardedAt || 0;
+    } else {
+      return { awarded: false, error: 'Tipo de actividad inválido' };
+    }
+    
+    let coinsToAward = 0;
+    let bonusAwarded = false;
+    let regularAwarded = false;
+    
+    // Verificar si el usuario ha alcanzado un múltiplo de 5
+    if (currentCount % 5 === 0) {
+      // Otorgar 5 fichas por cada múltiplo de 5
+      coinsToAward += 5;
+      regularAwarded = true;
+      
+      // Actualizar el último punto de recompensa regular según el tipo
+      if (type === 'post') {
+        userActivityCounts[userId].lastPostAwardedAt = currentCount;
+      } else {
+        userActivityCounts[userId].lastCommentAwardedAt = currentCount;
+      }
+    }
+    
+    // Verificar si el usuario ha alcanzado un múltiplo de 100
+    if (currentCount % 100 === 0 && currentCount > 0) {
+      // Solo otorgar bono si aún no se ha otorgado para este hito
+      if (lastBonusAwardedAt < currentCount) {
+        // Otorgar 50 fichas adicionales por múltiplos de 100
+        coinsToAward += 50;
+        bonusAwarded = true;
+        
+        // Actualizar el último bono otorgado según el tipo
+        if (type === 'post') {
+          userActivityCounts[userId].lastPostBonusAwardedAt = currentCount;
+        } else {
+          userActivityCounts[userId].lastCommentBonusAwardedAt = currentCount;
+        }
+      }
+    }
+    
+    let newTotal = null;
+    
+    // Si hay fichas para otorgar, actualizar la base de datos
+    if (coinsToAward > 0) {
+      // Actualizar el dinero del usuario en la base de datos
+      const result = await db.query(
+        `UPDATE users 
+        SET money = money + $1 
+        WHERE id = $2
+        RETURNING money`,
+        [coinsToAward, userId]
+      );
+      
+      // También actualizar en la sesión si está disponible
+      if (req && req.session) {
+        req.session.money = (req.session.money || 0) + coinsToAward;
+        newTotal = req.session.money;
+      }
+      
+      const activityType = type === 'post' ? 'publicaciones' : 'comentarios';
+      console.log(`Usuario ${username} (ID: ${userId}) recibió ${coinsToAward} fichas por alcanzar ${currentCount} ${activityType}!`);
+      
+      if (bonusAwarded) {
+        console.log(`Incluyendo un bono de 50 fichas por alcanzar un múltiplo de 100 ${activityType}!`);
+      }
+    }
+
+    // Actualizar rangos después de cada publicación o comentario
+    const updatedRanks = await updateUserRanks(userId);
+    
+    // Actualizar los rangos en la sesión del usuario si está disponible
+    if (req && req.session) {
+      req.session.rango1 = updatedRanks.rango1;
+      req.session.rango2 = updatedRanks.rango2;
+      req.session.rango3 = updatedRanks.rango3;
+    }
+    
+    return {
+      awarded: regularAwarded || bonusAwarded,
+      coins: coinsToAward,
+      newTotal: newTotal,
+      milestone: currentCount,
+      bonusAwarded: bonusAwarded,
+      type: type,
+      ranksUpdated: true,
+      updatedRanks
+    };
+  } catch (error) {
+    console.error('Error al otorgar fichas o actualizar rangos:', error);
+    return { awarded: false, error: error.message };
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.get('/comentario/:mensajeId/:comentarioId', async (req, res) => {
+  try {
+    const mensajeId = parseInt(req.params.mensajeId);
+    const comentarioId = parseInt(req.params.comentarioId);
+    
+    // También podemos obtener el comentario directamente de la base de datos
+    // para asegurar que incluya el comunidad_id
+    const comentarioResult = await db.query(
+      `SELECT c.*, array_agg(json_build_object('id', ci.id, 'url', ci.url)) as imagenes 
+       FROM forum_comments c
+       LEFT JOIN comment_images ci ON c.id = ci.comment_id
+       WHERE c.id = $1 AND c.post_id = $2
+       GROUP BY c.id`,
+      [comentarioId, mensajeId]
+    );
+    
+    if (comentarioResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
+    }
+    
+    const comentarioDB = comentarioResult.rows[0];
+    
+    const datosComentario = {
+      id: comentarioDB.id,
+      autor: comentarioDB.autor,
+      comentario: comentarioDB.comentario,
+      imagenes: comentarioDB.imagenes[0].id ? comentarioDB.imagenes : [],
+      fecha: comentarioDB.fecha,
+      fechaStr: comentarioDB.fecha_str,
+      comunidad_id: comentarioDB.comunidad_id
+    };
+    
+    res.json({
+      success: true,
+      comentario: datosComentario
+    });
+  } catch (error) {
+    console.error('Error al obtener comentario:', error);
+    return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+
+app.put('/actualizar-comentario/:mensajeId/:comentarioId', upload.array('imagenes', 9), async (req, res) => {
+  try {
+    const mensajeId = parseInt(req.params.mensajeId);
+    const comentarioId = parseInt(req.params.comentarioId);
+    const { autor, comentario, mantener_imagenes, comunidad_id } = req.body;
+    
+    // Validar datos básicos
+    if (!autor || !comentario) {
+      return res.status(400).json({ success: false, error: 'Datos incompletos' });
+    }
+    
+    // Encontrar índices
+    const mensajeIndex = mensajes.findIndex(m => m.id === mensajeId);
+    
+    if (mensajeIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
+    }
+    
+    const comentarioIndex = mensajes[mensajeIndex].comentarios.findIndex(c => c.id === comentarioId);
+    
+    if (comentarioIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
+    }
+    
+    // Fecha formateada para actualización
+    const fechaStr = new Date().toLocaleString() + ' (editado)';
+    
+    // Actualizar en la base de datos incluyendo comunidad_id
+    await db.query(`
+      UPDATE forum_comments 
+      SET autor = $1, comentario = $2, fecha_str = $3, comunidad_id = $4
+      WHERE id = $5 AND post_id = $6
+    `, [autor, comentario, fechaStr, comunidad_id || null, comentarioId, mensajeId]);
+    
+    // Obtener las imágenes actuales del comentario
+    const imagenesActuales = await db.query(`
+      SELECT id, url FROM comment_images WHERE comment_id = $1
+    `, [comentarioId]);
+    
+    // Preparar array para mantener las imágenes seleccionadas
+    let idsAMantener = [];
+    
+    // Si se proporcionó el parámetro mantener_imagenes, usarlo
+    if (mantener_imagenes) {
+      idsAMantener = Array.isArray(mantener_imagenes) 
+        ? mantener_imagenes.map(id => parseInt(id)) 
+        : [parseInt(mantener_imagenes)];
+    } else {
+      // Si no se especificó mantener_imagenes, no mantener ninguna imagen
+      idsAMantener = [];
+    }
+    
+    // Eliminar imágenes no seleccionadas
+    for (const imagen of imagenesActuales.rows) {
+      if (!idsAMantener.includes(imagen.id)) {
+        // Eliminar de la base de datos
+        await db.query(`DELETE FROM comment_images WHERE id = $1`, [imagen.id]);
+        
+        // Eliminar archivo físico
+        const filename = imagen.url.split('/').pop();
+        const imagePath = join(uploadDir, filename);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+    }
+    
+    // Añadir nuevas imágenes si hay, incluyendo comunidad_id
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // Incluir el filename y comunidad_id en la inserción
+        await db.query(`
+          INSERT INTO comment_images (comment_id, url, filename, comunidad_id)
+          VALUES ($1, $2, $3, $4)
+        `, [comentarioId, `/uploads/${file.filename}`, file.filename, comunidad_id || null]);
+      }
+    }
+    
+    // Actualizar la versión en memoria
+    mensajes[mensajeIndex].comentarios[comentarioIndex].autor = autor;
+    mensajes[mensajeIndex].comentarios[comentarioIndex].comentario = comentario;
+    mensajes[mensajeIndex].comentarios[comentarioIndex].fechaStr = fechaStr;
+    
+    // Actualizar imágenes en memoria - mantener las seleccionadas
+    if (idsAMantener.length > 0) {
+      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes = 
+        mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.filter(imagen => 
+          idsAMantener.includes(imagen.id)
+        );
+    } else {
+      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes = [];
+    }
+    
+    // Añadir nuevas imágenes en memoria
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // Usar un ID único para las nuevas imágenes
+        const newImageId = Date.now() + Math.floor(Math.random() * 1000);
+        
+        mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.push({
+          id: newImageId,
+          url: `/uploads/${file.filename}`
+        });
+      }
+    }
+    
+    // Cargar la versión actualizada desde la base de datos para mantener consistencia
+    await loadForumPosts();
+    
+    res.json({ 
+      success: true, 
+      comentario: mensajes[mensajeIndex].comentarios[comentarioIndex] 
+    });
+  } catch (error) {
+    console.error('Error al actualizar comentario:', error);
+    res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+  }
+});
+
+let ComunidadIdGlobal = null;
+
+// Ruta para publicar post con rangos
 app.post('/publicar', upload.array('imagenes', 9), async (req, res) => {
   try {
     const { autor, mensaje, etiqueta, subcategoria, extrasubcategoria, comunidad_id } = req.body;
@@ -1602,36 +2426,63 @@ app.post('/publicar', upload.array('imagenes', 9), async (req, res) => {
     }
     
     if (autor && mensaje) {
-      // Agregar los rangos del usuario al post
-      const rango1 = req.session.rango1 || 'Ninguno';
-      const rango2 = req.session.rango2 || 'Ninguno';
-      const rango3 = req.session.rango3 || 'Ninguno';
+      // 1. Primero actualizamos los rangos del usuario para asegurarnos de que están al día
+      const updatedRanks = await updateUserRanks(userId);
       
-// Más adelante:
-const postResult = await db.query(
-  `INSERT INTO forum_posts 
-   (user_id, autor, mensaje, etiqueta, subcategoria, extrasubcategoria, fecha_str, rango1, rango2, rango3, comunidad_id) 
-   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
-   RETURNING id, fecha`,
-  [
-    userId,
-    autor,
-    mensaje,
-    etiqueta || "Ninguna",
-    subcategoria || "Ninguna",
-    extrasubcategoria || "Ninguna",
-    new Date().toLocaleString(),
-    rango1,
-    rango2,
-    rango3,
-    comunidad_id || null // Añadimos el comunidad_id si existe
-  ]
-);
+      // 2. Actualizamos la sesión con los rangos actualizados para acceso inmediato en el front-end
+      req.session.rango1 = updatedRanks.rango1;
+      req.session.rango2 = updatedRanks.rango2;
+      req.session.rango3 = updatedRanks.rango3;
+      
+      // 3. Obtener los rangos directamente de la base de datos para asegurar consistencia
+      const userRanksResult = await db.query(
+        `SELECT rango1, rango2, rango3 FROM users WHERE id = $1`,
+        [userId]
+      );
+      
+      let rango1 = 'Ninguno';
+      let rango2 = 'Ninguno';
+      let rango3 = 'Ninguno';
+      
+      if (userRanksResult.rows.length > 0) {
+        rango1 = userRanksResult.rows[0].rango1 || 'Ninguno';
+        rango2 = userRanksResult.rows[0].rango2 || 'Ninguno';
+        rango3 = userRanksResult.rows[0].rango3 || 'Ninguno';
+        
+        // Actualizar la sesión con valores obtenidos de la base de datos
+        if (rango1 !== req.session.rango1 || rango2 !== req.session.rango2 || rango3 !== req.session.rango3) {
+          console.log(`Sincronizando rangos en sesión con la base de datos para usuario ${userId}`);
+          req.session.rango1 = rango1;
+          req.session.rango2 = rango2;
+          req.session.rango3 = rango3;
+        }
+      }
+      
+      // 4. Insertar el post con los rangos obtenidos de la tabla users
+      const postResult = await db.query(
+        `INSERT INTO forum_posts
+         (user_id, autor, mensaje, etiqueta, subcategoria, extrasubcategoria, fecha_str, rango1, rango2, rango3, comunidad_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         RETURNING id, fecha`,
+        [
+          userId,
+          autor,
+          mensaje,
+          etiqueta || "Ninguna",
+          subcategoria || "Ninguna",
+          extrasubcategoria || "Ninguna",
+          new Date().toLocaleString(),
+          rango1,
+          rango2,
+          rango3,
+          comunidad_id || null
+        ]
+      );
       
       const postId = postResult.rows[0].id;
       const fecha = postResult.rows[0].fecha;
       
-      // Handle image uploads
+      // 5. Manejar subida de imágenes
       if (req.files && req.files.length > 0) {
         for (const file of req.files) {
           await db.query(
@@ -1641,7 +2492,7 @@ const postResult = await db.query(
         }
       }
       
-      // Actualizar el objeto nuevoMensaje para incluir rangos y comunidad_id
+      // 6. Actualizar el objeto nuevoMensaje para incluir rangos y comunidad_id
       const nuevoMensaje = {
         id: postId,
         user_id: userId,
@@ -1653,25 +2504,29 @@ const postResult = await db.query(
         fecha,
         fechaStr: new Date().toLocaleString(),
         ranking: 0,
-        rango1: rango1,
-        rango2: rango2,
-        rango3: rango3,
+        rango1,
+        rango2,
+        rango3,
         comunidad_id: comunidad_id || null,
         imagenes: req.files ? req.files.map(file => ({
           id: Date.now() + Math.floor(Math.random() * 1000),
           url: `/uploads/${file.filename}`
         })) : [],
-        comentarios: [],
-        comunidad_id: comunidad_id || null
+        comentarios: []
       };
       
-      votos[postId] = {};
-      mensajes.push(nuevoMensaje);
+      if (typeof votos !== 'undefined') {
+        votos[postId] = {};
+      }
       
-      // Check and award coins for posting activity
+      if (typeof mensajes !== 'undefined') {
+        mensajes.push(nuevoMensaje);
+      }
+      
+      // 7. Verificar y otorgar fichas por actividad
       const rewardResult = await checkAndAwardCoins(userId, req.session.username, 'post', req);
       
-      // If coins were awarded, send a notification
+      // Si se otorgaron fichas, enviar notificación
       if (rewardResult.awarded) {
         req.session.rewardNotification = {
           type: 'post',
@@ -1682,60 +2537,76 @@ const postResult = await db.query(
         };
       }
       
- // Redirect to the appropriate context
-if (comunidad_id) {
-  res.redirect(`/foro?comunidad_id=${comunidad_id}`);
-} else {
-  res.redirect('/foro');
-}
+      // 8. Redireccionar a la página correspondiente
+      if (comunidad_id) {
+        res.redirect(`/foro?comunidad_id=${comunidad_id}`);
+      } else {
+        res.redirect('/foro');
+      }
+      
     } else {
       res.status(400).json({ success: false, error: 'Datos incompletos' });
     }
   } catch (error) {
     console.error('Error al publicar:', error);
-    res.status(500).send('Error al publicar el mensaje');
+    res.status(500).send('Error al publicar el mensaje: ' + error.message);
   }
 });
 
 
 
-
-
-
-
-
-
-
-
-// Ruta principal del foro
 app.get('/foro', requireLogin, async (req, res) => {
   try {
-    // Load categories first to ensure they're available
+    const comunidad_id = req.query.comunidad_id || null; // Obtener desde la URL
+    const userId = req.session.userId;
+    
+    // Actualizar los rangos del usuario antes de cargar la página
+    if (userId) {
+      try {
+        // Obtener rangos actuales del usuario desde la base de datos
+        const userResult = await db.query(
+          `SELECT rango1, rango2, rango3 FROM users WHERE id = $1`,
+          [userId]
+        );
+        
+        if (userResult.rows.length > 0) {
+          const userRanks = userResult.rows[0];
+          
+          // Actualizar la sesión con los rangos actuales
+          req.session.rango1 = userRanks.rango1 || 'Ninguno';
+          req.session.rango2 = userRanks.rango2 || 'Ninguno';
+          req.session.rango3 = userRanks.rango3 || 'Ninguno';
+          
+          console.log(`Rangos cargados del usuario ${userId}: Rango1=${req.session.rango1}, Rango2=${req.session.rango2}, Rango3=${req.session.rango3}`);
+        } else {
+          console.warn(`No se encontró el usuario ${userId} en la base de datos`);
+        }
+      } catch (error) {
+        console.error('Error al obtener rangos del usuario:', error);
+      }
+    }
+    
+    // Cargar etiquetas y posts
     const categories = await loadCategoriesFromDB();
     etiquetasDisponibles = categories.etiquetasDisponibles;
     subetiquetasDisponibles = categories.subetiquetasDisponibles;
     extrasubetiquetasDisponibles = categories.extrasubetiquetasDisponibles;
-    
-    // Load posts from database
+
     mensajes = await loadForumPosts();
     nextId = mensajes.length > 0 ? Math.max(...mensajes.map(m => m.id)) + 1 : 1;
-    
-    // Load user votes to update votoActual values
+
     if (req.session.userId) {
       const userVotesResult = await db.query(`
         SELECT post_id, valor FROM post_votes WHERE user_id = $1
       `, [req.session.userId]);
-      
-      // Process user votes here
+      // Puedes procesar los votos aquí si es necesario
     }
-    
-    // Get all communities for the filter dropdown - ONLY PUBLIC ONES
-    const communitiesResult = await db.query(
-      'SELECT id, nombre, es_privada FROM comunidades WHERE es_privada = false ORDER BY nombre'
-    );
+
+    const communitiesResult = await db.query(`
+      SELECT id, nombre, es_privada FROM comunidades WHERE es_privada = false ORDER BY nombre
+    `);
     const communities = communitiesResult.rows;
-    
-    // Obtener las comunidades del usuario (tanto públicas como privadas a las que pertenece)
+
     const userCommunitiesResult = await db.query(`
       SELECT c.*
       FROM comunidades c
@@ -1748,44 +2619,42 @@ app.get('/foro', requireLogin, async (req, res) => {
       ORDER BY nombre
     `, [req.session.userId]);
     const userCommunities = userCommunitiesResult.rows;
-    
-    // Obtener el total de usuarios registrados
+
     const totalUsersResult = await db.query('SELECT COUNT(*) as total FROM users');
     const totalUsers = totalUsersResult.rows[0].total;
-    
-    // Obtener el total de comunidades
+
     const totalCommunitiesResult = await db.query('SELECT COUNT(*) as total FROM comunidades');
     const totalCommunities = totalCommunitiesResult.rows[0].total;
-    
-    // Obtener el total de publicaciones
+
     const totalPostsResult = await db.query('SELECT COUNT(*) as total FROM forum_posts');
     const totalPosts = totalPostsResult.rows[0].total;
-    
+
     res.render('foro', { 
       username: req.session.username,
       userId: req.session.userId,
       descripcion: req.session.descripcion,
       money: req.session.money,
       mascotaActual: req.session.mascotaActual || null,
+      rutaImagen: req.session.mascotaActual ? req.session.mascotaActual.rutaImagen : null,
+      accesorios: req.session.accesorios,
       mensajes,
       etiquetasDisponibles,
       subetiquetasDisponibles,
       extrasubetiquetasDisponibles,
-      rutaImagen: req.session.mascotaActual ? req.session.mascotaActual.rutaImagen : null,
-      accesorios: req.session.accesorios,
       userRangos: {
         rango1: req.session.rango1 || 'Ninguno',
         rango2: req.session.rango2 || 'Ninguno',
         rango3: req.session.rango3 || 'Ninguno'
       },
-      communities: communities,
-      userCommunities: userCommunities,
+      communities,
+      userCommunities,
       filtros: {
         showAllCommunities: true
       },
-      totalUsers: totalUsers,
-      totalCommunities: totalCommunities,
-      totalPosts: totalPosts
+      totalUsers,
+      totalCommunities,
+      totalPosts,
+      comunidadSeleccionada: comunidad_id // Aquí lo pasas al frontend
     });
   } catch (error) {
     console.error('Error rendering forum page:', error);
@@ -1806,21 +2675,16 @@ app.get('/foro', requireLogin, async (req, res) => {
 
 
 
-
-
-
-
-
 async function loadForumPosts() {
   try {
-    // Load all posts
+    // Load all posts with user ranks from the users table
     const postResult = await db.query(`
-      SELECT fp.*, u.username,
+      SELECT fp.*, u.username, u.rango1, u.rango2, u.rango3,
              COALESCE(SUM(v.valor), 0) as ranking 
       FROM forum_posts fp
       JOIN users u ON fp.user_id = u.id
       LEFT JOIN post_votes v ON fp.id = v.post_id
-      GROUP BY fp.id, u.username
+      GROUP BY fp.id, u.username, u.rango1, u.rango2, u.rango3
       ORDER BY fp.fecha DESC
     `);
     
@@ -1834,15 +2698,15 @@ async function loadForumPosts() {
         SELECT id, url FROM post_images WHERE post_id = $1
       `, [post.id]);
       
-      // Load comments for this post
+      // Load comments for this post with user ranks from the users table
       const commentResult = await db.query(`
-        SELECT fc.*, u.username,
+        SELECT fc.*, u.username, u.rango1, u.rango2, u.rango3,
                COALESCE(SUM(cv.valor), 0) as ranking
         FROM forum_comments fc
         JOIN users u ON fc.user_id = u.id
         LEFT JOIN comment_votes cv ON fc.id = cv.comment_id
         WHERE fc.post_id = $1
-        GROUP BY fc.id, u.username
+        GROUP BY fc.id, u.username, u.rango1, u.rango2, u.rango3
         ORDER BY fc.fecha ASC
       `, [post.id]);
       
@@ -1873,8 +2737,7 @@ async function loadForumPosts() {
         });
       }
 
-
-      // Add the post to our array
+      // Add the post to our array with user ranks from the users table
       dbMensajes.push({
         id: post.id,
         user_id: post.user_id,
@@ -1888,7 +2751,7 @@ async function loadForumPosts() {
         comunidad_id: post.comunidad_id,
         ranking: post.ranking || 0,
         rango1: post.rango1 || 'Ninguno',
-        rango2: post.rango2 || 'Ninguno',
+        rango2: post.rango2 || 'Ninguno', 
         rango3: post.rango3 || 'Ninguno',
         imagenes: imageResult.rows.map(img => ({
           id: img.id,
@@ -2026,8 +2889,7 @@ app.get('/voto-estado/:tipo/:id', async (req, res) => {
   }
 });
 
-
-app.post('/publicar-comentario', upload.array('imagenes', 4), async (req, res) => {
+app.post('/publicar-comentario', upload.array('imagenes', 9), async (req, res) => {
   try {
     const { autor, comentario, mensaje_padre_id, comunidad_id } = req.body;
     const userId = req.session.userId;
@@ -2037,12 +2899,15 @@ app.post('/publicar-comentario', upload.array('imagenes', 4), async (req, res) =
     }
     
     if (autor && comentario && mensaje_padre_id) {
-      // Agregar los rangos del usuario al comentario
-      const rango1 = req.session.rango1 || 'Ninguno';
-      const rango2 = req.session.rango2 || 'Ninguno';
-      const rango3 = req.session.rango3 || 'Ninguno';
+      // Primero actualizamos los rangos del usuario para asegurarnos de que están al día
+      const updatedRanks = await updateUserRanks(userId);
       
-      // Insert the comment into the database con comunidad_id
+      // Actualizamos la sesión con los rangos actualizados
+      req.session.rango1 = updatedRanks.rango1;
+      req.session.rango2 = updatedRanks.rango2;
+      req.session.rango3 = updatedRanks.rango3;
+      
+      // Insert the comment into the database con comunidad_id y rangos actualizados
       const commentResult = await db.query(
         `INSERT INTO forum_comments 
          (post_id, user_id, autor, comentario, fecha_str, rango1, rango2, rango3, comunidad_id) 
@@ -2054,9 +2919,9 @@ app.post('/publicar-comentario', upload.array('imagenes', 4), async (req, res) =
           autor,
           comentario,
           new Date().toLocaleString(),
-          rango1,
-          rango2,
-          rango3,
+          updatedRanks.rango1,
+          updatedRanks.rango2,
+          updatedRanks.rango3,
           comunidad_id || null // Valor de comunidad_id, puede ser nulo
         ]
       );
@@ -2088,9 +2953,9 @@ app.post('/publicar-comentario', upload.array('imagenes', 4), async (req, res) =
         comentario,
         fecha,
         fechaStr: new Date().toLocaleString(),
-        rango1: rango1,
-        rango2: rango2,
-        rango3: rango3,
+        rango1: updatedRanks.rango1,
+        rango2: updatedRanks.rango2,
+        rango3: updatedRanks.rango3,
         comunidad_id: comunidad_id || null,
         imagenes,
         ranking: 0,
@@ -2244,178 +3109,74 @@ app.use(async (req, res, next) => {
 */
 
 
-app.get('/comentario/:mensajeId/:comentarioId', async (req, res) => {
+// Ruta para subir nuevas imágenes a un comentario existente
+app.post('/agregar-imagenes-comentario/:mensajeId/:comentarioId', upload.array('imagenes', 9), async (req, res) => {
   try {
     const mensajeId = parseInt(req.params.mensajeId);
     const comentarioId = parseInt(req.params.comentarioId);
+    const { comunidad_id } = req.body;
     
-    // También podemos obtener el comentario directamente de la base de datos
-    // para asegurar que incluya el comunidad_id
-    const comentarioResult = await db.query(
-      `SELECT c.*, array_agg(json_build_object('id', ci.id, 'url', ci.url)) as imagenes 
-       FROM forum_comments c
-       LEFT JOIN comment_images ci ON c.id = ci.comment_id
-       WHERE c.id = $1 AND c.post_id = $2
-       GROUP BY c.id`,
-      [comentarioId, mensajeId]
-    );
-    
-    if (comentarioResult.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
-    }
-    
-    const comentarioDB = comentarioResult.rows[0];
-    
-    const datosComentario = {
-      id: comentarioDB.id,
-      autor: comentarioDB.autor,
-      comentario: comentarioDB.comentario,
-      imagenes: comentarioDB.imagenes[0].id ? comentarioDB.imagenes : [],
-      fecha: comentarioDB.fecha,
-      fechaStr: comentarioDB.fecha_str,
-      comunidad_id: comentarioDB.comunidad_id
-    };
-    
-    res.json({
-      success: true,
-      comentario: datosComentario
-    });
-  } catch (error) {
-    console.error('Error al obtener comentario:', error);
-    return res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
-  }
-});
-
-
-    
-app.put('/actualizar-comentario/:mensajeId/:comentarioId', upload.array('imagenes', 4), async (req, res) => {
-  try {
-    const mensajeId = parseInt(req.params.mensajeId);
-    const comentarioId = parseInt(req.params.comentarioId);
-    const { autor, comentario, mantener_imagenes, comunidad_id } = req.body;
-    
-    // Validar datos básicos
-    if (!autor || !comentario) {
-      return res.status(400).json({ success: false, error: 'Datos incompletos' });
-    }
-    
-    // Encontrar índices (esto es lo que faltaba)
+    // Verificar si el comentario existe
     const mensajeIndex = mensajes.findIndex(m => m.id === mensajeId);
-    
     if (mensajeIndex === -1) {
       return res.status(404).json({ success: false, error: 'Mensaje no encontrado' });
     }
     
     const comentarioIndex = mensajes[mensajeIndex].comentarios.findIndex(c => c.id === comentarioId);
-    
     if (comentarioIndex === -1) {
       return res.status(404).json({ success: false, error: 'Comentario no encontrado' });
     }
     
-    // Fecha formateada para actualización
-    const fechaStr = new Date().toLocaleString() + ' (editado)';
-    
-    // Actualizar en la base de datos incluyendo comunidad_id
-    await db.query(`
-      UPDATE forum_comments 
-      SET autor = $1, comentario = $2, fecha_str = $3, comunidad_id = $4
-      WHERE id = $5 AND post_id = $6
-    `, [autor, comentario, fechaStr, comunidad_id || null, comentarioId, mensajeId]);
-    
-    // Gestionar imágenes en la base de datos
-    if (mantener_imagenes) {
-      const mantenerArray = Array.isArray(mantener_imagenes) ? mantener_imagenes : [mantener_imagenes];
-      const idsAMantener = mantenerArray.map(id => parseInt(id));
-      
-      // Obtener imágenes actuales de la base de datos
-      const imagenesResult = await db.query(`
-        SELECT id, url FROM comment_images WHERE comment_id = $1
-      `, [comentarioId]);
-      
-      // Identificar imágenes a eliminar
-      for (const imagen of imagenesResult.rows) {
-        if (!idsAMantener.includes(imagen.id)) {
-          // Eliminar de la base de datos
-          await db.query(`DELETE FROM comment_images WHERE id = $1`, [imagen.id]);
-          
-          // Eliminar archivo físico
-          const filename = imagen.url.split('/').pop();
-          const imagePath = join(uploadDir, filename);
-          if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
-          }
-        }
-      }
-    } else {
-      // Si no hay imágenes a mantener, eliminar todas
-      const imagenesResult = await db.query(`
-        SELECT id, url FROM comment_images WHERE comment_id = $1
-      `, [comentarioId]);
-      
-      // Eliminar archivos físicos y registros
-      for (const imagen of imagenesResult.rows) {
-        const filename = imagen.url.split('/').pop();
-        const imagePath = join(uploadDir, filename);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      }
-      
-      // Eliminar todas las imágenes de la base de datos
-      await db.query(`DELETE FROM comment_images WHERE comment_id = $1`, [comentarioId]);
+    // Verificar si hay imágenes nuevas
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, error: 'No se proporcionaron imágenes' });
     }
     
-    // Añadir nuevas imágenes si hay, incluyendo comunidad_id
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        // Incluir el filename y comunidad_id en la inserción
-        await db.query(`
-          INSERT INTO comment_images (comment_id, url, filename, comunidad_id)
-          VALUES ($1, $2, $3, $4)
-        `, [comentarioId, `/uploads/${file.filename}`, file.filename, comunidad_id || null]);
-      }
+    // Obtener cantidad actual de imágenes
+    const imagenesActuales = await db.query(`
+      SELECT COUNT(*) as total FROM comment_images WHERE comment_id = $1
+    `, [comentarioId]);
+    
+    const totalActual = parseInt(imagenesActuales.rows[0].total);
+    const totalNuevas = req.files.length;
+    
+    // Verificar que no se exceda el límite de 9 imágenes
+    if (totalActual + totalNuevas > 9) {
+      return res.status(400).json({ 
+        success: false, 
+        error: `No se pueden agregar ${totalNuevas} imágenes. El límite es de 9 imágenes en total y ya tienes ${totalActual}.`
+      });
     }
     
-    // Actualizar la versión en memoria
-    mensajes[mensajeIndex].comentarios[comentarioIndex].autor = autor;
-    mensajes[mensajeIndex].comentarios[comentarioIndex].comentario = comentario;
-    mensajes[mensajeIndex].comentarios[comentarioIndex].fechaStr = fechaStr;
-    
-    // Actualizar imágenes en memoria
-    if (mantener_imagenes) {
-      const mantenerArray = Array.isArray(mantener_imagenes) ? mantener_imagenes : [mantener_imagenes];
-      const idsAMantener = mantenerArray.map(id => parseInt(id));
-      
-      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes = 
-        mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.filter(imagen => 
-          idsAMantener.includes(imagen.id)
-        );
-    } else {
-      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes = [];
+    // Añadir nuevas imágenes a la base de datos
+    for (const file of req.files) {
+      await db.query(`
+        INSERT INTO comment_images (comment_id, url, filename, comunidad_id)
+        VALUES ($1, $2, $3, $4)
+      `, [comentarioId, `/uploads/${file.filename}`, file.filename, comunidad_id || null]);
     }
     
     // Añadir nuevas imágenes en memoria
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        // Usar un ID único para las nuevas imágenes
-        const newImageId = Date.now() + Math.floor(Math.random() * 1000);
-        
-        mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.push({
-          id: newImageId,
-          url: `/uploads/${file.filename}`
-        });
-      }
+    for (const file of req.files) {
+      const newImageId = Date.now() + Math.floor(Math.random() * 1000);
+      
+      mensajes[mensajeIndex].comentarios[comentarioIndex].imagenes.push({
+        id: newImageId,
+        url: `/uploads/${file.filename}`
+      });
     }
     
-    // Cargar la versión actualizada desde la base de datos para mantener consistencia
+    // Actualizar datos en memoria desde la base de datos
     await loadForumPosts();
     
     res.json({ 
       success: true, 
-      comentario: mensajes[mensajeIndex].comentarios[comentarioIndex] 
+      mensaje: `Se han agregado ${req.files.length} nuevas imágenes al comentario`,
+      comentario: mensajes[mensajeIndex].comentarios[comentarioIndex]
     });
+    
   } catch (error) {
-    console.error('Error al actualizar comentario:', error);
+    console.error('Error al agregar imágenes al comentario:', error);
     res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
   }
 });
@@ -2760,35 +3521,6 @@ app.delete('/eliminar-comentario/:mensajeId/:comentarioId', requireLogin, async 
 
 
 
-// Agregar al archivo de rutas del servidor
-app.get('/api/mis-comunidades', requireLogin, async (req, res) => {
-  try {
-    // Obtener las comunidades del usuario actual
-    const result = await db.query(`
-      SELECT c.id, c.nombre
-      FROM comunidades c
-      JOIN comunidad_miembros cm ON c.id = cm.comunidad_id
-      WHERE cm.user_id = $1 AND cm.estado = 'aceptado'
-      ORDER BY c.nombre
-    `, [req.session.userId]);
-    
-    res.json({
-      success: true,
-      comunidades: result.rows
-    });
-  } catch (error) {
-    console.error('Error al obtener las comunidades del usuario:', error);
-    res.status(500).json({
-      success: false,
-      mensaje: 'Error al obtener las comunidades'
-    });
-  }
-});
-
-
-
-
-
 
 // Ruta para obtener todos los votos del usuario
 app.get('/mis-votos', async (req, res) => {
@@ -3115,7 +3847,7 @@ app.post('/votar/:id', async (req, res) => {
         WHERE post_id = $1 AND user_id = $2 AND (comunidad_id = $3 OR comunidad_id IS NULL)
       `, [mensajeId, userId, comunidadId]);
       
-      // Actualizar ranking en la base de datos
+      // Error al enviar comentario ranking en la base de datos
       await db.query(`
         UPDATE forum_posts 
         SET ranking = ranking - $1 
@@ -3371,521 +4103,1033 @@ app.post('/votar-comentario', async (req, res) => {
 
 
 
-// Variables para rastrear la actividad de los usuarios
-let userActivityCounts = {}; // Almacenará conteos de posts/comentarios para cada usuario
-let userVoteCounts = {}; // Almacenará conteos de votos para cada usuario
 
-// Función para verificar y otorgar recompensas por publicaciones y comentarios
-async function checkAndAwardCoins(userId, username, type, req) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.get('/buscar', async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.trim() === '') return res.redirect('/inicio'); // si vacío, redirige
+
   try {
-    // Inicializar seguimiento de actividad del usuario si es necesario
-    if (!userActivityCounts[userId]) {
-      userActivityCounts[userId] = {
-        postCount: 0,
-        commentCount: 0,
-        lastPostAwardedAt: 0,
-        lastCommentAwardedAt: 0,
-        lastPostBonusAwardedAt: 0,
-        lastCommentBonusAwardedAt: 0
-      };
+    const texto = `%${q}%`;
+    
+    // Buscar mascotas por nombre o habilidad
+    const mascotas = await db.query(
+      `SELECT p.id, p.petname, p.habilidad, p."nivelAmor", p."nivelFelicidad", u.username as dueno, u.id as dueno_id 
+       FROM pets p
+       JOIN users u ON p.id_users = u.id
+       WHERE p.petname ILIKE $1 OR p.habilidad ILIKE $1
+       ORDER BY p."nivelAmor" DESC
+       LIMIT 5`, [texto]
+    );
+
+    // Buscar eventos relacionados con la búsqueda
+    const eventos = await db.query(
+      `SELECT id, titulo, descripcion, imagen, fecha, hora, duracion, plataforma, 
+              etiquetas, organizador, asistentes, popular, es_especial
+       FROM eventos 
+       WHERE titulo ILIKE $1 OR descripcion ILIKE $1 OR etiquetas ILIKE $1 OR organizador ILIKE $1
+       ORDER BY fecha ASC, popular DESC
+       LIMIT 4`, [texto]
+    );
+    
+    // Buscar posts del foro más votados
+    const posts = await db.query(
+      `SELECT fp.id, fp.autor, fp.mensaje, fp.etiqueta, fp.fecha, fp.ranking, COUNT(pv.id) as votos
+       FROM forum_posts fp
+       LEFT JOIN post_votes pv ON fp.id = pv.post_id
+       WHERE fp.autor ILIKE $1 OR fp.mensaje ILIKE $1 OR fp.etiqueta ILIKE $1
+       GROUP BY fp.id
+       ORDER BY COUNT(pv.id) DESC, fp.fecha DESC
+       LIMIT 8`, [texto]
+    );
+
+    // Buscar comunidades por nombre, descripción o categoría
+    const comunidades = await db.query(
+      `SELECT c.id, c.nombre, c.descripcion, c.categoria, c.subcategoria, c.subcategoria_extra, 
+              c.imagen_url, COUNT(cu.user_id) as miembros
+       FROM comunidades c
+       LEFT JOIN comunidades_usuarios cu ON c.id = cu.comunidad_id
+       WHERE c.nombre ILIKE $1 OR c.descripcion ILIKE $1 OR c.categoria ILIKE $1 OR 
+             c.subcategoria ILIKE $1 OR c.subcategoria_extra ILIKE $1
+       GROUP BY c.id
+       ORDER BY COUNT(cu.user_id) DESC
+       LIMIT 5`, [texto]
+    );
+
+    // Buscar comentarios relevantes
+    const comentarios = await db.query(
+      `SELECT fc.id, fc.autor, fc.comentario, fc.fecha, fc.ranking, fp.id as post_id
+       FROM forum_comments fc
+       JOIN forum_posts fp ON fc.post_id = fp.id
+       WHERE fc.comentario ILIKE $1 OR fc.autor ILIKE $1
+       ORDER BY fc.ranking DESC
+       LIMIT 5`, [texto]
+    );
+
+    // Eventos destacados (para ejemplos cuando no hay resultados)
+    const eventosDestacados = await db.query(
+      `SELECT id, titulo, fecha, imagen, popular 
+       FROM eventos 
+       WHERE fecha >= CURRENT_DATE
+       ORDER BY popular DESC, fecha ASC
+       LIMIT 3`
+    );
+
+    // Ejemplos destacados para cada categoría (simulando eventos o contenido destacado)
+    const ejemplos = {
+      mascotas: await db.query(
+        `SELECT id, petname, habilidad, "comidaFavorita" 
+         FROM pets 
+         ORDER BY "nivelFelicidad" DESC 
+         LIMIT 3`
+      ),
+      posts: await db.query(
+        `SELECT id, autor, etiqueta, mensaje, fecha 
+         FROM forum_posts 
+         ORDER BY ranking DESC 
+         LIMIT 3`
+      ),
+      comunidades: await db.query(
+        `SELECT c.id, c.nombre, c.categoria, COUNT(cu.user_id) as miembros 
+         FROM comunidades c
+         LEFT JOIN comunidades_usuarios cu ON c.id = cu.comunidad_id
+         GROUP BY c.id
+         ORDER BY COUNT(cu.user_id) DESC
+         LIMIT 3`
+      ),
+      eventos: eventosDestacados.rows
+    };
+
+    // Si el usuario está autenticado, obtener sus accesorios y mascota para el footer
+    let accesorios = [];
+    let usuario = null;
+    let mascotaActual = null;
+    let rutaImagen = '/imagenes_y_gif/default_mascota.png';  // Valor por defecto
+    
+    if (req.session && req.session.userId) {
+      // Obtener accesorios del usuario para el footer
+      const accResult = await db.query(
+        `SELECT * FROM accesorios WHERE id_users = $1`,
+        [req.session.userId]
+      );
+      accesorios = accResult.rows;
       
-      // Cargar conteos existentes desde la base de datos
-      const postCountQuery = await db.query(
-        `SELECT COUNT(*) as post_count FROM forum_posts WHERE user_id = $1`,
-        [userId]
+      // Obtener información del usuario
+      const userResult = await db.query(
+        `SELECT * FROM users WHERE id = $1`,
+        [req.session.userId]
       );
       
-      const commentCountQuery = await db.query(
-        `SELECT COUNT(*) as comment_count FROM forum_comments WHERE user_id = $1`,
-        [userId]
-      );
-      
-      userActivityCounts[userId].postCount = parseInt(postCountQuery.rows[0].post_count);
-      userActivityCounts[userId].commentCount = parseInt(commentCountQuery.rows[0].comment_count);
-    }
-    
-    // Determinar qué contador incrementar basado en el tipo
-    let currentCount, lastAwardedAt, lastBonusAwardedAt;
-    
-    if (type === 'post') {
-      // Incrementar contador de publicaciones
-      userActivityCounts[userId].postCount++;
-      currentCount = userActivityCounts[userId].postCount;
-      lastAwardedAt = userActivityCounts[userId].lastPostAwardedAt;
-      lastBonusAwardedAt = userActivityCounts[userId].lastPostBonusAwardedAt || 0;
-    } else if (type === 'comment') {
-      // Incrementar contador de comentarios
-      userActivityCounts[userId].commentCount++;
-      currentCount = userActivityCounts[userId].commentCount;
-      lastAwardedAt = userActivityCounts[userId].lastCommentAwardedAt;
-      lastBonusAwardedAt = userActivityCounts[userId].lastCommentBonusAwardedAt || 0;
-    } else {
-      return { awarded: false, error: 'Tipo de actividad inválido' };
-    }
-    
-    let coinsToAward = 0;
-    let bonusAwarded = false;
-    let regularAwarded = false;
-    
-    // Verificar si el usuario ha alcanzado un múltiplo de 5
-    if (currentCount % 5 === 0) {
-      // Otorgar 5 fichas por cada múltiplo de 5
-      coinsToAward += 5;
-      regularAwarded = true;
-      
-      // Actualizar el último punto de recompensa regular según el tipo
-      if (type === 'post') {
-        userActivityCounts[userId].lastPostAwardedAt = currentCount;
-      } else {
-        userActivityCounts[userId].lastCommentAwardedAt = currentCount;
+      if (userResult.rows.length > 0) {
+        usuario = userResult.rows[0];
       }
-    }
-    
-    // Verificar si el usuario ha alcanzado un múltiplo de 100
-    if (currentCount % 100 === 0 && currentCount > 0) {
-      // Solo otorgar bono si aún no se ha otorgado para este hito
-      if (lastBonusAwardedAt < currentCount) {
-        // Otorgar 50 fichas adicionales por múltiplos de 100
-        coinsToAward += 50;
-        bonusAwarded = true;
+      
+      // Obtener la mascota actual del usuario
+      if (req.session.mascotaActual) {
+        mascotaActual = req.session.mascotaActual;
         
-        // Actualizar el último bono otorgado según el tipo
-        if (type === 'post') {
-          userActivityCounts[userId].lastPostBonusAwardedAt = currentCount;
+        // Construir la ruta de la mascota correctamente
+        if (mascotaActual.rutaImagen) {
+          rutaImagen = mascotaActual.rutaImagen;
         } else {
-          userActivityCounts[userId].lastCommentBonusAwardedAt = currentCount;
+          // Usa las variables de mascota para generar una ruta
+          const rutaBase = "imagenes_de_mascotas/";
+          const especieMascotas = req.app.locals.especieMascotas || [];
+          const totalMascotas = especieMascotas.length;
+          let indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1;
+          
+          // Si la mascota tiene especie, usa eso en lugar del índice aleatorio
+          if (mascotaActual.especie && especieMascotas.includes(mascotaActual.especie)) {
+            rutaImagen = `${rutaBase}${mascotaActual.especie}.gif`;
+          } else {
+            // Fallback a mascota aleatoria
+            const especieAleatoria = especieMascotas[indiceAleatorio - 1] || 'default';
+            rutaImagen = `${rutaBase}${especieAleatoria}.gif`;
+          }
         }
       }
     }
+
+    res.render('resultados_busqueda', {
+      query: q,
+      mascotas: mascotas.rows,
+      posts: posts.rows,
+      comunidades: comunidades.rows,
+      comentarios: comentarios.rows,
+      eventos: eventos.rows, // Añadimos los eventos a la respuesta
+      ejemplos: {
+        mascotas: ejemplos.mascotas.rows,
+        posts: ejemplos.posts.rows,
+        comunidades: ejemplos.comunidades.rows,
+        eventos: ejemplos.eventos // Añadimos ejemplos de eventos
+      },
+      menuItems: [
+        {path: '/inicio', icon: 'fas fa-home', text: 'Inicio'},
+        {path: '/foro', icon: 'fas fa-comments', text: 'Foros'},
+        {path: '/eventos', icon: 'fas fa-calendar', text: 'Eventos'},
+        {path: '/comunidad', icon: 'fas fa-users', text: 'Comunidad'},
+        {path: '/corral_mascota', icon: 'fas fa-paw', text: 'Mascotas'}
+      ],
+      // Variables actualizadas para el footer
+      rutaImagen: rutaImagen,
+      mascotaActual: mascotaActual,
+      accesorios: accesorios || [],
+      usuario: usuario || null,
+      username: req.session.username,
+      userId: req.session.userId,
+      money: req.session.money,
+      isAuthenticated: !!req.session.userId,
+      descripcion: req.session.descripcion,
+      userRangos: {
+        rango1: req.session.rango1 || 'Ninguno',
+        rango2: req.session.rango2 || 'Ninguno',
+        rango3: req.session.rango3 || 'Ninguno'
+      }
+    });
+
+  } catch (err) {
+    console.error('Error en la búsqueda:', err);
+    res.status(500).send('Error interno al buscar');
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Endpoint para obtener información de un usuario específico
+app.get('/api/users/:id', requireLogin, async (req, res) => {
+  try {
+    const userId = req.params.id;
     
-    // Si hay fichas para otorgar, actualizar la base de datos
-    if (coinsToAward > 0) {
-      // Actualizar el dinero del usuario en la base de datos
-      const result = await db.query(
-        `UPDATE users 
-        SET money = money + $1 
-        WHERE id = $2
-        RETURNING money`,
-        [coinsToAward, userId]
-      );
-      
-      // También actualizar en la sesión si está disponible
-      let newTotal = null;
-      if (req && req.session) {
-        req.session.money = (req.session.money || 0) + coinsToAward;
-        newTotal = req.session.money;
-      }
-      
-      const activityType = type === 'post' ? 'publicaciones' : 'comentarios';
-      console.log(`Usuario ${username} (ID: ${userId}) recibió ${coinsToAward} fichas por alcanzar ${currentCount} ${activityType}!`);
-      
-      if (bonusAwarded) {
-        console.log(`Incluyendo un bono de 50 fichas por alcanzar un múltiplo de 100 ${activityType}!`);
-      }
-      
-      return {
-        awarded: true,
-        coins: coinsToAward,
-        newTotal: newTotal,
-        milestone: currentCount,
-        bonusAwarded: bonusAwarded,
-        type: type
-      };
+    // Verificar que es un ID válido
+    if (!userId || isNaN(parseInt(userId))) {
+      return res.status(400).json({
+        success: false,
+        mensaje: 'ID de usuario inválido'
+      });
     }
     
-    return { awarded: regularAwarded || bonusAwarded };
+    // Buscar el usuario en la base de datos
+    const userResult = await db.query(`
+      SELECT id, username FROM users WHERE id = $1
+    `, [userId]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        mensaje: 'Usuario no encontrado'
+      });
+    }
+    
+    // Devolver la información del usuario
+    res.json({
+      success: true,
+      id: userResult.rows[0].id,
+      username: userResult.rows[0].username
+    });
   } catch (error) {
-    console.error('Error al otorgar fichas:', error);
-    return { awarded: false, error: error.message };
+    console.error('Error al obtener información del usuario:', error);
+    res.status(500).json({
+      success: false,
+      mensaje: 'Error al obtener información del usuario'
+    });
   }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+});
+
+// Endpoint para obtener la lista de miembros de una comunidad
+app.get('/api/comunidad/:id/members', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    // Verificar si la comunidad existe
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        mensaje: 'Comunidad no encontrada' 
+      });
+    }
+    
+    // Obtener el creador de la comunidad
+    const creadorId = comunidadResult.rows[0].creador_id;
+    
+    // Obtener la lista de miembros
+    const miembrosResult = await db.query(`
+      SELECT u.id, u.username, cu.rol
+      FROM users u
+      JOIN comunidades_usuarios cu ON u.id = cu.user_id
+      WHERE cu.comunidad_id = $1
+      ORDER BY 
+        CASE 
+          WHEN cu.rol = 'administrador' THEN 1
+          WHEN cu.rol = 'moderador' THEN 2
+          WHEN cu.rol = 'miembro' THEN 3
+          ELSE 4
+        END, 
+        u.username
+    `, [comunidadId]);
+    
+    // Añadir el creador si no está en la lista de miembros
+    let members = [...miembrosResult.rows];
+    
+    // Verificar si el creador ya está en la lista
+    const creadorExisteEnLista = members.some(member => member.id === creadorId);
+    
+    // Si el creador no está en la lista, obtener sus datos y añadirlo
+    if (!creadorExisteEnLista) {
+      const creadorResult = await db.query(`
+        SELECT id, username FROM users WHERE id = $1
+      `, [creadorId]);
+      
+      if (creadorResult.rows.length > 0) {
+        members.push({
+          id: creadorResult.rows[0].id,
+          username: creadorResult.rows[0].username,
+          rol: 'administrador (creador)'
+        });
+      }
+    }
+    
+    res.json({
+      success: true,
+      members: members
+    });
+  } catch (error) {
+    console.error('Error al obtener miembros de la comunidad:', error);
+    res.status(500).json({ 
+      success: false, 
+      mensaje: 'Error al obtener la lista de miembros' 
+    });
+  }
+});
+
+// Modificación del endpoint para transferir la propiedad
+app.post('/api/comunidad/:id/transfer-ownership', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const currentUserId = req.session.userId;
+    const { newOwnerId } = req.body;
+    
+    if (!newOwnerId) {
+      return res.status(400).json({
+        success: false,
+        mensaje: 'Se requiere el ID del nuevo propietario'
+      });
+    }
+    
+    // Iniciar transacción
+    await db.query('BEGIN');
+    
+    // Verificar si la comunidad existe y el usuario actual es el creador
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      await db.query('ROLLBACK');
+      return res.status(404).json({ 
+        success: false, 
+        mensaje: 'Comunidad no encontrada' 
+      });
+    }
+    
+    const comunidad = comunidadResult.rows[0];
+    
+    if (comunidad.creador_id !== currentUserId) {
+      await db.query('ROLLBACK');
+      return res.status(403).json({ 
+        success: false, 
+        mensaje: 'No tienes permisos para transferir la propiedad de esta comunidad' 
+      });
+    }
+    
+    // Verificar que el nuevo propietario exista
+    const nuevoUsuarioResult = await db.query(`
+      SELECT u.* FROM users u 
+      WHERE u.id = $1
+    `, [newOwnerId]);
+    
+    if (nuevoUsuarioResult.rows.length === 0) {
+      await db.query('ROLLBACK');
+      return res.status(404).json({ 
+        success: false, 
+        mensaje: 'El usuario seleccionado no existe' 
+      });
+    }
+    
+    const isMemberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, newOwnerId]);
+    
+    // Si no es miembro, verificar si necesitamos agregarlo
+    if (isMemberResult.rows.length === 0) {
+      // Agregarlo como miembro con rol de administrador
+      await db.query(`
+        INSERT INTO comunidades_usuarios
+        (comunidad_id, user_id, rol, fecha_union)
+        VALUES ($1, $2, 'administrador', NOW())
+      `, [comunidadId, newOwnerId]);
+    } else {
+      // Actualizar su rol a administrador independientemente de su rol actual
+      await db.query(`
+        UPDATE comunidades_usuarios
+        SET rol = 'administrador'
+        WHERE comunidad_id = $1 AND user_id = $2
+      `, [comunidadId, newOwnerId]);
+    }
+    
+    // Actualizar el creador en la tabla comunidades
+    await db.query(`
+      UPDATE comunidades
+      SET creador_id = $1
+      WHERE id = $2
+    `, [newOwnerId, comunidadId]);
+    
+    // Cambiar el rol del anterior creador a miembro normal
+    // Primero verificar si ya existe en comunidades_usuarios
+    const oldOwnerMembershipResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, currentUserId]);
+    
+    if (oldOwnerMembershipResult.rows.length === 0) {
+      // Si no existe, agregarlo como miembro normal
+      await db.query(`
+        INSERT INTO comunidades_usuarios
+        (comunidad_id, user_id, rol, fecha_union)
+        VALUES ($1, $2, 'miembro', NOW())
+      `, [comunidadId, currentUserId]);
+    } else {
+      // Si existe, cambiar su rol a miembro
+      await db.query(`
+        UPDATE comunidades_usuarios
+        SET rol = 'miembro'
+        WHERE comunidad_id = $1 AND user_id = $2
+      `, [comunidadId, currentUserId]);
+    }
+    
+    // Confirmar transacción
+    await db.query('COMMIT');
+    
+    res.json({
+      success: true,
+      mensaje: `Propiedad transferida correctamente a ${nuevoUsuarioResult.rows[0].username}`
+    });
+  } catch (error) {
+    // Revertir transacción en caso de error
+    await db.query('ROLLBACK');
+    console.error('Error al transferir propiedad de la comunidad:', error);
+    res.status(500).json({ 
+      success: false, 
+      mensaje: 'Error al transferir la propiedad de la comunidad' 
+    });
+  }
+});
+// Modificar el endpoint para dejar una comunidad
+app.post('/api/comunidad/:id/leave', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    // Verificar si la comunidad existe
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        mensaje: 'Comunidad no encontrada' 
+      });
+    }
+    
+    const comunidad = comunidadResult.rows[0];
+    
+    // Verificar si es el creador (no debería poder abandonar, solo transferir la propiedad)
+    if (comunidad.creador_id === userId) {
+      return res.status(400).json({ 
+        success: false, 
+        mensaje: 'Como administrador no puedes abandonar la comunidad. Debes transferir la propiedad primero.' 
+      });
+    }
+    
+    // Verificar si es miembro
+    const isMemberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, userId]);
+    
+    if (isMemberResult.rows.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        mensaje: 'No eres miembro de esta comunidad' 
+      });
+    }
+    
+    // Iniciar una transacción para asegurar la integridad de los datos
+    await db.query('BEGIN');
+    
+    try {
+      // Eliminar al usuario de la comunidad
+      await db.query(`
+        DELETE FROM comunidades_usuarios
+        WHERE comunidad_id = $1 AND user_id = $2
+      `, [comunidadId, userId]);
+      
+      // También eliminar cualquier solicitud previa para permitir futuras solicitudes
+      await db.query(`
+        DELETE FROM solicitudes_comunidad
+        WHERE comunidad_id = $1 AND usuario_id = $2
+      `, [comunidadId, userId]);
+      
+      // Confirmar la transacción
+      await db.query('COMMIT');
+      
+      return res.json({ 
+        success: true, 
+        mensaje: 'Has abandonado la comunidad correctamente'
+      });
+    } catch (error) {
+      // Si hay algún error, deshacer todos los cambios
+      await db.query('ROLLBACK');
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error al abandonar la comunidad:', error);
+    res.status(500).json({ 
+      success: false, 
+      mensaje: 'Error al procesar la solicitud' 
+    });
+  }
+});
+
+
+
+
+
+
+// Endpoint para obtener información básica de una comunidad
+app.get('/api/comunidad/:id', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    
+    // Obtener información de la comunidad
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Comunidad no encontrada' });
+    }
+    
+    res.json(comunidadResult.rows[0]);
+  } catch (error) {
+    console.error('Error al obtener información de la comunidad:', error);
+    res.status(500).json({ error: 'Error al obtener información de la comunidad' });
+  }
+});
+
+// Endpoint para obtener estadísticas de la comunidad
+app.get('/api/comunidad/:id/stats', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    
+    // Contar miembros
+    const miembrosResult = await db.query(`
+      SELECT COUNT(*) as members FROM comunidades_usuarios 
+      WHERE comunidad_id = $1
+    `, [comunidadId]);
+    
+    // Contar publicaciones
+    const postsResult = await db.query(`
+      SELECT COUNT(*) as posts FROM forum_posts 
+      WHERE comunidad_id = $1
+    `, [comunidadId]);
+    
+    res.json({
+      members: parseInt(miembrosResult.rows[0].members) || 0,
+      posts: parseInt(postsResult.rows[0].posts) || 0
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas de la comunidad:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas de la comunidad' });
+  }
+});
+
+// Endpoint para verificar si el usuario es miembro
+app.get('/api/comunidad/:id/is-member', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    // Verificar en comunidades_usuarios
+    const memberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, userId]);
+    
+    // Verificar si es creador
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades 
+      WHERE id = $1 AND creador_id = $2
+    `, [comunidadId, userId]);
+    
+    const isMember = memberResult.rows.length > 0 || comunidadResult.rows.length > 0;
+    
+    res.json({ isMember });
+  } catch (error) {
+    console.error('Error al verificar membresía en la comunidad:', error);
+    res.status(500).json({ error: 'Error al verificar membresía' });
+  }
+});
+
+// 4. Corregir el endpoint API para unirse a una comunidad (versión API)
+app.post('/api/comunidad/:id/join', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    // Verificar si la comunidad existe
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ success: false, mensaje: 'Comunidad no encontrada' });
+    }
+    
+    const comunidad = comunidadResult.rows[0];
+    
+    // Verificar si ya es miembro (creador)
+    if (comunidad.creador_id === userId) {
+      return res.status(400).json({ success: false, mensaje: 'Ya eres el administrador de esta comunidad' });
+    }
+    
+    // Verificar si ya es miembro
+    const isMemberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, userId]);
+    
+    if (isMemberResult.rows.length > 0) {
+      return res.status(400).json({ success: false, mensaje: 'Ya eres miembro de esta comunidad' });
+    }
+    
+    // Si la comunidad es privada, crear solicitud
+    if (comunidad.es_privada) {
+      await db.query(`
+        INSERT INTO solicitudes_comunidad 
+        (usuario_id, comunidad_id, mensaje, estado) 
+        VALUES ($1, $2, $3, 'pendiente')
+        ON CONFLICT (usuario_id, comunidad_id) DO NOTHING
+      `, [userId, comunidadId, req.body.mensaje || '']);
+      
+      return res.json({ 
+        success: true, 
+        mensaje: 'Solicitud enviada correctamente. Espera la aprobación de un administrador.',
+        pending: true
+      });
+    }
+    
+    // Si la comunidad es pública, agregar directamente como miembro
+    await db.query(`
+      INSERT INTO comunidades_usuarios
+      (comunidad_id, user_id, rol, fecha_union)
+      VALUES ($1, $2, 'miembro', NOW())
+      ON CONFLICT (comunidad_id, user_id) DO NOTHING
+    `, [comunidadId, userId]);
+    
+    return res.json({ 
+      success: true, 
+      mensaje: 'Te has unido a la comunidad correctamente', 
+      pending: false 
+    });
+  } catch (error) {
+    console.error('Error al unirse a la comunidad:', error);
+    res.status(500).json({ success: false, mensaje: 'Error al procesar la solicitud' });
+  }
+});
 
 
 
@@ -4154,6 +5398,44 @@ app.get('/comunidad/:id', requireLogin, async (req, res) => {
   }
 });
 
+// API para obtener todas las categorías (accesible para todos los usuarios)
+app.get('/api/categorias', async (req, res) => {
+  try {
+    const categoriasResult = await db.query(`
+      SELECT * FROM categories_metadata 
+      WHERE tipo = 'categoria' AND activo = TRUE
+      ORDER BY nombre
+    `);
+    
+    res.json({ success: true, categorias: categoriasResult.rows });
+  } catch (error) {
+    console.error('Error al obtener categorías:', error);
+    res.status(500).json({ success: false, mensaje: 'Error al obtener categorías', error: error.message });
+  }
+});
+
+// API para obtener subcategorías por categoría (accesible para todos los usuarios)
+app.get('/api/subcategorias', async (req, res) => {
+  try {
+    const { categoria } = req.query;
+    
+    if (!categoria) {
+      return res.status(400).json({ success: false, mensaje: 'Se requiere una categoría' });
+    }
+    
+    const subcategoriasResult = await db.query(`
+      SELECT * FROM categories_metadata 
+      WHERE tipo = 'subcategoria' AND categoria = $1 AND activo = TRUE
+      ORDER BY nombre
+    `, [categoria]);
+    
+    res.json({ success: true, subcategorias: subcategoriasResult.rows });
+  } catch (error) {
+    console.error('Error al obtener subcategorías:', error);
+    res.status(500).json({ success: false, mensaje: 'Error al obtener subcategorías', error: error.message });
+  }
+});
+
 app.post('/comunidad/crear', requireLogin, upload.single('imagen'), async (req, res) => {
   try {
     const { nombre, descripcion, categoria, subcategoria, subcategoria_extra, reglas } = req.body;
@@ -4165,26 +5447,65 @@ app.post('/comunidad/crear', requireLogin, upload.single('imagen'), async (req, 
       return res.redirect('/comunidad?error=true&mensaje=El nombre y las reglas de la comunidad son obligatorios');
     }
     
-    // Insertar la nueva comunidad con subcategorías
-    const result = await db.query(`
-      INSERT INTO comunidades 
-      (nombre, descripcion, categoria, subcategoria, subcategoria_extra, imagen_url, creador_id, reglas, es_privada) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING id
-    `, [nombre, descripcion, categoria, subcategoria, subcategoria_extra, imagen_url, req.session.userId, reglas, es_privada]);
+    // Validar que la categoría existe
+    if (categoria) {
+      const categoriaResult = await db.query(`
+        SELECT * FROM categories_metadata 
+        WHERE tipo = 'categoria' AND nombre = $1 AND activo = TRUE
+      `, [categoria]);
+      
+      if (categoriaResult.rows.length === 0) {
+        return res.redirect('/comunidad?error=true&mensaje=La categoría seleccionada no existe');
+      }
+      
+      // Validar que la subcategoría existe si se proporciona
+      if (subcategoria) {
+        const subcategoriaResult = await db.query(`
+          SELECT * FROM categories_metadata 
+          WHERE tipo = 'subcategoria' AND categoria = $1 AND nombre = $2 AND activo = TRUE
+        `, [categoria, subcategoria]);
+        
+        if (subcategoriaResult.rows.length === 0) {
+          return res.redirect('/comunidad?error=true&mensaje=La subcategoría seleccionada no existe');
+        }
+      }
+    }
     
-    const comunidadId = result.rows[0].id;
-    
-    // Redirigir al listado de comunidades
-    res.redirect('/comunidad?exito=true&mensaje=Comunidad creada correctamente');
+    try {
+      // Begin transaction
+      await db.query('BEGIN');
+      
+      // Insertar la nueva comunidad con subcategorías
+      const result = await db.query(`
+        INSERT INTO comunidades 
+        (nombre, descripcion, categoria, subcategoria, subcategoria_extra, imagen_url, creador_id, reglas, es_privada) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id
+      `, [nombre, descripcion, categoria, subcategoria, subcategoria_extra, imagen_url, req.session.userId, reglas, es_privada]);
+      
+      const comunidadId = result.rows[0].id;
+      
+      // Añadir automáticamente al creador como miembro de la comunidad con rol 'administrador'
+      await db.query(`
+        INSERT INTO comunidades_usuarios (comunidad_id, user_id, rol, fecha_union)
+        VALUES ($1, $2, 'administrador', NOW())
+      `, [comunidadId, req.session.userId]);
+      
+      await db.query('COMMIT');
+      
+      // Redirigir a la página de comunidades con mensaje de éxito
+      res.redirect(`/comunidad?exito=true&mensaje=Comunidad creada correctamente`);
+    } catch (error) {
+      await db.query('ROLLBACK');
+      throw error;
+    }
   } catch (error) {
     console.error('Error al crear comunidad:', error);
     res.redirect('/comunidad?error=true&mensaje=Error al crear la comunidad');
   }
 });
 
-
-// Ruta para unirse a una comunidad
+// 3. Corregir el endpoint para unirse a una comunidad
 app.post('/comunidad/:id/unirse', requireLogin, async (req, res) => {
   try {
     const comunidadId = req.params.id;
@@ -4205,20 +5526,37 @@ app.post('/comunidad/:id/unirse', requireLogin, async (req, res) => {
       return res.status(400).json({ success: false, mensaje: 'Ya eres el administrador de esta comunidad' });
     }
     
+    // Verificar si ya es miembro
+    const isMemberResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, req.session.userId]);
+    
+    if (isMemberResult.rows.length > 0) {
+      return res.status(400).json({ success: false, mensaje: 'Ya eres miembro de esta comunidad' });
+    }
+    
     // Si la comunidad es privada, crear solicitud
     if (comunidad.es_privada) {
       await db.query(`
         INSERT INTO solicitudes_comunidad 
-        (usuario_id, comunidad_id, mensaje) 
-        VALUES ($1, $2, $3)
+        (usuario_id, comunidad_id, mensaje, estado) 
+        VALUES ($1, $2, $3, 'pendiente')
         ON CONFLICT (usuario_id, comunidad_id) DO NOTHING
       `, [req.session.userId, comunidadId, req.body.mensaje || '']);
       
       return res.json({ success: true, mensaje: 'Solicitud enviada correctamente. Espera la aprobación de un administrador.' });
     }
     
-    // Si la comunidad es pública, se considera unido cuando participa
-    return res.json({ success: true, mensaje: 'Ahora puedes participar en la comunidad.' });
+    // CORRECCIÓN: Si la comunidad es pública, agregar como miembro automáticamente
+    await db.query(`
+      INSERT INTO comunidades_usuarios
+      (comunidad_id, user_id, rol, fecha_union)
+      VALUES ($1, $2, 'miembro', NOW())
+      ON CONFLICT (comunidad_id, user_id) DO NOTHING
+    `, [comunidadId, req.session.userId]);
+    
+    return res.json({ success: true, mensaje: 'Te has unido a la comunidad correctamente.' });
   } catch (error) {
     console.error('Error al unirse a la comunidad:', error);
     res.status(500).json({ success: false, mensaje: 'Error al procesar la solicitud' });
@@ -4241,16 +5579,182 @@ app.post('/comunidad/:id/unirse', requireLogin, async (req, res) => {
 
 
 
+// Agregar estos endpoints a tu archivo index.js o routes/comunidades.js
 
+// Endpoint para obtener estadísticas de una comunidad
+app.get('/api/comunidades/:comunidadId/stats', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.comunidadId;
+    
+    // Consulta para obtener cantidad de miembros
+    const miembrosQuery = `
+      SELECT COUNT(user_id) AS total 
+      FROM comunidades_usuarios 
+      WHERE comunidad_id = $1
+    `;
+    
+    // Consulta para obtener cantidad de publicaciones
+    const publicacionesQuery = `
+      SELECT COUNT(id) AS total 
+      FROM publicaciones 
+      WHERE comunidad_id = $1
+    `;
+    
+    // Ejecutar consultas en paralelo
+    const [miembrosResult, publicacionesResult] = await Promise.all([
+      db.query(miembrosQuery, [comunidadId]),
+      db.query(publicacionesQuery, [comunidadId])
+    ]);
+    
+    return res.json({
+      exito: true,
+      miembros: parseInt(miembrosResult.rows[0]?.total || 0),
+      publicaciones: parseInt(publicacionesResult.rows[0]?.total || 0)
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener estadísticas de comunidad:', error);
+    return res.status(500).json({
+      error: true,
+      mensaje: 'Error al obtener estadísticas de la comunidad'
+    });
+  }
+});
 
+// Endpoint para eliminar una comunidad (versión actualizada)
+app.post('/api/comunidades/:comunidadId/eliminar', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.comunidadId;
+    const userId = req.session.userId;
+    
+    // Verificar que el usuario es administrador de la comunidad
+    const verificacionQuery = `
+      SELECT rol 
+      FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `;
+    
+    const verificacionResult = await db.query(verificacionQuery, [comunidadId, userId]);
+    
+    if (verificacionResult.rows.length === 0 || verificacionResult.rows[0].rol !== 'administrador') {
+      return res.status(403).json({
+        error: true,
+        mensaje: 'No tienes permiso para eliminar esta comunidad'
+      });
+    }
+    
+    // Usar una transacción para eliminar todos los datos relacionados
+    await db.query('BEGIN');
+    
+    try {
+      // Primero verificamos qué tablas existen antes de intentar eliminar datos
+      const tablesQuery = `
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name IN ('comunidades_usuarios', 'comentarios', 'likes', 'publicaciones', 'comunidades', 'forum_posts')
+      `;
+      
+      const tablesResult = await db.query(tablesQuery);
+      const existingTables = tablesResult.rows.map(row => row.table_name);
+      
+      console.log('Tablas existentes:', existingTables);
+      
+      // 1. Eliminar membresías de usuarios (si la tabla existe)
+      if (existingTables.includes('comunidades_usuarios')) {
+        await db.query('DELETE FROM comunidades_usuarios WHERE comunidad_id = $1', [comunidadId]);
+      }
+      
+      // 2. Eliminar publicaciones y referencias relacionadas (si la tabla existe)
+      if (existingTables.includes('publicaciones')) {
+        // Si existe la tabla 'likes', eliminar primero los likes de las publicaciones
+        if (existingTables.includes('likes')) {
+          await db.query(`
+            DELETE FROM likes 
+            WHERE publicacion_id IN (
+              SELECT id FROM publicaciones WHERE comunidad_id = $1
+            )
+          `, [comunidadId]);
+        }
+        
+        // Si existe la tabla 'comentarios', eliminar los comentarios de las publicaciones
+        if (existingTables.includes('comentarios')) {
+          await db.query(`
+            DELETE FROM comentarios 
+            WHERE publicacion_id IN (
+              SELECT id FROM publicaciones WHERE comunidad_id = $1
+            )
+          `, [comunidadId]);
+        }
+        
+        // Ahora eliminamos las publicaciones
+        await db.query('DELETE FROM publicaciones WHERE comunidad_id = $1', [comunidadId]);
+      }
+      
+      // 3. NUEVO: Eliminar los posts del foro relacionados con esta comunidad
+      if (existingTables.includes('forum_posts')) {
+        await db.query('DELETE FROM forum_posts WHERE comunidad_id = $1', [comunidadId]);
+        console.log('Posts del foro eliminados para la comunidad:', comunidadId);
+      }
+      
+      // 4. Finalmente, eliminar la comunidad
+      if (existingTables.includes('comunidades')) {
+        await db.query('DELETE FROM comunidades WHERE id = $1', [comunidadId]);
+      }
+      
+      // Confirmar transacción
+      await db.query('COMMIT');
+      
+      return res.json({
+        exito: true,
+        mensaje: 'Comunidad eliminada correctamente'
+      });
+      
+    } catch (error) {
+      // Revertir transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error en la transacción:', error);
+      throw error;
+    }
+    
+  } catch (error) {
+    console.error('Error al eliminar comunidad:', error);
+    return res.status(500).json({
+      error: true,
+      mensaje: 'Error al eliminar la comunidad: ' + error.message
+    });
+  }
+});
 
-
-
-
-
-
-
-
+// Endpoint para obtener las comunidades que el usuario administra o modera
+app.get('/api/comunidades/administradas', requireLogin, async (req, res) => {
+  try {
+    // Obtener directamente las comunidades donde el usuario es administrador o moderador
+    // Sin verificar el rango del usuario, ya que parece que esa información está en otra tabla
+    const query = `
+      SELECT c.id, c.nombre, c.descripcion, c.categoria, c.subcategoria, c.imagen_url, cu.rol
+      FROM comunidades c
+      JOIN comunidades_usuarios cu ON c.id = cu.comunidad_id
+      WHERE cu.user_id = $1 
+      AND (cu.rol = 'administrador' OR cu.rol = 'moderador')
+      ORDER BY c.nombre ASC
+    `;
+    
+    const result = await db.query(query, [req.session.userId]);
+    
+    return res.json({
+      exito: true,
+      comunidades: result.rows
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener comunidades administradas:', error);
+    return res.status(500).json({
+      error: true,
+      mensaje: 'Error al obtener las comunidades administradas'
+    });
+  }
+});
 
 
 
@@ -5000,220 +6504,6 @@ app.delete('/admin/subcategorias/:id', requireLogin, isAdmin, async (req, res) =
 
 
 
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Endpoint para obtener información básica de una comunidad
-app.get('/api/comunidad/:id', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    
-    // Obtener información de la comunidad
-    const comunidadResult = await db.query(`
-      SELECT * FROM comunidades WHERE id = $1
-    `, [comunidadId]);
-    
-    if (comunidadResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Comunidad no encontrada' });
-    }
-    
-    res.json(comunidadResult.rows[0]);
-  } catch (error) {
-    console.error('Error al obtener información de la comunidad:', error);
-    res.status(500).json({ error: 'Error al obtener información de la comunidad' });
-  }
-});
-
-// Endpoint para obtener estadísticas de la comunidad
-app.get('/api/comunidad/:id/stats', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    
-    // Contar miembros
-    const miembrosResult = await db.query(`
-      SELECT COUNT(*) as members FROM comunidades_usuarios 
-      WHERE comunidad_id = $1
-    `, [comunidadId]);
-    
-    // Contar publicaciones
-    const postsResult = await db.query(`
-      SELECT COUNT(*) as posts FROM forum_posts 
-      WHERE comunidad_id = $1
-    `, [comunidadId]);
-    
-    res.json({
-      members: parseInt(miembrosResult.rows[0].members) || 0,
-      posts: parseInt(postsResult.rows[0].posts) || 0
-    });
-  } catch (error) {
-    console.error('Error al obtener estadísticas de la comunidad:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas de la comunidad' });
-  }
-});
-
-// Endpoint para verificar si el usuario es miembro
-app.get('/api/comunidad/:id/is-member', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    const userId = req.session.userId;
-    
-    // Verificar en comunidades_usuarios
-    const memberResult = await db.query(`
-      SELECT * FROM comunidades_usuarios 
-      WHERE comunidad_id = $1 AND user_id = $2
-    `, [comunidadId, userId]);
-    
-    // Verificar si es creador
-    const comunidadResult = await db.query(`
-      SELECT * FROM comunidades 
-      WHERE id = $1 AND creador_id = $2
-    `, [comunidadId, userId]);
-    
-    const isMember = memberResult.rows.length > 0 || comunidadResult.rows.length > 0;
-    
-    res.json({ isMember });
-  } catch (error) {
-    console.error('Error al verificar membresía en la comunidad:', error);
-    res.status(500).json({ error: 'Error al verificar membresía' });
-  }
-});
-
-// Endpoint para unirse a una comunidad (versión API)
-app.post('/api/comunidad/:id/join', requireLogin, async (req, res) => {
-  try {
-    const comunidadId = req.params.id;
-    const userId = req.session.userId;
-    
-    // Verificar si la comunidad existe
-    const comunidadResult = await db.query(`
-      SELECT * FROM comunidades WHERE id = $1
-    `, [comunidadId]);
-    
-    if (comunidadResult.rows.length === 0) {
-      return res.status(404).json({ success: false, mensaje: 'Comunidad no encontrada' });
-    }
-    
-    const comunidad = comunidadResult.rows[0];
-    
-    // Verificar si ya es miembro (creador)
-    if (comunidad.creador_id === userId) {
-      return res.status(400).json({ success: false, mensaje: 'Ya eres el administrador de esta comunidad' });
-    }
-    
-    // Verificar si ya es miembro
-    const isMemberResult = await db.query(`
-      SELECT * FROM comunidades_usuarios 
-      WHERE comunidad_id = $1 AND user_id = $2
-    `, [comunidadId, userId]);
-    
-    if (isMemberResult.rows.length > 0) {
-      return res.status(400).json({ success: false, mensaje: 'Ya eres miembro de esta comunidad' });
-    }
-    
-    // Si la comunidad es privada, crear solicitud
-    if (comunidad.es_privada) {
-      await db.query(`
-        INSERT INTO solicitudes_comunidad 
-        (usuario_id, comunidad_id, mensaje) 
-        VALUES ($1, $2, $3)
-        ON CONFLICT (usuario_id, comunidad_id) DO NOTHING
-      `, [userId, comunidadId, req.body.mensaje || '']);
-      
-      return res.json({ 
-        success: true, 
-        mensaje: 'Solicitud enviada correctamente. Espera la aprobación de un administrador.',
-        pending: true
-      });
-    }
-    
-    // Si la comunidad es pública, agregar directamente como miembro
-    await db.query(`
-      INSERT INTO comunidades_usuarios
-      (comunidad_id, user_id, rol, fecha_union)
-      VALUES ($1, $2, 'miembro', NOW())
-    `, [comunidadId, userId]);
-    
-    return res.json({ 
-      success: true, 
-      mensaje: 'Te has unido a la comunidad correctamente', 
-      pending: false 
-    });
-  } catch (error) {
-    console.error('Error al unirse a la comunidad:', error);
-    res.status(500).json({ success: false, mensaje: 'Error al procesar la solicitud' });
-  }
-});
 
 
 
