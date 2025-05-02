@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sala <%= roomId %></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+         body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #viewport {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        #world {
+            position: absolute;
+            width: 10000px;
+            height: 10000px;
+            background: 
+                /* Fondo de mapa de aventura */
+                url('/fondopetchat.png') center/cover,
+                /* Patrón de cuadrícula semitransparente */
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 
+                cover, /* Para la imagen de fondo */
+                100px 100px; /* Para la cuadrícula */
+            background-blend-mode: overlay;
+        }
+        
+        /* Efecto de niebla para dar profundidad al mapa */
+        #world::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.3) 70%, 
+                rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+        }
+        
+        .webcam-container {
+            position: absolute;
+            width: 200px;
+            height: 150px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #444;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        
+        .webcam-container:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border-color: #666;
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+        
+        .webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #111;
+        }
+        
+        .user-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+        
+        /* Indicador de voz mejorado */
+        .voice-indicator {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0, 200, 0, 0.7);
+            border-radius: 50%;
+            display: none;
+            z-index: 11;
+            transition: all 0.3s ease;
+        }
+        
+        .connection-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            z-index: 11;
+        }
+        
+        .connection-badge.connected {
+            background-color: #28a745;
+        }
+        
+        #position-display {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 100;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        #room-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        #connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 100;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        #connection-status.connected {
+            background: rgba(40, 167, 69, 0.7);
+        }
+        
+        #connection-status.disconnected {
+            background: rgba(220, 53, 69, 0.7);
+        }
+        
+        #controls-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 100;
+            font-size: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Efectos para elementos interactivos */
+        button {
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Animación sutil para el mundo */
+        @keyframes subtleMove {
+            0%, 100% { background-position: 0 0; }
+            50% { background-position: 10px 10px; }
+        }
+        
+        #world {
+            animation: subtleMove 60s infinite ease-in-out;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="room-info">Sala: <%= roomId %></div>
+    <div id="connection-status" class="disconnected">Conectando...</div>
+    <div id="controls-info">Usa las teclas WASD o flechas para moverte</div>
+    <div id="viewport">
+        <div id="world"></div>
+    </div>
+    <div id="position-display">Posición: (5000, 5000)</div>
+    
+    <!-- Diálogo de permisos de cámara -->
+
+
+    <!-- Aseguramos que se carga Socket.IO primero, luego nuestro cliente -->
+    <script type="module" src="/scripts/client.js"></script>
+    
+    <script>
+        // Script auxiliar para gestionar permisos de cámara
+        document.addEventListener('DOMContentLoaded', function() {
+            const retryBtn = document.getElementById('retry-camera-btn');
+            
+            // Evento para reintentar acceso a cámara
+            if (retryBtn) {
+                retryBtn.addEventListener('click', function() {
+                    document.getElementById('camera-permissions-dialog').classList.remove('visible');
+                    // El cliente.js se encargará de reintentar la conexión
+                    window.location.reload();
+                });
+            }
+            
+            // Verificar si el usuario ha bloqueado permisos previamente
+            navigator.permissions.query({name: 'camera'}).then(function(permissionStatus) {
+                if (permissionStatus.state === 'denied') {
+                    document.getElementById('camera-permissions-dialog').classList.add('visible');
+                }
+                
+                permissionStatus.onchange = function() {
+                    if (permissionStatus.state === 'granted') {
+                        document.getElementById('camera-permissions-dialog').classList.remove('visible');
+                    } else if (permissionStatus.state === 'denied') {
+                        document.getElementById('camera-permissions-dialog').classList.add('visible');
+                    }
+                };
+            });
+        });
+    </script>
+</body>
+</html>
+
+

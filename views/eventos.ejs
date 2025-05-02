@@ -17,7 +17,7 @@
                 <div class="carrusel-imagen" style="background-image: url('https://66.media.tumblr.com/ee5169a677d71323105a5210404f474d/tumblr_ptp22tbWHk1tgo74ho1_1280.gif');"></div>
                 <div class="carrusel-imagen" style="background-image: url('https://i.gifer.com/xK.gif');"></div>
             </div>
-            <h1>Eventos en Pet-Chan</h1>
+            <h1>Eventos en Pet-Chan</h1> 
             <h2>Unete al Discord y participa en nuestros eventos</h2>
         </div>
 
@@ -39,8 +39,8 @@
                 <% if (typeof eventosData !== 'undefined' && eventosData.length > 0) { %>
                     <% eventosData.forEach(evento => { %>
                         <div class="evento <%= evento.popular ? 'evento-popular' : '' %>" 
-                             style="background-image: url('<%= evento.imagen || 'https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif' %>');"
-                             data-id="<%= evento.id %>">
+
+                             data-id="<%= evento.id %>">    
                             <div class="marco-dorado"></div>
                             <div class="fecha-evento">
                                 <span class="dia"><%= new Date(evento.fecha).getDate() %></span>
@@ -150,18 +150,7 @@
         <i class="fas fa-plus"></i>
     </button>
 
-    <!-- Scripts -->
-    <script>
-        // Inicializar variables globales con datos del servidor
-        let initialEventsData = <% if (typeof eventosData !== 'undefined' && eventosData.length > 0) { %>
-            <%= JSON.stringify(eventosData) %>
-        <% } else { %>
-            []
-        <% } %>;
-        
-        // Establecer si el usuario es administrador
-        let isAdmin = <%= typeof isAdmin !== 'undefined' && isAdmin ? 'true' : 'false' %>;
-    </script>
+    
     <script src="/scripts/eventos.js"></script>
 </body>
 </html>

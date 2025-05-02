@@ -1,0 +1,1762 @@
+/* Estilos base */
+.contenedor-biblioteca {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: rgba(98, 2, 150, 0.95);
+    border: 4px solid #d304c5;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.contenedor-biblioteca::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #a304fa, #d304c5, #a304fa);
+    animation: arcoiris 2s linear infinite;
+    background-size: 200% 100%;
+}
+
+@keyframes arcoiris {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.seccion-titulo {
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    padding: 15px;
+    background: linear-gradient(135deg, #a304fa 0%, #620296 100%);
+    border-radius: 10px;
+    border: 2px solid #cf7cfc;
+}
+
+.subtitulo {
+    color: #cf7cfc;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+/* Pestañas */
+.pestanas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.pestana {
+    background: rgba(163, 4, 250, 0.3);
+    border: 2px solid #cf7cfc;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.pestana:hover {
+    background: rgba(163, 4, 250, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(207, 124, 252, 0.7);
+}
+
+.pestana.activa {
+    background: linear-gradient(135deg, #d304c5 0%, #a304fa 100%);
+    box-shadow: 0 0 15px rgba(207, 124, 252, 0.5);
+}
+
+/* Contenido de pestañas */
+.contenido-pestanas {
+    background: rgba(163, 4, 250, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #cf7cfc;
+}
+
+.contenido-pestana {
+    display: none;
+}
+
+.contenido-pestana.activo {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Filtros */
+.filtros-coleccion {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filtros-coleccion input, 
+.filtros-coleccion select {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #cf7cfc;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+    font-family: inherit;
+    flex: 1;
+    min-width: 120px;
+}
+
+.filtros-coleccion input:focus,
+.filtros-coleccion select:focus {
+    outline: none;
+    border-color: #d304c5;
+    box-shadow: 0 0 10px rgba(207, 124, 252, 0.5);
+}
+
+/* Grid de mascotas - MEJORADO */
+.mascota-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.mascota-card {
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    border: 3px solid #cf7cfc;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transform-origin: center;
+}
+
+.mascota-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(207, 124, 252, 0.4);
+    border-color: #d304c5;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border-bottom: 2px solid #cf7cfc;
+}
+
+.card-nombre {
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-shadow: 0 0 8px rgba(207, 124, 252, 0.7);
+}
+
+.card-rareza {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-rareza.comun {
+    background-color: #7b9e89;
+    color: white;
+}
+
+.card-rareza.raro {
+    background-color: #4b6bab;
+    color: white;
+    animation: pulseRaro 2s infinite;
+}
+
+@keyframes pulseRaro {
+    0%, 100% { box-shadow: 0 0 5px rgba(75, 107, 171, 0.7); }
+    50% { box-shadow: 0 0 15px rgba(75, 107, 171, 0.9); }
+}
+
+.card-rareza.epico {
+    background-color: #9b59b6;
+    color: white;
+    animation: pulseEpico 2s infinite;
+}
+
+@keyframes pulseEpico {
+    0%, 100% { box-shadow: 0 0 5px rgba(155, 89, 182, 0.7); }
+    50% { box-shadow: 0 0 15px rgba(155, 89, 182, 0.9); }
+}
+
+.card-rareza.legendario {
+    background-color: #f1c40f;
+    color: black;
+    animation: pulseLegendario 1.5s infinite;
+}
+
+@keyframes pulseLegendario {
+    0%, 100% { box-shadow: 0 0 8px rgba(241, 196, 15, 0.7); }
+    50% { box-shadow: 0 0 20px rgba(241, 196, 15, 0.9); }
+}
+
+/* MEJORADO: Imagen de la mascota en tarjetas */
+.card-imagen-container {
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-imagen-container::before {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle at center, rgba(207, 124, 252, 0.3) 0%, transparent 70%);
+    z-index: 0;
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+.card-imagen {
+    height: 140px; /* TAMAÑO AUMENTADO */
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(207, 124, 252, 0.7));
+    z-index: 1;
+    transition: transform 0.5s ease;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.mascota-card:hover .card-imagen {
+    transform: scale(1.1) translateY(-5px);
+}
+
+.pixeleado {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.card-info {
+    padding: 15px;
+    font-size: 0.95rem;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.card-stats {
+    margin-top: 12px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    width: 30px;
+    text-align: center;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.barra-stat {
+    flex: 1;
+    height: 12px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-valor {
+    height: 100%;
+    background: linear-gradient(90deg, #ff5e62, #ff9966);
+    transition: width 0.8s ease-in-out;
+}
+
+.stat-valor.felicidad {
+    background: linear-gradient(90deg, #56ab2f, #a8e063);
+}
+
+.stat-valor.energia {
+    background: linear-gradient(90deg, #2193b0, #6dd5ed);
+}
+
+.card-acciones {
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.btn-accion {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: bold;
+    flex: 1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-ver-detalles {
+    background: linear-gradient(135deg, #3a1c71, #d76d77);
+    color: white;
+}
+
+.btn-activar {
+    background: linear-gradient(135deg, #56ab2f, #a8e063);
+    color: white;
+}
+
+.btn-activa {
+    background: #7f8c8d;
+    color: white;
+    cursor: not-allowed;
+}
+
+.btn-accion:hover:not(.btn-activa) {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-accion:active:not(.btn-activa) {
+    transform: translateY(1px);
+}
+
+/* Sección sin mascotas */
+.sin-mascotas {
+    text-align: center;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    border: 3px dashed #cf7cfc;
+    margin: 20px 0;
+}
+
+/* Sección de tienda - MEJORADO */
+.tienda-info {
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.monedas-container {
+    background: rgba(0, 0, 0, 0.4);
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 2px solid gold;
+    margin-top: 15px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.monedas-icono {
+    font-size: 1.8rem;
+    margin-right: 10px;
+    color: gold;
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+.monedas-cantidad {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+/* MEJORADO: Tienda más atractiva */
+/* Mejoras para centrar y elevar los sobres */
+.tienda-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Exactamente 2 columnas */
+    gap: 40px;
+    padding: 25px 0;
+    max-width: 800px; /* Ancho controlado */
+    margin: 40px auto; /* Margen superior aumentado */
+    justify-content: center;
+}
+
+/* Contenedor mejorado de los sobres */
+.sobre-container {
+    perspective: 1200px;
+    height: auto; /* Eliminamos altura fija */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 30px; /* Espacio inferior para evitar que toque el borde */
+}
+
+/* Sobre más grande */
+.sobre {
+    position: relative;
+    width: 90%; /* Ancho controlado */
+    margin: 0 auto;
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
+}
+
+.sobre-frontal {
+    position: relative; /* Cambiado de absolute */
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    border: 4px solid #cf7cfc;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+/* Hacer la imagen del sobre más grande */
+.sobre-frontal img {
+    max-width: 90%; /* Aumentado de 200px */
+    max-height: 220px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(207, 124, 252, 0.7));
+    animation: floatAndGlow 3s ease-in-out infinite;
+    z-index: 1;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Título del sobre */
+.sobre-frontal h3 {
+    margin-bottom: 15px;
+    color: #fff;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(207, 124, 252, 0.7);
+    z-index: 1;
+    text-align: center;
+}
+
+/* Posicionamiento del botón comprar */
+.btn-comprar-sobre {
+    background: linear-gradient(135deg, #d304c5 0%, #a304fa 100%);
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+    width: 90%;
+    display: block;
+    margin: 15px auto 0;
+    text-align: center;
+}
+
+/* Efecto hover mejorado para sobres */
+.sobre:hover {
+    transform: translateY(-15px) rotateY(10deg);
+    filter: brightness(1.1);
+}
+
+/* Resplandor al hover */
+.sobre:hover .sobre-frontal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(207, 124, 252, 0.4) 0%, transparent 70%);
+    z-index: 0;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Información de probabilidades centrada */
+.sobre-container p {
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #ddd;
+    max-width: 90%;
+}
+@keyframes floatAndGlow {
+    0%, 100% { 
+        transform: translateY(0); 
+        filter: drop-shadow(0 0 15px rgba(207, 124, 252, 0.7));
+    }
+    50% { 
+        transform: translateY(-15px); 
+        filter: drop-shadow(0 0 25px rgba(207, 124, 252, 0.9));
+    }
+}
+
+.sobre-frontal h3 {
+    margin-bottom: 15px;
+    color: #fff;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(207, 124, 252, 0.7);
+    z-index: 1;
+}
+
+.sobre-frontal p {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #ddd;
+    z-index: 1;
+    line-height: 1.5;
+}
+
+.btn-comprar-sobre {
+    background: linear-gradient(135deg, #d304c5 0%, #a304fa 100%);
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: auto;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+    /* Asegurarse que sea visible */
+    display: block;
+    width: 90%;
+}
+
+.btn-comprar-sobre::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn-comprar-sobre:hover {
+    transform: scale(1.1) translateY(-5px);
+    box-shadow: 0 15px 25px rgba(207, 124, 252, 0.5);
+}
+
+.btn-comprar-sobre:hover::before {
+    left: 100%;
+}
+
+.btn-comprar-sobre:active {
+    transform: scale(0.98) translateY(2px);
+}
+
+/* Mascota activa - MEJORADO */
+.mascota-activa-container {
+    display: flex;
+    gap: 35px;
+    align-items: center;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.mascota-activa-imagen {
+    flex: 1;
+    min-width: 280px;
+    height: 280px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+    border: 4px solid #cf7cfc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.mascota-activa-imagen::before {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle at center, rgba(207, 124, 252, 0.3) 0%, transparent 70%);
+    animation: pulseActiveGlow 3s infinite;
+}
+
+@keyframes pulseActiveGlow {
+    0%, 100% { 
+        opacity: 0.5; 
+        transform: scale(0.8); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.1); 
+    }
+}
+
+.mascota-activa-img {
+    max-width: 85%;
+    max-height: 85%;
+    z-index: 1;
+    filter: drop-shadow(0 0 15px rgba(207, 124, 252, 0.8));
+    animation: floatActive 4s ease-in-out infinite;
+}
+
+@keyframes floatActive {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(2deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+    75% { transform: translateY(-5px) rotate(-2deg); }
+}
+
+.mascota-accesorio {
+    position: absolute;
+    z-index: 2;
+    filter: drop-shadow(0 0 10px rgba(207, 124, 252, 0.7));
+    animation: rotateSlow 10s linear infinite;
+}
+
+@keyframes rotateSlow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.mascota-activa-info {
+    flex: 2;
+    min-width: 320px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 25px;
+    border-radius: 15px;
+    border: 3px solid #cf7cfc;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mascota-activa-info h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 1.8rem;
+    text-shadow: 0 0 12px rgba(207, 124, 252, 0.7);
+}
+
+.mascota-descripcion {
+    color: #cf7cfc;
+    margin-bottom: 25px;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.mascota-stats {
+    margin-bottom: 25px;
+}
+
+.mascota-stat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 12px;
+}
+
+.stat-barra {
+    flex: 1;
+    height: 18px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 9px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.stat-numero {
+    width: 45px;
+    text-align: right;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.mascota-detalles {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 18px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border: 1px solid rgba(207, 124, 252, 0.3);
+}
+
+.detalle-label {
+    color: #cf7cfc;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.sin-mascota-activa {
+    text-align: center;
+    padding: 60px 25px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+    border: 3px dashed #cf7cfc;
+    margin: 20px 0;
+}
+
+/* Efectos píxel en las esquinas */
+.esquina-pixel {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #cf7cfc;
+    box-shadow: 0 0 10px rgba(207, 124, 252, 0.7);
+}
+
+.esquina-pixel-si { top: -6px; left: -6px; }
+.esquina-pixel-sd { top: -6px; right: -6px; }
+.esquina-pixel-ii { bottom: -6px; left: -6px; }
+.esquina-pixel-id { bottom: -6px; right: -6px; }
+
+/* Modal - MEJORADO */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    overflow: auto;
+    animation: fadeIn 0.3s ease;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal.mostrar {
+    display: flex;
+}
+
+.modal-contenido {
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    border: 4px solid #cf7cfc;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 800px;
+    padding: 30px;
+    position: relative;
+    animation: scaleInBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+
+
+@keyframes scaleInBounce {
+    0% { transform: scale(0.7); opacity: 0; }
+    70% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.cerrar-modal:hover {
+    color: #d304c5;
+    transform: scale(1.2) rotate(90deg);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.detalles-mascota {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 35px;
+}
+
+.detalles-imagen {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid rgba(207, 124, 252, 0.5);
+}
+
+.detalles-imagen img {
+    max-width: 100%;
+    max-height: 220px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(207, 124, 252, 0.7));
+    animation: floatDetail 3s ease-in-out infinite;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+@keyframes floatDetail {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.detalles-info {
+    flex: 2;
+    min-width: 320px;
+}
+
+/* Resultado del sobre - MEJORADO DRAMÁTICAMENTE */
+/* Pop-up épico para mascota nueva */
+/* Ajustes para el modal de resultado */
+.modal-resultado {
+    max-width: 600px !important; /* Reducido para mejor control */
+    max-height: 90vh !important; /* Altura máxima controlada */
+    overflow-y: auto !important; /* Permitir scroll si es necesario */
+    padding: 20px !important; /* Reducir padding para más espacio interno */
+    box-sizing: border-box !important; /* Asegurar que el padding no afecte dimensiones */
+}
+
+/* Mejorar la presentación del contenido interno */
+.resultado-sobre {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* Contenedor para la nueva mascota - más compacto */
+.nueva-mascota-container {
+    max-width: 500px !important; 
+    padding: 15px !important;
+    margin: 10px auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    height: auto !important; /* Altura automática basada en contenido */
+}
+
+/* Ajuste de tamaño de imagen para asegurar que quepa */
+#nueva-mascota-img {
+    max-height: 180px !important; 
+    min-height: auto !important; /* Eliminar altura mínima fija */
+    width: auto !important;
+    margin: 10px auto !important;
+}
+
+/* Ajustar banner de rareza */
+.rareza-banner {
+    padding: 8px !important;
+    margin: 10px auto !important;
+    width: 80% !important;
+}
+
+/* Mejorar el formulario */
+.campo-form {
+    width: 90% !important;
+    margin: 10px auto !important;
+}
+
+.campo-form label {
+    margin-bottom: 8px !important;
+    font-size: 0.95rem !important;
+}
+
+.campo-form input {
+    padding: 10px !important;
+}
+
+/* Botón más compacto */
+.btn-guardar-mascota {
+    padding: 12px !important;
+    margin: 15px auto !important;
+    width: 80% !important;
+}
+
+/* Título más compacto */
+.resultado-sobre h2 {
+    font-size: 1.8rem !important;
+    margin: 15px 0 !important;
+}
+
+/* Asegurar que el modal se centre correctamente en la pantalla */
+.modal.mostrar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Media query para dispositivos móviles */
+@media (max-width: 480px) {
+    .modal-resultado {
+        width: 95% !important;
+        padding: 15px 10px !important;
+    }
+    
+    .resultado-sobre h2 {
+        font-size: 1.4rem !important;
+    }
+    
+    #nueva-mascota-img {
+        max-height: 150px !important;
+    }
+    
+    .btn-guardar-mascota {
+        font-size: 1rem !important;
+        padding: 10px !important;
+    }
+}
+
+/* Animación de entrada épica */
+@keyframes apareceEpico {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.05); opacity: 1; }
+    85% { transform: scale(0.98); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Título más épico */
+.resultado-sobre h2,
+.modal-contenido h2 {
+    color: #fff;
+    font-size: 2.4rem !important;
+    text-shadow: 0 0 15px rgba(211, 4, 197, 0.8), 
+                 0 0 30px rgba(207, 124, 252, 0.6) !important;
+    margin-bottom: 30px !important;
+    letter-spacing: 1px;
+    animation: pulseText 2s infinite;
+    text-transform: uppercase;
+}
+
+@keyframes pulseText {
+    0%, 100% { text-shadow: 0 0 15px rgba(211, 4, 197, 0.8), 0 0 30px rgba(207, 124, 252, 0.6); }
+    50% { text-shadow: 0 0 25px rgba(211, 4, 197, 1), 0 0 50px rgba(207, 124, 252, 0.8); }
+}
+
+/* Contenedor para la nueva mascota */
+.nueva-mascota-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    background: rgba(0, 0, 0, 0.35) !important;
+    padding: 40px !important;
+    border-radius: 20px !important;
+    border: 4px solid #cf7cfc !important;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 30px !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5) inset !important;
+}
+
+/* Efectos de fondo con animación */
+.nueva-mascota-container::before {
+    content: '';
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    top: -100%;
+    left: -100%;
+    background: radial-gradient(circle at center, 
+                rgba(211, 4, 197, 0.3) 0%, 
+                transparent 40%, 
+                rgba(207, 124, 252, 0.2) 75%, 
+                transparent 100%);
+    animation: rotateGradient 15s linear infinite;
+    z-index: 0;
+}
+
+@keyframes rotateGradient {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Imagen de mascota MUCHO más grande y con efectos */
+#nueva-mascota-img,
+.nueva-mascota-container img {
+    max-width: 85% !important; /* Mucho más grande */
+    min-height: 250px !important;
+    max-height: 300px !important;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(211, 4, 197, 0.8)) !important;
+    animation: floatAndGlowEpic 4s ease-in-out infinite, 
+               revealMascotaEpic 1.2s cubic-bezier(0.17, 0.89, 0.32, 1.37) !important;
+    z-index: 1;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    transform-origin: center center;
+}
+
+/* Animación de revelación más dramática */
+@keyframes revealMascotaEpic {
+    0% { 
+        transform: scale(0.1) rotate(-15deg); 
+        opacity: 0; 
+        filter: blur(30px) drop-shadow(0 0 20px rgba(211, 4, 197, 0.8));
+    }
+    40% { 
+        transform: scale(0.6) rotate(10deg); 
+        opacity: 0.6; 
+    }
+    70% { 
+        transform: scale(1.2) rotate(-5deg); 
+        opacity: 1; 
+        filter: blur(0) drop-shadow(0 0 40px rgba(211, 4, 197, 1));
+    }
+    85% { 
+        transform: scale(0.95) rotate(2deg); 
+    }
+    100% { 
+        transform: scale(1) rotate(0); 
+        opacity: 1; 
+        filter: drop-shadow(0 0 20px rgba(211, 4, 197, 0.8));
+    }
+}
+
+/* Flotación y brillo animados */
+@keyframes floatAndGlowEpic {
+    0%, 100% { 
+        transform: translateY(0) rotate(0deg); 
+        filter: drop-shadow(0 0 20px rgba(211, 4, 197, 0.8));
+    }
+    25% { 
+        transform: translateY(-15px) rotate(3deg); 
+        filter: drop-shadow(0 0 30px rgba(211, 4, 197, 1));
+    }
+    50% { 
+        transform: translateY(0) rotate(-2deg); 
+        filter: drop-shadow(0 0 25px rgba(207, 124, 252, 0.9));
+    }
+    75% { 
+        transform: translateY(-8px) rotate(1deg); 
+        filter: drop-shadow(0 0 20px rgba(211, 4, 197, 0.8));
+    }
+}
+
+/* Efecto de partículas flotantes alrededor de la mascota */
+.nueva-mascota-container::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(211, 4, 197, 0.8) 0%, rgba(211, 4, 197, 0) 5px),
+        radial-gradient(circle at 80% 40%, rgba(211, 4, 197, 0.8) 0%, rgba(211, 4, 197, 0) 5px),
+        radial-gradient(circle at 40% 80%, rgba(211, 4, 197, 0.8) 0%, rgba(211, 4, 197, 0) 5px),
+        radial-gradient(circle at 60% 10%, rgba(211, 4, 197, 0.8) 0%, rgba(211, 4, 197, 0) 5px),
+        radial-gradient(circle at 10% 60%, rgba(211, 4, 197, 0.8) 0%, rgba(211, 4, 197, 0) 5px);
+    background-repeat: no-repeat;
+    filter: blur(1px);
+    opacity: 0.7;
+    animation: moveParticles 8s linear infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes moveParticles {
+    0% { background-position: 0% 0%, 100% 0%, 50% 100%, 80% 30%, 20% 70%; }
+    50% { background-position: 20% 20%, 80% 20%, 30% 80%, 60% 50%, 40% 50%; }
+    100% { background-position: 0% 0%, 100% 0%, 50% 100%, 80% 30%, 20% 70%; }
+}
+
+/* Banner de rareza más vistoso */
+.rareza-banner {
+    font-size: 1.5rem !important;
+    font-weight: bold;
+    padding: 15px !important;
+    margin-bottom: 25px !important;
+    border-radius: 12px !important;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    width: 100% !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Ajustes para el banner de rareza */
+.rareza-banner {
+    width: 90% !important; /* Ancho controlado */
+    max-width: 450px !important; /* Ancho máximo */
+    margin: 25px auto !important; /* Centrado horizontal con margen vertical */
+    font-size: 1.5rem !important;
+    font-weight: bold;
+    padding: 15px !important;
+    border-radius: 12px !important;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center !important;
+    display: block !important;
+    box-sizing: border-box !important; /* Para que el padding no afecte el ancho total */
+}
+
+/* Mejoras adicionales para el contenedor de la nueva mascota */
+.nueva-mascota-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important; /* Reducido de 25px para mejor espaciado */
+    background: rgba(0, 0, 0, 0.35) !important;
+    padding: 30px 15px !important;
+    border-radius: 20px !important;
+    border: 4px solid #cf7cfc !important;
+    position: relative;
+    overflow: hidden;
+    width: 90% !important;
+    max-width: 600px !important;
+    margin: 0 auto 30px auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Asegurar que la mascota está centrada y tiene espacio adecuado */
+.nueva-mascota-container img {
+    display: block !important;
+    margin: 15px auto !important;
+}
+
+/* Contenedor interior para alinear mejor el banner y formulario */
+.mascota-info-resultado {
+    width: 100% !important;
+    max-width: 500px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* Ajustes específicos para cada tipo de rareza */
+.rareza-banner.comun {
+    background: linear-gradient(135deg, #7b9e89, #a3c9b7) !important;
+    color: white;
+    border: 2px solid #a3c9b7;
+}
+
+.rareza-banner.raro {
+    background: linear-gradient(135deg, #4b6bab, #7d8fb3) !important;
+    color: white;
+    border: 2px solid #7d8fb3;
+    animation: pulseRareBanner 2s infinite !important;
+}
+
+.rareza-banner.epico {
+    background: linear-gradient(135deg, #9b59b6, #c39bd3) !important;
+    color: white;
+    border: 2px solid #c39bd3;
+    animation: pulseEpicBanner 2s infinite !important;
+}
+
+.rareza-banner.legendario {
+    background: linear-gradient(135deg, #f1c40f, #f7dc6f) !important;
+    color: black;
+    border: 2px solid #f7dc6f;
+    animation: glowLegendary 1.5s infinite alternate !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Mejorar el espaciado general en el modal */
+.modal-contenido {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 30px 20px !important;
+    box-sizing: border-box !important;
+}
+
+/* Ajustar el texto de especie */
+.modal-contenido .especie {
+    display: block !important;
+    text-align: center !important;
+    width: 90% !important;
+    max-width: 450px !important;
+    margin: 15px auto !important;
+}
+
+/* Especificaciones de la mascota */
+.mascota-info-resultado {
+    width: 100%;
+    z-index: 1;
+    animation: fadeInUp 1s ease 0.5s both;
+}
+
+/* Mejorar el campo de nombre */
+.campo-form input {
+    width: 100%;
+    padding: 15px 20px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 3px solid #cf7cfc !important;
+    border-radius: 10px !important;
+    color: white;
+    font-family: inherit;
+    font-size: 1.1rem !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3) inset !important;
+}
+
+.campo-form input:focus {
+    outline: none;
+    border-color: #d304c5 !important;
+    box-shadow: 0 0 20px rgba(211, 4, 197, 0.4) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Texto sobre la especie */
+.modal-contenido .especie {
+    color: #cf7cfc;
+    font-size: 1.2rem !important;
+    margin-bottom: 20px !important;
+    text-shadow: 0 0 10px rgba(207, 124, 252, 0.5) !important;
+}
+
+/* Botón guardar mascota mejorado */
+.btn-guardar-mascota {
+    background: linear-gradient(135deg, #d304c5 0%, #a304fa 100%) !important;
+    color: white;
+    border: none;
+    padding: 18px 30px !important;
+    border-radius: 12px !important;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+    font-size: 1.3rem !important;
+    font-weight: bold;
+    margin-top: 25px;
+    width: 100%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-guardar-mascota::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn-guardar-mascota:hover {
+    transform: scale(1.05) translateY(-5px) !important;
+    box-shadow: 0 15px 30px rgba(211, 4, 197, 0.5) !important;
+}
+
+.btn-guardar-mascota:hover::before {
+    left: 100%;
+}
+
+.btn-guardar-mascota:active {
+    transform: scale(0.98) translateY(2px) !important;
+}
+
+/* Efecto de confeti para legendarios */
+.confeti-activo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Botón de cierre mejorado */
+.cerrar-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(207, 124, 252, 0.5);
+    z-index: 10;
+}
+
+.cerrar-modal:hover {
+    color: #d304c5;
+    transform: scale(1.2) rotate(90deg);
+    background: rgba(0, 0, 0, 0.6);
+    border-color: #d304c5;
+}
+/* Formulario con estilo mejorado */
+/* Ajustes para la caja de texto y el campo de formulario */
+.campo-form {
+    margin: 18px auto !important; /* Centrado horizontal con margen automático */
+    position: relative;
+    width: 90% !important; /* Ancho controlado */
+    max-width: 450px !important; /* Ancho máximo */
+}
+
+.campo-form label {
+    display: block;
+    margin-bottom: 15px !important;
+    color: #cf7cfc;
+    font-weight: bold;
+    font-size: 1.05rem;
+    text-align: center; /* Centrar la etiqueta */
+}
+
+.campo-form input {
+    width: 100% !important;
+    padding: 15px 20px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 3px solid #cf7cfc !important;
+    border-radius: 10px !important;
+    color: white;
+    font-family: inherit;
+    font-size: 1.1rem !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3) inset !important;
+    display: block; /* Asegurar que es un bloque */
+    box-sizing: border-box; /* Para que el padding no afecte el ancho total */
+}
+
+.campo-form input:focus {
+    outline: none;
+    border-color: #d304c5 !important;
+    box-shadow: 0 0 20px rgba(211, 4, 197, 0.4) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ajustes para el botón guardar */
+.btn-guardar-mascota {
+    width: 90% !important; /* Ancho controlado */
+    max-width: 450px !important; /* Ancho máximo */
+    margin: 25px auto !important; /* Centrado horizontal con margen */
+    display: block; /* Para asegurar que es un bloque */
+}
+
+/* Ajustes para el contenedor principal del formulario */
+.nueva-mascota-container {
+    padding: 30px 15px !important; /* Padding horizontal reducido */
+    width: 90% !important; /* Ancho controlado */
+    max-width: 600px !important; /* Ancho máximo */
+    margin: 0 auto !important; /* Centrado horizontal */
+    box-sizing: border-box; /* Para que el padding no afecte el ancho total */
+}
+
+/* Ajustes para todo el modal */
+.modal-contenido {
+    width: 90% !important;
+    max-width: 700px !important;
+    padding: 10px 5px !important; /* Padding horizontal reducido */
+    box-sizing: border-box; /* Para que el padding no afecte el ancho total */
+}
+
+/* Centrar textos */
+.modal-contenido .especie {
+    text-align: center !important;
+    margin: 15px auto !important;
+    width: 100% !important;
+}
+
+/* Para dar más espacio a la caja de texto */
+.modal-resultado {
+    padding-bottom: 40px !important;
+}
+
+/* Mensaje "Dale un nombre a tu nueva mascota" */
+.modal-contenido p {
+    text-align: center !important;
+    margin: 15px auto !important;
+    width: 90% !important;
+    max-width: 450px !important;
+}
+
+
+/* Botón guardar mascota con animación mejorada */
+.btn-guardar-mascota {
+    background: linear-gradient(135deg, #d304c5 0%, #a304fa 100%);
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 25px;
+    width: 100%;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.btn-guardar-mascota::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn-guardar-mascota:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 20px rgba(207, 124, 252, 0.5);
+}
+
+.btn-guardar-mascota:hover::before {
+    left: 100%;
+}
+
+.btn-guardar-mascota:active {
+    transform: scale(0.98);
+}
+
+/* NOTA IMPORTANTE: Agregar atributo "disabled" al botón cuando se esté procesando */
+.btn-guardar-mascota:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Mensaje sin saldo */
+.sin-saldo {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(231, 76, 60, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(231, 76, 60, 0.5);
+    animation: pulsarError 2s infinite;
+}
+
+@keyframes pulsarError {
+    0%, 100% { background: rgba(231, 76, 60, 0.2); }
+    50% { background: rgba(231, 76, 60, 0.3); }
+}
+
+/* Efecto de apertura del sobre - MEJORADO DRAMÁTICAMENTE */
+.sobre.abriendo {
+    animation: abrirSobreEpico 1.8s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: center;
+}
+
+@keyframes abrirSobreEpico {
+    0% { 
+        transform: scale(1) rotate(0deg); 
+        filter: brightness(1);
+    }
+    20% { 
+        transform: scale(1.1) rotate(-5deg); 
+        filter: brightness(1.2);
+    }
+    40% { 
+        transform: scale(1.15) rotate(5deg); 
+        filter: brightness(1.3);
+    }
+    60% { 
+        transform: scale(1.2) rotate(-3deg); 
+        filter: brightness(1.4);
+    }
+    80% { 
+        transform: scale(1.25) rotate(2deg); 
+        filter: brightness(1.5) blur(2px);
+    }
+    100% { 
+        transform: scale(1.3) rotate(0deg); 
+        opacity: 0; 
+        filter: brightness(1.8) blur(5px);
+    }
+}
+
+/* Efectos de luz para sobres */
+.luz-sobre {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0) 0%, rgba(255, 215, 0, 0) 60%, rgba(255, 215, 0, 0.3) 100%);
+    opacity: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.sobre.abriendo .luz-sobre {
+    animation: luzEpica 1.5s forwards;
+}
+
+@keyframes luzEpica {
+    0% { opacity: 0; transform: scale(0.1); }
+    50% { opacity: 0.7; transform: scale(0.5); }
+    100% { opacity: 0; transform: scale(2); }
+}
+
+/* NUEVO: Solución para los botones de los sobres */
+.sobre-container .btn-comprar-sobre {
+    display: block;
+    width: 90%;
+    margin: 15px auto 0 auto;
+    z-index: 10;
+    position: relative;
+    font-size: 1.1rem;
+    padding: 12px 20px;
+}
+
+/* NUEVO: Añadir efecto de brillo a los sobres cuando se pasa el ratón */
+.sobre:hover .sobre-frontal::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(211, 4, 197, 0.4) 0%, transparent 70%);
+    opacity: 0.6;
+    z-index: 0;
+    animation: expandLight 1.5s ease-out;
+}
+
+@keyframes expandLight {
+    0% { transform: scale(0.1); opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+/* NUEVO: Añadir efecto de confeti para celebraciones */
+.confeti {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.confeti-pieza {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--color);
+    opacity: 0.8;
+    top: -10px;
+    animation: caer var(--tiempo) linear forwards;
+}
+
+@keyframes caer {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Notificación estilizada */
+.notificacion-biblioteca {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.5s ease;
+    transform: translateY(-20px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.notificacion-biblioteca.exito {
+    background: linear-gradient(135deg, #56ab2f, #a8e063);
+}
+
+.notificacion-biblioteca.error {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+
+.notificacion-biblioteca.info {
+    background: linear-gradient(135deg, #2193b0, #6dd5ed);
+}
+
+.notificacion-biblioteca.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pestanas {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .tienda-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        max-width: 100%;
+    }
+    
+    .sobre-container {
+        max-width: 100%;
+    }
+    
+    .mascota-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+    
+    .mascota-activa-container {
+        flex-direction: column;
+    }
+    
+    .detalles-mascota {
+        flex-direction: column;
+    }
+    
+    .filtros-coleccion {
+        flex-direction: column;
+    }
+
+    .modal-contenido {
+        width: 95%;
+        padding: 20px;
+    }
+
+    
+    /* NUEVO: Mejorar la visualización de los sobres en móvil */
+    .sobre-container {
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .sobre-frontal {
+        position: relative;
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .sobre-frontal img {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pestana {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+    
+    .mascota-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-imagen-container {
+        height: 160px;
+    }
+    
+    .card-imagen {
+        height: 120px;
+    }
+    
+    .modal-contenido {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .tienda-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* NUEVO: Ajustar tamaños para móviles pequeños */
+    .sobre-frontal h3 {
+        font-size: 1.3rem;
+    }
+    
+    .sobre-frontal p {
+        font-size: 0.9rem;
+    }
+    
+    .btn-comprar-sobre {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+}

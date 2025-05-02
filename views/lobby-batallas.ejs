@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lobby de Batalla de Mascotas</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/batallas2.css">
+</head>
+<body>
+  <!-- Efecto de fondo -->
+  <div class="bg-effect"></div>
+  
+  <!-- Estrellas decorativas -->
+  <script>
+    function createStars() {
+      const starsCount = 50;
+      for (let i = 0; i < starsCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        // Posición aleatoria
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        // Tamaño aleatorio
+        const size = Math.random() * 4 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        // Retraso aleatorio para la animación
+        star.style.animationDelay = `${Math.random() * 3}s`;
+        document.body.appendChild(star);
+      }
+    }
+    
+    // Crear estrellas al cargar la página
+    window.addEventListener('load', createStars);
+  </script>
+
+  <div class="container">
+    <h1>⚔️ Lobby de Batalla de Mascotas</h1>
+    
+    <div class="action-box glowing-border">
+      <h2>Mi Mascota</h2>
+      <div class="mascota-container">
+        <img src="<%= mascota.rutaImagen %>" alt="Mascota" class="mascota-imagen">
+        <div class="nivel-badge"><%= mascota.niveldeAmor %></div>
+      </div>
+      <div class="mascota-info">
+        <p><strong><%= mascota.nombre %></strong> (Nivel <%= mascota.niveldeAmor %>)</p>
+      </div>
+    </div>
+
+    <div class="action-box glowing-border">
+      <h2>Crear nueva sala</h2>
+      <button id="btn-crear-sala">Crear Sala Nueva</button>
+      <span id="crear-sala-loading" class="loading" style="display: none;"></span>
+      <div id="crear-sala-error" class="error-message"></div>
+    </div>
+
+    <div class="action-box glowing-border">
+      <h2>Unirse a sala existente</h2>
+      <form id="formulario-unirse" onsubmit="unirseASala(event)">
+        <input type="text" id="codigo-sala" placeholder="Código de la sala" required>
+        <button type="submit">Unirse a Sala</button>
+      </form>
+      <div id="unirse-error" class="error-message"></div>
+    </div>
+
+    <div id="salas-disponibles" class="action-box glowing-border">
+      <h2>Salas disponibles</h2>
+      <div id="lista-salas">
+        <p>Cargando salas disponibles...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificación -->
+  <div class="notification" id="notification">¡Notificación!</div>
+
+  <script>
+    // Función para crear sala
+    document.getElementById('btn-crear-sala').addEventListener('click', function() {
+      const loadingSpinner = document.getElementById('crear-sala-loading');
+      const errorDiv = document.getElementById('crear-sala-error');
+      
+      loadingSpinner.style.display = 'inline-block';
+      errorDiv.textContent = '';
+      
+      // Añadir efecto de pulsación al botón
+      this.classList.add('pulse');
+      
+      fetch('/batalla/crear-sala', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: '<%= userId %>',
+          petId: '<%= petId %>'
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        loadingSpinner.style.display = 'none';
+        this.classList.remove('pulse');
+        
+        if (data.error) {
+          errorDiv.textContent = data.error;
+          showNotification('Error: ' + data.error);
+        } else if (data.redirect) {
+          // Efecto de portal antes de redirigir
+          const portalEffect = document.createElement('div');
+          portalEffect.classList.add('explosion');
+          document.body.appendChild(portalEffect);
+          
+          portalEffect.style.opacity = '1';
+          
+          setTimeout(() => {
+            // Redirigir a la sala creada
+            window.location.href = data.redirect;
+          }, 500);
+        }
+      })
+      .catch(error => {
+        loadingSpinner.style.display = 'none';
+        this.classList.remove('pulse');
+        errorDiv.textContent = 'Error al crear la sala. Inténtalo de nuevo.';
+        showNotification('Error al crear la sala');
+        console.error('Error:', error);
+      });
+    });
+    
+    // Función para unirse a sala
+    function unirseASala(event) {
+      event.preventDefault();
+      const codigoSala = document.getElementById('codigo-sala').value;
+      if (codigoSala) {
+        // Efecto antes de redirigir
+        const submitBtn = event.target.querySelector('button');
+        submitBtn.classList.add('pulse');
+        
+        setTimeout(() => {
+          window.location.href = `/batalla/sala/${codigoSala}`;
+        }, 300);
+      }
+    }
+
+    // Función para cargar salas disponibles
+    function cargarSalasDisponibles() {
+      fetch('/batalla/salas-disponibles')
+        .then(response => response.json())
+        .then(data => {
+          const lista = document.getElementById('lista-salas');
+          if (data.length === 0) {
+            lista.innerHTML = '<p>No hay salas disponibles. ¡Crea una!</p>';
+            return;
+          }
+          
+          lista.innerHTML = '';
+          data.forEach((sala, index) => {
+            const salaItem = document.createElement('div');
+            salaItem.className = 'sala-item';
+            salaItem.style.animationDelay = `${index * 0.1}s`;
+            salaItem.innerHTML = `
+              <div class="sala-contador">
+                <span class="sala-estado"></span>
+                ${sala.jugadores}/2
+              </div>
+              <p>Sala: <strong>${sala.id}</strong></p>
+              <p>Jugadores: ${sala.jugadores}/2</p>
+              <a href="/batalla/sala/${sala.id}" class="btn-unirse">Unirse</a>
+            `;
+            lista.appendChild(salaItem);
+          });
+        })
+        .catch(error => {
+          document.getElementById('lista-salas').innerHTML = 
+            '<p>Error al cargar las salas. <a href="#" onclick="cargarSalasDisponibles(); return false;">Reintentar</a></p>';
+          console.error('Error:', error);
+        });
+    }
+
+    // Función para mostrar notificaciones
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Cargar salas al inicio y cada 5 segundos
+    cargarSalasDisponibles();
+    setInterval(cargarSalasDisponibles, 5000);
+    
+    // Verificar si hay un mensaje de error en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get('error');
+    if (errorParam === 'sala_llena') {
+      document.getElementById('unirse-error').textContent = 'La sala está llena o no existe.';
+      showNotification('Error: La sala está llena o no existe');
+    }
+    
+    // Efecto de explosión para cuando se hace clic en unirse a sala
+    const botonesUnirse = document.querySelectorAll('.btn-unirse');
+    botonesUnirse.forEach(boton => {
+      boton.addEventListener('click', function(event) {
+        const href = this.getAttribute('href');
+        event.preventDefault();
+        
+        const explosion = document.createElement('div');
+        explosion.classList.add('explosion');
+        explosion.style.top = `${event.clientY}px`;
+        explosion.style.left = `${event.clientX}px`;
+        document.body.appendChild(explosion);
+        
+        explosion.style.opacity = '1';
+        
+        setTimeout(() => {
+          window.location.href = href;
+        }, 500);
+      });
+    });
+    
+    // Añadir clase para efecto de hover a las cajas
+    document.querySelectorAll('.action-box').forEach(box => {
+      box.addEventListener('mouseenter', function() {
+        this.classList.add('hover');
+      });
+      
+      box.addEventListener('mouseleave', function() {
+        this.classList.remove('hover');
+      });
+    });
+    
+    // Añadir efecto de pulsación a la imagen de la mascota
+    const mascotaImg = document.querySelector('.mascota-container img');
+    if (mascotaImg) {
+      mascotaImg.addEventListener('click', function() {
+        this.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 300);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intercambio de Mascotas</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/intercambio.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="intercambio-contenedor">
+        <div class="intercambio-banner">
+            <div class="pixel-decoracion pixel-esquina-1"></div>
+            <div class="pixel-decoracion pixel-esquina-2"></div>
+            <div class="pixel-decoracion pixel-esquina-3"></div>
+            <div class="pixel-decoracion pixel-esquina-4"></div>
+            <div class="efecto-brillo"></div>
+            
+            <h1>Intercambio de Mascotas</h1>
+            <p>Conecta con otros entrenadores y realiza intercambios increíbles</p>
+        </div>
+        
+        <div class="intercambio-opciones">
+            <!-- Formulario para CREAR sala -->
+            <div class="opcion-card crear-sala">
+                <div class="opcion-titulo">
+                    <h2>Crear nueva sala</h2>
+                </div>
+                <div class="opcion-contenido">
+                    <div class="opcion-icono">
+                        <span>+</span>
+                    </div>
+                    <p>Crea una sala nueva e invita a amigos a unirse con tu código</p>
+                    <form action="/intercambio/crear-sala" method="POST">
+                        <input type="hidden" name="userId" value="<%= userId %>">
+                        <button type="submit" class="intercambio-boton animacion-pulso">Crear sala nueva</button>
+                    </form>
+                </div>
+                <div class="efecto-brillo"></div>
+            </div>
+
+            <!-- Formulario para UNIRSE a sala existente -->
+            <div class="opcion-card unirse-sala">
+                <div class="opcion-titulo">
+                    <h2>Unirse a sala existente</h2>
+                </div>
+                <div class="opcion-contenido">
+                    <div class="opcion-icono">
+                        <span>→</span>
+                    </div>
+                    <p>Introduce el código de la sala a la que deseas unirte</p>
+                    <form action="/intercambio/unirse-sala" method="POST" class="form-unirse">
+                        <div class="input-container">
+                            <label for="codigoSala">Código de sala:</label>
+                            <input type="text" name="codigoSala" id="codigoSala" required class="codigo-input">
+                        </div>
+                        <input type="hidden" name="userId" value="<%= userId %>">
+                        <button type="submit" class="intercambio-boton">Unirse a sala</button>
+                    </form>
+                </div>
+                <div class="efecto-brillo"></div>
+            </div>
+        </div>
+        
+        <div class="particulas-container">
+            <div class="particula" style="--delay: 0s; --tamaño: 7px;"></div>
+            <div class="particula" style="--delay: 2s; --tamaño: 5px;"></div>
+            <div class="particula" style="--delay: 4s; --tamaño: 9px;"></div>
+            <div class="particula" style="--delay: 1s; --tamaño: 6px;"></div>
+            <div class="particula" style="--delay: 3s; --tamaño: 8px;"></div>
+            <div class="particula" style="--delay: 5s; --tamaño: 4px;"></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/biblioteca.css">
+
+<div class="contenedor-biblioteca">
+    <div class="seccion-titulo">
+        <div class="esquina-pixel esquina-pixel-si"></div>
+        <div class="esquina-pixel esquina-pixel-sd"></div>
+        <div class="esquina-pixel esquina-pixel-ii"></div>
+        <div class="esquina-pixel esquina-pixel-id"></div>
+        <h1>★★ Biblioteca de Mascotas ★★</h1>
+        <p class="subtitulo">Colecciona, intercambia y cuida a tus mascotas virtuales</p>
+    </div>
+
+    <div class="secciones-biblioteca">
+        <!-- Panel de pestañas -->
+        <div class="pestanas">
+            <button class="pestana activa" data-tab="coleccion">★ Mi Colección</button>
+            <button class="pestana" data-tab="tienda">✧ Gacha-Mascotas</button>
+            <button class="pestana" data-tab="activa">☆ Mascota Activa</button>
+        </div>
+
+        <!-- Contenido de las pestañas -->
+        <div class="contenido-pestanas">
+            <!-- Pestaña: Mi Colección -->
+            <div id="tab-coleccion" class="contenido-pestana activo">
+                <div class="filtros-coleccion">
+                    <input type="text" id="buscar-mascota" placeholder="Buscar por nombre...">
+                    <select id="filtro-especie">
+                        <option value="">Todas las especies</option>
+                        <% especieMascotas.forEach((especie, indice) => { %>
+                            <option value="<%= indice %>"><%= especie %></option>
+                        <% }); %>
+                    </select>
+                    <select id="filtro-rareza">
+                        <option value="">Todas las rarezas</option>
+                        <option value="comun">Común</option>
+                        <option value="raro">Raro</option>
+                        <option value="epico">Épico</option>
+                        <option value="legendario">Legendario</option>
+                    </select>
+                </div>
+
+                <div class="mascota-grid">
+                    <% if (mascotas && mascotas.length > 0) { %>
+                        <% mascotas.forEach(mascota => { %>
+                            <div class="mascota-card" data-id="<%= mascota.id %>" data-indice="<%= mascota.indice %>" data-rareza="<%= mascota.rareza %>">
+                                <div class="card-header">
+                                    <span class="card-nombre"><%= mascota.petname %></span>
+                                    <span class="card-rareza <%= mascota.rareza %>"><%= mascota.rareza %></span>
+                                </div>
+                                <div class="card-imagen-container">
+                                    <img src="imagenes_de_mascotas/<%= mascota.indice %>.gif" alt="<%= mascota.petname %>" class="pixeleado card-imagen">
+                                </div>
+                                <div class="card-info">
+                                    <p>Especie: <%= especieMascotas[mascota.indice - 1] %></p>
+                                    <p>Nivel: <%= mascota.nivel || 1 %></p>
+                                    <div class="card-stats">
+                                        <div class="stat">
+                                            <span class="stat-label">❤️</span>
+                                            <div class="barra-stat">
+                                                <div class="stat-valor" style="width: <%= mascota.nivelAmor %>%;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="stat">
+                                            <span class="stat-label">😊</span>
+                                            <div class="barra-stat">
+                                                <div class="stat-valor felicidad" style="width: <%= mascota.nivelFelicidad %>%;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="stat">
+                                            <span class="stat-label">⚡</span>
+                                            <div class="barra-stat">
+                                                <div class="stat-valor energia" style="width: <%= mascota.nivelEnergia %>%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-acciones">
+                                    <button class="btn-accion btn-ver-detalles" data-id="<%= mascota.id %>">Detalles</button>
+                                    <% if (mascota.id !== mascotaActiva) { %>
+                                        <button class="btn-accion btn-activar" data-id="<%= mascota.id %>">Activar</button>
+                                    <% } else { %>
+                                        <button class="btn-accion btn-activa" disabled>Activa</button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="sin-mascotas">
+                            <p>¡Aún no tienes mascotas en tu colección!</p>
+                            <p>Visita la tienda para conseguir tu primera mascota.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Pestaña: Gacha-Mascotas -->
+            <div id="tab-tienda" class="contenido-pestana">
+                <div class="tienda-info">
+                    <h2>✧ Gacha-Mascotas ✧</h2>
+                    <p>¡Consigue nuevas mascotas para tu colección! Cada sobre contiene una mascota aleatoria.</p>
+                    <div class="monedas-container">
+                        <span class="monedas-icono">💰</span>
+                        <span class="monedas-cantidad"><%= money %></span>
+                    </div>
+                </div>
+
+                <div class="tienda-grid">
+                    <div class="sobre-container">
+                        <div class="sobre">
+                            <div class="sobre-frontal">
+                                <img src="imagenes_y_gif/sobre_mascota.png" alt="Sobre de mascota">
+                                <h3>Sobre Básico</h3>
+                                <p>Consigue una mascota aleatoria con posibilidad de rarezas: Común (70%), Raro (25%), Épico (5%)</p>
+                                <button id="comprar-sobre-basico" class="btn-comprar-sobre" data-precio="1000" data-tipo="basico">Comprar por 1000 💰</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sobre-container">
+                        <div class="sobre">
+                            <div class="sobre-frontal">
+                                <img src="imagenes_y_gif/sobre_premium.png" alt="Sobre premium">
+                                <h3>Sobre Premium</h3>
+                                <p>Consigue una mascota aleatoria con posibilidad de rarezas: Raro (60%), Épico (30%), Legendario (10%)</p>
+                                <button id="comprar-sobre-premium" class="btn-comprar-sobre" data-precio="2500" data-tipo="premium">Comprar por 2500 💰</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Mascota Activa -->
+            <div id="tab-activa" class="contenido-pestana">
+                <% if (mascotaActual) { %>
+                    <div class="mascota-activa-container">
+                        <div class="mascota-activa-imagen">
+                            <img src="<%= rutaImagen %>" alt="<%= mascotaActual.nombre %>" class="pixeleado mascota-activa-img">
+                            <% if (accesorios != null) { %>
+                                <% for (let i = 0; i < accesorios.length; i++) { %>
+                                    <img class="mascota-accesorio pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice + 1 %>.gif" alt="Accesorio">
+                                <% } %>
+                            <% } %>
+                        </div>
+                        <div class="mascota-activa-info">
+                            <h2><%= mascotaActual.nombre %></h2>
+                            <p class="mascota-descripcion"><%= mascotaActual.pronombre %> <%= mascotaActual.especie %></p>
+                            
+                            <div class="mascota-stats">
+                                <div class="mascota-stat">
+                                    <span class="stat-label">Amor</span>
+                                    <div class="stat-barra">
+                                        <div class="stat-valor" style="width: <%= mascotaActual.niveldeAmor %>%;"></div>
+                                    </div>
+                                    <span class="stat-numero"><%= mascotaActual.niveldeAmor %>%</span>
+                                </div>
+                                
+                                <div class="mascota-stat">
+                                    <span class="stat-label">Felicidad</span>
+                                    <div class="stat-barra">
+                                        <div class="stat-valor felicidad" style="width: <%= mascotaActual.niveldeFelicidad %>%;"></div>
+                                    </div>
+                                    <span class="stat-numero"><%= mascotaActual.niveldeFelicidad %>%</span>
+                                </div>
+                                
+                                <div class="mascota-stat">
+                                    <span class="stat-label">Energía</span>
+                                    <div class="stat-barra">
+                                        <div class="stat-valor energia" style="width: <%= mascotaActual.niveldeEnergia %>%;"></div>
+                                    </div>
+                                    <span class="stat-numero"><%= mascotaActual.niveldeEnergia %>%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mascota-detalles">
+                                <p><span class="detalle-label">✧ Habilidad Especial:</span> <%= mascotaActual.habilidad %></p>
+                                <p><span class="detalle-label">✧ Comida Favorita:</span> <%= mascotaActual.comidaFavorita %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="sin-mascota-activa">
+                        <p>No tienes ninguna mascota activa.</p>
+                        <p>Selecciona una de tu colección para activarla.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles de mascota -->
+<div id="modal-detalles" class="modal">
+    <div class="modal-contenido">
+        <span class="cerrar-modal">&times;</span>
+        <div class="detalles-mascota">
+            <!-- El contenido se llenará dinámicamente con JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal para resultado del sobre -->
+<div id="modal-resultado-sobre" class="modal">
+    <div class="modal-contenido modal-resultado">
+        <span class="cerrar-modal">&times;</span>
+        <div class="resultado-sobre">
+            <h2>¡Has conseguido una nueva mascota!</h2>
+            <div class="nueva-mascota-container">
+                <img id="nueva-mascota-img" src="" alt="Nueva mascota" class="pixeleado">
+                <div class="mascota-info-resultado">
+                    <div class="rareza-banner" id="rareza-banner">Común</div>
+                    <p class="especie-texto">Especie: <span id="especie-resultado"></span></p>
+                    <form id="form-nombrar-mascota">
+                        <div class="campo-form">
+                            <label for="nombre-nueva-mascota">Dale un nombre a tu nueva mascota:</label>
+                            <input type="text" id="nombre-nueva-mascota" required>
+                            <input type="hidden" id="indice-nueva-mascota" value="">
+                            <input type="hidden" id="genero-nueva-mascota" value="">
+                            <input type="hidden" id="rareza-nueva-mascota" value="">
+                        </div>
+                        <button type="submit" class="btn-guardar-mascota">Guardar mascota</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="scripts/biblioteca.js"></script>
+
+<%- include("partials/footer.ejs") %>

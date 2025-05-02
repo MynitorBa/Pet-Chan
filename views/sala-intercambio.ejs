@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sala de Intercambio - <%= sala %></title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/styles/intercambio.css">
+   
+</head>
+<body>
+    <div class="intercambio-contenedor">
+        <div class="intercambio-banner sala-banner">
+            <div class="pixel-decoracion pixel-esquina-1"></div>
+            <div class="pixel-decoracion pixel-esquina-2"></div>
+            <div class="pixel-decoracion pixel-esquina-3"></div>
+            <div class="pixel-decoracion pixel-esquina-4"></div>
+            <div class="efecto-brillo"></div>
+            <div class="escaneo-linea"></div>
+            
+            <h1>Sala de Intercambio</h1>
+            <p>Prepárate para intercambiar tu mascota con otro entrenador</p>
+        </div>
+        
+        <div class="sala-contenido">
+            <div class="sala-info-card">
+                <div class="sala-header">
+                    <h2>Información de la Sala</h2>
+                    <div class="sala-spinner"></div>
+                </div>
+                
+                <div class="sala-body">
+                    <div id="codigo-sala-container" class="info-bloque" style="display: <%= esCreador ? 'flex' : 'none' %>">
+                        <div class="info-etiqueta">Código único:</div>
+                        <div class="codigo-display">
+                            <span id="codigo-sala"></span>
+                            <button id="compartir-codigo" class="intercambio-boton boton-pequeno">
+                                <span class="icono-copiar">⎘</span> Copiar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="info-bloque estado-bloque">
+                        <div class="info-etiqueta">Estado:</div>
+                        <div id="estado" class="estado-valor">Conectando a la sala...</div>
+                    </div>
+                    
+                    <div class="info-bloque">
+                        <div class="info-etiqueta">Participantes:</div>
+                        <div id="info-usuarios" class="usuarios-lista">Buscando usuarios...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sala-mascotas">
+                <div class="mascota-card tu-mascota">
+                    <div class="mascota-header">
+                        <h3>Tu mascota</h3>
+                    </div>
+                    <div class="mascota-imagen">
+                        <div class="pixel-placeholder">
+                            <img src="/<%= rutaImagen %>" id = "imagenMascota" class="mascota-imagen imagenMascota" alt="">
+                        </div>
+                    </div>
+                    <div class="mascota-info">
+                        <div class="mascota-nombre">Mascota #<%= petId %></div>
+                        <div class="mascota-estado">Lista para intercambio</div>
+                    </div>
+                </div>
+                
+                <div class="flecha-intercambio">
+                    <div class="flecha-cuerpo"></div>
+                    <div class="flecha-punta"></div>
+                </div>
+                
+                <div class="mascota-card otra-mascota">
+                    <div class="mascota-header">
+                        <h3>Mascota a recibir</h3>
+                    </div>
+                    <div class="mascota-imagen esperando">
+                        <div class="signo-interrogacion">?</div>
+                    </div>
+                    <div class="mascota-info">
+                        <div class="mascota-nombre">Esperando...</div>
+                        <div class="mascota-estado">Aguardando conexión</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sala-acciones">
+                <button id="confirmar" class="intercambio-boton boton-confirmar animacion-pulso" disabled>
+                    <span class="icono-confirmar">✓</span> Confirmar Intercambio
+                </button>
+                <a href="/intercambio" class="intercambio-boton boton-secundario">
+                    <span class="icono-volver">↩</span> Volver
+                </a>
+            </div>
+            
+            <div id="mensaje-resultado" class="mensaje-resultado" style="display: none;">
+                <div class="mensaje-icono">✓</div>
+                <div class="mensaje-texto">¡Intercambio completado con éxito!</div>
+            </div>
+        </div>
+        
+        <div class="particulas-container">
+            <div class="particula" style="--delay: 0s; --tamaño: 7px;"></div>
+            <div class="particula" style="--delay: 2s; --tamaño: 5px;"></div>
+            <div class="particula" style="--delay: 4s; --tamaño: 9px;"></div>
+            <div class="particula" style="--delay: 1s; --tamaño: 6px;"></div>
+            <div class="particula" style="--delay: 3s; --tamaño: 8px;"></div>
+            <div class="particula" style="--delay: 5s; --tamaño: 4px;"></div>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const userId = <%= userId %>;
+        const petId = <%= petId %>;
+        const sala = "<%= sala %>";
+        const esCreador = <%= esCreador %>;
+
+        const socket = io();
+
+        // Elementos del DOM
+        const codigoSalaElement = document.getElementById("codigo-sala");
+        const compartirCodigoBtn = document.getElementById("compartir-codigo");
+        const estadoElement = document.getElementById("estado");
+        const infoUsuariosElement = document.getElementById("info-usuarios");
+        const confirmarBtn = document.getElementById("confirmar");
+        const mensajeResultado = document.getElementById("mensaje-resultado");
+        const otraMascotaCard = document.querySelector(".otra-mascota");
+        const otraMascotaImagen = document.querySelector(".otra-mascota .mascota-imagen");
+        const otraMascotaNombre = document.querySelector(".otra-mascota .mascota-nombre");
+        const otraMascotaEstado = document.querySelector(".otra-mascota .mascota-estado");
+
+        // Efectos de sonido
+        function reproducirSonido(tipo) {
+            // Aquí podrías implementar sonidos si lo deseas
+            console.log(`Reproduciendo sonido: ${tipo}`);
+        }
+
+        // Mostrar código de sala si es creador
+        if (esCreador && codigoSalaElement) {
+            codigoSalaElement.textContent = sala;
+            
+            if (compartirCodigoBtn) {
+                compartirCodigoBtn.addEventListener("click", () => {
+                    navigator.clipboard.writeText(sala)
+                        .then(() => {
+                            // Mostrar una animación de copiado
+                            compartirCodigoBtn.classList.add("copiado");
+                            compartirCodigoBtn.innerHTML = "<span>¡Copiado!</span>";
+                            setTimeout(() => {
+                                compartirCodigoBtn.classList.remove("copiado");
+                                compartirCodigoBtn.innerHTML = "<span class='icono-copiar'>⎘</span> Copiar";
+                            }, 2000);
+                            reproducirSonido("copiar");
+                        })
+                        .catch(err => console.error("Error al copiar:", err));
+                });
+            }
+        }
+
+        // Conectar a la sala
+        socket.emit("unirse_sala_intercambio_pets", { sala, userId, petId });
+
+        socket.on("usuarios_sala_intercambio", (data) => {
+            if (infoUsuariosElement) {
+                if (data.usuarios.length === 1) {
+                    infoUsuariosElement.innerHTML = `<span class="usuario-conectado">Tú (ID: ${userId})</span>`;
+                } else {
+                    infoUsuariosElement.innerHTML = data.usuarios.map(u => 
+                        `<span class="usuario-conectado">${u === userId ? 'Tú' : 'Entrenador'} (ID: ${u})</span>`
+                    ).join('<span class="separador">•</span>');
+                }
+            }
+            
+            if (estadoElement) {
+                if (data.usuarios.length === 1) {
+                    estadoElement.textContent = "Esperando a otro entrenador...";
+                    estadoElement.className = "estado-valor estado-esperando";
+                } else {
+                    estadoElement.textContent = "¡Ambos entrenadores conectados!";
+                    estadoElement.className = "estado-valor estado-listo";
+                    
+                    // Actualizar la otra mascota
+                    if (otraMascotaImagen) {
+                        otraMascotaImagen.classList.remove("esperando");
+                        otraMascotaImagen.innerHTML = `<div class="pixel-placeholder activo">
+                                                        <div id="mascota-oponente">
+                                                      </div>`;
+                    }
+                    if (otraMascotaNombre) {
+                        const otroUsuario = data.usuarios.find(u => u !== userId);
+                        otraMascotaNombre.textContent = `Mascota del entrenador #${otroUsuario}`;
+                    }
+                    if (otraMascotaEstado) {
+                        otraMascotaEstado.textContent = "Lista para intercambio";
+                    }
+                    
+                    reproducirSonido("conexion");
+                }
+            }
+        });
+
+        socket.on("ambos_usuarios_conectados", () => {
+            if (estadoElement) {
+                estadoElement.textContent = "¡Ambos conectados! Listos para intercambiar";
+                estadoElement.className = "estado-valor estado-listo";
+            }
+            if (confirmarBtn) {
+                confirmarBtn.disabled = false;
+                confirmarBtn.classList.add("activo");
+            }
+
+            document.querySelector(".flecha-intercambio").classList.add("activa");
+        });
+
+        socket.on("intercambio_realizado", () => {
+            if (estadoElement) {
+                estadoElement.textContent = "✅ ¡Intercambio realizado con éxito!";
+                estadoElement.className = "estado-valor estado-completado";
+            }
+            
+            // Mostrar animación de éxito
+            if (mensajeResultado) {
+                mensajeResultado.style.display = "flex";
+                document.querySelector(".sala-mascotas").classList.add("intercambio-completado");
+            }
+            
+            // Deshabilitar el botón de confirmar
+            if (confirmarBtn) {
+                confirmarBtn.disabled = true;
+                confirmarBtn.classList.remove("activo");
+            }
+            
+            reproducirSonido("exito");
+            
+            // Redireccionar después de un tiempo
+            fetch("/actualizar-mascota", { method: "POST" })
+                .then(() => setTimeout(() => window.location.href = "/perfil", 3000));
+        });
+
+        socket.on("sala_llena_intercambio", () => {
+            mostrarError("❌ La sala ya está llena. No puedes unirte.");
+            setTimeout(() => window.location.href = "/intercambio", 2000);
+        });
+
+        socket.on("error_usuario_en_otra_sala", () => {
+            mostrarError("⚠️ Ya estás en otra sala de intercambio");
+            setTimeout(() => window.location.href = "/intercambio", 2000);
+        });
+
+        if (confirmarBtn) {
+            confirmarBtn.addEventListener("click", () => {
+                // Efecto de clic
+                confirmarBtn.classList.add("clic-animacion");
+                setTimeout(() => confirmarBtn.classList.remove("clic-animacion"), 300);
+                
+                // Enviar confirmación
+                socket.emit("confirmar_intercambio_pets", { sala });
+                confirmarBtn.disabled = true;
+                confirmarBtn.textContent = "Procesando...";
+                
+                reproducirSonido("confirmar");
+            });
+        }
+
+        socket.on("error_intercambio", (mensaje) => {
+            mostrarError(`Error: ${mensaje}`);
+            if (mensaje.includes("No eres dueño") || mensaje.includes("Validación")) {
+                setTimeout(() => window.location.href = "/intercambio", 2000);
+            }
+        });
+        
+        function mostrarError(mensaje) {
+            const errorContainer = document.createElement("div");
+            errorContainer.className = "error-mensaje";
+            errorContainer.innerHTML = `
+                <div class="error-contenido">
+                    <div class="error-icono">⚠️</div>
+                    <div class="error-texto">${mensaje}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(errorContainer);
+            
+            setTimeout(() => {
+                errorContainer.classList.add("mostrar");
+            }, 100);
+            
+            setTimeout(() => {
+                errorContainer.classList.remove("mostrar");
+                setTimeout(() => errorContainer.remove(), 500);
+            }, 3000);
+            
+            reproducirSonido("error");
+        }
+
+        // Variable para almacenar la info de la mascota oponente
+        let mascotaOponente = null;
+
+        socket.on("info_mascota_oponente", (data) => {
+            mascotaOponente = data;
+            actualizarVistaMascotas();
+        });
+
+        function actualizarVistaMascotas() {
+            if (mascotaOponente) {
+                // Mostrar la mascota del otro usuario
+                const contenedorOponente = document.getElementById("mascota-oponente");
+                contenedorOponente.innerHTML = `
+                    <img src="/${mascotaOponente.rutaImagen}" id = "imagenMascota" alt="${mascotaOponente.petname} imagenMascota" 
+                    style="width: 120px; height: 120px; position: absolute;
+                    top: -10px;
+                    left: -10px;
+                    z-index: 1;
+                    image-rendering: pixelated;
+                    image-rendering: crisp-edges;"
+                    >
+
+                `;
+            }
+        }
+
+        actualizarVistaMascotas();
+    </script>
+</body>
+</html>

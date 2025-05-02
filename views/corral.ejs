@@ -17,7 +17,7 @@
             <% if (accesorios != null) { %>
 
                 <% for (let i = 0; i < accesorios.length; i++) { %>
-                    <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
+                    <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice + 1 %>.gif" alt="Accesorio">
                 <% } %>
         
             <% } %>
@@ -31,7 +31,7 @@
                 <% items.forEach((item, i) => { %>
                     <% if (item.categoria === "comida") { %>
                 <div class="item-inventario" draggable="true" data-tipo="comida" data-id="<%= item.indice %>">
-                    <img src="./<%= item.indice %>.gif" alt="<%= item.indice %>">
+                    <img src="imagenes_de_comidas/<%= item.indice + 1 %>.gif" alt="<%= item.indice %>">
                     <div><p style="font-size: 10px;"><%= comidasFavoritas[item.indice] %></p></div>
                 </div>
                     <% } %>
@@ -46,7 +46,7 @@
                 <% items.forEach((item, i) => { %>
                     <% if (item.categoria === "juguetes") { %>
                         <div class="item-inventario" draggable="true" data-tipo="juguete"  data-id="<%= item.indice %>">
-                            <img src="/<%= item.indice %>.gif" alt="<%= item.indice %>">
+                            <img src="imagenes_de_juguetes/<%= item.indice + 1 %>.gif" alt="<%= item.indice %>">
                             <div><p style="font-size: 10px;"><%= juguetes[item.indice] %></p></div>
                         </div>
                     <% } %>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear o unirse a sala</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Video Chat con Mundo Compartido</h1>
+        <button id="create-room">Crear nueva sala</button>
+        <p>o</p>
+        <input type="text" id="room-id" placeholder="ID de sala">
+        <button id="join-room">Unirse a sala</button>
+    </div>
+
+    <script type="module">
+        document.getElementById('create-room').addEventListener('click', () => {
+            const roomId = Math.random().toString(36).substring(2, 8);
+            window.location.href = `/room/${roomId}`;
+        });
+
+        document.getElementById('join-room').addEventListener('click', () => {
+            const roomId = document.getElementById('room-id').value.trim();
+            if (roomId) {
+                window.location.href = `/room/${roomId}`;
+            } else {
+                alert('Por favor ingresa un ID de sala');
+            }
+        });
+    </script>
+</body>
+</html>

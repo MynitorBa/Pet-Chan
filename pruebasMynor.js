@@ -3,6 +3,13 @@ import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import { log } from 'console';
 
+
+/*agregar esto xd*/
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+/*agregar esto xd*/
+
+
 /*---------------------------importaciones necesarias para la base de datos------------------------------------------------ */
 /*necesario para la base de datos*/
 import pg from "pg";
@@ -28,6 +35,17 @@ app.set('view engine', 'ejs');
 
 
 
+/*agregar esto xd*/
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+/*agregar esto xd*/
+
+
 
 
 /*---------------------------variable necesarias para la base de datos------------------------------------------------ */
@@ -35,8 +53,9 @@ app.set('view engine', 'ejs');
 app.use(session({
     secret: 'Ayer_me_econtre_con_sabrina_corazoncitos',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
+      httpOnly: false,
         secure: false,
     }
 }));
@@ -265,6 +284,8 @@ app.get("/logout", (req, res) => {
     });
 })
 
+
+//Esto tambien hay que ponerlo en meme xd
 /*---------------------------creamos rutas generales------------------------------------------------*/
 
 
@@ -283,7 +304,7 @@ app.get('/minijuegomascota', requireLogin, async (req, res) => {
         }
 
         // Si no tiene mascota, seguimos con la lógica normal del juego
-        let indicesValidos = [1, 4, 7, 10, 11, 13, 16, 18, 21, 23, 27, 29, 32, 35, 37];
+        let indicesValidos = [1, 4, 7, 10, 11, 13, 16, 18, 21, 23, 27, 29, 32, 35, 37, 38];
         const indiceMascota = indicesValidos[Math.floor(Math.random() * indicesValidos.length)];
         const rutaImagen = `${rutaBase}${indiceMascota}.gif`;
         const especieDeMascota = especieMascotas[indiceMascota - 1];
@@ -311,72 +332,83 @@ app.get('/minijuegomascota', requireLogin, async (req, res) => {
 });
 
 
-
+//Esto hay que ponerlo en meme xd
 /*---------------------------creamos post de prueba necesario------------------------------------------------*/
 app.post('/NombreMascota', requireLogin, async (req, res) => {
-    const mascotaNombre = req.body.mascota;
-    const userId = req.session.userId;
-    const datos = req.session.mascotaPendiente;
+  const mascotaNombre = req.body.mascota;
+  const userId = req.session.userId;
+  const datos = req.session.mascotaPendiente;
 
-    if (!datos) {
-        return res.status(400).send("No hay datos de mascota pendiente en sesión.");
-    }
+  if (!datos) {
+      return res.status(400).send("No hay datos de mascota pendiente en sesión.");
+  }
 
-    let indice = Math.floor(Math.random() * 10); // número entre 0 y 9
-    const comida = comidasFavoritas[indice];
-    indice = Math.floor(Math.random() * 10); // número entre 0 y 9
-    const habilidad = habilidadesEspeciales[indice];
+  let indice = Math.floor(Math.random() * 10); // número entre 0 y 9
+  const comida = comidasFavoritas[indice];
+  indice = Math.floor(Math.random() * 10); // número entre 0 y 9
+  const habilidad = habilidadesEspeciales[indice];
 
-    try {
-        const result = await db.query(
-            `INSERT INTO pets ("petname", "genero", "indice", "nivelAmor", "nivelFelicidad", "nivelEnergia", "habilidad", "comidaFavorita", "id_users")
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-             RETURNING id`,
-            [
-                mascotaNombre,
-                datos.genero,
-                datos.indice,
-                0, // nivelAmor
-                50, // nivelFelicidad
-                50, // nivelEnergia
-                habilidad, // habilidad
-                comida, // comida favorita
-                userId
-            ]
-        );
+  try {
+      // Iniciar transacción
+      await db.query('BEGIN');
+      
+      // Crear mascota en la tabla pets (mascota activa)
+      const result = await db.query(
+          `INSERT INTO pets ("petname", "genero", "indice", "nivelAmor", "nivelFelicidad", "nivelEnergia", "habilidad", "comidaFavorita", "id_users")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id`,
+          [
+              mascotaNombre,
+              datos.genero,
+              datos.indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad, // habilidad
+              comida, // comida favorita
+              userId
+          ]
+      );
 
-        const idMascota = result.rows[0].id;
+      const idMascota = result.rows[0].id;
 
-        // 🧠 Guardamos en sesión la mascota actual para uso en otras vistas
-        req.session.mascotaActual = {
-            id: idMascota,
-            nombre: mascotaNombre,
-            genero: datos.genero,
-            especie: datos.especie,
-            indice: datos.indice,
-            rutaImagen: datos.rutaImagen,
-            pronombre: datos.genero === "macho" ? "el" : "la",
-            niveldeAmor: 0,
-            niveldeFelicidad: 50,
-            niveldeEnergia: 50,
-            habilidad: habilidad,
-            comidaFavorita: comida
-        };
+      // ELIMINAMOS LA INSERCIÓN EN pets2
+      // Ya no duplicamos la mascota en pets2
 
-        // Guardamos también el ID por separado si lo necesitas
-        req.session.idMascotaReciente = idMascota;
+      // Confirmar transacción
+      await db.query('COMMIT');
 
-        // Limpiamos la sesión temporal
-        delete req.session.mascotaPendiente;
+      // Guardamos en sesión la mascota actual para uso en otras vistas
+      req.session.mascotaActual = {
+          id: idMascota,
+          nombre: mascotaNombre,
+          genero: datos.genero,
+          especie: datos.especie,
+          indice: datos.indice,
+          rutaImagen: datos.rutaImagen,
+          pronombre: datos.genero === "macho" ? "el" : "la",
+          niveldeAmor: 0,
+          niveldeFelicidad: 50,
+          niveldeEnergia: 50,
+          habilidad: habilidad,
+          comidaFavorita: comida
+      };
 
-        console.log(`Mascota creada con ID ${idMascota} y nombre ${mascotaNombre}`);
-        res.redirect('/inicio');
-    } catch (error) {
-        console.error('Error al crear mascota:', error);
-        res.status(500).send("Error al guardar la mascota");
-    }
+      // Guardamos también el ID por separado si lo necesitas
+      req.session.idMascotaReciente = idMascota;
+
+      // Limpiamos la sesión temporal
+      delete req.session.mascotaPendiente;
+
+      console.log(`Mascota creada con ID ${idMascota} y nombre ${mascotaNombre}`);
+      res.redirect('/inicio');
+  } catch (error) {
+      // Revertir transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error al crear mascota:', error);
+      res.status(500).send("Error al guardar la mascota");
+  }
 });
-
 
 
 app.post('/modificarPerfil', requireLogin, async (req, res) => {
@@ -1137,11 +1169,11 @@ app.get('/minijuego2', (req, res) => {
 /*---------------------------creamos rutas individuales para los juegos------------------------------------------------*/
 
 
-
+/*
 app.listen(3000, '0.0.0.0', () => {
     console.log('Server is running on port 3000');
 })
-
+*/
 
 
 
@@ -1782,6 +1814,452 @@ app.get('/foro', requireLogin, async (req, res) => {
 });
 
 
+
+
+
+// Ruta para cargar la biblioteca de mascotas Esto agregar a meme xd
+
+app.get('/biblioteca', requireLogin, async (req, res) => {
+  const userId = req.session.userId;
+  const mascotaActual = req.session.mascotaActual;
+
+  try {
+      // Eliminamos el bloque que verificaba y clonaba la mascota activa en pets2
+      // Ya no hay duplicación entre pets y pets2
+
+      // Obtener las mascotas de la biblioteca
+      const mascotasResult = await db.query(
+          `SELECT * FROM pets2 WHERE id_users = $1`,
+          [userId]
+      );
+
+      // Obtener el ID de la mascota activa
+      const mascotaActivaResult = await db.query(
+          `SELECT id FROM pets WHERE id_users = $1 LIMIT 1`,
+          [userId]
+      );
+
+      const mascotaActivaId = mascotaActivaResult.rows.length > 0 ? mascotaActivaResult.rows[0].id : null;
+
+      res.render('biblioteca.ejs', {
+          rutaImagen: mascotaActual ? mascotaActual.rutaImagen : null,
+          accesorios: req.session.accesorios,
+          money: req.session.money,
+          mascotaActual: mascotaActual,
+          mascotas: mascotasResult.rows,
+          mascotaActiva: mascotaActivaId,
+          especieMascotas: especieMascotas
+      });
+  } catch (error) {
+      console.error('Error al cargar la biblioteca:', error);
+      res.status(500).send('Error al cargar la biblioteca de mascotas');
+  }
+});
+
+app.get('/biblioteca/detalle-mascota/:id', requireLogin, async (req, res) => {
+  const mascotaId = req.params.id;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar que la mascota pertenece al usuario
+      const mascotaResult = await db.query(
+          `SELECT * FROM pets2 WHERE id = $1 AND id_users = $2`,
+          [mascotaId, userId]
+      );
+
+      if (mascotaResult.rows.length === 0) {
+          return res.json({ success: false, mensaje: 'Mascota no encontrada' });
+      }
+
+      const mascota = mascotaResult.rows[0];
+      const especie = especieMascotas[mascota.indice - 1];
+
+      res.json({
+          success: true,
+          mascota: mascota,
+          especie: especie
+      });
+  } catch (error) {
+      console.error('Error al obtener detalles de la mascota:', error);
+      res.json({ success: false, mensaje: 'Error al obtener detalles' });
+  }
+});
+
+app.post('/biblioteca/activar-mascota', requireLogin, async (req, res) => {
+  const mascotaId = req.body.mascotaId;
+  const userId = req.session.userId;
+
+  try {
+      // Obtener los datos de la mascota seleccionada en pets2
+      const mascotaNuevaResult = await db.query(
+          `SELECT * FROM pets2 WHERE id = $1 AND id_users = $2`,
+          [mascotaId, userId]
+      );
+
+      if (mascotaNuevaResult.rows.length === 0) {
+          return res.json({ success: false, mensaje: 'Mascota no encontrada o no te pertenece' });
+      }
+
+      const mascotaNueva = mascotaNuevaResult.rows[0];
+
+      // Obtener la mascota activa actual (si existe)
+      const mascotaActivaResult = await db.query(
+          `SELECT * FROM pets WHERE id_users = $1`,
+          [userId]
+      );
+
+      const existeMascotaActiva = mascotaActivaResult.rows.length > 0;
+      const mascotaActiva = existeMascotaActiva ? mascotaActivaResult.rows[0] : null;
+
+      // Comenzar una transacción
+      await db.query('BEGIN');
+
+      // 1. Si existe una mascota activa, guardarla en pets2 antes de eliminarla
+      if (existeMascotaActiva) {
+          // Verificamos primero si la mascota activa ya existe en pets2 con los mismos datos
+          const mascotaExisteEnPets2 = await db.query(
+              `SELECT id FROM pets2 
+               WHERE id_users = $1 AND indice = $2 AND petname = $3`,
+              [userId, mascotaActiva.indice, mascotaActiva.petname]
+          );
+
+          // Si no existe una mascota idéntica en pets2, la insertamos
+          if (mascotaExisteEnPets2.rows.length === 0) {
+              await db.query(
+                  `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                                    habilidad, "comidaFavorita", rareza, id_users)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+                  [
+                      mascotaActiva.petname,
+                      mascotaActiva.genero,
+                      mascotaActiva.indice,
+                      mascotaActiva.nivelAmor,
+                      mascotaActiva.nivelFelicidad,
+                      mascotaActiva.nivelEnergia,
+                      mascotaActiva.habilidad,
+                      mascotaActiva.comidaFavorita,
+                      'comun', // Rareza predeterminada si no se conoce
+                      userId
+                  ]
+              );
+              
+              console.log(`Mascota activa anterior guardada en la biblioteca: ${mascotaActiva.petname}`);
+          }
+
+          // 2. Eliminar la mascota activa actual
+          await db.query('DELETE FROM pets WHERE id_users = $1', [userId]);
+      }
+
+      // 3. Eliminar la mascota seleccionada de pets2
+      await db.query('DELETE FROM pets2 WHERE id = $1', [mascotaId]);
+
+      // 4. Insertar la nueva mascota activa en pets
+      const result = await db.query(
+          `INSERT INTO pets (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                         habilidad, "comidaFavorita", id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id`,
+          [
+              mascotaNueva.petname,
+              mascotaNueva.genero,
+              mascotaNueva.indice,
+              mascotaNueva.nivelAmor,
+              mascotaNueva.nivelFelicidad,
+              mascotaNueva.nivelEnergia,
+              mascotaNueva.habilidad,
+              mascotaNueva.comidaFavorita,
+              userId
+          ]
+      );
+
+      // Confirmar la transacción
+      await db.query('COMMIT');
+
+      // Actualizar la sesión con la nueva mascota activa
+      const rutaImagen = `${rutaBase}${mascotaNueva.indice}.gif`;
+      const especieDeMascota = especieMascotas[mascotaNueva.indice - 1];
+      const pronombre = mascotaNueva.genero === "macho" ? "el" : "la";
+
+      req.session.mascotaActual = {
+          id: result.rows[0].id,
+          nombre: mascotaNueva.petname,
+          genero: mascotaNueva.genero,
+          especie: especieDeMascota,
+          indice: mascotaNueva.indice,
+          rutaImagen,
+          pronombre,
+          niveldeAmor: mascotaNueva.nivelAmor,
+          niveldeFelicidad: mascotaNueva.nivelFelicidad,
+          niveldeEnergia: mascotaNueva.nivelEnergia,
+          habilidad: mascotaNueva.habilidad,
+          comidaFavorita: mascotaNueva.comidaFavorita
+      };
+
+      res.json({ 
+          success: true, 
+          mensaje: 'Mascota activada correctamente. Refresca la página para ver todos los cambios.' 
+      });
+  } catch (error) {
+      // Revertir la transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error al activar mascota:', error);
+      res.json({ success: false, mensaje: 'Error al activar la mascota: ' + error.message });
+  }
+});
+
+app.post('/biblioteca/guardar-mascota', requireLogin, async (req, res) => {
+  const { nombre, indice, genero, rareza } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar datos necesarios
+      if (!nombre || !indice || !genero || !rareza) {
+          return res.json({ success: false, mensaje: 'Datos incompletos' });
+      }
+
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      // Insertar la nueva mascota en pets2
+      await db.query(
+          `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", habilidad, "comidaFavorita", rareza, id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+              nombre,
+              genero,
+              indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad,
+              comidaFavorita,
+              rareza,
+              userId
+          ]
+      );
+
+      res.json({ success: true, mensaje: 'Mascota guardada correctamente' });
+  } catch (error) {
+      console.error('Error al guardar mascota:', error);
+      res.json({ success: false, mensaje: 'Error al guardar la mascota' });
+  }
+});
+
+
+
+
+
+
+
+app.get('/migracion-mascotas', requireLogin, async (req, res) => {
+  // Solo permitir al administrador ejecutar esta migración
+  if (req.session.rango3 !== 'Administrador') {
+      return res.status(403).send('Acceso denegado. Se requieren permisos de administrador.');
+  }
+
+  try {
+      // Obtener todas las mascotas activas que no están en pets2
+      const mascotasActivas = await db.query(`
+          SELECT p.* 
+          FROM pets p
+          WHERE NOT EXISTS (
+              SELECT 1 
+              FROM pets2 p2 
+              WHERE p2.id_users = p.id_users AND p2.indice = p.indice
+          )
+      `);
+
+      let mascotasMigradas = 0;
+
+      // Migrar cada mascota activa a pets2
+      for (const mascota of mascotasActivas.rows) {
+          await db.query(`
+              INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                               habilidad, "comidaFavorita", rareza, id_users)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          `, [
+              mascota.petname,
+              mascota.genero,
+              mascota.indice,
+              mascota.nivelAmor,
+              mascota.nivelFelicidad,
+              mascota.nivelEnergia,
+              mascota.habilidad,
+              mascota.comidaFavorita,
+              'comun', // rareza por defecto para mascotas migradas
+              mascota.id_users
+          ]);
+          
+          mascotasMigradas++;
+      }
+
+      res.send(`Migración completada. Se migraron ${mascotasMigradas} mascotas a la biblioteca.`);
+  } catch (error) {
+      console.error('Error en la migración de mascotas:', error);
+      res.status(500).send('Error en la migración: ' + error.message);
+  }
+});
+
+
+
+
+//Agregar esto xd
+
+
+
+//agrega esto xd
+// Versión mejorada de la función del cliente para comprar sobres
+app.post('/biblioteca/comprar-sobre', requireLogin, async (req, res) => {
+  const { tipo, precio } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar si el usuario tiene suficiente dinero
+      const userResult = await db.query('SELECT money FROM users WHERE id = $1', [userId]);
+      const userMoney = userResult.rows[0].money;
+
+      if (userMoney < precio) {
+          return res.json({
+              success: false,
+              mensaje: 'No tienes suficientes monedas para comprar este sobre'
+          });
+      }
+
+      // Actualizar dinero del usuario
+      await db.query('UPDATE users SET money = money - $1 WHERE id = $2', [precio, userId]);
+      req.session.money = userMoney - precio;
+
+      // Obtener mascota aleatoria según el tipo de sobre
+      let rareza;
+      const random = Math.random() * 100;
+      
+      if (tipo === 'basico') {
+          // Sobre básico: 70% común, 25% raro, 5% épico
+          if (random < 70) {
+              rareza = 'comun';
+          } else if (random < 95) {
+              rareza = 'raro';
+          } else {
+              rareza = 'epico';
+          }
+      } else if (tipo === 'premium') {
+          // Sobre premium: 60% raro, 30% épico, 10% legendario
+          if (random < 60) {
+              rareza = 'raro';
+          } else if (random < 90) {
+              rareza = 'epico';
+          } else {
+              rareza = 'legendario';
+          }
+      }
+      
+      // Seleccionar un índice de mascota según la rareza
+      let indicesDisponibles;
+      
+      // Ejemplo de asignación de índices por rareza (ajusta según la distribución deseada)
+      const indicesComunes = [1, 4, 7, 10, 11];
+      const indicesRaros = [13, 16, 18, 21];
+      const indicesEpicos = [23, 27, 29, 32];
+      const indicesLegendarios = [35, 37, 38];
+      
+      switch (rareza) {
+          case 'comun':
+              indicesDisponibles = indicesComunes;
+              break;
+          case 'raro':
+              indicesDisponibles = indicesRaros;
+              break;
+          case 'epico':
+              indicesDisponibles = indicesEpicos;
+              break;
+          case 'legendario':
+              indicesDisponibles = indicesLegendarios;
+              break;
+      }
+      
+      // Seleccionar un índice aleatorio de la lista disponible
+      const indiceAleatorio = indicesDisponibles[Math.floor(Math.random() * indicesDisponibles.length)];
+      
+      // Determinar aleatoriamente el género
+      const genero = Math.random() < 0.5 ? "macho" : "hembra";
+      
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      res.json({
+          success: true,
+          moneyRestante: req.session.money,
+          mascota: {
+              indice: indiceAleatorio,
+              genero: genero,
+              rareza: rareza,
+              especie: especieMascotas[indiceAleatorio - 1],
+              habilidad: habilidad,
+              comidaFavorita: comidaFavorita
+          }
+      });
+  } catch (error) {
+      console.error('Error al comprar sobre:', error);
+      res.json({ success: false, mensaje: 'Error al procesar la compra' });
+  }
+});
+// Agrega esta ruta para guardar la mascota después de que el usuario le asigne un nombre
+app.post('/biblioteca/guardar-mascota', requireLogin, async (req, res) => {
+  const { nombre, indice, genero, rareza } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar datos necesarios
+      if (!nombre || !indice || !genero || !rareza) {
+          return res.json({ success: false, mensaje: 'Datos incompletos' });
+      }
+
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      // Insertar la nueva mascota en pets2 con todos los campos necesarios
+      const result = await db.query(
+          `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                          habilidad, "comidaFavorita", rareza, id_users, nivel, fechaObtencion)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP)
+           RETURNING id`,
+          [
+              nombre,         // petname
+              genero,         // genero
+              indice,         // indice
+              0,              // nivelAmor
+              50,             // nivelFelicidad
+              50,             // nivelEnergia
+              habilidad,      // habilidad
+              comidaFavorita, // comidaFavorita
+              rareza,         // rareza
+              userId,         // id_users
+              1               // nivel (valor predeterminado)
+          ]
+      );
+
+      res.json({ success: true, mensaje: 'Mascota guardada correctamente' });
+  } catch (error) {
+      console.error('Error al guardar mascota:', error);
+      res.json({ 
+          success: false, 
+          mensaje: 'Error al guardar la mascota: ' + error.message
+      });
+  }
+});
+//xdd
 
 
 
@@ -5549,3 +6027,1114 @@ async function initializeEventsTable() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*agregar esto xd*/
+app.get("/intercambio", requireLogin, (req, res) => {
+
+  res.render("intercambio-mascotas.ejs", {
+    userId: req.session.userId,
+    petId: req.session.mascotaActual.id
+  });
+});
+
+
+
+// Ruta para crear nueva sala
+app.post("/intercambio/crear-sala", requireLogin, (req, res) => {
+  const { userId } = req.body;
+  const petId = req.session.mascotaActual.id;
+  const mascota = req.session.mascotaActual;
+  
+  // Generar código aleatorio de 6 caracteres
+  const sala = Math.random().toString(36).substring(2, 8).toUpperCase();
+  
+  res.render("sala-intercambio.ejs", {
+      sala,
+      userId,
+      petId,
+      esCreador: true,  // Para identificar al creador de la sala
+      rutaImagen: mascota.rutaImagen,
+  });
+});
+
+// Ruta para unirse a sala existente
+app.post("/intercambio/unirse-sala", requireLogin, async (req, res) => {
+  const { codigoSala, userId } = req.body;
+  const petId = req.session.mascotaActual.id;
+  const mascota = req.session.mascotaActual;
+
+  // Verificar si la sala existe y tiene espacio
+  if (salasDeIntercambio[codigoSala] && salasDeIntercambio[codigoSala].length < 2) {
+      res.render("sala-intercambio.ejs", {
+          sala: codigoSala,
+          userId,
+          petId,
+          esCreador: false,
+          rutaImagen: mascota.rutaImagen,
+      });
+  } else {
+      res.status(400).send("Sala no encontrada o llena");
+  }
+});
+
+app.post("/actualizar-mascota", requireLogin, async (req, res) => {
+  const userId = req.session.userId;
+  if (!userId) return res.status(401).send("No autorizado");
+
+  try {
+      const petResult = await db.query('SELECT * FROM pets WHERE id_users = $1 LIMIT 1', [userId]);
+
+      if (petResult.rows.length > 0) {
+          const mascota = petResult.rows[0];
+          const rutaImagen = `${rutaBase}${mascota.indice}.gif`;
+          const especieDeMascota = especieMascotas[mascota.indice - 1];
+          const pronombre = mascota.genero === "macho" ? "el" : "la";
+
+          req.session.mascotaActual = {
+              id: mascota.id,
+              nombre: mascota.petname,
+              genero: mascota.genero,
+              especie: especieDeMascota,
+              indice: mascota.indice,
+              rutaImagen,
+              pronombre,
+              niveldeAmor: mascota.nivelAmor,
+              niveldeFelicidad: mascota.nivelFelicidad,
+              niveldeEnergia: mascota.nivelEnergia,
+              habilidad: mascota.habilidad,
+              comidaFavorita: mascota.comidaFavorita
+          };
+
+          return res.send("ok");
+      }
+
+      res.status(404).send("Mascota no encontrada");
+
+  } catch (err) {
+      console.error("❌ Error al actualizar sesión:", err);
+      res.status(500).send("Error interno");
+  }
+});
+
+
+
+// Rutas para batallas
+app.get("/batalla", requireLogin, (req, res) => {
+  res.render("lobby-batallas.ejs", {
+    userId: req.session.userId,
+    petId: req.session.mascotaActual.id,
+    mascota: req.session.mascotaActual
+  });
+});
+
+// Modifica la ruta para manejar mejor la validación de mascota
+app.get("/batalla/sala/:id", requireLogin, (req, res) => {
+  const salaId = req.params.id;
+  const sala = salasBatalla.get(salaId);
+  
+  // Verificar si la sala existe y está llena
+  if (sala && sala.jugadores.length >= 2) {
+    return res.redirect("/batalla?error=sala_llena");
+  }
+  
+  // Verificar que el usuario tenga una mascota seleccionada
+  if (!req.session.mascotaActual || !req.session.mascotaActual.id) {
+    return res.redirect("/batalla?error=no_mascota");
+  }
+  
+  res.render("sala-batalla.ejs", { 
+    salaId,
+    userId: req.session.userId,
+    petId: req.session.mascotaActual.id,  // Aseguramos que se pase el petId
+    mascota: req.session.mascotaActual
+  });
+});
+
+// Actualizar la ruta para unirse a salas existentes para asegurar que petId está definido
+app.post("/intercambio/unirse-sala", requireLogin, async (req, res) => {
+  const { codigoSala, userId } = req.body;
+  
+  // Verificar que el usuario tenga una mascota seleccionada
+  if (!req.session.mascotaActual || !req.session.mascotaActual.id) {
+    return res.status(400).send("No tienes una mascota seleccionada");
+  }
+  
+  const petId = req.session.mascotaActual.id;
+  const mascota = req.session.mascotaActual;
+
+  // Verificar si la sala existe y tiene espacio
+  if (salasDeIntercambio[codigoSala] && salasDeIntercambio[codigoSala].length < 2) {
+      res.render("sala-intercambio.ejs", {
+          sala: codigoSala,
+          userId,
+          petId,  // Aseguramos que se pase el petId
+          esCreador: false,
+          rutaImagen: mascota.rutaImagen,
+      });
+  } else {
+      res.status(400).send("Sala no encontrada o llena");
+  }
+});
+
+// Ruta para crear una sala de batalla
+app.post("/batalla/crear-sala", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const petId = req.session.mascotaActual?.id;
+    
+    // Verificar que el usuario tenga una mascota seleccionada
+    if (!petId) {
+      return res.status(400).json({ 
+        error: "No tienes una mascota seleccionada",
+        redirect: "/mascota"
+      });
+    }
+    
+    // Validar la propiedad de la mascota
+    const esValido = await validarPropiedadMascota(userId, petId);
+    if (!esValido) {
+      return res.status(403).json({ 
+        error: "No eres el dueño de esta mascota" 
+      });
+    }
+    
+    // Generar código aleatorio para la sala (6 caracteres alfanuméricos)
+    const salaId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    // Crear la sala en la estructura de datos
+    salasBatalla.set(salaId, { 
+      jugadores: [],
+      selecciones: {},
+      estado: 'esperando',
+      ronda: 1,
+      turnos: 0,
+      vida: {
+        jugador1: 500,
+        jugador2: 500
+      },
+      mascotas: {},
+      creadoEn: new Date()
+    });
+    
+    // Devolver el ID de la sala para redirigir al usuario
+    res.json({ 
+      success: true,
+      salaId: salaId,
+      redirect: `/batalla/sala/${salaId}`
+    });
+    
+  } catch (error) {
+    console.error("❌ Error al crear sala:", error);
+    res.status(500).json({ 
+      error: "Error al crear la sala de batalla" 
+    });
+  }
+});
+
+// Ruta para obtener salas de batalla disponibles
+app.get("/batalla/salas-disponibles", requireLogin, (req, res) => {
+  const salasDisponibles = [];
+  
+  // Convertir el Map de salas a un array de objetos con la información requerida
+  salasBatalla.forEach((sala, salaId) => {
+    // Solo incluir salas que estén en estado "esperando" y no estén llenas
+    if (sala.estado === 'esperando' && sala.jugadores.length < 2) {
+      salasDisponibles.push({
+        id: salaId,
+        jugadores: sala.jugadores.length,
+        // Incluir información adicional útil 
+        mascotaAnfitrion: sala.jugadores.length > 0 ? {
+          nombre: sala.mascotas.jugador1?.petname || "Desconocido",
+          especie: sala.mascotas.jugador1?.especie || "Desconocido",
+          indice: sala.mascotas.jugador1?.indice || 1
+        } : null
+      });
+    }
+  });
+  
+  res.json(salasDisponibles);
+});
+
+//-------------------------------------------------rutas de pet-chat--------------------------------------------------------------------//
+app.get('/petchat', requireLogin, (req, res) => {
+  res.render('petchat');
+});
+
+app.get('/room/:id', requireLogin, (req, res) => {
+  res.render('room', { roomId: req.params.id });
+});
+
+
+//funcion para validar la propiedad de la mascota
+async function validarPropiedadMascota(userId, petId) {
+  try {
+      const result = await db.query(
+          'SELECT id FROM pets WHERE id = $1 AND id_users = $2',
+          [petId, userId]
+      );
+      return result.rows.length > 0;
+  } catch (err) {
+      console.error("Error validando propiedad:", err);
+      return false;
+  }
+}
+
+
+const salasDeIntercambio = {}; // sala => [{ userId, petId, socketId, confirmado }]
+
+//variables principales para la batalla
+// Estructuras para batallas
+const salasBatalla = new Map(); 
+import { typeEffectiveness } from './informacion/batallasInfor.js';
+
+//variables para las camaras
+const rooms = new Map(); // Para el seguimiento de usuarios en cámaras
+const MAX_USERS_PER_ROOM = 10; // Límite para cámaras
+
+/*---------------------------------funcion para calcular daño----------------------------------------------------*/
+/**
+ * Calcula el daño de un ataque basado en tipos y efectividad
+ */
+function calcularDanio(ataque, tipoAtacante, tipoDefensor) {
+  // Si alguno de los tipos no existe, daño normal
+  if (!typeEffectiveness[ataque.type] || !typeEffectiveness[tipoDefensor]) {
+    return {
+      danio: Math.floor(ataque.power * (0.85 + Math.random() * 0.3)),
+      mensaje: "Ataque normal. (x1)"
+    };
+  }
+
+  // Calcular multiplicador de efectividad
+  let efectividad = 1;
+  
+  // Verificar si no tiene efecto
+  if (typeEffectiveness[ataque.type].noEffectAgainst?.includes(tipoDefensor)) {
+
+    efectividad = 0;
+  } 
+  // Verificar si es super efectivo
+  else if (typeEffectiveness[ataque.type].strongAgainst.includes(tipoDefensor)) {
+    efectividad = 2;
+  } 
+  // Verificar si es poco efectivo
+  else if (typeEffectiveness[ataque.type].weakAgainst.includes(tipoDefensor)) {
+    efectividad = 0.5;
+  }
+
+  // Variación aleatoria entre 85% y 115%
+  const variacion = 0.85 + Math.random() * 0.3;
+  const danioFinal = Math.floor(ataque.power * efectividad * variacion);
+
+  // Mensajes según efectividad
+  let mensajeEfectividad = '';
+  if (efectividad === 0) {
+    console.log('baja efectividad', efectividad);
+    mensajeEfectividad = '¡No tuvo efecto! (x0)';
+  } else if (efectividad === 0.5) {
+    console.log('poca efectividad', efectividad);
+    mensajeEfectividad = 'No es muy efectivo... (x0.5)';
+  } else if (efectividad === 1) {
+    console.log('media efectividad', efectividad);
+    mensajeEfectividad = 'Ataque normal. (x1)';
+  } else if (efectividad === 2) {
+    console.log('alta efectividad', efectividad);
+    mensajeEfectividad = '¡ES SUPER EFECTIVO! (x2)';
+  }
+
+  console.log('ataque', ataque, 'atacante', tipoAtacante, 'defensor', tipoDefensor);
+  console.log('tipo atacante', typeEffectiveness[ataque.type], 'tipo defensor', typeEffectiveness[tipoDefensor]);
+  console.log(`Efectividad: ${efectividad}, Variación: ${variacion}, Danio: ${danioFinal}`);
+
+  return {
+    danio: efectividad === 0 ? 0 : danioFinal, // Asegurar 0 de daño si no tiene efecto
+    mensaje: mensajeEfectividad
+  };
+}
+
+// En tu servidor Express (index.js)
+app.post('/actualizar-sesion-batalla', async (req, res) => {
+  if (!req.session.userId) return res.status(401).send();
+  
+  try {
+    const user = await db.query('SELECT money FROM users WHERE id = $1', [req.session.userId]);
+    const mascota = await db.query('SELECT * FROM pets WHERE id_users = $1', [req.session.userId]);
+    
+    if (user.rows[0] && mascota.rows[0]) {
+      const evoluciono = req.session.mascotaActual?.indice !== mascota.rows[0].indice;
+      
+      req.session.money = user.rows[0].money;
+      req.session.mascotaActual = {
+        ...req.session.mascotaActual,
+        indice: mascota.rows[0].indice,
+        niveldeAmor: mascota.rows[0].nivelAmor,
+        rutaImagen: `imagenes_de_mascotas/${mascota.rows[0].indice}.gif`
+      };
+      req.session.save();
+      
+      return res.json({
+        status: "ok",
+        evoluciono,
+        nuevaImagen: req.session.mascotaActual.rutaImagen
+      });
+    }
+    res.status(404).send();
+  } catch (err) {
+    console.error("Error al actualizar sesión:", err);
+    res.status(500).send();
+  }
+});
+
+function obtenerTodosLosAtaques() {
+  return [
+    { name: "Llamarada", type: "fuego", power: 500 }, { name: "Infierno", type: "fuego", power: 500 },
+    { name: "Hidrobomba", type: "agua", power: 500 }, { name: "Surf", type: "agua", power: 500 },
+    { name: "Rayo Solar", type: "planta", power: 500 }, { name: "Latigazo", type: "planta", power: 500 },
+    { name: "Trueno", type: "electrico", power: 500 }, { name: "Rayo", type: "electrico", power: 500 },
+    { name: "Terremoto", type: "tierra", power: 500 }, { name: "Excavar", type: "tierra", power: 500 },
+    { name: "Avalancha", type: "roca", power: 500 }, { name: "Ventisca", type: "hielo", power: 500 },
+    { name: "Tijera X", type: "bicho", power: 500 }, { name: "Ataque Aéreo", type: "volador", power: 500 },
+    { name: "Residuos", type: "veneno", power: 500 }, { name: "Psicorrayo", type: "psiquico", power: 500 },
+    { name: "Patada Salto", type: "lucha", power: 500 }, { name: "Bola Sombra", type: "fantasma", power: 500 },
+    { name: "Cabeza de Hierro", type: "acero", power: 500 }, { name: "Garra Dragón", type: "dragon", power: 500 },
+    { name: "Viento Feérico", type: "hada", power: 500 }, { name: "Hiperrayo", type: "normal", power: 500 }
+  ];
+}
+/*
+function obtenerTodosLosAtaques() {
+  return [
+    { name: "Llamarada", type: "fuego", power: 60 }, { name: "Infierno", type: "fuego", power: 90 },
+    { name: "Hidrobomba", type: "agua", power: 110 }, { name: "Surf", type: "agua", power: 75 },
+    { name: "Rayo Solar", type: "planta", power: 90 }, { name: "Latigazo", type: "planta", power: 60 },
+    { name: "Trueno", type: "electrico", power: 85 }, { name: "Rayo", type: "electrico", power: 65 },
+    { name: "Terremoto", type: "tierra", power: 90 }, { name: "Excavar", type: "tierra", power: 70 },
+    { name: "Avalancha", type: "roca", power: 80 }, { name: "Ventisca", type: "hielo", power: 85 },
+    { name: "Tijera X", type: "bicho", power: 80 }, { name: "Ataque Aéreo", type: "volador", power: 75 },
+    { name: "Residuos", type: "veneno", power: 65 }, { name: "Psicorrayo", type: "psiquico", power: 75 },
+    { name: "Patada Salto", type: "lucha", power: 85 }, { name: "Bola Sombra", type: "fantasma", power: 80 },
+    { name: "Cabeza de Hierro", type: "acero", power: 80 }, { name: "Garra Dragón", type: "dragon", power: 90 },
+    { name: "Viento Feérico", type: "hada", power: 80 }, { name: "Hiperrayo", type: "normal", power: 100 }
+  ];
+}
+*/
+
+//funciones necesarias para la evolucion de mascotas 
+// En tu archivo principal (index.js o donde tengas configuraciones)
+const EVOLUCIONES_NIVEL_60 = [1, 4, 7, 11, 13, 16, 18, 21, 23, 27, 29, 32, 35];  // Índices que pueden evolucionar al llegar a 60
+const EVOLUCIONES_NIVEL_180 = [2, 5, 8, 14, 19, 24, 30, 33]; // Índices que pueden evolucionar al llegar a 180
+
+
+
+async function actualizarNivelAmor(petId, userId, incrementoAmor, incrementoDinero) {
+  try {
+    await db.query('BEGIN');
+
+    // 1. Obtener datos actuales de la mascota
+    const mascotaActual = await db.query(
+      'SELECT indice, "nivelAmor", "nivelEnergia" FROM pets WHERE id = $1',
+      [petId]
+    );
+
+    if (mascotaActual.rows.length === 0) throw new Error('Mascota no encontrada');
+
+    const indiceActual = mascotaActual.rows[0].indice;
+    const nivelAmorActual = mascotaActual.rows[0].nivelAmor;
+    const nivelEnergia = mascotaActual.rows[0].nivelEnergia;
+    const nuevoNivelAmor = nivelAmorActual + incrementoAmor;
+
+    // 2. Actualizar nivelAmor y dinero
+    await db.query(
+      'UPDATE pets SET "nivelAmor" = "nivelAmor" + $1 WHERE id = $2',
+      [incrementoAmor, petId]
+    );
+
+    await db.query(
+      'UPDATE users SET money = money + $1 WHERE id = $2',
+      [incrementoDinero, userId]
+    );
+
+    // 3. Verificar evolución
+    let nuevoIndice = indiceActual;
+    
+    // Caso especial para índice 24 al nivel 180
+    if (nuevoNivelAmor >= 180 && indiceActual === 24) {
+      nuevoIndice = (nivelEnergia > 50) ? 25 : 26;
+      console.log(`Evolución especial para mascota ${petId}:
+        Nivel Energía: ${nivelEnergia}
+        Evolución a: ${nuevoIndice}`);
+    }
+    // Evoluciones normales
+    else if (nuevoNivelAmor >= 60 && EVOLUCIONES_NIVEL_60.includes(indiceActual)) {
+      nuevoIndice = indiceActual + 1;
+      console.log(`Evolución nivel 60 para mascota ${petId}, nuevo índice: ${nuevoIndice}`);
+    } 
+    else if (nuevoNivelAmor >= 180 && EVOLUCIONES_NIVEL_180.includes(indiceActual)) {
+      nuevoIndice = indiceActual + 1;
+      console.log(`Evolución nivel 180 para mascota ${petId}, nuevo índice: ${nuevoIndice}`);
+    }
+
+    // 4. Aplicar evolución si es necesario
+    if (nuevoIndice !== indiceActual) {
+      await db.query(
+        'UPDATE pets SET indice = $1 WHERE id = $2',
+        [nuevoIndice, petId]
+      );
+    }
+
+    await db.query('COMMIT');
+
+    return {
+      evoluciono: nuevoIndice !== indiceActual,
+      nuevoIndice,
+      nivelEnergia // Devuelve el nivel de energía para posibles usos adicionales
+    };
+
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error('Error en actualizarNivelAmor:', error);
+    throw error;
+  }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+
+io.on("connection", (socket) => {
+
+  console.log(`🔌 Cliente conectado: ${socket.id}`);
+
+  socket.on("connection_intercambio_pets", ({ sala, userId, petId }) => {
+    if (!sala || !userId || !petId) return;
+
+    socket.join(sala);
+    if (!salasDeIntercambio[sala]) salasDeIntercambio[sala] = [];
+
+    salasDeIntercambio[sala].push({ socketId: socket.id, userId, petId });
+
+    if (salasDeIntercambio[sala].length === 1) {
+      socket.emit("esperando_otro_usuario");
+    } else if (salasDeIntercambio[sala].length === 2) {
+      io.to(sala).emit("ambos_usuarios_conectados");
+    } else {
+      socket.leave(sala);
+      socket.emit("error_sala_llena");
+    }
+  });
+
+  socket.on("unirse_sala_intercambio_pets", async ({ sala, userId, petId }) => {
+        // Validar propiedad inmediatamente
+        const esValido = await validarPropiedadMascota(userId, petId);
+        if (!esValido) {
+            socket.emit("error_intercambio", "No tienes permiso para intercambiar esta mascota");
+            return;
+        }
+
+        // Verificar si el usuario ya está en alguna sala
+        for (const salaExistente in salasDeIntercambio) {
+            if (salasDeIntercambio[salaExistente].some(u => u.userId === userId)) {
+                socket.emit("error_usuario_en_otra_sala");
+                return;
+            }
+        }
+
+        // Si la sala no existe, solo permitir si el usuario es el primero
+        if (!salasDeIntercambio[sala]) {
+            salasDeIntercambio[sala] = [];
+        }
+
+        // Verificar si la sala está llena
+        if (salasDeIntercambio[sala].length >= 2) {
+            socket.emit("sala_llena_intercambio");
+            return;
+        }
+
+        socket.join(sala);
+        salasDeIntercambio[sala].push({
+            socketId: socket.id,
+            userId,
+            petId,
+            confirmado: false
+        });
+
+        // Notificar a los usuarios en la sala
+        io.to(sala).emit("usuarios_sala_intercambio", {
+            usuarios: salasDeIntercambio[sala].map(p => p.userId),
+            codigoSala: sala
+        });
+
+        // Si hay 2 usuarios, notificar
+        if (salasDeIntercambio[sala].length === 2) {
+            io.to(sala).emit("ambos_usuarios_conectados");
+        }
+
+        // Cuando hay 2 usuarios, enviar la info completa de ambas mascotas
+        if (salasDeIntercambio[sala]?.length === 2) {
+          const [usuario1, usuario2] = salasDeIntercambio[sala];
+          
+          // Obtener info completa de ambas mascotas
+          const mascota1 = await obtenerInfoMascota(usuario1.petId);
+          const mascota2 = await obtenerInfoMascota(usuario2.petId);
+          
+          // Enviar a cada usuario la info de la mascota del otro
+          io.to(usuario1.socketId).emit("info_mascota_oponente", {
+              ...mascota2,
+              rutaImagen: `imagenes_de_mascotas/${mascota2.indice}.gif`
+          });
+          
+          io.to(usuario2.socketId).emit("info_mascota_oponente", {
+              ...mascota1,
+              rutaImagen: `imagenes_de_mascotas/${mascota1.indice}.gif`
+          });
+      }
+    });
+
+    socket.on("confirmar_intercambio_pets", async ({ sala }) => {
+      if (!salasDeIntercambio[sala] || salasDeIntercambio[sala].length !== 2) {
+          return socket.emit("error_intercambio", "Sala inválida");
+      }
+
+      const usuario = salasDeIntercambio[sala].find(p => p.socketId === socket.id);
+      if (!usuario) return;
+
+      // Validar que la mascota pertenece al usuario
+      const esPropietario = await validarPropiedadMascota(usuario.userId, usuario.petId);
+      if (!esPropietario) {
+          return socket.emit("error_intercambio", "No eres dueño de esta mascota");
+      }
+
+      usuario.confirmado = true;
+      const [p1, p2] = salasDeIntercambio[sala];
+
+      if (p1.confirmado && p2.confirmado) {
+          try {
+              // Validar nuevamente ANTES del intercambio
+              const validaciones = await Promise.all([
+                  validarPropiedadMascota(p1.userId, p1.petId),
+                  validarPropiedadMascota(p2.userId, p2.petId)
+              ]);
+
+              if (!validaciones.every(v => v)) {
+                  throw new Error("Validación de propiedad falló");
+              }
+
+              /*cambio de mascota*/
+              await db.query("BEGIN");
+              await db.query(`UPDATE pets SET id_users = $1 WHERE id = $2`, [p2.userId, p1.petId]);
+              await db.query(`UPDATE pets SET id_users = $1 WHERE id = $2`, [p1.userId, p2.petId]);
+              await db.query("COMMIT");
+
+              io.to(sala).emit("intercambio_realizado");
+          } catch (err) {
+              await db.query("ROLLBACK");
+              console.error("❌ Error en intercambio:", err);
+              io.to(sala).emit("error_intercambio", "Error en el intercambio");
+          } finally {
+              delete salasDeIntercambio[sala];
+          }
+      }
+    });
+
+    
+
+
+
+    /*----------------------------------------------------------------------------------------------------------------------------*/
+
+
+    socket.on('unirse-sala-batalla', async ({ salaId, userId, petId }) => {
+      try {
+        const esValido = await validarPropiedadMascota(userId, petId);
+        if (!esValido) throw new Error('MASCOTA_NO_VALIDA');
+    
+        if (!salasBatalla.has(salaId)) {
+          const mascota = await obtenerInfoMascota(petId);
+          salasBatalla.set(salaId, {
+            jugadores: [],
+            selecciones: {},
+            ataques: { jugador1: [], jugador2: [] },
+            estado: 'esperando',
+            ronda: 1,
+            turnoActual: null,
+            vida: { jugador1: 500, jugador2: 500 },
+            mascotas: {}
+          });
+        }
+    
+        const sala = salasBatalla.get(salaId);
+        if (sala.jugadores.length >= 2) throw new Error('SALA_LLENA');
+    
+        socket.join(salaId);
+        const mascota = await obtenerInfoMascota(petId);
+        const rol = sala.jugadores.length === 0 ? 'jugador1' : 'jugador2';
+    
+        sala.jugadores.push({ socketId: socket.id, userId, petId, rol });
+        sala.mascotas[rol] = { ...mascota, rutaImagen: `imagenes_de_mascotas/${mascota.indice}.gif` };
+        socket.emit('asignar-rol', { rol });
+    
+        io.to(salaId).emit('jugadores-actualizados', {
+          jugadores: sala.jugadores.map(j => j.userId),
+          estado: sala.estado,
+          mascotas: sala.mascotas
+        });
+    
+        if (sala.jugadores.length === 2) {
+          const tipos = Object.keys(typeEffectiveness);
+          sala.tiposDisponibles = {
+            jugador1: tipos.sort(() => 0.5 - Math.random()).slice(0, 3),
+            jugador2: tipos.sort(() => 0.5 - Math.random()).slice(0, 3)
+          };
+          sala.estado = 'seleccion_tipo';
+          io.to(salaId).emit('iniciar-juego', {
+            tiposDisponibles: sala.tiposDisponibles,
+            ronda: sala.ronda,
+            mascotas: sala.mascotas
+          });
+        }
+    
+      } catch (error) {
+        socket.emit('error-sala', { mensaje: error.message });
+      }
+    });
+    
+    socket.on('seleccionar-tipo-batalla', ({ salaId, tipo }) => {
+      const sala = salasBatalla.get(salaId);
+      if (!sala) return;
+      const jugador = sala.jugadores.find(j => j.socketId === socket.id);
+      if (!jugador || !typeEffectiveness[tipo]) return;
+
+      
+      
+      try {
+        
+      
+    
+      sala.selecciones[jugador.rol] = tipo;
+      io.to(salaId).emit('tipo-seleccionado', {
+        jugador: jugador.rol,
+        tipo,
+        color: typeEffectiveness[tipo].color
+      });
+    
+      if (Object.keys(sala.selecciones).length === 2) {
+        sala.estado = 'en_batalla';
+        sala.turnoActual = 'jugador1';
+        const allAttacks = obtenerTodosLosAtaques();
+        sala.ataques = {
+          jugador1: allAttacks.sort(() => 0.5 - Math.random()).slice(0, 4),
+          jugador2: allAttacks.sort(() => 0.5 - Math.random()).slice(0, 4)
+        };
+        io.to(salaId).emit('ronda-iniciada', {
+          turno: sala.turnoActual,
+          ronda: sala.ronda,
+          ataques: sala.ataques,
+          vida: sala.vida
+        });
+      }
+    } catch (error) {
+      socket.emit('error-sala', { mensaje: error.message });
+      return;
+    }
+    });
+    
+    socket.on('realizar-ataque', async ({ salaId, ataque }) => {
+      const sala = salasBatalla.get(salaId);
+      if (!sala) return;
+
+      try {
+
+      const jugador = sala.jugadores.find(j => j.socketId === socket.id);
+      const oponente = sala.jugadores.find(j => j.rol !== jugador.rol);
+      if (sala.turnoActual !== jugador.rol) return;
+    
+      const resultado = calcularDanio(
+        ataque,
+        sala.selecciones[jugador.rol],
+        sala.selecciones[oponente.rol]
+      );
+    
+      sala.vida[oponente.rol] = Math.max(0, sala.vida[oponente.rol] - resultado.danio);
+      sala.historial = sala.historial || [];
+      sala.historial.push({ atacante: jugador.rol, oponente: oponente.rol, ataque, ...resultado, ronda: sala.ronda });
+    
+      io.to(salaId).emit('ataque-procesado', {
+        atacante: jugador.rol,
+        oponente: oponente.rol,
+        ataque,
+        danio: resultado.danio,
+        mensajeEfectividad: resultado.mensaje,
+        vida: sala.vida,
+        turno: oponente.rol
+      });
+    
+      // Verificar si la batalla ha terminado
+      if (sala.vida.jugador1 <= 0 || sala.vida.jugador2 <= 0) {
+        const ganador = sala.vida.jugador1 <= 0 ? 'jugador2' : 'jugador1';
+    
+        try {
+          const jugador1 = sala.jugadores.find(j => j.rol === 'jugador1');
+          const jugador2 = sala.jugadores.find(j => j.rol === 'jugador2');
+    
+          if (ganador === 'jugador1') {
+            // Jugador 1 gana (+5 amor, +20 dinero), Jugador 2 pierde (+1 amor, +4 dinero)
+            await actualizarNivelAmor(jugador1.petId, jugador1.userId, 5, 20, jugador1.req);
+            await actualizarNivelAmor(jugador2.petId, jugador2.userId, 1, 4, jugador2.req);
+          } else {
+            // Jugador 2 gana (+5 amor, +20 dinero), Jugador 1 pierde (+1 amor, +4 dinero)
+            await actualizarNivelAmor(jugador2.petId, jugador2.userId, 5, 20, jugador2.req);
+            await actualizarNivelAmor(jugador1.petId, jugador1.userId, 1, 4, jugador1.req);
+          }
+    
+          io.to(salaId).emit('batalla-terminada', { 
+            ganador,
+            incrementos: {
+              jugador1: {
+                amor: ganador === 'jugador1' ? 5 : 1,
+                dinero: ganador === 'jugador1' ? 20 : 4
+              },
+              jugador2: {
+                amor: ganador === 'jugador2' ? 5 : 1,
+                dinero: ganador === 'jugador2' ? 20 : 4
+              }
+            }
+          });
+    
+        } catch (error) {
+          console.error('Error al actualizar:', error);
+          io.to(salaId).emit('error-batalla', { 
+            mensaje: 'Error al actualizar recompensas' 
+          });
+        } finally {
+          salasBatalla.delete(salaId);
+        }
+      } else {
+        sala.turnoActual = oponente.rol;
+        io.to(salaId).emit('cambio-turno', {
+          turno: sala.turnoActual,
+          vida: sala.vida
+        });
+      }
+
+    } catch (error) {
+      socket.emit('error-sala', { mensaje: error.message });
+      return;
+    }
+  
+    });
+
+    // Modifica el manejador de 'batalla-terminada'
+    socket.on('batalla-terminada', async ({ ganador }) => {
+      const sala = salasBatalla.get(salaId);
+      if (!sala) return;
+
+      try {
+        // Obtener los IDs de las mascotas de ambos jugadores
+        const jugador1PetId = sala.jugadores.find(j => j.rol === 'jugador1').petId;
+        const jugador2PetId = sala.jugadores.find(j => j.rol === 'jugador2').petId;
+
+        // Actualizar niveles de amor
+        if (ganador === 'jugador1') {
+          await actualizarNivelAmor(jugador1PetId, 5); // Ganador +5
+          await actualizarNivelAmor(jugador2PetId, 1); // Perdedor +1
+        } else {
+          await actualizarNivelAmor(jugador2PetId, 5); // Ganador +5
+          await actualizarNivelAmor(jugador1PetId, 1); // Perdedor +1
+        }
+
+        // Emitir evento con los resultados
+        io.to(salaId).emit('batalla-terminada', { 
+          ganador,
+          incrementos: {
+            jugador1: ganador === 'jugador1' ? 5 : 1,
+            jugador2: ganador === 'jugador2' ? 5 : 1
+          }
+        });
+
+      } catch (error) {
+        console.error('Error al actualizar niveles de amor:', error);
+        io.to(salaId).emit('error-batalla', { 
+          mensaje: 'Error al actualizar niveles de amor' 
+        });
+      } finally {
+        salasBatalla.delete(salaId);
+      }
+      
+    });
+
+    
+    
+    socket.on('rendirse', ({ salaId }) => {
+      const sala = salasBatalla.get(salaId);
+      if (!sala) return;
+    
+      const jugador = sala.jugadores.find(j => j.socketId === socket.id);
+      if (!jugador) return;
+    
+      const ganador = jugador.rol === 'jugador1' ? 'jugador2' : 'jugador1';
+      io.to(salaId).emit('batalla-terminada', {
+        ganador,
+        motivo: 'rendicion',
+        vida: sala.vida,
+        historial: sala.historial || []
+      });
+    
+      salasBatalla.delete(salaId);
+    });
+    
+    socket.on('abandonar-batalla', ({ salaId }) => {
+      const sala = salasBatalla.get(salaId);
+      if (!sala) return;
+    
+      const jugador = sala.jugadores.find(j => j.socketId === socket.id);
+      const oponente = sala.jugadores.find(j => j.socketId !== socket.id);
+    
+      if (oponente) io.to(oponente.socketId).emit('oponente-abandono');
+    
+      salasBatalla.delete(salaId);
+      socket.leave(salaId);
+    });
+
+    socket.on('solicitar-nueva-ronda', ({ salaId }, callback) => {
+      const sala = salasBatalla.get(salaId);
+      if (!sala) {
+        return callback({ success: false, error: 'Sala no existe' });
+      }
+    
+      // Reinicia selecciones y genera nuevos tipos/ataques
+      sala.selecciones = {};
+      sala.estado = 'seleccion_tipo'; // Forzar estado correcto
+      sala.ronda += 1;
+    
+      const tipos = Object.keys(typeEffectiveness);
+      sala.tiposDisponibles = {
+        jugador1: tipos.sort(() => 0.5 - Math.random()).slice(0, 3),
+        jugador2: tipos.sort(() => 0.5 - Math.random()).slice(0, 3)
+      };
+    
+      const allAttacks = obtenerTodosLosAtaques();
+      sala.ataques = {
+        jugador1: allAttacks.sort(() => 0.5 - Math.random()).slice(0, 4),
+        jugador2: allAttacks.sort(() => 0.5 - Math.random()).slice(0, 4)
+      };
+    
+      // Respuesta exitosa con datos actualizados
+      callback({
+        success: true,
+        tipos: sala.tiposDisponibles,  // Envía ambos jugadores
+        ataques: sala.ataques,
+        ronda: sala.ronda
+      });
+    });
+  
+   /*--------------------------------------------rutas de pet-chat-----------------------------------------------------------*/
+
+
+    let currentRoomId = null;
+    let currentUserId = null;
+
+    socket.on('join-room', (roomId, userId) => {
+        // Guardar información para uso posterior
+        currentRoomId = roomId;
+        currentUserId = userId;
+        
+        socket.join(roomId);
+        
+        // Inicializar la sala si no existe
+        if (!rooms.has(roomId)) {
+            rooms.set(roomId, new Map());
+        }
+        
+        const room = rooms.get(roomId);
+        
+        // Verificar si la sala está llena
+        if (room.size >= MAX_USERS_PER_ROOM) {
+            socket.emit('room-full');
+            return;
+        }
+        
+        // Almacenar información del usuario
+        room.set(userId, {
+            id: userId,
+            x: 5000, // Posición inicial x
+            y: 5000, // Posición inicial y
+            socketId: socket.id
+        });
+        
+        // Enviar lista de usuarios ya conectados al nuevo usuario
+        const usersInRoom = Array.from(room.values());
+        socket.emit('current-users', usersInRoom);
+        
+        // Notificar a los demás sobre el nuevo usuario
+        socket.to(roomId).emit('user-connected', userId);
+        
+        console.log(`Usuario ${userId} se unió a la sala ${roomId}. Total en sala: ${room.size}`);
+    });
+    
+    // Manejar movimiento del usuario
+    socket.on('move', (data) => {
+        if (!currentRoomId || !currentUserId) return;
+        
+        const room = rooms.get(currentRoomId);
+        if (!room) return;
+        
+        const user = room.get(currentUserId);
+        if (user) {
+            user.x = data.x;
+            user.y = data.y;
+            socket.to(currentRoomId).emit('user-moved', { 
+                userId: currentUserId, 
+                x: data.x, 
+                y: data.y 
+            });
+        }
+    });
+    
+    // Señalización WebRTC
+    socket.on('webrtc-offer', ({ to, offer }) => {
+        if (!currentRoomId || !currentUserId) return;
+        
+        const room = rooms.get(currentRoomId);
+        if (!room) return;
+        
+        const targetUser = Array.from(room.values()).find(user => user.id === to);
+        if (targetUser) {
+            console.log(`Reenviando oferta de ${currentUserId} a ${to}`);
+            io.to(targetUser.socketId).emit('webrtc-offer', {
+                from: currentUserId,
+                offer
+            });
+        } else {
+            console.log(`Usuario ${to} no encontrado en la sala ${currentRoomId}`);
+        }
+    });
+    
+    socket.on('webrtc-answer', ({ to, answer }) => {
+        if (!currentRoomId || !currentUserId) return;
+        
+        const room = rooms.get(currentRoomId);
+        if (!room) return;
+        
+        const targetUser = Array.from(room.values()).find(user => user.id === to);
+        if (targetUser) {
+            console.log(`Reenviando respuesta de ${currentUserId} a ${to}`);
+            io.to(targetUser.socketId).emit('webrtc-answer', {
+                from: currentUserId,
+                answer
+            });
+        } else {
+            console.log(`Usuario ${to} no encontrado en la sala ${currentRoomId}`);
+        }
+    });
+    
+    socket.on('webrtc-ice-candidate', ({ to, candidate }) => {
+        if (!currentRoomId || !currentUserId) return;
+        
+        const room = rooms.get(currentRoomId);
+        if (!room) return;
+        
+        const targetUser = Array.from(room.values()).find(user => user.id === to);
+        if (targetUser) {
+            io.to(targetUser.socketId).emit('webrtc-ice-candidate', {
+                from: currentUserId,
+                candidate
+            });
+        }
+    });
+    
+    // Nuevo evento para solicitar conexión
+    socket.on('request-connection', ({ to }) => {
+        if (!currentRoomId || !currentUserId) return;
+        
+        const room = rooms.get(currentRoomId);
+        if (!room) return;
+        
+        const targetUser = Array.from(room.values()).find(user => user.id === to);
+        if (targetUser) {
+            console.log(`${currentUserId} solicita conexión a ${to}`);
+            io.to(targetUser.socketId).emit('request-connection', {
+                from: currentUserId
+            });
+        }
+    });
+
+  /*----------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+
+
+      // Manejo de desconexión para ambos sistemas
+  socket.on("disconnect", () => {
+    // Limpiar de intercambios
+    for (const sala in salasDeIntercambio) {
+      const index = salasDeIntercambio[sala].findIndex(p => p.socketId === socket.id);
+      if (index !== -1) {
+        salasDeIntercambio[sala].splice(index, 1);
+        io.to(sala).emit("usuarios_sala_intercambio", salasDeIntercambio[sala].map(p => p.userId));
+      }
+    }
+    
+    // Limpiar de batallas
+    salasBatalla.forEach((sala, salaId) => {
+      sala.jugadores = sala.jugadores.filter(j => j.socketId !== socket.id);
+      if (sala.jugadores.length === 0) {
+        setTimeout(() => {
+          if (salasBatalla.get(salaId)?.jugadores.length === 0) {
+            salasBatalla.delete(salaId);
+          }
+        }, 30000);
+      } else {
+        io.to(salaId).emit('jugador-desconectado', { socketId: socket.id });
+      }
+    });
+
+    // Limpiar de cámaras (nuevo)
+    if (currentRoomId && currentUserId) {
+      const room = rooms.get(currentRoomId);
+      if (room && room.has(currentUserId)) {
+          room.delete(currentUserId);
+          socket.to(currentRoomId).emit('user-disconnected', currentUserId);
+          
+          if (room.size === 0) {
+              rooms.delete(currentRoomId);
+          }
+      }
+  }
+  });
+
+});
+
+
+// Función auxiliar para obtener info completa de la mascota
+async function obtenerInfoMascota(petId) {
+  const result = await db.query(
+      `SELECT p.*, u.username as dueno 
+       FROM pets p 
+       JOIN users u ON p.id_users = u.id 
+       WHERE p.id = $1`,
+      [petId]
+  );
+  return result.rows[0];
+}
+
+httpServer.listen(3000, () => {
+  console.log("Servidor corriendo en http://192.168.0.21:3000");
+});

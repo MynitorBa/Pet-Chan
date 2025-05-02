@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Batalla de Mascotas - Sala <%= salaId %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles/batallas.css">
+
+  <style>
+/* ANIMACIÓN MEJORADA - EVOLUCIÓN */
+.animacion-evolucion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.evolucion-contenido {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  perspective: 1000px;
+}
+
+.destello-epico {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, 
+    rgba(255,255,255,1) 0%, 
+    rgba(255,215,0,0.9) 20%, 
+    rgba(255,100,0,0.8) 40%, 
+    rgba(200,0,200,0.6) 60%,
+    transparent 80%);
+  transform: translate(-50%, -50%) scale(0);
+  animation: destelloEpico 3s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+.mascota-evolucionando {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) drop-shadow(0 0 5px black);
+  transform: scale(0.3) rotateY(0deg);
+  animation: 
+    aparecerMascota 2.5s 0.5s forwards,
+    flotar 4s 3s infinite ease-in-out;
+  position: relative;
+  z-index: 2;
+  will-change: transform, filter;
+}
+
+.mensaje-evolucion {
+  font-size: 4em;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 
+    0 0 15px gold,
+    0 0 25px orange,
+    0 0 35px red;
+  margin-top: 40px;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: 
+    aparecerMensaje 1.5s 2s forwards,
+    brilloTexto 3s 3s infinite alternate;
+  position: relative;
+  z-index: 2;
+  font-family: 'Arial Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.efecto-confeti {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confeti {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  opacity: 0;
+  animation: 
+    caerConfeti 6s linear forwards,
+    girarConfeti 4s linear infinite;
+  will-change: transform;
+}
+
+/* Keyframes mejorados */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes destelloEpico {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  30% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+  70% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+@keyframes aparecerMascota {
+  0% { transform: scale(0.3) rotateY(0deg); filter: brightness(0) drop-shadow(0 0 0px gold); }
+  40% { transform: scale(1.3) rotateY(360deg); filter: brightness(1.8) drop-shadow(0 0 30px gold); }
+  60% { transform: scale(1.1) rotateY(540deg); filter: brightness(1.5) drop-shadow(0 0 20px gold); }
+  100% { transform: scale(1) rotateY(720deg); filter: brightness(1) drop-shadow(0 0 10px gold); }
+}
+
+@keyframes aparecerMensaje {
+  0% { opacity: 0; transform: translateY(40px) scale(0.8); }
+  60% { opacity: 0.8; transform: translateY(0) scale(1.1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes brilloTexto {
+  0% { text-shadow: 0 0 15px gold, 0 0 25px orange, 0 0 35px red; }
+  50% { text-shadow: 0 0 25px gold, 0 0 35px orange, 0 0 45px red; }
+  100% { text-shadow: 0 0 15px gold, 0 0 25px orange, 0 0 35px red; }
+}
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotateY(0deg); }
+  25% { transform: translateY(-20px) rotateY(10deg); }
+  50% { transform: translateY(0) rotateY(0deg); }
+  75% { transform: translateY(-10px) rotateY(-10deg); }
+}
+
+@keyframes caerConfeti {
+  0% { transform: translateY(-100px) rotate(0deg) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(100vh) rotate(720deg) translateX(calc(var(--random-x) * 100px)); opacity: 0; }
+}
+
+@keyframes girarConfeti {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <div class="battle-header">
+      <h1>⚡ Batalla de Mascotas ⚡</h1>
+    </div>
+
+    <div class="sala-info">
+      <p>🔑 Código de la sala: <strong id="codigo-sala"><%= salaId %></strong></p>
+      <button onclick="copiarCodigo()">📋 Copiar código</button>
+    </div>
+
+    <div id="estado-conexion" class="turn-indicator">
+      Conectando a la sala...
+    </div>
+
+    <div id="contador-jugadores" class="turn-indicator" style="display: none;">
+      Jugadores conectados: <span id="jugadores-conectados">1</span>/2
+    </div>
+
+    <div id="juego" style="display:none;">
+      <div id="type-selection-screen">
+        <h2 id="type-selection-title">Selecciona tu tipo para esta ronda:</h2>
+        <div id="current-player-types" class="battle-actions"></div>
+      </div>
+
+      <div id="battle-screen" style="display:none;">
+        <div class="battle-pets">
+          <div class="pet" id="jugador1-pet">
+            <img id="jugador1-img" class="pet-img" src="/images/mascota-default.png">
+            <div class="pet-info">
+              <h3 id="jugador1-nombre">Jugador 1</h3>
+              <p id="jugador1-tipo"></p>
+              <div class="health-bar">
+                <div id="jugador1-health-bar" class="health-progress"></div>
+              </div>
+              <p id="jugador1-health-text">500/500</p>
+            </div>
+          </div>
+          
+          <div class="pet" id="jugador2-pet">
+            <img id="jugador2-img" class="pet-img" src="/images/mascota-default.png">
+            <div class="pet-info">
+              <h3 id="jugador2-nombre">Jugador 2</h3>
+              <p id="jugador2-tipo"></p>
+              <div class="health-bar">
+                <div id="jugador2-health-bar" class="health-progress"></div>
+              </div>
+              <p id="jugador2-health-text">500/500</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="battle-log" class="battle-log"></div>
+        <div id="battle-actions" class="battle-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+<script type="module">
+  import { iniciarJuego } from '/scripts/batallas.js';
+
+  const socket = io();
+  const salaId = "<%= salaId %>";
+  const userId = "<%= userId %>";
+  const petId = "<%= petId %>";
+
+  let miRol = null;
+  let datosJuego = null;
+  let juegoIniciado = false;
+
+  function intentarIniciarJuego() {
+    if (miRol && datosJuego && !juegoIniciado) {
+      juegoIniciado = true;
+      iniciarJuego(miRol, socket, salaId, datosJuego);
+    }
+  }
+
+  // 1. Recibe el rol del jugador
+  socket.on('asignar-rol', ({ rol }) => {
+    console.log('✅ Rol asignado:', rol);
+    miRol = rol;
+
+    // UI rápida opcional
+    document.getElementById("estado-conexion").innerHTML =
+      `👤 Eres el <strong>${rol.toUpperCase()}</strong>`;
+    document.getElementById("contador-jugadores").style.display = "block";
+    document.getElementById(`${rol}-pet`).style.border = `3px solid var(--color-${rol})`;
+
+    intentarIniciarJuego();
+  });
+
+  // 2. Recibe los datos para iniciar el juego
+  socket.on('iniciar-juego', (data) => {
+    console.log('🚀 Datos de juego recibidos:', data);
+    datosJuego = data;
+    
+    // Actualizar las imágenes de las mascotas según el rol
+    if (miRol === 'jugador1') {
+      document.getElementById("jugador1-img").src = "/" + data.mascotas.jugador1.rutaImagen;
+      document.getElementById("jugador1-nombre").textContent = data.mascotas.jugador1.petname;
+      document.getElementById("jugador2-img").src = "/" + data.mascotas.jugador2.rutaImagen;
+      document.getElementById("jugador2-nombre").textContent = data.mascotas.jugador2.petname;
+    } else {
+      document.getElementById("jugador1-img").src = "/" + data.mascotas.jugador1.rutaImagen;
+      document.getElementById("jugador1-nombre").textContent = data.mascotas.jugador1.petname;
+      document.getElementById("jugador2-img").src = "/" + data.mascotas.jugador2.rutaImagen;
+      document.getElementById("jugador2-nombre").textContent = data.mascotas.jugador2.petname;
+    }
+    
+    intentarIniciarJuego();
+  });
+
+  // 3. Jugadores conectados
+  socket.on('jugadores-actualizados', (data) => {
+    console.log('👥 Jugadores conectados:', data.jugadores.length);
+    document.getElementById("jugadores-conectados").textContent = data.jugadores.length;
+
+    if (data.jugadores.length === 2) {
+      document.getElementById("estado-conexion").innerHTML += `<br>¡Ambos jugadores conectados!`;
+    }
+  });
+
+  // 4. Error general
+  socket.on('error', (error) => {
+    console.error('❌ Error de socket:', error);
+    alert(`Error: ${error.message || error}`);
+  });
+
+  // 5. Emitir evento de unión
+  console.log('🔗 Uniéndose a sala:', salaId);
+  socket.emit('unirse-sala-batalla', { salaId, userId, petId });
+
+  // 6. Función para copiar el código
+  window.copiarCodigo = function() {
+    const codigo = document.getElementById("codigo-sala").textContent;
+    navigator.clipboard.writeText(codigo)
+      .then(() => alert("¡Código copiado al portapapeles!"))
+      .catch(err => console.error("Error al copiar:", err));
+  };
+
+  
+</script>
+</body>
+</html>

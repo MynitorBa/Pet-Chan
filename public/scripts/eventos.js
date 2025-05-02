@@ -88,7 +88,136 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Manejar botones de inscripción
     setupInscripcionButtons();
+    
+    // Iniciar verificador automático de eventos
+    iniciarVerificadorDeEventos();
 });
+
+// Función para validar el formato de duración
+function validarFormatoDuracion(duracion) {
+    // Formato válido: un número seguido de "hora", "horas", "minuto" o "minutos"
+    const regex = /^\d+\s*(hora|horas|minuto|minutos)$/i;
+    return regex.test(duracion);
+}
+
+// Función mejorada para verificar si un evento ha finalizado
+function esEventoPasado(evento) {
+    const fechaEvento = new Date(evento.fecha);
+    
+    // Configurar la hora del evento
+    if (evento.hora) {
+        const [horas, minutos] = evento.hora.split(':').map(Number);
+        fechaEvento.setHours(horas, minutos, 0);
+    }
+    
+    // Calcular la fecha y hora de finalización considerando la duración
+    let fechaFinEvento = new Date(fechaEvento);
+    
+    if (evento.duracion) {
+        // Extraer datos de duración con el formato normalizado
+        const duracionStr = evento.duracion.toString().toLowerCase().trim();
+        
+        // Buscar horas o minutos con regex adecuado para el formato restringido
+        const horasMatch = duracionStr.match(/^(\d+)\s*(hora|horas)$/);
+        const minutosMatch = duracionStr.match(/^(\d+)\s*(minuto|minutos)$/);
+        
+        if (horasMatch) {
+            // Añadir horas a la fecha de finalización
+            const horasDuracion = parseInt(horasMatch[1]);
+            fechaFinEvento.setHours(fechaFinEvento.getHours() + horasDuracion);
+        } else if (minutosMatch) {
+            // Añadir minutos a la fecha de finalización
+            const minutosDuracion = parseInt(minutosMatch[1]);
+            fechaFinEvento.setMinutes(fechaFinEvento.getMinutes() + minutosDuracion);
+        } else {
+            // Si el formato no coincide exactamente, asumimos 2 horas por defecto
+            console.warn('Formato de duración no reconocido:', duracionStr);
+            fechaFinEvento.setHours(fechaFinEvento.getHours() + 2);
+        }
+    } else {
+        // Si no hay duración especificada, asumimos 2 horas por defecto
+        fechaFinEvento.setHours(fechaFinEvento.getHours() + 2);
+    }
+    
+    // Comparar con la fecha y hora actual
+    const ahora = new Date();
+    return ahora > fechaFinEvento;
+}
+
+// Función para verificar periódicamente si algún evento ha finalizado
+function iniciarVerificadorDeEventos() {
+    // Verificar cada minuto
+    setInterval(() => {
+        const eventos = document.querySelectorAll('.evento');
+        let cambiosDetectados = false;
+
+        eventos.forEach(eventoElement => {
+            const eventoId = eventoElement.dataset.id;
+            if (!eventoId) return;
+
+            const evento = eventosData.find(e => e.id == eventoId);
+            if (!evento) return;
+
+            const esPasadoAhora = esEventoPasado(evento);
+            const tieneMarcaPasado = eventoElement.classList.contains('evento-pasado');
+
+            // Si el estado ha cambiado, marcar que se necesita actualizar
+            if (esPasadoAhora && !tieneMarcaPasado) {
+                cambiosDetectados = true;
+            }
+        });
+
+        // Si algún evento cambió de estado, regenerar todos los eventos
+        if (cambiosDetectados) {
+            console.log('Algunos eventos han finalizado, actualizando interfaz...');
+            generarEventos();
+            mostrarNotificacion('Algunos eventos han finalizado', 'info');
+        }
+    }, 60000); // Verificar cada minuto
+}
+
+// Función para agregar el botón de mostrar/ocultar eventos pasados
+function agregarToggleEventosPasados() {
+    const filtrosContainer = document.querySelector('.filtros-eventos');
+    if (!filtrosContainer) return;
+    
+    // Crear botón toggle si no existe ya
+    if (!document.querySelector('.filtro-eventos-pasados')) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'filtro-btn filtro-eventos-pasados';
+        toggleBtn.innerHTML = '<i class="fas fa-history"></i> Mostrar eventos pasados';
+        toggleBtn.dataset.showing = 'true'; // Por defecto los mostramos
+        
+        // Agregar botón al contenedor de filtros
+        filtrosContainer.appendChild(toggleBtn);
+        
+        // Manejar clic
+        toggleBtn.addEventListener('click', function() {
+            const showingPast = this.dataset.showing === 'true';
+            const newState = !showingPast;
+            
+            // Actualizar estado
+            this.dataset.showing = newState.toString();
+            this.innerHTML = newState 
+                ? '<i class="fas fa-history"></i> Ocultar eventos pasados' 
+                : '<i class="fas fa-history"></i> Mostrar eventos pasados';
+            
+            // Actualizar visualización
+            document.querySelectorAll('.evento-pasado').forEach(evento => {
+                evento.style.display = newState ? 'flex' : 'none';
+            });
+        });
+    }
+    
+    // Verificar si hay eventos pasados
+    const hayEventosPasados = document.querySelectorAll('.evento-pasado').length > 0;
+    const btnEventosPasados = document.querySelector('.filtro-eventos-pasados');
+    
+    if (btnEventosPasados) {
+        // Mostrar u ocultar el botón según si hay eventos pasados
+        btnEventosPasados.style.display = hayEventosPasados ? 'inline-block' : 'none';
+    }
+}
 
 // Function to check if user is admin
 function checkAdminStatus() {
@@ -98,32 +227,42 @@ function checkAdminStatus() {
             if (data.success && data.isAdmin) {
                 isAdmin = true;
                 // Show admin controls
-                document.getElementById('panel-admin').style.display = 'block';
-                document.getElementById('boton-flotante').style.display = 'flex';
+                const panelAdmin = document.getElementById('panel-admin');
+                const botonFlotante = document.getElementById('boton-flotante');
+                
+                if (panelAdmin) panelAdmin.style.display = 'block';
+                if (botonFlotante) botonFlotante.style.display = 'flex';
                 
                 // Add event listener for toggle button
-                document.getElementById('toggle-admin-panel').addEventListener('click', function() {
+                document.getElementById('toggle-admin-panel')?.addEventListener('click', function() {
                     var adminTools = document.getElementById('admin-tools');
-                    if (adminTools.style.display === 'none') {
-                        adminTools.style.display = 'block';
-                    } else {
-                        adminTools.style.display = 'none';
+                    if (adminTools) {
+                        if (adminTools.style.display === 'none') {
+                            adminTools.style.display = 'block';
+                        } else {
+                            adminTools.style.display = 'none';
+                        }
                     }
                 });
                 
                 // Add events to admin panel buttons
-                document.getElementById('nuevo-evento').addEventListener('click', function() {
+                document.getElementById('nuevo-evento')?.addEventListener('click', function() {
                     abrirFormularioEvento('crear');
                 });
                 
-                document.getElementById('gestionar-eventos').addEventListener('click', function() {
+                document.getElementById('gestionar-eventos')?.addEventListener('click', function() {
                     mostrarListaEventosAdmin();
                 });
                 
                 // Add event to floating button
-                document.getElementById('boton-flotante').addEventListener('click', function() {
+                document.getElementById('boton-flotante')?.addEventListener('click', function() {
                     abrirFormularioEvento('crear');
                 });
+                
+                // Re-render eventos to ensure admin buttons are properly displayed
+                if (eventosData.length > 0) {
+                    generarEventos();
+                }
             }
         })
         .catch(error => {
@@ -160,6 +299,9 @@ function fetchEventosFromServer() {
 // Función para configurar botones de inscripción
 function setupInscripcionButtons() {
     document.querySelectorAll('.boton-inscribirse').forEach(boton => {
+        // Saltar si el botón tiene el atributo disabled
+        if (boton.hasAttribute('disabled')) return;
+        
         boton.addEventListener('click', function(e) {
             e.stopPropagation();
             const eventoElement = this.closest('.evento');
@@ -237,7 +379,11 @@ function setupInscripcionButtons() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            mostrarNotificacion('¡Inscripción exitosa! Te hemos enviado un correo con los detalles.', 'success');
+                            mostrarNotificacion('¡Inscripción exitosa!', 'success');
+                            
+                            // Actualizar los datos del evento para reflejar el nuevo asistente
+                            fetchEventosFromServer();
+                            
                         } else {
                             mostrarNotificacion('Error al registrarse: ' + data.error, 'error');
                         }
@@ -280,6 +426,164 @@ function formatearFecha(fecha) {
     }
     const opciones = { day: 'numeric', month: 'short', year: 'numeric' };
     return fecha.toLocaleDateString('es-ES', opciones);
+}
+
+// Función para generar eventos dinámicamente (usada para renovar la lista de eventos)
+function generarEventos() {
+    const listaEventos = document.querySelector('.lista-eventos');
+    if (!listaEventos) return;
+    
+    // Limpiar lista actual
+    listaEventos.innerHTML = '';
+    
+    // Verificar si hay eventos
+    if (!eventosData || eventosData.length === 0) {
+        listaEventos.innerHTML = `
+            <div class="evento">
+                <div class="info-evento">
+                    <h3 class="titulo-evento">No hay eventos programados</h3>
+                    <p class="descripcion-evento">No hay eventos disponibles en este momento. ¡Vuelve pronto!</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar eventos por fecha
+    const eventosOrdenados = [...eventosData].sort((a, b) => {
+        // First sort by date
+        const dateComparison = new Date(a.fecha) - new Date(b.fecha);
+        if (dateComparison !== 0) return dateComparison;
+        
+        // If same date, sort by time
+        return a.hora.localeCompare(b.hora);
+    });
+    
+    // Generar HTML para cada evento
+    eventosOrdenados.forEach(evento => {
+        // Check if the event date is valid
+        if (!evento.fecha) {
+            console.error('Invalid date for event:', evento);
+            return; // Skip this event
+        }
+        
+        const fechaObj = new Date(evento.fecha);
+        const dia = fechaObj.getDate();
+        const mes = fechaObj.toLocaleString('es-ES', { month: 'short' });
+        const año = fechaObj.getFullYear();
+        
+        // Verificar si el evento ya ha finalizado
+        const isPast = esEventoPasado(evento);
+        
+        // CAMBIO: Determinar si es popular (10 o más asistentes)
+        const asistentes = parseInt(evento.asistentes) || 0;
+        const isPopular = asistentes >= 10; // Ahora es popular si tiene 10 o más asistentes
+        
+        // CSS classes for the event
+        let eventClasses = 'evento';
+        if (isPopular) eventClasses += ' evento-popular';
+        if (isPast) eventClasses += ' evento-pasado';
+        
+        const eventoElement = document.createElement('div');
+        eventoElement.className = eventClasses;
+        eventoElement.style.backgroundImage = `url('${evento.imagen || "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif"}')`;
+        eventoElement.dataset.id = evento.id;
+        
+        // Format etiquetas
+        const etiquetasHTML = Array.isArray(evento.etiquetas) 
+            ? evento.etiquetas.map(etiqueta => `<span class="etiqueta">${etiqueta}</span>`).join('')
+            : '';
+        
+        // Añadir propiedad style para asegurar que el elemento es visible
+        eventoElement.style.display = 'flex';
+        
+        // Generar el HTML para el evento
+        eventoElement.innerHTML = `
+            ${isPopular ? '<div class="marco-dorado"></div>' : ''}
+            <div class="fecha-evento">
+                <span class="dia">${dia}</span>
+                <span class="mes">${mes}</span>
+                <span class="año">${año}</span>
+            </div>
+            <div class="info-evento">
+                <h3 class="titulo-evento">${evento.titulo}</h3>
+                <p class="descripcion-evento">${evento.descripcion}</p>
+                <div class="detalles-evento">
+                    <div class="detalle"><i class="fas fa-clock"></i> ${evento.hora}</div>
+                    <div class="detalle"><i class="fas fa-stopwatch"></i> ${evento.duracion || '2 horas'}</div>
+                    <div class="detalle"><i class="fas fa-laptop"></i> ${evento.plataforma}</div>
+                    <div class="detalle"><i class="fas fa-users"></i> ${asistentes} asistente${asistentes !== 1 ? 's' : ''}</div>
+                </div>
+                <div class="etiquetas-evento">
+                    ${etiquetasHTML}
+                </div>
+                ${isPast ? 
+                    `<button class="boton-inscribirse" disabled><i class="fas fa-calendar-times"></i> Evento finalizado</button>` : 
+                    `<button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>`
+                }
+                ${isAdmin ? `
+                <div class="admin-buttons">
+                    <button class="boton-editar" data-id="${evento.id}"><i class="fas fa-edit"></i> Editar</button>
+                    <button class="boton-eliminar" data-id="${evento.id}"><i class="fas fa-trash"></i> Eliminar</button>
+                </div>
+                ` : ''}
+            </div>
+            <div class="brillo-evento"></div>
+            <div class="reflejo"></div>
+            ${isPopular ? '<div class="evento-popular-badge">🔥 Popular</div>' : ''}
+        `;
+        
+        listaEventos.appendChild(eventoElement);
+    });
+    
+    // Reconfigurar botones de inscripción
+    setupInscripcionButtons();
+    
+    // Configurar botones de admin si es necesario
+    if (isAdmin) {
+        document.querySelectorAll('.boton-editar').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const eventoId = this.dataset.id;
+                abrirFormularioEvento('editar', eventoId);
+            });
+        });
+        
+        document.querySelectorAll('.boton-eliminar').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const eventoId = this.dataset.id;
+                const evento = eventosData.find(e => e.id == eventoId);
+                
+                if (confirm(`¿Estás seguro de que deseas eliminar el evento "${evento.titulo}"?`)) {
+                    // Llamar a la API para eliminar
+                    fetch(`/api/eventos/${eventoId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Actualizar datos y UI
+                            fetchEventosFromServer();
+                            mostrarNotificacion('Evento eliminado correctamente', 'success');
+                        } else {
+                            mostrarNotificacion('Error: ' + data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        mostrarNotificacion('Error al comunicarse con el servidor', 'error');
+                    });
+                }
+            });
+        });
+    }
+    
+    // Agregar toggle para eventos pasados
+    agregarToggleEventosPasados();
 }
 
 // Funciones para administración de eventos
@@ -331,8 +635,14 @@ function abrirFormularioEvento(modo, eventoId = null) {
                     </div>
                     <div class="form-row">
                         <div class="form-group half">
-                            <label for="duracion"><i class="fas fa-hourglass"></i> Duración</label>
-                            <input type="text" id="duracion" name="duracion" value="${evento ? evento.duracion : '2 horas'}" placeholder="Ej: 2 horas">
+                            <label for="duracion"><i class="fas fa-hourglass"></i> Duración *</label>
+                            <input type="text" id="duracion" name="duracion" value="${evento ? evento.duracion : '2 horas'}" 
+                                placeholder="Ej: 2 horas, 30 minutos" required>
+                            <div class="help-text">Formato válido: número seguido de "hora", "horas", "minuto" o "minutos".</div>
+                            <div class="help-text">Ejemplos: "2 horas", "30 minutos", "1 hora", "45 minutos"</div>
+                            <div id="duracion-error" class="error-text" style="color: #ff6b6b; display: none;">
+                                <i class="fas fa-exclamation-circle"></i> Formato inválido. Use un número seguido de "hora", "horas", "minuto" o "minutos".
+                            </div>
                         </div>
                         <div class="form-group half">
                             <label for="plataforma"><i class="fas fa-laptop"></i> Plataforma *</label>
@@ -372,6 +682,22 @@ function abrirFormularioEvento(modo, eventoId = null) {
     
     modal.style.display = 'block';
     
+    // Validación en tiempo real del campo de duración
+    const duracionInput = document.getElementById('duracion');
+    const duracionError = document.getElementById('duracion-error');
+    
+    // Validar al escribir en el campo
+    duracionInput.addEventListener('input', function() {
+        const valor = this.value.trim();
+        if (valor && !validarFormatoDuracion(valor)) {
+            duracionError.style.display = 'block';
+            this.classList.add('campo-error');
+        } else {
+            duracionError.style.display = 'none';
+            this.classList.remove('campo-error');
+        }
+    });
+    
     // Cerrar modal
     document.querySelector('.cerrar-modal').addEventListener('click', function() {
         modal.style.display = 'none';
@@ -386,6 +712,16 @@ function abrirFormularioEvento(modo, eventoId = null) {
     document.getElementById('formulario-evento')?.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // Validar formato de duración antes de enviar
+        const duracionValor = duracionInput.value.trim();
+        if (!validarFormatoDuracion(duracionValor)) {
+            duracionError.style.display = 'block';
+            duracionInput.classList.add('campo-error');
+            duracionInput.focus();
+            mostrarNotificacion('El formato de duración no es válido.', 'error');
+            return;
+        }
+        
         // Recopilar datos del formulario
         const eventoId = document.getElementById('evento-id').value;
         const formData = {
@@ -393,7 +729,7 @@ function abrirFormularioEvento(modo, eventoId = null) {
             descripcion: document.getElementById('descripcion').value,
             fecha: document.getElementById('fecha').value,
             hora: document.getElementById('hora').value,
-            duracion: document.getElementById('duracion').value || '2 horas',
+            duracion: duracionValor,
             plataforma: document.getElementById('plataforma').value,
             imagen: document.getElementById('imagen').value,
             etiquetas: document.getElementById('etiquetas').value.split(',').map(tag => tag.trim()).filter(tag => tag),
@@ -452,15 +788,30 @@ function mostrarListaEventosAdmin() {
     let eventosHTML = '';
     eventosOrdenados.forEach(evento => {
         const fechaFormateada = formatearFecha(evento.fecha);
+        const asistentes = parseInt(evento.asistentes) || 0;
+        const isPopular = asistentes >= 10;
+        
+        const estadoEvento = esEventoPasado(evento) ? 
+            '<span class="estado estado-finalizado">Finalizado</span>' : 
+            '<span class="estado estado-activo">Activo</span>';
+        
         eventosHTML += `
             <tr>
                 <td>${evento.id}</td>
-                <td>${evento.titulo}</td>
+                <td>
+                    <div class="evento-info-admin">
+                        <span class="evento-titulo-admin">${evento.titulo}</span>
+                        ${isPopular ? '<span class="badge-popular">🔥</span>' : ''}
+                    </div>
+                </td>
                 <td>${fechaFormateada}</td>
                 <td>${evento.hora}</td>
                 <td>${evento.plataforma}</td>
-                <td>${evento.asistentes || 0}</td>
-                <td>
+                <td class="asistentes-column">
+                    <span class="asistentes-badge">${asistentes}</span>
+                </td>
+                <td>${estadoEvento}</td>
+                <td class="acciones-column">
                     <button class="btn-admin-editar" data-id="${evento.id}"><i class="fas fa-edit"></i></button>
                     <button class="btn-admin-eliminar" data-id="${evento.id}"><i class="fas fa-trash"></i></button>
                 </td>
@@ -477,6 +828,20 @@ function mostrarListaEventosAdmin() {
                     <button id="btn-crear-evento" class="boton-primario">
                         <i class="fas fa-plus"></i> Nuevo Evento
                     </button>
+                    <div class="admin-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">${eventosOrdenados.length}</span>
+                            <span class="stat-label">Total Eventos</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">${eventosOrdenados.filter(e => !esEventoPasado(e)).length}</span>
+                            <span class="stat-label">Eventos Activos</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">${eventosOrdenados.filter(e => parseInt(e.asistentes) >= 10).length}</span>
+                            <span class="stat-label">Eventos Populares</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="tabla-container">
                     <table class="tabla-admin">
@@ -488,6 +853,7 @@ function mostrarListaEventosAdmin() {
                                 <th>Hora</th>
                                 <th>Plataforma</th>
                                 <th>Asistentes</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -539,12 +905,14 @@ function mostrarListaEventosAdmin() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Refresh events from server
-                        fetchEventosFromServer();
-                        
-                        // Show success message and update the list
-                        mostrarNotificacion('Evento eliminado correctamente', 'success');
-                        mostrarListaEventosAdmin();
+                        // Primero actualizar los datos desde el servidor
+                        fetchEventosFromServer().then(() => {
+                            // Después mostrar la notificación
+                            mostrarNotificacion('Evento eliminado correctamente', 'success');
+                            
+                            // Y finalmente volver a mostrar el panel de admin con los datos actualizados
+                            mostrarListaEventosAdmin();
+                        });
                     } else {
                         mostrarNotificacion('Error: ' + data.error, 'error');
                     }
@@ -613,144 +981,4 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
             notificacion.remove();
         }, 300);
     }, 5000);
-}
-
-// Función para generar eventos dinámicamente (usada para renovar la lista de eventos)
-function generarEventos() {
-    const listaEventos = document.querySelector('.lista-eventos');
-    if (!listaEventos) return;
-    
-    // Limpiar lista actual
-    listaEventos.innerHTML = '';
-    
-    // Verificar si hay eventos
-    if (!eventosData || eventosData.length === 0) {
-        listaEventos.innerHTML = `
-            <div class="evento">
-                <div class="info-evento">
-                    <h3 class="titulo-evento">No hay eventos programados</h3>
-                    <p class="descripcion-evento">No hay eventos disponibles en este momento. ¡Vuelve pronto!</p>
-                </div>
-            </div>
-        `;
-        return;
-    }
-    
-    // Ordenar eventos por fecha
-    const eventosOrdenados = [...eventosData].sort((a, b) => {
-        // First sort by date
-        const dateComparison = new Date(a.fecha) - new Date(b.fecha);
-        if (dateComparison !== 0) return dateComparison;
-        
-        // If same date, sort by time
-        return a.hora.localeCompare(b.hora);
-    });
-    
-    // Generar HTML para cada evento
-    eventosOrdenados.forEach(evento => {
-        // Check if the event date is valid
-        if (!evento.fecha) {
-            console.error('Invalid date for event:', evento);
-            return; // Skip this event
-        }
-        
-        const fechaObj = new Date(evento.fecha);
-        const dia = fechaObj.getDate();
-        const mes = fechaObj.toLocaleString('es-ES', { month: 'short' });
-        const año = fechaObj.getFullYear();
-        
-        // Check if the event is in the past
-        const isPast = fechaObj < new Date();
-        
-        // CSS classes for the event
-        let eventClasses = 'evento';
-        if (evento.popular) eventClasses += ' evento-popular';
-        if (isPast) eventClasses += ' evento-pasado';
-        
-        const eventoElement = document.createElement('div');
-        eventoElement.className = eventClasses;
-        eventoElement.style.backgroundImage = `url('${evento.imagen || "https://i.pinimg.com/originals/ae/0a/a1/ae0aa14707e1b4bb35fe11b8f00a9956.gif"}')`;
-        eventoElement.dataset.id = evento.id;
-        
-        // Format etiquetas
-        const etiquetasHTML = Array.isArray(evento.etiquetas) 
-            ? evento.etiquetas.map(etiqueta => `<span class="etiqueta">${etiqueta}</span>`).join('')
-            : '';
-        
-        eventoElement.innerHTML = `
-            <div class="marco-dorado"></div>
-            <div class="fecha-evento">
-                <span class="dia">${dia}</span>
-                <span class="mes">${mes}</span>
-                <span class="año">${año}</span>
-            </div>
-            <div class="info-evento">
-                <h3 class="titulo-evento">${evento.titulo}</h3>
-                <p class="descripcion-evento">${evento.descripcion}</p>
-                <div class="detalles-evento">
-                    <div class="detalle"><i class="fas fa-clock"></i> ${evento.hora}</div>
-                    <div class="detalle"><i class="fas fa-stopwatch"></i> ${evento.duracion || '2 horas'}</div>
-                    <div class="detalle"><i class="fas fa-laptop"></i> ${evento.plataforma}</div>
-                </div>
-                <div class="etiquetas-evento">
-                    ${etiquetasHTML}
-                </div>
-                <button class="boton-inscribirse"><i class="fas fa-user-plus"></i> Inscribirse</button>
-                ${isAdmin ? `
-                <button class="boton-editar" data-id="${evento.id}"><i class="fas fa-edit"></i> Editar</button>
-                <button class="boton-eliminar" data-id="${evento.id}"><i class="fas fa-trash"></i> Eliminar</button>
-                ` : ''}
-            </div>
-            <div class="brillo-evento"></div>
-            <div class="reflejo"></div>
-        `;
-        
-        listaEventos.appendChild(eventoElement);
-    });
-    
-    // Reconfigurar botones de inscripción
-    setupInscripcionButtons();
-    
-    // Configurar botones de admin si es necesario
-    if (isAdmin) {
-        document.querySelectorAll('.boton-editar').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const eventoId = this.dataset.id;
-                abrirFormularioEvento('editar', eventoId);
-            });
-        });
-        
-        document.querySelectorAll('.boton-eliminar').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const eventoId = this.dataset.id;
-                const evento = eventosData.find(e => e.id == eventoId);
-                
-                if (confirm(`¿Estás seguro de que deseas eliminar el evento "${evento.titulo}"?`)) {
-                    // Llamar a la API para eliminar
-                    fetch(`/api/eventos/${eventoId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Actualizar datos y UI
-                            fetchEventosFromServer();
-                            mostrarNotificacion('Evento eliminado correctamente', 'success');
-                        } else {
-                            mostrarNotificacion('Error: ' + data.error, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        mostrarNotificacion('Error al comunicarse con el servidor', 'error');
-                    });
-                }
-            });
-        });
-    }
 }
