@@ -406,68 +406,83 @@ app.get('/minijuegomascota', requireLogin, async (req, res) => {
 
 
 /*---------------------------creamos post de prueba necesario------------------------------------------------*/
+
+//Esto hay que ponerlo en meme xd
+/*---------------------------creamos post de prueba necesario------------------------------------------------*/
 app.post('/NombreMascota', requireLogin, async (req, res) => {
-    const mascotaNombre = req.body.mascota;
-    const userId = req.session.userId;
-    const datos = req.session.mascotaPendiente;
+  const mascotaNombre = req.body.mascota;
+  const userId = req.session.userId;
+  const datos = req.session.mascotaPendiente;
 
-    if (!datos) {
-        return res.status(400).send("No hay datos de mascota pendiente en sesión.");
-    }
+  if (!datos) {
+      return res.status(400).send("No hay datos de mascota pendiente en sesión.");
+  }
 
-    let indice = Math.floor(Math.random() * 10); // número entre 0 y 9
-    const comida = comidasFavoritas[indice];
-    indice = Math.floor(Math.random() * 10); // número entre 0 y 9
-    const habilidad = habilidadesEspeciales[indice];
+  let indice = Math.floor(Math.random() * 10); // número entre 0 y 9
+  const comida = comidasFavoritas[indice];
+  indice = Math.floor(Math.random() * 10); // número entre 0 y 9
+  const habilidad = habilidadesEspeciales[indice];
 
-    try {
-        const result = await db.query(
-            `INSERT INTO pets ("petname", "genero", "indice", "nivelAmor", "nivelFelicidad", "nivelEnergia", "habilidad", "comidaFavorita", "id_users")
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-             RETURNING id`,
-            [
-                mascotaNombre,
-                datos.genero,
-                datos.indice,
-                0, // nivelAmor
-                50, // nivelFelicidad
-                50, // nivelEnergia
-                habilidad, // habilidad
-                comida, // comida favorita
-                userId
-            ]
-        );
+  try {
+      // Iniciar transacción
+      await db.query('BEGIN');
+      
+      // Crear mascota en la tabla pets (mascota activa)
+      const result = await db.query(
+          `INSERT INTO pets ("petname", "genero", "indice", "nivelAmor", "nivelFelicidad", "nivelEnergia", "habilidad", "comidaFavorita", "id_users")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id`,
+          [
+              mascotaNombre,
+              datos.genero,
+              datos.indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad, // habilidad
+              comida, // comida favorita
+              userId
+          ]
+      );
 
-        const idMascota = result.rows[0].id;
+      const idMascota = result.rows[0].id;
 
-        // 🧠 Guardamos en sesión la mascota actual para uso en otras vistas
-        req.session.mascotaActual = {
-            id: idMascota,
-            nombre: mascotaNombre,
-            genero: datos.genero,
-            especie: datos.especie,
-            indice: datos.indice,
-            rutaImagen: datos.rutaImagen,
-            pronombre: datos.genero === "macho" ? "el" : "la",
-            niveldeAmor: 0,
-            niveldeFelicidad: 50,
-            niveldeEnergia: 50,
-            habilidad: habilidad,
-            comidaFavorita: comida
-        };
+      // ELIMINAMOS LA INSERCIÓN EN pets2
+      // Ya no duplicamos la mascota en pets2
 
-        // Guardamos también el ID por separado si lo necesitas
-        req.session.idMascotaReciente = idMascota;
+      // Confirmar transacción
+      await db.query('COMMIT');
 
-        // Limpiamos la sesión temporal
-        delete req.session.mascotaPendiente;
+      // Guardamos en sesión la mascota actual para uso en otras vistas
+      req.session.mascotaActual = {
+          id: idMascota,
+          nombre: mascotaNombre,
+          genero: datos.genero,
+          especie: datos.especie,
+          indice: datos.indice,
+          rutaImagen: datos.rutaImagen,
+          pronombre: datos.genero === "macho" ? "el" : "la",
+          niveldeAmor: 0,
+          niveldeFelicidad: 50,
+          niveldeEnergia: 50,
+          habilidad: habilidad,
+          comidaFavorita: comida
+      };
 
-        console.log(`Mascota creada con ID ${idMascota} y nombre ${mascotaNombre}`);
-        res.redirect('/inicio');
-    } catch (error) {
-        console.error('Error al crear mascota:', error);
-        res.status(500).send("Error al guardar la mascota");
-    }
+      // Guardamos también el ID por separado si lo necesitas
+      req.session.idMascotaReciente = idMascota;
+
+      // Limpiamos la sesión temporal
+      delete req.session.mascotaPendiente;
+
+      console.log(`Mascota creada con ID ${idMascota} y nombre ${mascotaNombre}`);
+      res.redirect('/inicio');
+  } catch (error) {
+      // Revertir transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error al crear mascota:', error);
+      res.status(500).send("Error al guardar la mascota");
+  }
 });
 
 
@@ -2677,6 +2692,464 @@ app.get('/foro', requireLogin, async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ruta para cargar la biblioteca de mascotas Esto agregar a meme xd
+
+app.get('/biblioteca', requireLogin, async (req, res) => {
+  const userId = req.session.userId;
+  const mascotaActual = req.session.mascotaActual;
+
+  try {
+      // Eliminamos el bloque que verificaba y clonaba la mascota activa en pets2
+      // Ya no hay duplicación entre pets y pets2
+
+      // Obtener las mascotas de la biblioteca
+      const mascotasResult = await db.query(
+          `SELECT * FROM pets2 WHERE id_users = $1`,
+          [userId]
+      );
+
+      // Obtener el ID de la mascota activa
+      const mascotaActivaResult = await db.query(
+          `SELECT id FROM pets WHERE id_users = $1 LIMIT 1`,
+          [userId]
+      );
+
+      const mascotaActivaId = mascotaActivaResult.rows.length > 0 ? mascotaActivaResult.rows[0].id : null;
+
+      res.render('biblioteca.ejs', {
+          rutaImagen: mascotaActual ? mascotaActual.rutaImagen : null,
+          accesorios: req.session.accesorios,
+          money: req.session.money,
+          mascotaActual: mascotaActual,
+          mascotas: mascotasResult.rows,
+          mascotaActiva: mascotaActivaId,
+          especieMascotas: especieMascotas
+      });
+  } catch (error) {
+      console.error('Error al cargar la biblioteca:', error);
+      res.status(500).send('Error al cargar la biblioteca de mascotas');
+  }
+});
+
+app.get('/biblioteca/detalle-mascota/:id', requireLogin, async (req, res) => {
+  const mascotaId = req.params.id;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar que la mascota pertenece al usuario
+      const mascotaResult = await db.query(
+          `SELECT * FROM pets2 WHERE id = $1 AND id_users = $2`,
+          [mascotaId, userId]
+      );
+
+      if (mascotaResult.rows.length === 0) {
+          return res.json({ success: false, mensaje: 'Mascota no encontrada' });
+      }
+
+      const mascota = mascotaResult.rows[0];
+      const especie = especieMascotas[mascota.indice - 1];
+
+      res.json({
+          success: true,
+          mascota: mascota,
+          especie: especie
+      });
+  } catch (error) {
+      console.error('Error al obtener detalles de la mascota:', error);
+      res.json({ success: false, mensaje: 'Error al obtener detalles' });
+  }
+});
+
+app.post('/biblioteca/activar-mascota', requireLogin, async (req, res) => {
+  const mascotaId = req.body.mascotaId;
+  const userId = req.session.userId;
+
+  try {
+      // Obtener los datos de la mascota seleccionada en pets2
+      const mascotaNuevaResult = await db.query(
+          `SELECT * FROM pets2 WHERE id = $1 AND id_users = $2`,
+          [mascotaId, userId]
+      );
+
+      if (mascotaNuevaResult.rows.length === 0) {
+          return res.json({ success: false, mensaje: 'Mascota no encontrada o no te pertenece' });
+      }
+
+      const mascotaNueva = mascotaNuevaResult.rows[0];
+
+      // Obtener la mascota activa actual (si existe)
+      const mascotaActivaResult = await db.query(
+          `SELECT * FROM pets WHERE id_users = $1`,
+          [userId]
+      );
+
+      const existeMascotaActiva = mascotaActivaResult.rows.length > 0;
+      const mascotaActiva = existeMascotaActiva ? mascotaActivaResult.rows[0] : null;
+
+      // Comenzar una transacción
+      await db.query('BEGIN');
+
+      // 1. Si existe una mascota activa, guardarla en pets2 antes de eliminarla
+      if (existeMascotaActiva) {
+          // Verificamos primero si la mascota activa ya existe en pets2 con los mismos datos
+          const mascotaExisteEnPets2 = await db.query(
+              `SELECT id FROM pets2 
+               WHERE id_users = $1 AND indice = $2 AND petname = $3`,
+              [userId, mascotaActiva.indice, mascotaActiva.petname]
+          );
+
+          // Si no existe una mascota idéntica en pets2, la insertamos
+          if (mascotaExisteEnPets2.rows.length === 0) {
+              await db.query(
+                  `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                                    habilidad, "comidaFavorita", rareza, id_users)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+                  [
+                      mascotaActiva.petname,
+                      mascotaActiva.genero,
+                      mascotaActiva.indice,
+                      mascotaActiva.nivelAmor,
+                      mascotaActiva.nivelFelicidad,
+                      mascotaActiva.nivelEnergia,
+                      mascotaActiva.habilidad,
+                      mascotaActiva.comidaFavorita,
+                      'comun', // Rareza predeterminada si no se conoce
+                      userId
+                  ]
+              );
+              
+              console.log(`Mascota activa anterior guardada en la biblioteca: ${mascotaActiva.petname}`);
+          }
+
+          // 2. Eliminar la mascota activa actual
+          await db.query('DELETE FROM pets WHERE id_users = $1', [userId]);
+      }
+
+      // 3. Eliminar la mascota seleccionada de pets2
+      await db.query('DELETE FROM pets2 WHERE id = $1', [mascotaId]);
+
+      // 4. Insertar la nueva mascota activa en pets
+      const result = await db.query(
+          `INSERT INTO pets (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                         habilidad, "comidaFavorita", id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           RETURNING id`,
+          [
+              mascotaNueva.petname,
+              mascotaNueva.genero,
+              mascotaNueva.indice,
+              mascotaNueva.nivelAmor,
+              mascotaNueva.nivelFelicidad,
+              mascotaNueva.nivelEnergia,
+              mascotaNueva.habilidad,
+              mascotaNueva.comidaFavorita,
+              userId
+          ]
+      );
+
+      // Confirmar la transacción
+      await db.query('COMMIT');
+
+      // Actualizar la sesión con la nueva mascota activa
+      const rutaImagen = `${rutaBase}${mascotaNueva.indice}.gif`;
+      const especieDeMascota = especieMascotas[mascotaNueva.indice - 1];
+      const pronombre = mascotaNueva.genero === "macho" ? "el" : "la";
+
+      req.session.mascotaActual = {
+          id: result.rows[0].id,
+          nombre: mascotaNueva.petname,
+          genero: mascotaNueva.genero,
+          especie: especieDeMascota,
+          indice: mascotaNueva.indice,
+          rutaImagen,
+          pronombre,
+          niveldeAmor: mascotaNueva.nivelAmor,
+          niveldeFelicidad: mascotaNueva.nivelFelicidad,
+          niveldeEnergia: mascotaNueva.nivelEnergia,
+          habilidad: mascotaNueva.habilidad,
+          comidaFavorita: mascotaNueva.comidaFavorita
+      };
+
+      res.json({ 
+          success: true, 
+          mensaje: 'Mascota activada correctamente. Refresca la página para ver todos los cambios.' 
+      });
+  } catch (error) {
+      // Revertir la transacción en caso de error
+      await db.query('ROLLBACK');
+      console.error('Error al activar mascota:', error);
+      res.json({ success: false, mensaje: 'Error al activar la mascota: ' + error.message });
+  }
+});
+
+app.post('/biblioteca/guardar-mascota', requireLogin, async (req, res) => {
+  const { nombre, indice, genero, rareza } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar datos necesarios
+      if (!nombre || !indice || !genero || !rareza) {
+          return res.json({ success: false, mensaje: 'Datos incompletos' });
+      }
+
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      // Insertar la nueva mascota en pets2
+      await db.query(
+          `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", habilidad, "comidaFavorita", rareza, id_users)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+              nombre,
+              genero,
+              indice,
+              0, // nivelAmor
+              50, // nivelFelicidad
+              50, // nivelEnergia
+              habilidad,
+              comidaFavorita,
+              rareza,
+              userId
+          ]
+      );
+
+      res.json({ success: true, mensaje: 'Mascota guardada correctamente' });
+  } catch (error) {
+      console.error('Error al guardar mascota:', error);
+      res.json({ success: false, mensaje: 'Error al guardar la mascota' });
+  }
+});
+
+
+
+
+
+
+
+app.get('/migracion-mascotas', requireLogin, async (req, res) => {
+  // Solo permitir al administrador ejecutar esta migración
+  if (req.session.rango3 !== 'Administrador') {
+      return res.status(403).send('Acceso denegado. Se requieren permisos de administrador.');
+  }
+
+  try {
+      // Obtener todas las mascotas activas que no están en pets2
+      const mascotasActivas = await db.query(`
+          SELECT p.* 
+          FROM pets p
+          WHERE NOT EXISTS (
+              SELECT 1 
+              FROM pets2 p2 
+              WHERE p2.id_users = p.id_users AND p2.indice = p.indice
+          )
+      `);
+
+      let mascotasMigradas = 0;
+
+      // Migrar cada mascota activa a pets2
+      for (const mascota of mascotasActivas.rows) {
+          await db.query(`
+              INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                               habilidad, "comidaFavorita", rareza, id_users)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          `, [
+              mascota.petname,
+              mascota.genero,
+              mascota.indice,
+              mascota.nivelAmor,
+              mascota.nivelFelicidad,
+              mascota.nivelEnergia,
+              mascota.habilidad,
+              mascota.comidaFavorita,
+              'comun', // rareza por defecto para mascotas migradas
+              mascota.id_users
+          ]);
+          
+          mascotasMigradas++;
+      }
+
+      res.send(`Migración completada. Se migraron ${mascotasMigradas} mascotas a la biblioteca.`);
+  } catch (error) {
+      console.error('Error en la migración de mascotas:', error);
+      res.status(500).send('Error en la migración: ' + error.message);
+  }
+});
+
+
+
+
+//Agregar esto xd
+
+
+
+//agrega esto xd
+// Versión mejorada de la función del cliente para comprar sobres
+app.post('/biblioteca/comprar-sobre', requireLogin, async (req, res) => {
+  const { tipo, precio } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar si el usuario tiene suficiente dinero
+      const userResult = await db.query('SELECT money FROM users WHERE id = $1', [userId]);
+      const userMoney = userResult.rows[0].money;
+
+      if (userMoney < precio) {
+          return res.json({
+              success: false,
+              mensaje: 'No tienes suficientes monedas para comprar este sobre'
+          });
+      }
+
+      // Actualizar dinero del usuario
+      await db.query('UPDATE users SET money = money - $1 WHERE id = $2', [precio, userId]);
+      req.session.money = userMoney - precio;
+
+      // Obtener mascota aleatoria según el tipo de sobre
+      let rareza;
+      const random = Math.random() * 100;
+      
+      if (tipo === 'basico') {
+          // Sobre básico: 70% común, 25% raro, 5% épico
+          if (random < 70) {
+              rareza = 'comun';
+          } else if (random < 95) {
+              rareza = 'raro';
+          } else {
+              rareza = 'epico';
+          }
+      } else if (tipo === 'premium') {
+          // Sobre premium: 60% raro, 30% épico, 10% legendario
+          if (random < 60) {
+              rareza = 'raro';
+          } else if (random < 90) {
+              rareza = 'epico';
+          } else {
+              rareza = 'legendario';
+          }
+      }
+      
+      // Seleccionar un índice de mascota según la rareza
+      let indicesDisponibles;
+      
+      // Ejemplo de asignación de índices por rareza (ajusta según la distribución deseada)
+      const indicesComunes = [1, 4, 7, 10, 11];
+      const indicesRaros = [13, 16, 18, 21];
+      const indicesEpicos = [23, 27, 29, 32];
+      const indicesLegendarios = [35, 37, 38];
+      
+      switch (rareza) {
+          case 'comun':
+              indicesDisponibles = indicesComunes;
+              break;
+          case 'raro':
+              indicesDisponibles = indicesRaros;
+              break;
+          case 'epico':
+              indicesDisponibles = indicesEpicos;
+              break;
+          case 'legendario':
+              indicesDisponibles = indicesLegendarios;
+              break;
+      }
+      
+      // Seleccionar un índice aleatorio de la lista disponible
+      const indiceAleatorio = indicesDisponibles[Math.floor(Math.random() * indicesDisponibles.length)];
+      
+      // Determinar aleatoriamente el género
+      const genero = Math.random() < 0.5 ? "macho" : "hembra";
+      
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      res.json({
+          success: true,
+          moneyRestante: req.session.money,
+          mascota: {
+              indice: indiceAleatorio,
+              genero: genero,
+              rareza: rareza,
+              especie: especieMascotas[indiceAleatorio - 1],
+              habilidad: habilidad,
+              comidaFavorita: comidaFavorita
+          }
+      });
+  } catch (error) {
+      console.error('Error al comprar sobre:', error);
+      res.json({ success: false, mensaje: 'Error al procesar la compra' });
+  }
+});
+// Agrega esta ruta para guardar la mascota después de que el usuario le asigne un nombre
+app.post('/biblioteca/guardar-mascota', requireLogin, async (req, res) => {
+  const { nombre, indice, genero, rareza } = req.body;
+  const userId = req.session.userId;
+
+  try {
+      // Verificar datos necesarios
+      if (!nombre || !indice || !genero || !rareza) {
+          return res.json({ success: false, mensaje: 'Datos incompletos' });
+      }
+
+      // Generar aleatoriamente una habilidad y comida favorita
+      const indiceHabilidad = Math.floor(Math.random() * habilidadesEspeciales.length);
+      const indiceComida = Math.floor(Math.random() * comidasFavoritas.length);
+      
+      const habilidad = habilidadesEspeciales[indiceHabilidad];
+      const comidaFavorita = comidasFavoritas[indiceComida];
+
+      // Insertar la nueva mascota en pets2 con todos los campos necesarios
+      const result = await db.query(
+          `INSERT INTO pets2 (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
+                          habilidad, "comidaFavorita", rareza, id_users, nivel, fechaObtencion)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP)
+           RETURNING id`,
+          [
+              nombre,         // petname
+              genero,         // genero
+              indice,         // indice
+              0,              // nivelAmor
+              50,             // nivelFelicidad
+              50,             // nivelEnergia
+              habilidad,      // habilidad
+              comidaFavorita, // comidaFavorita
+              rareza,         // rareza
+              userId,         // id_users
+              1               // nivel (valor predeterminado)
+          ]
+      );
+
+      res.json({ success: true, mensaje: 'Mascota guardada correctamente' });
+  } catch (error) {
+      console.error('Error al guardar mascota:', error);
+      res.json({ 
+          success: false, 
+          mensaje: 'Error al guardar la mascota: ' + error.message
+      });
+  }
+});
+//xdd
 
 
 
