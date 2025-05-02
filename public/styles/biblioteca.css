@@ -930,6 +930,7 @@
 
 /* Título más compacto */
 .resultado-sobre h2 {
+    text-align: center !important;
     font-size: 1.8rem !important;
     margin: 15px 0 !important;
 }

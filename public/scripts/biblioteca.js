@@ -517,46 +517,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para filtrar mascotas
-    function filtrarMascotas() {
-        const textoBusqueda = buscadorMascota.value.toLowerCase();
-        const especieSeleccionada = filtroEspecie.value;
-        const rarezaSeleccionada = filtroRareza.value;
+    // Función para filtrar mascotas - simplificada sin filtro de especie
+function filtrarMascotas() {
+    const textoBusqueda = buscadorMascota.value.toLowerCase();
+    const rarezaSeleccionada = filtroRareza.value;
+    
+    const mascotaCards = document.querySelectorAll('.mascota-card');
+    let mascotasVisibles = 0;
+    
+    mascotaCards.forEach(card => {
+        const nombre = card.querySelector('.card-nombre').textContent.toLowerCase();
+        const rareza = card.getAttribute('data-rareza');
         
-        const mascotaCards = document.querySelectorAll('.mascota-card');
-        let mascotasVisibles = 0;
+        // Filtros simplificados (eliminamos el filtro de especie)
+        const coincideNombre = nombre.includes(textoBusqueda);
+        const coincideRareza = !rarezaSeleccionada || rareza === rarezaSeleccionada;
         
-        mascotaCards.forEach(card => {
-            const nombre = card.querySelector('.card-nombre').textContent.toLowerCase();
-            const indice = card.getAttribute('data-indice');
-            const rareza = card.getAttribute('data-rareza');
-            
-            // Filtros
-            const coincideNombre = nombre.includes(textoBusqueda);
-            const coincideEspecie = !especieSeleccionada || indice === especieSeleccionada;
-            const coincideRareza = !rarezaSeleccionada || rareza === rarezaSeleccionada;
-            
-            // Mostrar u ocultar según coincidencias
-            if (coincideNombre && coincideEspecie && coincideRareza) {
-                card.style.display = '';
-                mascotasVisibles++;
-            } else {
-                card.style.display = 'none';
-            }
-        });
-        
-        // Mostrar mensaje si no hay resultados
-        const sinResultados = document.querySelector('.sin-resultados');
-        if (mascotasVisibles === 0 && !sinResultados) {
-            const grid = document.querySelector('.mascota-grid');
-            const mensaje = document.createElement('div');
-            mensaje.className = 'sin-mascotas sin-resultados';
-            mensaje.innerHTML = '<p>No se encontraron mascotas con esos filtros.</p><p>Intenta con otros criterios de búsqueda.</p>';
-            grid.appendChild(mensaje);
-        } else if (mascotasVisibles > 0 && sinResultados) {
-            sinResultados.remove();
+        // Mostrar u ocultar según coincidencias
+        if (coincideNombre && coincideRareza) {
+            card.style.display = '';
+            mascotasVisibles++;
+        } else {
+            card.style.display = 'none';
         }
+    });
+    
+    // Mostrar mensaje si no hay resultados
+    const sinResultados = document.querySelector('.sin-resultados');
+    if (mascotasVisibles === 0 && !sinResultados) {
+        const grid = document.querySelector('.mascota-grid');
+        const mensaje = document.createElement('div');
+        mensaje.className = 'sin-mascotas sin-resultados';
+        mensaje.innerHTML = '<p>No se encontraron mascotas con esos filtros.</p><p>Intenta con otros criterios de búsqueda.</p>';
+        grid.appendChild(mensaje);
+    } else if (mascotasVisibles > 0 && sinResultados) {
+        sinResultados.remove();
     }
+}
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo) {

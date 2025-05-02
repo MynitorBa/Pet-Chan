@@ -26,12 +26,7 @@
             <div id="tab-coleccion" class="contenido-pestana activo">
                 <div class="filtros-coleccion">
                     <input type="text" id="buscar-mascota" placeholder="Buscar por nombre...">
-                    <select id="filtro-especie">
-                        <option value="">Todas las especies</option>
-                        <% especieMascotas.forEach((especie, indice) => { %>
-                            <option value="<%= indice %>"><%= especie %></option>
-                        <% }); %>
-                    </select>
+                    
                     <select id="filtro-rareza">
                         <option value="">Todas las rarezas</option>
                         <option value="comun">Común</option>
@@ -137,11 +132,6 @@
                     <div class="mascota-activa-container">
                         <div class="mascota-activa-imagen">
                             <img src="<%= rutaImagen %>" alt="<%= mascotaActual.nombre %>" class="pixeleado mascota-activa-img">
-                            <% if (accesorios != null) { %>
-                                <% for (let i = 0; i < accesorios.length; i++) { %>
-                                    <img class="mascota-accesorio pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice + 1 %>.gif" alt="Accesorio">
-                                <% } %>
-                            <% } %>
                         </div>
                         <div class="mascota-activa-info">
                             <h2><%= mascotaActual.nombre %></h2>
@@ -149,7 +139,7 @@
                             
                             <div class="mascota-stats">
                                 <div class="mascota-stat">
-                                    <span class="stat-label">Amor</span>
+                                    <span class="stat-label">❤️</span>
                                     <div class="stat-barra">
                                         <div class="stat-valor" style="width: <%= mascotaActual.niveldeAmor %>%;"></div>
                                     </div>
@@ -157,7 +147,7 @@
                                 </div>
                                 
                                 <div class="mascota-stat">
-                                    <span class="stat-label">Felicidad</span>
+                                    <span class="stat-label">😊</span>
                                     <div class="stat-barra">
                                         <div class="stat-valor felicidad" style="width: <%= mascotaActual.niveldeFelicidad %>%;"></div>
                                     </div>
@@ -165,7 +155,7 @@
                                 </div>
                                 
                                 <div class="mascota-stat">
-                                    <span class="stat-label">Energía</span>
+                                    <span class="stat-label">⚡</span>
                                     <div class="stat-barra">
                                         <div class="stat-valor energia" style="width: <%= mascotaActual.niveldeEnergia %>%;"></div>
                                     </div>
