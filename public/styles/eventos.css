@@ -10,7 +10,7 @@ body {
 
 .contenedor-inicio {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 40px auto 0 auto; /* Este valor controla el espacio desde arriba */
     padding: 20px;
     background-color: rgba(98, 2, 150, 0.95);
     border: 4px solid #d304c5;
@@ -19,6 +19,7 @@ body {
     position: relative;
     overflow: hidden;
 }
+
 
 /* Sección Hero con Carrusel - Fondo oscurecido */
 .seccion-hero {

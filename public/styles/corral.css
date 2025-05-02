@@ -9,7 +9,6 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     padding: 20px;
 }
 
@@ -23,6 +22,7 @@ main {
     box-shadow: 0 0 20px rgba(163, 4, 250, 0.5);
     position: relative;
     overflow: hidden;
+    margin: 0 auto; /* Esto centra horizontalmente */
 }
 
 .corral-header {
@@ -43,6 +43,18 @@ main {
     position: relative;
     margin-bottom: 20px;
     overflow: hidden;
+}
+
+/* Ajuste para sobrescribir cualquier estilo adicional en el encabezado */
+.encabezado-principal {
+    margin-bottom: 0 !important;
+}
+
+/* Asegurarse de que el cuerpo de la página no tenga márgenes no deseados */
+body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 .mascota {

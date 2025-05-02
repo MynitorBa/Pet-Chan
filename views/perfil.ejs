@@ -1,11 +1,10 @@
 <%- include("partials/header.ejs") %>
 
-<link rel="stylesheet" href="styles/perfil.css">
+<link rel="stylesheet" href="/styles/perfil.css">
 
 <div class="contenedor-perfil">
     <div class="cabecera">
         <div class="info-usuario">
-            <img src="./perfil de prueba.png" alt="Avatar de Usuario" class="avatar">
             <div class="biografia-container">
                 <h1>★★ <%= usuario %> ★★</h1>
                 <h2>Bibliografia:</h2>
@@ -17,18 +16,6 @@
                 <div class="rango-item"><span class="rango-etiqueta">✩ Rango Secundario:</span> <span class="rango-valor"><%= rango2 %></span></div>
                 <div class="rango-item"><span class="rango-etiqueta">✩ Rango Especial:</span> <span class="rango-valor"><%= rango3 %></span></div>
             </div>
-        </div>
-    </div>
-
-    <div class="estadisticas">
-        <h2>○•○ Inventario de Usuario ○•○</h2>
-        <div class="insignias">
-            <div class="insignia" title="Coleccionista Maestro">🏆</div>
-            <div class="insignia" title="Espíritu Creativo">🎨</div>
-            <div class="insignia" title="Maestro de Mascotas">🐾</div>
-            <div class="insignia" title="Estrella del Foro">⭐</div>
-            <div class="insignia" title="Campeón de Juegos">🎮</div>
-            <div class="insignia" title="Usuario Amistoso">💝</div>
         </div>
     </div>
 
@@ -46,7 +33,7 @@
 
                 <% if (accesorios != null) { %>
                     <% for (let i = 0; i < accesorios.length; i++) { %>
-                        <img class="Accesorio1 pixeleado" src="imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
+                        <img class="Accesorio1 pixeleado" src="/imagenes_de_accesorios/<%= accesorios[i].indice +1 %>.gif" alt="Accesorio">
                     <% } %>
                 <% } %>
             </div>

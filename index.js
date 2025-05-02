@@ -1340,55 +1340,8 @@ app.get('/formularioSoporte', requireLogin, (req, res) => {
         accesorios: req.session.accesorios
     });
 });
-app.get('/perfil', requireLogin, async (req, res) => {
-  try {
-      const mascota = req.session.mascotaActual;
-      const userId = req.session.userId;
-      
-      // Obtener el conteo total de publicaciones del usuario
-      const postsResult = await db.query('SELECT COUNT(*) FROM forum_posts WHERE user_id = $1', [userId]);
-      const postCount = parseInt(postsResult.rows[0].count);
-      
-      // Obtener el conteo total de comentarios del usuario
-      const commentsResult = await db.query('SELECT COUNT(*) FROM forum_comments WHERE user_id = $1', [userId]);
-      const commentCount = parseInt(commentsResult.rows[0].count);
-      
-      // Sumar ambos para obtener el total de actividad
-      const totalPublicaciones = postCount + commentCount;
-      
-      // Obtener información del usuario, incluyendo last_login_time
-      const userResult = await db.query('SELECT last_login_time FROM users WHERE id = $1', [userId]);
-      
-      // Si el usuario tiene last_login_time en la base de datos y NO tiene fecha guardada en la sesión
-      if (userResult.rows.length > 0 && userResult.rows[0].last_login_time && !req.session.membresia_date) {
-          // Guardamos la fecha en la sesión como fecha de membresía (solo la primera vez)
-          req.session.membresia_date = userResult.rows[0].last_login_time;
-      }
-      
-      res.render('perfil.ejs', {
-          rutaImagen: mascota.rutaImagen,
-          accesorios: req.session.accesorios,
-          mascotaNombre: mascota.nombre,
-          usuario: req.session.username,
-          especieDeMascota: mascota.especie,
-          pronombre: mascota.pronombre,
-          nivelAmor: mascota.niveldeAmor,
-          nivelEnergia: mascota.niveldeEnergia,
-          nivelFelicidad: mascota.niveldeFelicidad,
-          comidaFavorita: mascota.comidaFavorita,
-          habilidadesEspeciales: mascota.habilidad,
-          descripcion: req.session.descripcion,
-          rango1: req.session.rango1,
-          rango2: req.session.rango2,
-          rango3: req.session.rango3,
-          totalPublicaciones: totalPublicaciones,
-          fechaMembresia: req.session.membresia_date ? new Date(req.session.membresia_date).toLocaleDateString() : "2024"
-      });
-  } catch (error) {
-      console.error('Error al obtener datos para el perfil:', error);
-      res.status(500).send('Error al cargar el perfil');
-  }
-});
+
+
 
 
 // Implementar la ruta para guardar rangos directamente en la tabla users
@@ -4934,24 +4887,172 @@ app.post('/votar-comentario', async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Ruta para ver perfiles de usuarios específicos
+app.get('/usuario/:userId', async (req, res) => {
+  try {
+    const viewerId = req.session.userId; // ID del usuario que está viendo el perfil
+    const profileId = req.params.userId; // ID del usuario cuyo perfil se está viendo
+    
+    // Verificar si el usuario está viendo su propio perfil
+    const isOwnProfile = viewerId && viewerId.toString() === profileId.toString();
+    
+    // Si es su propio perfil, redirigir a la ruta normal de perfil
+    if (isOwnProfile) {
+      return res.redirect('/perfil');
+    }
+    
+    // Obtener información del usuario cuyo perfil se está viendo
+    const userResult = await db.query(`
+      SELECT id, username, description, rango1, rango2, rango3, last_login_time
+      FROM users WHERE id = $1
+    `, [profileId]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(404).send('Usuario no encontrado');
+    }
+    
+    const user = userResult.rows[0];
+    
+    // Obtener la mascota del usuario
+    const mascotaResult = await db.query(`
+      SELECT id, petname, genero, indice, habilidad, "nivelAmor", "nivelFelicidad", "nivelEnergia", "comidaFavorita"
+      FROM pets
+      WHERE id_users = $1
+    `, [profileId]);
+    
+    // Configurar los datos de la mascota
+    let mascotaNombre = "Sin mascota";
+    let rutaImagen = "/imagenes_y_gif/default_mascota.png";
+    let especieDeMascota = "Desconocida";
+    let pronombre = "le"; // Valor por defecto
+    let nivelAmor = 0;
+    let nivelEnergia = 0;
+    let nivelFelicidad = 0;
+    let comidaFavorita = "Desconocida";
+    let habilidadesEspeciales = "Ninguna";
+    
+    if (mascotaResult.rows.length > 0) {
+      const mascota = mascotaResult.rows[0];
+      mascotaNombre = mascota.petname;
+      rutaImagen = `/imagenes_de_mascotas/${mascota.indice}.gif`;
+      especieDeMascota = "Mascota";
+      pronombre = mascota.genero === 'Femenino' ? 'ella' : 'el';
+      nivelAmor = mascota["nivelAmor"];
+      nivelEnergia = mascota["nivelEnergia"];
+      nivelFelicidad = mascota["nivelFelicidad"];
+      comidaFavorita = mascota["comidaFavorita"] || "Desconocida";
+      habilidadesEspeciales = mascota.habilidad;
+    }
+    
+    // Obtener accesorios del usuario
+    const accesoriosResult = await db.query(`
+      SELECT * FROM accesorios WHERE id_users = $1
+    `, [profileId]);
+    
+    // Obtener conteo de actividad (publicaciones y comentarios)
+    const postsResult = await db.query('SELECT COUNT(*) FROM forum_posts WHERE user_id = $1', [profileId]);
+    const postCount = parseInt(postsResult.rows[0].count);
+    
+    const commentsResult = await db.query('SELECT COUNT(*) FROM forum_comments WHERE user_id = $1', [profileId]);
+    const commentCount = parseInt(commentsResult.rows[0].count);
+    
+    const totalPublicaciones = postCount + commentCount;
+    
+    // Usar una fecha fija para la membresía si no hay last_login_time
+    const fechaMembresia = user.last_login_time ? 
+                         new Date(user.last_login_time).toLocaleDateString('es-ES') : 
+                         new Date('2024-01-01').toLocaleDateString('es-ES');
+    
+    // Renderizar la vista de perfil con los datos del usuario
+    res.render('perfil.ejs', {
+      rutaImagen,
+      accesorios: accesoriosResult.rows,
+      mascotaNombre,
+      usuario: user.username,
+      especieDeMascota,
+      pronombre,
+      nivelAmor,
+      nivelEnergia,
+      nivelFelicidad,
+      comidaFavorita,
+      habilidadesEspeciales,
+      descripcion: user.description || 'Sin descripción',
+      rango1: user.rango1 || 'Ninguno',
+      rango2: user.rango2 || 'Ninguno',
+      rango3: user.rango3 || 'Ninguno',
+      totalPublicaciones,
+      fechaMembresia,
+      viewingOwnProfile: false,
+      viewerId,
+      // Variables para header y footer
+      isAuthenticated: !!req.session.userId,
+      username: req.session.username,
+      userId: req.session.userId,
+      money: req.session.money,
+      mascotaActual: req.session.mascotaActual,
+      miUsuarioId: req.session.userId // Para el script del footer
+    });
+  } catch (error) {
+    console.error('Error al obtener datos del perfil de usuario:', error);
+    res.status(500).send('Error al cargar el perfil del usuario');
+  }
+});
+// Dejar la ruta existente tal como está y simplemente añadir la nueva propiedad viewingOwnProfile
+app.get('/perfil', requireLogin, async (req, res) => {
+  try {
+      const mascota = req.session.mascotaActual;
+      const userId = req.session.userId;
+      
+      // Obtener el conteo total de publicaciones del usuario
+      const postsResult = await db.query('SELECT COUNT(*) FROM forum_posts WHERE user_id = $1', [userId]);
+      const postCount = parseInt(postsResult.rows[0].count);
+      
+      // Obtener el conteo total de comentarios del usuario
+      const commentsResult = await db.query('SELECT COUNT(*) FROM forum_comments WHERE user_id = $1', [userId]);
+      const commentCount = parseInt(commentsResult.rows[0].count);
+      
+      // Sumar ambos para obtener el total de actividad
+      const totalPublicaciones = postCount + commentCount;
+      
+      // Obtener información del usuario, incluyendo last_login_time
+      const userResult = await db.query('SELECT last_login_time FROM users WHERE id = $1', [userId]);
+      
+      // Si el usuario tiene last_login_time en la base de datos y NO tiene fecha guardada en la sesión
+      if (userResult.rows.length > 0 && userResult.rows[0].last_login_time && !req.session.membresia_date) {
+          // Guardamos la fecha en la sesión como fecha de membresía (solo la primera vez)
+          req.session.membresia_date = userResult.rows[0].last_login_time;
+      }
+      
+      // Usar una fecha fija si no hay fecha de membresía
+      const fechaMembresia = req.session.membresia_date ? 
+                         new Date(req.session.membresia_date).toLocaleDateString('es-ES') : 
+                         new Date('2024-01-01').toLocaleDateString('es-ES');
+      
+      res.render('perfil.ejs', {
+          rutaImagen: mascota.rutaImagen,
+          accesorios: req.session.accesorios,
+          mascotaNombre: mascota.nombre,
+          usuario: req.session.username,
+          especieDeMascota: mascota.especie,
+          pronombre: mascota.pronombre,
+          nivelAmor: mascota.niveldeAmor,
+          nivelEnergia: mascota.niveldeEnergia,
+          nivelFelicidad: mascota.niveldeFelicidad,
+          comidaFavorita: mascota.comidaFavorita,
+          habilidadesEspeciales: mascota.habilidad,
+          descripcion: req.session.descripcion,
+          rango1: req.session.rango1,
+          rango2: req.session.rango2,
+          rango3: req.session.rango3,
+          totalPublicaciones: totalPublicaciones,
+          fechaMembresia: fechaMembresia,
+          viewingOwnProfile: true // Indicar que es el propio perfil
+      });
+  } catch (error) {
+      console.error('Error al obtener datos para el perfil:', error);
+      res.status(500).send('Error al cargar el perfil');
+  }
+});
 
 
 
@@ -4964,12 +5065,12 @@ app.get('/buscar', async (req, res) => {
     
     // Buscar mascotas por nombre o habilidad
     const mascotas = await db.query(
-      `SELECT p.id, p.petname, p.habilidad, p."nivelAmor", p."nivelFelicidad", u.username as dueno, u.id as dueno_id 
+      `SELECT p.id, p.petname, p.genero, p.indice, p.habilidad, p."nivelAmor", 
+              p."nivelFelicidad", p."nivelEnergia", p."comidaFavorita" 
        FROM pets p
        JOIN users u ON p.id_users = u.id
-       WHERE p.petname ILIKE $1 OR p.habilidad ILIKE $1
-       ORDER BY p."nivelAmor" DESC
-       LIMIT 5`, [texto]
+       WHERE p.petname ILIKE $1 OR p.habilidad ILIKE $1 OR p."comidaFavorita" ILIKE $1
+       ORDER BY p."nivelAmor" DESC`, [texto]
     );
 
     // Buscar eventos relacionados con la búsqueda
@@ -4978,19 +5079,21 @@ app.get('/buscar', async (req, res) => {
               etiquetas, organizador, asistentes, popular, es_especial
        FROM eventos 
        WHERE titulo ILIKE $1 OR descripcion ILIKE $1 OR etiquetas ILIKE $1 OR organizador ILIKE $1
-       ORDER BY fecha ASC, popular DESC
-       LIMIT 4`, [texto]
+       ORDER BY fecha ASC, popular DESC`, [texto]
     );
     
-    // Buscar posts del foro más votados
+    // Buscar posts del foro más votados incluyendo imágenes
     const posts = await db.query(
-      `SELECT fp.id, fp.autor, fp.mensaje, fp.etiqueta, fp.fecha, fp.ranking, COUNT(pv.id) as votos
+      `SELECT fp.id, fp.user_id, fp.autor, fp.mensaje, fp.etiqueta, fp.subcategoria, 
+              fp.extrasubcategoria, fp.fecha, fp.fecha_str, fp.ranking, 
+              (SELECT url FROM post_images WHERE post_id = fp.id LIMIT 1) as imagen_url,
+              COUNT(pv.id) as votos
        FROM forum_posts fp
        LEFT JOIN post_votes pv ON fp.id = pv.post_id
-       WHERE fp.autor ILIKE $1 OR fp.mensaje ILIKE $1 OR fp.etiqueta ILIKE $1
+       WHERE fp.autor ILIKE $1 OR fp.mensaje ILIKE $1 OR fp.etiqueta ILIKE $1 
+             OR fp.subcategoria ILIKE $1 OR fp.extrasubcategoria ILIKE $1
        GROUP BY fp.id
-       ORDER BY COUNT(pv.id) DESC, fp.fecha DESC
-       LIMIT 8`, [texto]
+       ORDER BY COUNT(pv.id) DESC, fp.fecha DESC`, [texto]
     );
 
     // Buscar comunidades por nombre, descripción o categoría
@@ -5002,18 +5105,49 @@ app.get('/buscar', async (req, res) => {
        WHERE c.nombre ILIKE $1 OR c.descripcion ILIKE $1 OR c.categoria ILIKE $1 OR 
              c.subcategoria ILIKE $1 OR c.subcategoria_extra ILIKE $1
        GROUP BY c.id
-       ORDER BY COUNT(cu.user_id) DESC
-       LIMIT 5`, [texto]
+       ORDER BY COUNT(cu.user_id) DESC`, [texto]
     );
 
-    // Buscar comentarios relevantes
+    // Buscar comentarios relevantes con imágenes
     const comentarios = await db.query(
-      `SELECT fc.id, fc.autor, fc.comentario, fc.fecha, fc.ranking, fp.id as post_id
+      `SELECT fc.id, fc.post_id, fc.user_id, fc.autor, fc.comentario, fc.fecha, fc.fecha_str, fc.ranking, 
+              (SELECT url FROM comment_images WHERE comment_id = fc.id LIMIT 1) as imagen_url,
+              fp.id as post_id, fp.etiqueta, fp.subcategoria
        FROM forum_comments fc
        JOIN forum_posts fp ON fc.post_id = fp.id
        WHERE fc.comentario ILIKE $1 OR fc.autor ILIKE $1
-       ORDER BY fc.ranking DESC
-       LIMIT 5`, [texto]
+       ORDER BY fc.ranking DESC`, [texto]
+    );
+
+    // Buscar accesorios
+    const accesoriosBusqueda = await db.query(
+      `SELECT a.id, a.indice, a.id_users, u.username as dueno
+       FROM accesorios a
+       JOIN users u ON a.id_users = u.id
+       WHERE u.username ILIKE $1`, [texto]
+    );
+
+    // Buscar items
+    const items = await db.query(
+      `SELECT i.id, i.indice, i.categoria, i.id_users, u.username as dueno
+       FROM items i
+       JOIN users u ON i.id_users = u.id
+       WHERE i.categoria ILIKE $1 OR u.username ILIKE $1`, [texto]
+    );
+
+    // Buscar usuarios
+    const usuarios = await db.query(
+      `SELECT id, username, description, rango1, rango2, rango3
+       FROM users
+       WHERE username ILIKE $1 OR description ILIKE $1 OR rango1 ILIKE $1 OR rango2 ILIKE $1 OR rango3 ILIKE $1`, [texto]
+    );
+
+    // Buscar categorías
+    const categorias = await db.query(
+      `SELECT id, nombre, descripcion, tipo, categoria, subcategoria, extrasubcategoria
+       FROM categories_metadata
+       WHERE nombre ILIKE $1 OR descripcion ILIKE $1 OR categoria ILIKE $1 
+             OR subcategoria ILIKE $1 OR extrasubcategoria ILIKE $1`, [texto]
     );
 
     // Eventos destacados (para ejemplos cuando no hay resultados)
@@ -5021,40 +5155,43 @@ app.get('/buscar', async (req, res) => {
       `SELECT id, titulo, fecha, imagen, popular 
        FROM eventos 
        WHERE fecha >= CURRENT_DATE
-       ORDER BY popular DESC, fecha ASC
-       LIMIT 3`
+       ORDER BY popular DESC, fecha ASC`
     );
 
-    // Ejemplos destacados para cada categoría (simulando eventos o contenido destacado)
+    // Ejemplos destacados para cada categoría
     const ejemplos = {
       mascotas: await db.query(
-        `SELECT id, petname, habilidad, "comidaFavorita" 
+        `SELECT id, petname, habilidad, "comidaFavorita"
          FROM pets 
-         ORDER BY "nivelFelicidad" DESC 
-         LIMIT 3`
+         ORDER BY "nivelFelicidad" DESC`
       ),
       posts: await db.query(
-        `SELECT id, autor, etiqueta, mensaje, fecha 
+        `SELECT id, autor, etiqueta, mensaje, fecha,
+              (SELECT url FROM post_images WHERE post_id = forum_posts.id LIMIT 1) as imagen_url
          FROM forum_posts 
-         ORDER BY ranking DESC 
-         LIMIT 3`
+         ORDER BY ranking DESC`
       ),
       comunidades: await db.query(
-        `SELECT c.id, c.nombre, c.categoria, COUNT(cu.user_id) as miembros 
+        `SELECT c.id, c.nombre, c.categoria, c.imagen_url, COUNT(cu.user_id) as miembros 
          FROM comunidades c
          LEFT JOIN comunidades_usuarios cu ON c.id = cu.comunidad_id
          GROUP BY c.id
-         ORDER BY COUNT(cu.user_id) DESC
-         LIMIT 3`
+         ORDER BY COUNT(cu.user_id) DESC`
       ),
-      eventos: eventosDestacados.rows
+      eventos: eventosDestacados.rows,
+      accesorios: await db.query(
+        `SELECT id, indice FROM accesorios ORDER BY id DESC`
+      ),
+      items: await db.query(
+        `SELECT id, indice, categoria FROM items ORDER BY id DESC`
+      )
     };
 
     // Si el usuario está autenticado, obtener sus accesorios y mascota para el footer
-    let accesorios = [];
+    let accesoriosUsuario = [];
     let usuario = null;
-    let mascotaActual = null;
-    let rutaImagen = '/imagenes_y_gif/default_mascota.png';  // Valor por defecto
+    let mascotaActual = req.session.mascotaActual || null;
+    let rutaImagen = req.session.mascotaActual ? req.session.mascotaActual.rutaImagen : '/imagenes_y_gif/default_mascota.png';
     
     if (req.session && req.session.userId) {
       // Obtener accesorios del usuario para el footer
@@ -5062,7 +5199,7 @@ app.get('/buscar', async (req, res) => {
         `SELECT * FROM accesorios WHERE id_users = $1`,
         [req.session.userId]
       );
-      accesorios = accResult.rows;
+      accesoriosUsuario = accResult.rows;
       
       // Obtener información del usuario
       const userResult = await db.query(
@@ -5073,31 +5210,6 @@ app.get('/buscar', async (req, res) => {
       if (userResult.rows.length > 0) {
         usuario = userResult.rows[0];
       }
-      
-      // Obtener la mascota actual del usuario
-      if (req.session.mascotaActual) {
-        mascotaActual = req.session.mascotaActual;
-        
-        // Construir la ruta de la mascota correctamente
-        if (mascotaActual.rutaImagen) {
-          rutaImagen = mascotaActual.rutaImagen;
-        } else {
-          // Usa las variables de mascota para generar una ruta
-          const rutaBase = "imagenes_de_mascotas/";
-          const especieMascotas = req.app.locals.especieMascotas || [];
-          const totalMascotas = especieMascotas.length;
-          let indiceAleatorio = Math.floor(Math.random() * totalMascotas) + 1;
-          
-          // Si la mascota tiene especie, usa eso en lugar del índice aleatorio
-          if (mascotaActual.especie && especieMascotas.includes(mascotaActual.especie)) {
-            rutaImagen = `${rutaBase}${mascotaActual.especie}.gif`;
-          } else {
-            // Fallback a mascota aleatoria
-            const especieAleatoria = especieMascotas[indiceAleatorio - 1] || 'default';
-            rutaImagen = `${rutaBase}${especieAleatoria}.gif`;
-          }
-        }
-      }
     }
 
     res.render('resultados_busqueda', {
@@ -5106,24 +5218,32 @@ app.get('/buscar', async (req, res) => {
       posts: posts.rows,
       comunidades: comunidades.rows,
       comentarios: comentarios.rows,
-      eventos: eventos.rows, // Añadimos los eventos a la respuesta
+      eventos: eventos.rows,
+      accesorios: accesoriosBusqueda.rows,
+      items: items.rows,
+      usuarios: usuarios.rows,
+      categorias: categorias.rows,
       ejemplos: {
         mascotas: ejemplos.mascotas.rows,
         posts: ejemplos.posts.rows,
         comunidades: ejemplos.comunidades.rows,
-        eventos: ejemplos.eventos // Añadimos ejemplos de eventos
+        eventos: ejemplos.eventos,
+        accesorios: ejemplos.accesorios.rows,
+        items: ejemplos.items.rows
       },
       menuItems: [
         {path: '/inicio', icon: 'fas fa-home', text: 'Inicio'},
         {path: '/foro', icon: 'fas fa-comments', text: 'Foros'},
         {path: '/eventos', icon: 'fas fa-calendar', text: 'Eventos'},
         {path: '/comunidad', icon: 'fas fa-users', text: 'Comunidad'},
-        {path: '/corral_mascota', icon: 'fas fa-paw', text: 'Mascotas'}
+        {path: '/corral_mascota', icon: 'fas fa-paw', text: 'Mascotas'},
+        {path: '/tienda', icon: 'fas fa-shopping-cart', text: 'Tienda'},
       ],
       // Variables actualizadas para el footer
-      rutaImagen: rutaImagen,
-      mascotaActual: mascotaActual,
-      accesorios: accesorios || [],
+      rutaImagen: req.session.mascotaActual ? req.session.mascotaActual.rutaImagen : '/imagenes_y_gif/default_mascota.png',
+      mascotaActual: req.session.mascotaActual || null,
+      accesorios: req.session.accesorios,
+      accesoriosUsuario: accesoriosUsuario || [],
       usuario: usuario || null,
       username: req.session.username,
       userId: req.session.userId,
@@ -5149,10 +5269,27 @@ app.get('/buscar', async (req, res) => {
 
 
 
-
-
-
-
+// Nueva ruta para buscar y redirigir al perfil del dueño de una mascota
+app.post('/buscar-dueno', async (req, res) => {
+  try {
+    const mascotaId = req.body.mascotaId;
+    
+    // Consultar la base de datos para obtener el id_users de la mascota
+    const result = await db.query('SELECT id_users FROM pets WHERE id = $1', [mascotaId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).send('Mascota no encontrada');
+    }
+    
+    const userId = result.rows[0].id_users;
+    
+    // Redirigir al perfil del usuario
+    res.redirect(`/usuario/${userId}`);
+  } catch (error) {
+    console.error('Error al buscar dueño de mascota:', error);
+    res.status(500).send('Error interno al buscar dueño');
+  }
+});
 
 
 
@@ -6994,6 +7131,177 @@ app.delete('/admin/subcategorias/:id', requireLogin, isAdmin, async (req, res) =
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Endpoint to get unread event notifications
+app.get('/api/notificaciones-eventos', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    // Get events that the user hasn't received a notification for
+    // or hasn't read yet, and that haven't passed yet
+    const query = `
+      SELECT e.* 
+      FROM eventos e
+      LEFT JOIN eventos_notificaciones en ON e.id = en.evento_id AND en.user_id = $1
+      WHERE 
+        e.fecha >= CURRENT_DATE AND 
+        (en.id IS NULL OR en.leido = false)
+      ORDER BY e.fecha ASC, e.hora ASC
+      LIMIT 10
+    `;
+    
+    const result = await db.query(query, [userId]);
+    
+    // Process each event to format the etiquetas
+    const eventos = result.rows.map(event => ({
+      ...event,
+      etiquetas: event.etiquetas ? event.etiquetas.split(',').map(tag => tag.trim()) : []
+    }));
+    
+    // Get count of unread notifications
+    const countQuery = `
+      SELECT COUNT(*) 
+      FROM eventos e
+      LEFT JOIN eventos_notificaciones en ON e.id = en.evento_id AND en.user_id = $1
+      WHERE 
+        e.fecha >= CURRENT_DATE AND 
+        (en.id IS NULL OR en.leido = false)
+    `;
+    
+    const countResult = await db.query(countQuery, [userId]);
+    const unreadCount = parseInt(countResult.rows[0].count || 0);
+    
+    // Create notification entries for new events
+    const eventIds = eventos.map(e => e.id);
+    if (eventIds.length > 0) {
+      // Use INSERT with ON CONFLICT to avoid duplicates
+      await db.query(`
+        INSERT INTO eventos_notificaciones (evento_id, user_id, leido)
+        SELECT e.id, $1, false
+        FROM unnest($2::int[]) AS e(id)
+        ON CONFLICT (evento_id, user_id) DO NOTHING
+      `, [userId, eventIds]);
+    }
+    
+    res.json({
+      success: true,
+      eventos: eventos,
+      unreadCount: unreadCount
+    });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error fetching notifications' 
+    });
+  }
+});
+
+// Endpoint to mark notifications as read
+app.post('/api/notificaciones-eventos/marcar-leido', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { eventoId } = req.body;
+    
+    if (eventoId) {
+      // Mark a specific notification as read
+      await db.query(`
+        UPDATE eventos_notificaciones
+        SET leido = true, fecha_lectura = CURRENT_TIMESTAMP
+        WHERE evento_id = $1 AND user_id = $2
+      `, [eventoId, userId]);
+    } else {
+      // Mark all notifications as read
+      await db.query(`
+        UPDATE eventos_notificaciones
+        SET leido = true, fecha_lectura = CURRENT_TIMESTAMP
+        WHERE user_id = $1 AND leido = false
+      `, [userId]);
+    }
+    
+    res.json({
+      success: true,
+      mensaje: 'Notificaciones marcadas como leídas'
+    });
+  } catch (error) {
+    console.error('Error marking notifications as read:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error marking notifications as read' 
+    });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
 // ---------------------- API DE EVENTOS -------------------------
 // API endpoints para la gestión de eventos
 
@@ -7073,10 +7381,11 @@ const isAdminEventos = async (req, res, next) => {
   }
 };
 
-// POST - Crear un nuevo evento (solo admin)
-app.post('/api/eventos', requireLogin, isAdminEventos, async (req, res) => {
+// POST - Create a new event (admin or community admin)
+app.post('/api/eventos', requireLogin, async (req, res) => {
   try {
-    const { titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, esEspecial } = req.body;
+    const { titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, esEspecial, comunidad_id } = req.body;
+    const userId = req.session.userId;
     
     // Validate required fields
     if (!titulo || !descripcion || !fecha || !hora || !plataforma) {
@@ -7086,14 +7395,55 @@ app.post('/api/eventos', requireLogin, isAdminEventos, async (req, res) => {
       });
     }
     
+    // Check authorization using both approaches
+    const isSystemAdmin = req.session.rango3 === 'Administrador';
+    let isCommunityAdmin = false;
+    
+    // Only check community admin status if a community_id is provided
+    if (comunidad_id) {
+      // Log the community_id and userId for debugging
+      console.log(`Checking admin status for user ${userId} in community ${comunidad_id}`);
+      
+      const adminCheck = await db.query(
+        `SELECT * FROM comunidades_usuarios 
+         WHERE comunidad_id = $1 AND user_id = $2 AND rol = 'administrador'`,
+        [comunidad_id, userId]
+      );
+      
+      // Log the result for debugging
+      console.log('Admin check query results:', adminCheck.rows);
+      
+      isCommunityAdmin = adminCheck.rows.length > 0;
+    }
+    
+    // Log both flags for debugging
+    console.log(`isSystemAdmin: ${isSystemAdmin}, isCommunityAdmin: ${isCommunityAdmin}`);
+    
+    // If neither system admin nor community admin, reject
+    if (!isSystemAdmin && !isCommunityAdmin) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'No tienes permisos para crear eventos' 
+      });
+    }
+    
     // Process etiquetas (convert array to comma-separated string if needed)
-    const etiquetasString = Array.isArray(etiquetas) ? etiquetas.join(',') : etiquetas;
+    const etiquetasString = Array.isArray(etiquetas) ? etiquetas.join(',') : etiquetas || '';
+    
+    // Get community name for the organizer field
+    let organizerName = "Equipo Pet-Chan";
+    if (!isSystemAdmin && comunidad_id) {
+      const communityResult = await db.query('SELECT nombre FROM comunidades WHERE id = $1', [comunidad_id]);
+      if (communityResult.rows.length > 0) {
+        organizerName = `Comunidad: ${communityResult.rows[0].nombre}`;
+      }
+    }
     
     // Insert the new event into the database
     const result = await db.query(`
       INSERT INTO eventos 
-      (titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, organizador, es_especial) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, organizador, es_especial, creador_id, comunidad_id) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
     `, [
       titulo, 
@@ -7104,8 +7454,10 @@ app.post('/api/eventos', requireLogin, isAdminEventos, async (req, res) => {
       duracion || "1 hora",
       plataforma,
       etiquetasString,
-      "Equipo Pet-Chan", // Default organizer
-      esEspecial === true || esEspecial === 'true'
+      organizerName,
+      esEspecial === true || esEspecial === 'true',
+      userId, // Añadir creador_id
+      comunidad_id || null // Añadir comunidad_id
     ]);
     
     // Format the returned event for the response
@@ -7114,6 +7466,32 @@ app.post('/api/eventos', requireLogin, isAdminEventos, async (req, res) => {
       etiquetas: result.rows[0].etiquetas ? result.rows[0].etiquetas.split(',').map(tag => tag.trim()) : []
     };
     
+    // Crear notificaciones para todos los usuarios
+    try {
+      // Obtener todos los usuarios
+      const userIdsResult = await db.query(`SELECT id FROM users`);
+      
+      if (userIdsResult.rows.length > 0 && newEvent && newEvent.id) {
+        // Preparar valores para inserción masiva
+        const values = userIdsResult.rows.map(row => 
+          `(${newEvent.id}, ${row.id}, false)`
+        ).join(', ');
+        
+        // Insertar notificaciones para todos los usuarios
+        if (values.length > 0) {
+          await db.query(`
+            INSERT INTO eventos_notificaciones (evento_id, user_id, leido)
+            VALUES ${values}
+            ON CONFLICT (evento_id, user_id) DO NOTHING
+          `);
+          console.log(`Creadas ${userIdsResult.rows.length} notificaciones para el evento ${newEvent.id}`);
+        }
+      }
+    } catch (notifError) {
+      // Solo registrar el error, pero no interrumpir la creación de eventos
+      console.error('Error al crear notificaciones para el evento:', notifError);
+    }
+    
     res.status(201).json({
       success: true,
       mensaje: 'Evento creado correctamente',
@@ -7121,25 +7499,85 @@ app.post('/api/eventos', requireLogin, isAdminEventos, async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating event:', error);
-    res.status(500).json({ success: false, error: 'Error al crear evento en la base de datos' });
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error al crear evento en la base de datos', 
+      details: error.message 
+    });
   }
 });
 
-// PUT - Actualizar un evento existente (solo admin)
-app.put('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
+// Función para verificar el esquema actual de la tabla eventos
+async function checkEventosSchema() {
+  try {
+    const query = `
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'eventos' 
+      ORDER BY ordinal_position;
+    `;
+    
+    const result = await db.query(query);
+    console.log("Esquema actual de la tabla eventos:");
+    console.table(result.rows);
+    
+    return result.rows;
+  } catch (error) {
+    console.error("Error al verificar el esquema:", error);
+    return [];
+  }
+}
+
+// Ejecutar esta función antes de implementar los cambios para verificar la estructura actual
+// checkEventosSchema();
+
+// PUT - Update an existing event (admin or community admin)
+app.put('/api/eventos/:id', requireLogin, async (req, res) => {
   try {
     const eventId = req.params.id;
-    const { titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, esEspecial } = req.body;
+    const { titulo, descripcion, imagen, fecha, hora, duracion, plataforma, etiquetas, esEspecial, comunidad_id } = req.body;
+    const userId = req.session.userId;
     
     // Check if the event exists
-    const checkResult = await db.query(`SELECT * FROM eventos WHERE id = $1`, [eventId]);
+    const eventResult = await db.query(`SELECT * FROM eventos WHERE id = $1`, [eventId]);
     
-    if (checkResult.rows.length === 0) {
+    if (eventResult.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Evento no encontrado' });
+    }
+    
+    const event = eventResult.rows[0];
+    
+    // Check authorization
+    const isSystemAdmin = req.session.rango3 === 'Administrador';
+    let isCommunityAdmin = false;
+    
+    // For community admin, check if they have admin role in the community associated with the event
+    if (event.comunidad_id) {
+      const adminCheck = await db.query(
+        `SELECT * FROM comunidades_usuarios 
+         WHERE comunidad_id = $1 AND user_id = $2 AND rol = 'administrador'`,
+        [event.comunidad_id, userId]
+      );
+      
+      isCommunityAdmin = adminCheck.rows.length > 0;
+    }
+    
+    // Also check if user is the creator of the event
+    const isCreator = event.creador_id && event.creador_id === userId;
+    
+    // If neither system admin nor community admin nor creator, reject
+    if (!isSystemAdmin && !isCommunityAdmin && !isCreator) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'No tienes permisos para editar este evento' 
+      });
     }
     
     // Process etiquetas
     const etiquetasString = Array.isArray(etiquetas) ? etiquetas.join(',') : etiquetas;
+    
+    // Only system admin can change the community association
+    const finalComunidadId = isSystemAdmin ? (comunidad_id || event.comunidad_id) : event.comunidad_id;
     
     // Update the event in the database
     const updateResult = await db.query(`
@@ -7152,8 +7590,10 @@ app.put('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
         duracion = COALESCE($6, duracion),
         plataforma = COALESCE($7, plataforma),
         etiquetas = COALESCE($8, etiquetas),
-        es_especial = COALESCE($9, es_especial)
-      WHERE id = $10
+        es_especial = COALESCE($9, es_especial),
+        comunidad_id = $10,
+        fecha_modificacion = CURRENT_TIMESTAMP
+      WHERE id = $11
       RETURNING *
     `, [
       titulo || null,
@@ -7165,6 +7605,7 @@ app.put('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
       plataforma || null,
       etiquetasString || null,
       esEspecial !== undefined ? (esEspecial === true || esEspecial === 'true') : null,
+      finalComunidadId,
       eventId
     ]);
     
@@ -7181,20 +7622,54 @@ app.put('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating event:', error);
-    res.status(500).json({ success: false, error: 'Error al actualizar evento en la base de datos' });
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error al actualizar evento en la base de datos',
+      details: error.message
+    });
   }
 });
 
-// DELETE - Eliminar un evento (solo admin)
-app.delete('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) => {
+
+// DELETE - Delete an event (admin, community admin, or creator)
+app.delete('/api/eventos/:id', requireLogin, async (req, res) => {
   try {
     const eventId = req.params.id;
+    const userId = req.session.userId;
     
     // Check if the event exists
     const checkResult = await db.query(`SELECT * FROM eventos WHERE id = $1`, [eventId]);
     
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Evento no encontrado' });
+    }
+    
+    const event = checkResult.rows[0];
+    
+    // Check authorization
+    const isSystemAdmin = req.session.rango3 === 'Administrador';
+    let isCommunityAdmin = false;
+    
+    // Check if community admin (if event belongs to a community)
+    if (event.comunidad_id) {
+      const adminCheck = await db.query(
+        `SELECT * FROM comunidades_usuarios 
+         WHERE comunidad_id = $1 AND user_id = $2 AND rol = 'administrador'`,
+        [event.comunidad_id, userId]
+      );
+      
+      isCommunityAdmin = adminCheck.rows.length > 0;
+    }
+    
+    // Check if user is the creator
+    const isCreator = event.creador_id && event.creador_id === userId;
+    
+    // If neither system admin nor community admin nor creator, reject
+    if (!isSystemAdmin && !isCommunityAdmin && !isCreator) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'No tienes permisos para eliminar este evento' 
+      });
     }
     
     // Delete the event
@@ -7207,7 +7682,57 @@ app.delete('/api/eventos/:id', requireLogin, isAdminEventos, async (req, res) =>
     });
   } catch (error) {
     console.error('Error deleting event:', error);
-    res.status(500).json({ success: false, error: 'Error al eliminar evento de la base de datos' });
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error al eliminar evento de la base de datos',
+      details: error.message
+    });
+  }
+});
+
+// Helper function to check if user is admin or community admin
+async function isUserAuthorized(userId, communityId = null) {
+  try {
+    // Check if system admin
+    const userCheck = await db.query('SELECT rango3 FROM users WHERE id = $1', [userId]);
+    
+    if (userCheck.rows.length > 0 && userCheck.rows[0].rango3 === 'Administrador') {
+      return true;
+    }
+    
+    // If communityId provided, check if community admin
+    if (communityId) {
+      const adminCheck = await db.query(
+        `SELECT * FROM comunidades_usuarios 
+         WHERE comunidad_id = $1 AND user_id = $2 AND rol = 'administrador'`,
+        [communityId, userId]
+      );
+      
+      return adminCheck.rows.length > 0;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking user authorization:', error);
+    return false;
+  }
+}
+
+// GET - Check if the current user can create/edit events in a community
+app.get('/api/eventos/check-permissions/:comunidad_id?', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const comunidadId = req.params.comunidad_id || null;
+    
+    const isAuthorized = await isUserAuthorized(userId, comunidadId);
+    
+    res.json({
+      success: true,
+      canManageEvents: isAuthorized
+    });
+  } catch (error) {
+    console.error('Error checking permissions:', error);
+    res.status(500).json({ success: false, error: 'Error al verificar permisos' });
   }
 });
 
@@ -7828,7 +8353,7 @@ app.post('/actualizar-sesion-batalla', async (req, res) => {
     res.status(500).send();
   }
 });
-
+/*
 function obtenerTodosLosAtaques() {
   return [
     { name: "Llamarada", type: "fuego", power: 500 }, { name: "Infierno", type: "fuego", power: 500 },
@@ -7844,7 +8369,7 @@ function obtenerTodosLosAtaques() {
     { name: "Viento Feérico", type: "hada", power: 500 }, { name: "Hiperrayo", type: "normal", power: 500 }
   ];
 }
-/*
+*/
 function obtenerTodosLosAtaques() {
   return [
     { name: "Llamarada", type: "fuego", power: 60 }, { name: "Infierno", type: "fuego", power: 90 },
@@ -7860,7 +8385,7 @@ function obtenerTodosLosAtaques() {
     { name: "Viento Feérico", type: "hada", power: 80 }, { name: "Hiperrayo", type: "normal", power: 100 }
   ];
 }
-*/
+
 
 //funciones necesarias para la evolucion de mascotas 
 // En tu archivo principal (index.js o donde tengas configuraciones)
@@ -8563,3 +9088,6 @@ async function obtenerInfoMascota(petId) {
 httpServer.listen(3000, () => {
   console.log("Servidor corriendo en http://192.168.0.21:3000");
 });
+
+
+

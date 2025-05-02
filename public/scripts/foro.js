@@ -788,44 +788,41 @@ function cargarMensajesFiltrados(params) {
   // Añadir el mensaje a la lista primero
     listaMensajes.appendChild(mensajeElement);
     
-    // DESPUÉS creamos la sección de comentarios como un elemento separado
-    const comentariosSeccion = document.createElement('div');
-    comentariosSeccion.classList.add('comentarios-seccion');
-    
-    // Contador de comentarios y botón para mostrar/ocultar
-    const totalComentarios = mensaje.comentarios ? mensaje.comentarios.length : 0;
-    
-    const comentariosHeader = document.createElement('div');
-    comentariosHeader.classList.add('comentarios-header');
-    comentariosHeader.innerHTML = `
-      <button class="toggle-comentarios" aria-expanded="false">
-        <i class="fas fa-chevron-down"></i>
-        <span class="comentarios-contador">${totalComentarios} comentarios</span>
-      </button>
-    `;
-    comentariosSeccion.appendChild(comentariosHeader);
-    
-    // Contenedor de comentarios (inicialmente oculto)
-    const comentariosContenedor = document.createElement('div');
-    comentariosContenedor.classList.add('comentarios-contenedor');
-    comentariosContenedor.style.display = 'none';
-    
-    // Lista de comentarios
-    const comentariosLista = document.createElement('div');
-    comentariosLista.classList.add('comentarios-lista');
-    
-    if (mensaje.comentarios && mensaje.comentarios.length > 0) {
-      mensaje.comentarios.forEach(comentario => {
-        const comentarioElement = createCommentElement(comentario, mensaje.id, currentUsername);
-        comentariosLista.appendChild(comentarioElement);
-      });
-    }
-
+       // FIRST create the comments section
+       const comentariosSeccion = document.createElement('div');
+       comentariosSeccion.classList.add('comentarios-seccion');
+       
+       // Add comments header
+       const comentariosHeader = document.createElement('div');
+       comentariosHeader.classList.add('comentarios-header');
+       comentariosHeader.innerHTML = `
+         <button class="toggle-comentarios" aria-expanded="false">
+           <i class="fas fa-chevron-down"></i>
+           <span class="comentarios-contador">${mensaje.comentarios ? mensaje.comentarios.length : 0} comentarios</span>
+         </button>
+       `;
+       comentariosSeccion.appendChild(comentariosHeader);
+       
+       // Add comments container
+       const comentariosContenedor = document.createElement('div');
+       comentariosContenedor.classList.add('comentarios-contenedor');
+       comentariosContenedor.style.display = 'none';
+       
+       // Create comments list
+       const comentariosLista = document.createElement('div');
+       comentariosLista.classList.add('comentarios-lista');
+       
+       
+       // Assemble the comments structure
        comentariosContenedor.appendChild(comentariosLista);
-    comentariosSeccion.appendChild(comentariosContenedor);
-    
-    // Añadir la sección de comentarios DESPUÉS del mensaje
-    listaMensajes.appendChild(comentariosSeccion);
+       comentariosSeccion.appendChild(comentariosContenedor);
+       
+       // REMOVE THIS LINE - this is causing the duplication:
+       // mensajeElement.appendChild(comentariosSeccion);
+       
+       // Instead, append the comments section AFTER the message to the listaMensajes directly
+       listaMensajes.appendChild(mensajeElement);
+       listaMensajes.appendChild(comentariosSeccion);
 
 
       

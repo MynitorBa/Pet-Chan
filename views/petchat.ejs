@@ -2,48 +2,322 @@
 <html>
 <head>
     <title>Crear o unirse a sala</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
             margin: 0;
-            background-color: #f0f0f0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        input, button {
-            padding: 10px;
-            margin: 10px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
+        
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #220033;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(100, 0, 255, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 200, 0.2) 0%, transparent 40%);
+            position: relative;
+            overflow-x: hidden;
         }
-        button:hover {
-            background-color: #45a049;
+        
+        /* Efecto de partículas flotantes */
+        .particula {
+            position: absolute;
+            width: var(--tamaño, 5px);
+            height: var(--tamaño, 5px);
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotar calc(10s + var(--delay, 0s)) linear infinite;
+            top: calc(var(--posY, 50) * 1%);
+            left: calc(var(--posX, 50) * 1%);
+            opacity: 0.7;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+        
+        @keyframes flotar {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .titulo-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(128, 0, 255, 0.8);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(200, 0, 255, 0.5);
+            border: 2px solid rgba(255, 100, 255, 0.7);
+            overflow: hidden;
+        }
+        
+        .titulo-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #ff00ff, transparent);
+            animation: scan-line 2s linear infinite;
+        }
+        
+        @keyframes scan-line {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(100px);
+            }
+        }
+        
+        .decoracion-esquina {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+        }
+        
+        .esquina-1 {
+            top: 5px;
+            left: 5px;
+        }
+        
+        .esquina-2 {
+            top: 5px;
+            right: 5px;
+        }
+        
+        .esquina-3 {
+            bottom: 5px;
+            left: 5px;
+        }
+        
+        .esquina-4 {
+            bottom: 5px;
+            right: 5px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: white;
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 10px rgba(255, 100, 255, 0.8),
+                0 0 20px rgba(255, 100, 255, 0.5),
+                0 0 30px rgba(255, 100, 255, 0.3);
+            text-transform: uppercase;
+        }
+        
+        .subtitulo {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+        
+        .opciones-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 90%;
+            max-width: 1000px;
+        }
+        
+        .opcion-card {
+            width: 45%;
+            min-width: 300px;
+            background: linear-gradient(to bottom, #9900ff, #6600cc);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 100, 255, 0.5);
+        }
+        
+        .opcion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .opcion-header {
+            background-color: rgba(255, 0, 200, 0.7);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .opcion-body {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 200px;
+            justify-content: center;
+        }
+        
+        .boton-circular {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom right, rgba(255, 0, 200, 1), rgba(128, 0, 255, 1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            margin: 20px 0;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+        
+        .boton-circular:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.7);
+        }
+        
+        .opcion-texto {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 15px 0;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+        
+        .input-codigo {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 100, 255, 0.5);
+            border-radius: 5px;
+            color: white;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            outline: none;
+            font-family: 'VT323', monospace;
+            transition: all 0.3s ease;
+        }
+        
+        .input-codigo:focus {
+            border-color: rgba(255, 0, 255, 0.8);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+        
+        .label-codigo {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            align-self: flex-start;
+        }
+        
+        /* Botón Salir */
+        .boton-salir {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background-color: #ff0000;
+          color: white;
+          border: 3px solid #ffcc00;
+          border-radius: 8px;
+          padding: 10px 20px;
+          font-weight: bold;
+          cursor: pointer;
+          font-size: 18px;
+          box-shadow: 0 0 15px rgba(255,0,0,0.7);
+          transition: all 0.3s ease;
+          z-index: 9999;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .boton-salir:hover {
+          background-color: #ff3333;
+          transform: scale(1.1);
+          box-shadow: 0 0 20px rgba(255,0,0,0.9);
+        }
+
+        .boton-salir:active {
+          transform: scale(0.95);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Video Chat con Mundo Compartido</h1>
-        <button id="create-room">Crear nueva sala</button>
-        <p>o</p>
-        <input type="text" id="room-id" placeholder="ID de sala">
-        <button id="join-room">Unirse a sala</button>
+    <!-- Partículas de fondo -->
+    <div class="particula" style="--delay: 0s; --tamaño: 7px; --posX: 20; --posY: 80;"></div>
+    <div class="particula" style="--delay: 2s; --tamaño: 5px; --posX: 40; --posY: 60;"></div>
+    <div class="particula" style="--delay: 4s; --tamaño: 9px; --posX: 60; --posY: 70;"></div>
+    <div class="particula" style="--delay: 1s; --tamaño: 6px; --posX: 80; --posY: 50;"></div>
+    <div class="particula" style="--delay: 3s; --tamaño: 8px; --posX: 30; --posY: 40;"></div>
+    <div class="particula" style="--delay: 5s; --tamaño: 4px; --posX: 70; --posY: 30;"></div>
+    
+    <!-- Título principal -->
+    <div class="titulo-container">
+        <div class="decoracion-esquina esquina-1"></div>
+        <div class="decoracion-esquina esquina-2"></div>
+        <div class="decoracion-esquina esquina-3"></div>
+        <div class="decoracion-esquina esquina-4"></div>
+        
+        <h1>Video Chat</h1>
+        <div class="subtitulo">Conecta con otros usuarios en un mundo virtual compartido</div>
     </div>
+    
+    <!-- Opciones de sala -->
+    <div class="opciones-container">
+        <div class="opcion-card">
+            <div class="opcion-header">Crear nueva sala</div>
+            <div class="opcion-body">
+                <button id="create-room" class="boton-circular">+</button>
+                <div class="opcion-texto">Crea una sala nueva e invita a amigos a unirse con tu código</div>
+            </div>
+        </div>
+        
+        <div class="opcion-card">
+            <div class="opcion-header">Unirse a sala existente</div>
+            <div class="opcion-body">
+                <div class="opcion-texto">Introduce el código de la sala a la que deseas unirte</div>
+                <label class="label-codigo">Código de sala:</label>
+                <input type="text" id="room-id" class="input-codigo" placeholder="Escribe el código aquí...">
+                <button id="join-room" class="boton-circular">→</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botón de Salir añadido -->
+    <a href="/inicio" class="boton-salir">
+        <span style="font-size: 22px; margin-right: 5px;">⇦</span> SALIR
+    </a>
 
     <script type="module">
         document.getElementById('create-room').addEventListener('click', () => {

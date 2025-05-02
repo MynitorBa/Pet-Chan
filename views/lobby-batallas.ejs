@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,10 +6,50 @@
   <title>Lobby de Batalla de Mascotas</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles/batallas2.css">
+  <style>
+    /* Botón Salir */
+    .boton-salir {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #ff0000;
+      color: white;
+      border: 3px solid #ffcc00;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 0 15px rgba(255,0,0,0.7);
+      transition: all 0.3s ease;
+      z-index: 9999;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .boton-salir:hover {
+      background-color: #ff3333;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255,0,0,0.9);
+    }
+
+    .boton-salir:active {
+      transform: scale(0.95);
+    }
+  </style>
 </head>
 <body>
   <!-- Efecto de fondo -->
   <div class="bg-effect"></div>
+  
+  <!-- Botón de Salir añadido -->
+  <a href="/inicio" class="boton-salir">
+    <span style="font-size: 18px; margin-right: 5px;">⇦</span> SALIR
+  </a>
   
   <!-- Estrellas decorativas -->
   <script>

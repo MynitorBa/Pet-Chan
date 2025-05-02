@@ -5,9 +5,75 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/intercambio.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Botón Salir integrado con el estilo existente */
+        .boton-salir {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #ff0000;
+            color: white;
+            border: 3px solid #ffcc00;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'VT323', monospace;
+            box-shadow: 0 0 15px rgba(255,0,0,0.7);
+            transition: all 0.3s ease;
+            z-index: 9999;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform-style: preserve-3d;
+            perspective: 500px;
+        }
+
+        .boton-salir:hover {
+            background-color: #ff3333;
+            transform: scale(1.1) translateZ(10px);
+            box-shadow: 0 0 20px rgba(255,0,0,0.9);
+        }
+
+        .boton-salir:active {
+            transform: scale(0.95);
+        }
+        
+        /* Efecto pixel para los bordes, consistente con el diseño actual */
+        .boton-salir::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            z-index: 1;
+        }
+        
+        .boton-salir::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            z-index: 1;
+        }
+    </style>
 </head>
 <body>
     <div class="intercambio-contenedor">
+        <!-- Botón de Salir añadido -->
+        <a href="/inicio" class="boton-salir">
+            <span style="font-size: 18px; margin-right: 5px;">⇦</span> SALIR
+        </a>
+        
         <div class="intercambio-banner">
             <div class="pixel-decoracion pixel-esquina-1"></div>
             <div class="pixel-decoracion pixel-esquina-2"></div>

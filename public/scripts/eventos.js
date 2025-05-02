@@ -586,7 +586,6 @@ function generarEventos() {
     agregarToggleEventosPasados();
 }
 
-// Funciones para administración de eventos
 function abrirFormularioEvento(modo, eventoId = null) {
     let evento = null;
     let titulo = 'Crear nuevo evento';
@@ -608,79 +607,124 @@ function abrirFormularioEvento(modo, eventoId = null) {
     }
     
     const modal = document.querySelector('.modal');
-    modal.innerHTML = `
-        <div class="modal-contenido modal-grande">
-            <span class="cerrar-modal">×</span>
-            <h2 class="modal-titulo">${titulo}</h2>
-            <div class="modal-cuerpo">
-                <form id="formulario-evento" class="formulario-evento">
-                    <input type="hidden" id="evento-id" value="${evento ? evento.id : ''}">
-                    <div class="form-group">
-                        <label for="titulo"><i class="fas fa-heading"></i> Título del evento *</label>
-                        <input type="text" id="titulo" name="titulo" value="${evento ? evento.titulo : ''}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="descripcion"><i class="fas fa-align-left"></i> Descripción del evento *</label>
-                        <textarea id="descripcion" name="descripcion" rows="3" required>${evento ? evento.descripcion : ''}</textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label for="fecha"><i class="fas fa-calendar"></i> Fecha *</label>
-                            <input type="date" id="fecha" name="fecha" value="${fechaFormateada}" required>
-                        </div>
-                        <div class="form-group half">
-                            <label for="hora"><i class="fas fa-clock"></i> Hora *</label>
-                            <input type="time" id="hora" name="hora" value="${evento ? evento.hora : '18:00'}" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label for="duracion"><i class="fas fa-hourglass"></i> Duración *</label>
-                            <input type="text" id="duracion" name="duracion" value="${evento ? evento.duracion : '2 horas'}" 
-                                placeholder="Ej: 2 horas, 30 minutos" required>
-                            <div class="help-text">Formato válido: número seguido de "hora", "horas", "minuto" o "minutos".</div>
-                            <div class="help-text">Ejemplos: "2 horas", "30 minutos", "1 hora", "45 minutos"</div>
-                            <div id="duracion-error" class="error-text" style="color: #ff6b6b; display: none;">
-                                <i class="fas fa-exclamation-circle"></i> Formato inválido. Use un número seguido de "hora", "horas", "minuto" o "minutos".
-                            </div>
-                        </div>
-                        <div class="form-group half">
-                            <label for="plataforma"><i class="fas fa-laptop"></i> Plataforma *</label>
-                            <select id="plataforma" name="plataforma" required>
-                                <option value="Discord" ${evento && evento.plataforma === 'Discord' ? 'selected' : ''}>Discord</option>
-                                <option value="Zoom" ${evento && evento.plataforma === 'Zoom' ? 'selected' : ''}>Zoom</option>
-                                <option value="Twitch" ${evento && evento.plataforma === 'Twitch' ? 'selected' : ''}>Twitch</option>
-                                <option value="YouTube Live" ${evento && evento.plataforma === 'YouTube Live' ? 'selected' : ''}>YouTube Live</option>
-                                <option value="Pet-Chan App" ${evento && evento.plataforma === 'Pet-Chan App' ? 'selected' : ''}>Pet-Chan App</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="imagen"><i class="fas fa-image"></i> URL de la imagen</label>
-                        <input type="url" id="imagen" name="imagen" value="${evento ? evento.imagen : ''}" placeholder="https://ejemplo.com/imagen.gif">
-                        <div class="help-text">Deja en blanco para usar una imagen predeterminada.</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="etiquetas"><i class="fas fa-tags"></i> Etiquetas (separadas por coma)</label>
-                        <input type="text" id="etiquetas" name="etiquetas" value="${evento ? (evento.etiquetas && evento.etiquetas.join ? evento.etiquetas.join(', ') : evento.etiquetas) : ''}" placeholder="Ej: Competitivo, Premios, Mascotas">
-                    </div>
-                    <div class="form-group">
-                        <label for="es-especial" class="checkbox-label">
-                            <input type="checkbox" id="es-especial" name="esEspecial" ${evento && evento.es_especial ? 'checked' : ''}>
-                            <span><i class="fas fa-star"></i> Evento especial (anual)</span>
-                        </label>
-                        <div class="help-text">Los eventos especiales se reprograman automáticamente para el año siguiente.</div>
-                    </div>
-                    <div class="form-group buttons-group">
-                        <button type="submit" class="boton-enviar">${modo === 'editar' ? '<i class="fas fa-save"></i> Guardar cambios' : '<i class="fas fa-plus"></i> Crear evento'}</button>
-                        <button type="button" class="boton-cancelar" id="cancelar-evento"><i class="fas fa-times"></i> Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    `;
     
-    modal.style.display = 'block';
+    // First, check if user is system admin or community admin
+    const fetchPromises = [
+        fetch('/api/check-admin').then(res => res.json()),
+        fetch('/api/comunidades/administradas').then(res => res.json())
+    ];
+    
+    Promise.all(fetchPromises)
+        .then(([sysAdminData, commAdminData]) => {
+            const isSysAdmin = sysAdminData.success && sysAdminData.isAdmin;
+            const adminCommunities = commAdminData.exito ? commAdminData.comunidades : [];
+            
+            // Build community selector HTML if user is a community admin
+            let comunidadSelectorHTML = '';
+            if (adminCommunities.length > 0) {
+                comunidadSelectorHTML = `
+                    <div class="form-group">
+                        <label for="comunidad"><i class="fas fa-users"></i> Comunidad asociada</label>
+                        <select id="comunidad" name="comunidad" ${isSysAdmin ? '' : 'required'}>
+                            ${isSysAdmin ? '<option value="">Sin asociación (Evento global)</option>' : ''}
+                            ${adminCommunities.map(c => `
+                                <option value="${c.id}" ${evento && evento.comunidad_id == c.id ? 'selected' : ''}>${c.nombre}</option>
+                            `).join('')}
+                        </select>
+                        <div class="help-text">Elige la comunidad a la que pertenece este evento.</div>
+                    </div>
+                `;
+            }
+            
+            modal.innerHTML = `
+                <div class="modal-contenido modal-grande">
+                    <span class="cerrar-modal">×</span>
+                    <h2 class="modal-titulo">${titulo}</h2>
+                    <div class="modal-cuerpo">
+                        <form id="formulario-evento" class="formulario-evento">
+                            <input type="hidden" id="evento-id" value="${evento ? evento.id : ''}">
+                            <div class="form-group">
+                                <label for="titulo"><i class="fas fa-heading"></i> Título del evento *</label>
+                                <input type="text" id="titulo" name="titulo" value="${evento ? evento.titulo : ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcion"><i class="fas fa-align-left"></i> Descripción del evento *</label>
+                                <textarea id="descripcion" name="descripcion" rows="3" required>${evento ? evento.descripcion : ''}</textarea>
+                            </div>
+                            
+                            ${comunidadSelectorHTML}
+                            
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="fecha"><i class="fas fa-calendar"></i> Fecha *</label>
+                                    <input type="date" id="fecha" name="fecha" value="${fechaFormateada}" required>
+                                </div>
+                                <div class="form-group half">
+                                    <label for="hora"><i class="fas fa-clock"></i> Hora *</label>
+                                    <input type="time" id="hora" name="hora" value="${evento ? evento.hora : '18:00'}" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="duracion"><i class="fas fa-hourglass"></i> Duración *</label>
+                                    <input type="text" id="duracion" name="duracion" value="${evento ? evento.duracion : '2 horas'}" 
+                                        placeholder="Ej: 2 horas, 30 minutos" required>
+                                    <div class="help-text">Formato válido: número seguido de "hora", "horas", "minuto" o "minutos".</div>
+                                    <div class="help-text">Ejemplos: "2 horas", "30 minutos", "1 hora", "45 minutos"</div>
+                                    <div id="duracion-error" class="error-text" style="color: #ff6b6b; display: none;">
+                                        <i class="fas fa-exclamation-circle"></i> Formato inválido. Use un número seguido de "hora", "horas", "minuto" o "minutos".
+                                    </div>
+                                </div>
+                                <div class="form-group half">
+                                    <label for="plataforma"><i class="fas fa-laptop"></i> Plataforma *</label>
+                                    <select id="plataforma" name="plataforma" required>
+                                        <option value="Discord" ${evento && evento.plataforma === 'Discord' ? 'selected' : ''}>Discord</option>
+                                        <option value="Zoom" ${evento && evento.plataforma === 'Zoom' ? 'selected' : ''}>Zoom</option>
+                                        <option value="Twitch" ${evento && evento.plataforma === 'Twitch' ? 'selected' : ''}>Twitch</option>
+                                        <option value="YouTube Live" ${evento && evento.plataforma === 'YouTube Live' ? 'selected' : ''}>YouTube Live</option>
+                                        <option value="Pet-Chan App" ${evento && evento.plataforma === 'Pet-Chan App' ? 'selected' : ''}>Pet-Chan App</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="imagen"><i class="fas fa-image"></i> URL de la imagen</label>
+                                <input type="url" id="imagen" name="imagen" value="${evento ? evento.imagen : ''}" placeholder="https://ejemplo.com/imagen.gif">
+                                <div class="help-text">Deja en blanco para usar una imagen predeterminada.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="etiquetas"><i class="fas fa-tags"></i> Etiquetas (separadas por coma)</label>
+                                <input type="text" id="etiquetas" name="etiquetas" value="${evento ? (evento.etiquetas && evento.etiquetas.join ? evento.etiquetas.join(', ') : evento.etiquetas) : ''}" placeholder="Ej: Competitivo, Premios, Mascotas">
+                            </div>
+                            <div class="form-group">
+                                <label for="es-especial" class="checkbox-label">
+                                    <input type="checkbox" id="es-especial" name="esEspecial" ${evento && evento.es_especial ? 'checked' : ''}>
+                                    <span><i class="fas fa-star"></i> Evento especial (anual)</span>
+                                </label>
+                                <div class="help-text">Los eventos especiales se reprograman automáticamente para el año siguiente.</div>
+                            </div>
+                            <div class="form-group buttons-group">
+                                <button type="submit" class="boton-enviar">${modo === 'editar' ? '<i class="fas fa-save"></i> Guardar cambios' : '<i class="fas fa-plus"></i> Crear evento'}</button>
+                                <button type="button" class="boton-cancelar" id="cancelar-evento"><i class="fas fa-times"></i> Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+            
+            // Add event listeners and validation
+            setupEventFormListeners(evento);
+        })
+        .catch(error => {
+            console.error('Error obtaining admin data:', error);
+            mostrarNotificacion('Error al cargar el formulario', 'error');
+        });
+}
+  
+   // Separate function for event listeners setup to reduce complexity
+function setupEventFormListeners(evento) {
+    const modal = document.querySelector('.modal');
     
     // Validación en tiempo real del campo de duración
     const duracionInput = document.getElementById('duracion');
@@ -735,6 +779,12 @@ function abrirFormularioEvento(modo, eventoId = null) {
             etiquetas: document.getElementById('etiquetas').value.split(',').map(tag => tag.trim()).filter(tag => tag),
             esEspecial: document.getElementById('es-especial').checked
         };
+        
+        // Add comunidad_id if present
+        const comunidadSelect = document.getElementById('comunidad');
+        if (comunidadSelect && comunidadSelect.value) {
+            formData.comunidad_id = parseInt(comunidadSelect.value);
+        }
         
         // Validar campos obligatorios
         if (!formData.titulo || !formData.descripcion || !formData.fecha || !formData.hora || !formData.plataforma) {
@@ -873,56 +923,92 @@ function mostrarListaEventosAdmin() {
         modal.style.display = 'none';
     });
     
+
     // Botón para crear nuevo evento
-    document.getElementById('btn-crear-evento').addEventListener('click', function() {
-        modal.style.display = 'none';
-        abrirFormularioEvento('crear');
-    });
+document.getElementById('btn-crear-evento').addEventListener('click', function() {
+    modal.style.display = 'none';
+    abrirFormularioEvento('crear');
+});
+
+// Y en el manejador del formulario de eventos (dentro de la función abrirFormularioEvento):
+document.getElementById('formulario-evento')?.addEventListener('submit', function(e) {
+    e.preventDefault();
     
-    // Botones de editar
-    document.querySelectorAll('.btn-admin-editar').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const eventoId = this.dataset.id;
-            modal.style.display = 'none';
-            abrirFormularioEvento('editar', eventoId);
-        });
-    });
+    // Validar formato de duración antes de enviar
+    const duracionValor = duracionInput.value.trim();
+    if (!validarFormatoDuracion(duracionValor)) {
+        duracionError.style.display = 'block';
+        duracionInput.classList.add('campo-error');
+        duracionInput.focus();
+        mostrarNotificacion('El formato de duración no es válido.', 'error');
+        return;
+    }
     
-    // Botones de eliminar
-    document.querySelectorAll('.btn-admin-eliminar').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const eventoId = this.dataset.id;
-            const evento = eventosData.find(e => e.id == eventoId);
+    // Recopilar datos del formulario
+    const eventoId = document.getElementById('evento-id').value;
+    const formData = {
+        titulo: document.getElementById('titulo').value,
+        descripcion: document.getElementById('descripcion').value,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        duracion: duracionValor,
+        plataforma: document.getElementById('plataforma').value,
+        imagen: document.getElementById('imagen').value,
+        etiquetas: document.getElementById('etiquetas').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+        esEspecial: document.getElementById('es-especial').checked
+    };
+    
+    // Validar campos obligatorios
+    if (!formData.titulo || !formData.descripcion || !formData.fecha || !formData.hora || !formData.plataforma) {
+        mostrarNotificacion('Por favor, completa todos los campos obligatorios', 'error');
+        return;
+    }
+    
+    // Determinar si es crear o actualizar
+    const method = eventoId ? 'PUT' : 'POST';
+    const url = eventoId ? `/api/eventos/${eventoId}` : '/api/eventos';
+    
+    // Llamar a la API
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            mostrarNotificacion(
+                eventoId ? 'Evento actualizado correctamente' : 'Evento creado correctamente', 
+                'success'
+            );
             
-            if (confirm(`¿Estás seguro de que deseas eliminar el evento "${evento.titulo}"?`)) {
-                // Llamar a la API para eliminar
-                fetch(`/api/eventos/${eventoId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Primero actualizar los datos desde el servidor
-                        fetchEventosFromServer().then(() => {
-                            // Después mostrar la notificación
-                            mostrarNotificacion('Evento eliminado correctamente', 'success');
-                            
-                            // Y finalmente volver a mostrar el panel de admin con los datos actualizados
-                            mostrarListaEventosAdmin();
-                        });
-                    } else {
-                        mostrarNotificacion('Error: ' + data.error, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    mostrarNotificacion('Error al comunicarse con el servidor', 'error');
-                });
+            // Cerrar modal
+            modal.style.display = 'none';
+            
+            // AÑADIR RECARGA DE PÁGINA DESPUÉS DE CREAR UN EVENTO
+            if (!eventoId) { // Solo recargamos si es un evento nuevo (crear, no editar)
+                // Breve retraso para que el usuario vea la notificación
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500); // Recargar después de 1.5 segundos
+            } else {
+                // Si es edición, actualizamos los datos sin recargar
+                fetchEventosFromServer();
             }
-        });
+        } else {
+            mostrarNotificacion('Error: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al comunicarse con el servidor', 'error');
+    });
+
+            
+        
     });
 }
 
@@ -981,4 +1067,90 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
             notificacion.remove();
         }, 300);
     }, 5000);
+}
+
+
+
+
+
+
+
+
+
+
+// Function to check if user is admin or community admin
+function checkAdminStatus() {
+    // First check if user is a system administrator
+    fetch('/api/check-admin')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.isAdmin) {
+                isAdmin = true;
+                showAdminControls();
+            } else {
+                // If not system admin, check if user is a community admin
+                checkCommunityAdminStatus();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking admin status:', error);
+            // If error, still check community admin status as fallback
+            checkCommunityAdminStatus();
+        });
+}
+
+// New function to check if user is admin of any community
+function checkCommunityAdminStatus() {
+    fetch('/api/comunidades/administradas')
+        .then(response => response.json())
+        .then(data => {
+            if (data.exito && data.comunidades && data.comunidades.length > 0) {
+                // User is admin of at least one community
+                isAdmin = true;
+                showAdminControls();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking community admin status:', error);
+        });
+}
+
+// Function to show admin controls
+function showAdminControls() {
+    const panelAdmin = document.getElementById('panel-admin');
+    const botonFlotante = document.getElementById('boton-flotante');
+    
+    if (panelAdmin) panelAdmin.style.display = 'block';
+    if (botonFlotante) botonFlotante.style.display = 'flex';
+    
+    // Add event listener for toggle button
+    document.getElementById('toggle-admin-panel')?.addEventListener('click', function() {
+        var adminTools = document.getElementById('admin-tools');
+        if (adminTools) {
+            if (adminTools.style.display === 'none') {
+                adminTools.style.display = 'block';
+            } else {
+                adminTools.style.display = 'none';
+            }
+        }
+    });
+    
+    // Add events to admin panel buttons
+    document.getElementById('nuevo-evento')?.addEventListener('click', function() {
+        abrirFormularioEvento('crear');
+    });
+    
+    document.getElementById('gestionar-eventos')?.addEventListener('click', function() {
+        mostrarListaEventosAdmin();
+    });
+    
+    // Add event to floating button
+    document.getElementById('boton-flotante')?.addEventListener('click', function() {
+        abrirFormularioEvento('crear');
+    });
+    
+    // Re-render eventos to ensure admin buttons are properly displayed
+    if (eventosData.length > 0) {
+        generarEventos();
+    }
 }

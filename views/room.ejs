@@ -151,7 +151,7 @@
         #connection-status {
             position: fixed;
             top: 10px;
-            right: 10px;
+            right: 170px; /* Movido más hacia la izquierda */
             color: white;
             background: rgba(0,0,0,0.7);
             padding: 10px 15px;
@@ -185,6 +185,40 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         
+        /* Botón Salir - modificado para estar arriba */
+        .boton-salir {
+          position: fixed;
+          top: 10px;
+          right: 10px;
+          background-color: #ff0000;
+          color: white;
+          border: 3px solid #ffcc00;
+          border-radius: 8px;
+          padding: 10px 20px;
+          font-weight: bold;
+          cursor: pointer;
+          font-size: 16px;
+          box-shadow: 0 0 15px rgba(255,0,0,0.7);
+          transition: all 0.3s ease;
+          z-index: 9999;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .boton-salir:hover {
+          background-color: #ff3333;
+          transform: scale(1.1);
+          box-shadow: 0 0 20px rgba(255,0,0,0.9);
+        }
+
+        .boton-salir:active {
+          transform: scale(0.95);
+        }
+        
         /* Efectos para elementos interactivos */
         button {
             transition: all 0.3s ease;
@@ -209,6 +243,12 @@
 </head>
 <body>
     <div id="room-info">Sala: <%= roomId %></div>
+    
+    <!-- Botón de Salir ahora en la parte superior -->
+    <a href="/inicio" class="boton-salir">
+        <span style="font-size: 18px; margin-right: 5px;">⇦</span> SALIR
+    </a>
+    
     <div id="connection-status" class="disconnected">Conectando...</div>
     <div id="controls-info">Usa las teclas WASD o flechas para moverte</div>
     <div id="viewport">
@@ -254,5 +294,3 @@
     </script>
 </body>
 </html>
-
-

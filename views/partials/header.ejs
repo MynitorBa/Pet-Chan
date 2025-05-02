@@ -4,16 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foro Inicio</title>
-    <link rel="stylesheet" href="styles/header.css">
+    <link rel="stylesheet" href="/styles/header.css">
     <!-- Asegúrate de incluir Font Awesome para los iconos -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Estilos para el panel de notificaciones */
+        .notificacion-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: -80px;
+            width: 320px;
+            max-height: 400px;
+            background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1002;
+            overflow-y: auto;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        .notificacion-panel.activo {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notificacion-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notificacion-panel-title {
+            font-size: 1em;
+            color: white;
+            margin: 0;
+        }
+
+        .notificacion-panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notificacion-panel-actions button {
+            background: rgba(163, 4, 250, 0.8);
+            border: none;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notificacion-panel-actions button:hover {
+            background: #620296;
+        }
+
+        .notificacion-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notificacion-item {
+            background: rgba(163, 4, 250, 0.6);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .notificacion-item:hover {
+            background: rgba(163, 4, 250, 0.8);
+            transform: translateX(5px);
+        }
+
+        .notificacion-icono {
+            background: #ff3366;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notificacion-contenido {
+            flex: 1;
+        }
+
+        .notificacion-titulo {
+            font-size: 0.85em;
+            color: white;
+            margin: 0 0 5px 0;
+        }
+
+        .notificacion-detalles {
+            display: flex;
+            gap: 10px;
+            font-size: 0.75em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .notificacion-detalle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .notificacion-vacia {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.85em;
+        }
+
+        .ver-todos-link {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            color: white;
+            background: rgba(163, 4, 250, 0.8);
+            border-radius: 6px;
+            margin-top: 10px;
+            text-decoration: none;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+
+        .ver-todos-link:hover {
+            background: #620296;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
     <header class="encabezado-principal">
         <div class="contenido-encabezado">
             <!-- Logo section -->
             <div class="logo-container">
-                <img src="../imagenes_y_gif/logo.png" alt="Logo del sitio">
+                <img src="/imagenes_y_gif/logo.png" alt="Logo del sitio">
             </div>
     
             <button class="boton-menu">
@@ -32,7 +178,6 @@
                     <li><a href="/eventos"><i class="fas fa-calendar"></i>Eventos</a></li>
                     <li><a href="/biblioteca"><i class="fas fa-book"></i>Biblioteca</a></li>
                     <li><a href="/comunidad"><i class="fas fa-users"></i>Comunidad</a></li>
-                    <li><a href="#"><i class="fas fa-cog"></i>Configuración</a></li>
                     <li><a href="/ayuda"><i class="fas fa-question-circle"></i>Ayuda</a></li>
                     <li><a href="/logout"><i class="fas fa-sign-out-alt"></i>Cerrar Sesión</a></li>
                 </ul>
@@ -47,12 +192,26 @@
     
             <!-- Action buttons and Notification Bell -->
             <div class="botones-accion">
-
                 
                 <!-- Notification Bell -->
-                <div class="notificacion-campana">
+                <div class="notificacion-campana" id="notificacion-campana">
                     <i class="fas fa-bell"></i>
-                    <span class="badge-notificacion">5</span>
+                    <span class="badge-notificacion" id="badge-notificacion">0</span>
+                    
+                    <!-- Panel de notificaciones -->
+                    <div class="notificacion-panel" id="notificacion-panel">
+                        <div class="notificacion-panel-header">
+                            <h3 class="notificacion-panel-title">Notificaciones</h3>
+                            <div class="notificacion-panel-actions">
+                                <button id="marcar-todo-leido">Marcar todo como leído</button>
+                            </div>
+                        </div>
+                        <ul class="notificacion-lista" id="notificacion-lista">
+                            <!-- Los items de notificación se generarán dinámicamente -->
+                            <li class="notificacion-vacia">Cargando notificaciones...</li>
+                        </ul>
+                        <a href="/eventos" class="ver-todos-link">Ver todos los eventos</a>
+                    </div>
                 </div>
             </div>
     
@@ -76,22 +235,173 @@
             </div>
         </div>
     </header>
-
-
     
     <!-- Overlay for mobile menu -->
     <div id="menu-overlay" class="menu-overlay"></div>
-
-    
     
     <main>
-
-
-
-        <script src="/scripts/header.js"></script>
-
-
-
-
-
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos del DOM
+        const campana = document.getElementById('notificacion-campana');
+        const panel = document.getElementById('notificacion-panel');
+        const badge = document.getElementById('badge-notificacion');
+        const listaNotificaciones = document.getElementById('notificacion-lista');
+        const marcarTodoLeido = document.getElementById('marcar-todo-leido');
         
+        // Variable para almacenar las notificaciones
+        let notificaciones = [];
+        
+        // Función para cargar las notificaciones
+        function cargarNotificaciones() {
+            fetch('/api/notificaciones-eventos')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        notificaciones = data.eventos;
+                        actualizarBadgeNotificaciones(data.unreadCount);
+                        renderizarNotificaciones();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar notificaciones:', error);
+                    listaNotificaciones.innerHTML = '<li class="notificacion-vacia">Error al cargar notificaciones</li>';
+                });
+        }
+        
+        // Función para actualizar el contador de notificaciones
+        function actualizarBadgeNotificaciones(count) {
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'flex' : 'none';
+            
+            // Añadir animación a la campana si hay notificaciones
+            if (count > 0) {
+                campana.classList.add('animating');
+                setTimeout(() => {
+                    campana.classList.remove('animating');
+                }, 1000);
+            }
+        }
+        
+        // Función para renderizar las notificaciones en el panel
+        function renderizarNotificaciones() {
+            if (notificaciones.length === 0) {
+                listaNotificaciones.innerHTML = '<li class="notificacion-vacia">No tienes notificaciones</li>';
+                return;
+            }
+            
+            listaNotificaciones.innerHTML = '';
+            
+            notificaciones.forEach(evento => {
+                // Formatear la fecha
+                const fecha = new Date(evento.fecha);
+                const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
+                
+                const li = document.createElement('li');
+                li.className = 'notificacion-item';
+                li.dataset.id = evento.id;
+                
+                li.innerHTML = `
+                    <div class="notificacion-icono">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="notificacion-contenido">
+                        <h4 class="notificacion-titulo">${evento.titulo}</h4>
+                        <div class="notificacion-detalles">
+                            <span class="notificacion-detalle">
+                                <i class="fas fa-calendar"></i> ${fechaFormateada}
+                            </span>
+                            <span class="notificacion-detalle">
+                                <i class="fas fa-clock"></i> ${evento.hora}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                
+                li.addEventListener('click', () => {
+                    marcarComoLeido(evento.id);
+                    window.location.href = `/eventos#evento-${evento.id}`;
+                });
+                
+                listaNotificaciones.appendChild(li);
+            });
+        }
+        
+        // Función para marcar una notificación como leída
+        function marcarComoLeido(eventoId) {
+            fetch('/api/notificaciones-eventos/marcar-leido', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ eventoId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar la UI
+                    cargarNotificaciones();
+                }
+            })
+            .catch(error => {
+                console.error('Error al marcar notificación como leída:', error);
+            });
+        }
+        
+        // Marcar todas las notificaciones como leídas
+        marcarTodoLeido.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            fetch('/api/notificaciones-eventos/marcar-leido', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar la UI
+                    actualizarBadgeNotificaciones(0);
+                    cargarNotificaciones();
+                }
+            })
+            .catch(error => {
+                console.error('Error al marcar todo como leído:', error);
+            });
+        });
+        
+        // Toggle del panel de notificaciones
+        campana.addEventListener('click', function(e) {
+            e.stopPropagation();
+            panel.classList.toggle('activo');
+            
+            // Si se está mostrando el panel, cargar las notificaciones
+            if (panel.classList.contains('activo')) {
+                cargarNotificaciones();
+            }
+        });
+        
+        // Cerrar panel al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (panel.classList.contains('activo') && !panel.contains(e.target) && e.target !== campana && !campana.contains(e.target)) {
+                panel.classList.remove('activo');
+            }
+        });
+        
+        // Inicializar: cargar notificaciones al cargar la página
+        cargarNotificaciones();
+        
+        // Comprobar notificaciones cada 5 minutos
+        setInterval(cargarNotificaciones, 5 * 60 * 1000);
+    });
+    </script>
+    <script src="/scripts/header.js"></script>
+    </main>
+</body>
+</html>

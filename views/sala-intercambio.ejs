@@ -7,8 +7,49 @@
 
     <link rel="stylesheet" href="/styles/intercambio.css">
    
+    <style>
+        /* Botón Salir */
+        .boton-salir {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background-color: #ff0000;
+          color: white;
+          border: 3px solid #ffcc00;
+          border-radius: 8px;
+          padding: 10px 20px;
+          font-weight: bold;
+          cursor: pointer;
+          font-size: 18px;
+          box-shadow: 0 0 15px rgba(255,0,0,0.7);
+          transition: all 0.3s ease;
+          z-index: 9999;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .boton-salir:hover {
+          background-color: #ff3333;
+          transform: scale(1.1);
+          box-shadow: 0 0 20px rgba(255,0,0,0.9);
+        }
+
+        .boton-salir:active {
+          transform: scale(0.95);
+        }
+
+    </style>
 </head>
 <body>
+    <!-- Botón de Salir añadido -->
+    <a href="/inicio" class="boton-salir">
+        <span style="font-size: 22px; margin-right: 5px;">⇦</span> SALIR
+    </a>
+
     <div class="intercambio-contenedor">
         <div class="intercambio-banner sala-banner">
             <div class="pixel-decoracion pixel-esquina-1"></div>
@@ -103,7 +144,7 @@
         </div>
         
         <div class="particulas-container">
-            <div class="particula" style="--delay: 0s; --tamaño: 7px;"></div>
+            <div class="particula" style="--delay: a0s; --tamaño: 7px;"></div>
             <div class="particula" style="--delay: 2s; --tamaño: 5px;"></div>
             <div class="particula" style="--delay: 4s; --tamaño: 9px;"></div>
             <div class="particula" style="--delay: 1s; --tamaño: 6px;"></div>
