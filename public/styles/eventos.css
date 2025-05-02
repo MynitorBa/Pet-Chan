@@ -734,7 +734,33 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid #cf7cfc;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    padding: 15px; /* Añadido relleno para mejorar la apariencia */
+    max-width: 300px; /* Asegura que el panel no crezca demasiado */
+    width: auto; /* Evita que el panel tenga un tamaño fijo */
 }
+
+/* Ajustes para pantallas medianas */
+@media (max-width: 768px) {
+    .panel-admin {
+        bottom: 80px; /* Ajuste de la distancia inferior */
+        left: 10px; /* Ajuste de la distancia desde la izquierda */
+        width: 80%; /* Ancho ajustable según el tamaño de la pantalla */
+        max-width: 250px; /* Limita el tamaño del panel en pantallas más pequeñas */
+        padding: 12px; /* Reduce el relleno */
+    }
+}
+
+/* Ajustes para pantallas más pequeñas */
+@media (max-width: 480px) {
+    .panel-admin {
+        bottom: 70px; /* Ajusta la posición desde la parte inferior */
+        left: 5%; /* Ajuste de la distancia desde la izquierda */
+        width: 90%; /* Hace que el panel ocupe más espacio en pantallas pequeñas */
+        max-width: 200px; /* Limita el tamaño del panel */
+        padding: 10px; /* Rellena un poco menos para ahorrar espacio */
+    }
+}
+
 
 .boton-admin {
     background: linear-gradient(45deg, #620296, #a304fa);

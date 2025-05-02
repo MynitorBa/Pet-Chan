@@ -290,10 +290,13 @@ body {
     word-wrap: break-word;
 }
 
+/* Ensure tags and community badges don't get too squeezed */
 .etiqueta, .comunidad-badge {
-    max-width: 150px; /* Limitar el ancho máximo */
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0; /* Prevent shrinking too much */
 }
-
 .comunidad-nombre {
     max-width: 100%;
 }
@@ -338,19 +341,23 @@ body {
     margin-right: 5px;
 }
 
+/* Add more spacing in the footer to prevent elements from being too close */
 .publicacion-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
+    padding: 12px 15px; /* Slightly increased padding */
     background-color: rgba(0, 0, 0, 0.2);
+    gap: 15px; /* Add gap to create space between elements */
 }
-
 .etiquetas-container {
     display: flex;
-    gap: 8px;
+    gap: 10px; /* Increased from 8px */
     flex-wrap: wrap;
+    margin-right: 15px; /* Add margin to separate from community badge */
 }
+
+
 
 .etiqueta {
     background-color: var(--secondary-color);
@@ -361,17 +368,21 @@ body {
     font-weight: bold;
 }
 
+/* Make community badge more distinct */
 .comunidad-badge {
     background-color: var(--primary-color);
     color: var(--text-color);
-    padding: 3px 10px;
+    padding: 4px 12px; /* Slightly increased padding */
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: bold;
     display: flex;
     align-items: center;
+    white-space: nowrap; /* Prevent wrapping */
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
+/* Add a subtle separator between tags and community badge if needed */
 .comunidad-badge::before {
     content: '\f0c0';
     font-family: 'Font Awesome 5 Free';
