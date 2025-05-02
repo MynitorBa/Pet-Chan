@@ -101,7 +101,7 @@
           <h4>Comunidades populares</h4>
           <div class="ejemplos-lista">
             <% ejemplos.comunidades.forEach(c => { %>
-              <a href="/comunidades/<%= c.id %>" class="ejemplo-item">
+              <a href="/comunidades" class="ejemplo-item">
                 <div class="ejemplo-imagen">
                   <% if (c.imagen_url) { %>
                     <img src="<%= c.imagen_url %>" alt="<%= c.nombre %>">
@@ -123,59 +123,61 @@
     </section>
     <% } %>
 
-    <!-- MASCOTAS -->
-    <% if (mascotas.length) { %>
-    <section class="resultado-seccion mascotas-seccion">
-      <div class="seccion-header">
-        <h2><i class="fas fa-paw"></i> Mascotas</h2>
-        <a href="/tienda" class="ver-todos">Ver todas</a>
-      </div>
-      
-      <div class="tarjetas-contenedor">
-        <% mascotas.forEach(p => { %>
-          <div class="tarjeta-item">
-            <div class="tarjeta-imagen mascota-imagen">
-              <img src="/imagenes_de_mascotas/<%= p.indice %>.gif" alt="<%= p.petname %>" class="mascota-img">
-            </div>
-            <div class="tarjeta-contenido">
-              <h3><%= p.petname %></h3>
-              <p class="tarjeta-descripcion">Habilidad: <%= p.habilidad %></p>
-              <div class="tarjeta-meta">
-                <span class="meta-item"><i class="fas fa-heart"></i> Amor: <%= p.nivelAmor %></span>
-                <span class="meta-item"><i class="fas fa-smile"></i> Felicidad: <%= p.nivelFelicidad %></span>
-              </div>
-              <form action="/buscar-dueno" method="POST" style="display:inline;">
-                <input type="hidden" name="mascotaId" value="<%= p.id %>">
-                <button type="submit" class="boton-explorar">Ver dueño</button>
-              </form>            </div>
+<!-- MASCOTAS -->
+<% if (mascotas.length) { %>
+  <section class="resultado-seccion mascotas-seccion">
+    <div class="seccion-header">
+      <h2><i class="fas fa-paw"></i> Mascotas</h2>
+      <a href="/tienda" class="ver-todos">Ver todas</a>
+    </div>
+    
+    <div class="tarjetas-contenedor">
+      <% mascotas.forEach(p => { %>
+        <div class="tarjeta-item">
+          <div class="tarjeta-imagen mascota-imagen">
+            <img src="/imagenes_de_mascotas/<%= p.indice %>.gif" alt="<%= p.petname %>" class="mascota-img">
           </div>
-        <% }) %>
-      </div>
-    </section>
-    <% } else { %>
-    <section class="resultado-seccion mascotas-seccion">
-      <div class="seccion-header">
-        <h2><i class="fas fa-paw"></i> Mascotas</h2>
-        <a href="/mascotas" class="ver-todos">Ver todas</a>
-      </div>
-      <div class="sin-resultados">
-        <p>No se encontraron mascotas para "<%= query %>"</p>
-        <div class="ejemplos-contenedor">
-          <h4>Mascotas destacadas</h4>
-          <div class="ejemplos-lista">
-            <% ejemplos.mascotas.forEach(p => { %>
-              <div class="ejemplo-item">
-                <div class="ejemplo-imagen">
-                  <img src="/imagenes_de_mascotas/<%= p.indice || 1 %>.gif" alt="<%= p.petname %>" class="mascota-img-mini">
-                </div>
-                <%= p.petname %> <span class="ejemplo-meta"><%= p.habilidad %></span>
-              </div>
-            <% }) %>
+          <div class="tarjeta-contenido">
+            <h3><%= p.petname %></h3>
+            <p class="tarjeta-descripcion">Habilidad: <%= p.habilidad %></p>
+            <div class="tarjeta-meta">
+              <span class="meta-item"><i class="fas fa-heart"></i> Amor: <%= p.nivelAmor %></span>
+              <span class="meta-item"><i class="fas fa-smile"></i> Felicidad: <%= p.nivelFelicidad %></span>
+            </div>
+            <form action="/buscar-dueno" method="POST" style="display:inline;">
+              <input type="hidden" name="mascotaId" value="<%= p.id %>">
+              <button type="submit" class="boton-explorar">Ver dueño</button>
+            </form>
           </div>
         </div>
+      <% }) %>
+    </div>
+  </section>
+  <% } else { %>
+  <section class="resultado-seccion mascotas-seccion">
+    <div class="seccion-header">
+      <h2><i class="fas fa-paw"></i> Mascotas</h2>
+      <a href="/tienda" class="ver-todos">Ver todas</a>
+    </div>
+    <div class="sin-resultados">
+      <p>No se encontraron mascotas para "<%= query %>"</p>
+      <div class="ejemplos-contenedor">
+        <h4>Mascotas destacadas</h4>
+        <div class="ejemplos-lista">
+          <% ejemplos.mascotas.forEach(p => { %>
+            <!-- Modificado: Agregando enlace a eventos -->
+            <a href="/tienda" class="ejemplo-item">
+              <div class="ejemplo-imagen">
+                <img src="/imagenes_de_mascotas/<%= p.indice || 1 %>.gif" alt="<%= p.petname %>" class="mascota-img-mini">
+              </div>
+              <%= p.petname %> <span class="ejemplo-meta"><%= p.habilidad %></span>
+            </a>
+          <% }) %>
+        </div>
       </div>
-    </section>
-    <% } %>
+    </div>
+  </section>
+  <% } %>
 
     <!-- EVENTOS -->
     <% if (eventos && eventos.length) { %>
@@ -232,7 +234,7 @@
           <div class="ejemplos-lista">
             <% if (ejemplos.eventos && ejemplos.eventos.length) { %>
               <% ejemplos.eventos.forEach(e => { %>
-                <a href="/eventos/<%= e.id %>" class="ejemplo-item">
+                <a href="/eventos" class="ejemplo-item">
                   <div class="ejemplo-imagen">
                     <% if (e.imagen) { %>
                       <img src="<%= e.imagen %>" alt="<%= e.titulo %>">
@@ -266,10 +268,9 @@
         <div class="post-item">
           <div class="post-cabecera">
             <h3><%= post.autor %></h3>
-</div>
-<% if (post.imagen_url) { %>
-  <div class="post-imagen">
-
+          </div>
+          <% if (post.imagen_url) { %>
+            <div class="post-imagen">
               <img src="<%= post.imagen_url %>" alt="Imagen de publicación">
             </div>
           <% } %>
@@ -281,9 +282,9 @@
             <% if (post.subcategoria && post.subcategoria !== 'Ninguna') { %>
               <span class="subcategoria"><%= post.subcategoria %></span>
             <% } %>
-<span class="votos">★ Votos: <%= post.ranking || 0 %></span>
+            <span class="votos">★ Votos: <%= post.ranking || 0 %></span>
           </div>
-          <a href="/foro" class="boton-leer">Leer más</a>
+          <a href="/foro/post/<%= post.id %>" class="boton-leer">Leer más</a>
         </div>
       <% }) %>
     </div>
@@ -300,7 +301,7 @@
         <h4>Publicaciones populares</h4>
         <div class="ejemplos-lista">
           <% ejemplos.posts.forEach(post => { %>
-            <a href="/foro/post/<%= post.id %>" class="ejemplo-item">
+            <a href="/foro" class="ejemplo-item">
               <div class="ejemplo-imagen">
                 <% if (post.imagen_url) { %>
                   <img src="<%= post.imagen_url %>" alt="Imagen de publicación">
@@ -324,7 +325,6 @@
       <h2><i class="fas fa-reply"></i> Comentarios</h2>
       <a href="/foro" class="ver-todos">Ver todos</a>
     </div>
-
     
     <div class="comentarios-lista">
       <% comentarios.forEach(com => { %>
@@ -351,15 +351,41 @@
             <span class="votos">★ Votos: <%= com.ranking || 0 %></span>
           </div>
           
-
-          <a href="/foro" class="boton-ir">Ver en contexto</a>
+          <a href="/foro/post/<%= com.post_id %>#comentario-<%= com.id %>" class="boton-ir">Ver en contexto</a>
         </div>
       <% }) %>
     </div>
   </section>
+<% } else if (query) { %>
+  <section class="resultado-seccion comentarios-seccion">
+    <div class="seccion-header">
+      <h2><i class="fas fa-reply"></i> Comentarios</h2>
+      <a href="/foro" class="ver-todos">Ver todos</a>
+    </div>
+    <div class="sin-resultados">
+      <p>No se encontraron comentarios para "<%= query %>"</p>
+      <div class="ejemplos-contenedor">
+        <h4>Comentarios recientes</h4>
+        <div class="ejemplos-lista">
+          <% if (ejemplos && ejemplos.comentarios) { %>
+            <% ejemplos.comentarios.forEach(com => { %>
+              <a href="/foro" class="ejemplo-item">
+                <div class="ejemplo-imagen">
+                  <% if (com.imagen_url) { %>
+                    <img src="<%= com.imagen_url %>" alt="Imagen de comentario">
+                  <% } else { %>
+                    <i class="fas fa-reply"></i>
+                  <% } %>
+                </div>
+                <%= com.comentario.substring(0, 40) %>... <span class="ejemplo-meta"><%= com.autor %></span>
+              </a>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
 <% } %>
-
-  
 
 <!-- CATEGORÍAS -->
 <% if (categorias && categorias.length) { %>
@@ -369,56 +395,55 @@
       <a href="/foro" class="ver-todos">Ver todas</a>
     </div>
       
-      <div class="categorias-lista">
-        <% categorias.forEach(cat => { %>
-          <div class="categoria-item">
-            <div class="categoria-cabecera">
-              <h4><%= cat.nombre %></h4>
-              <span class="categoria-tipo"><i class="fas fa-layer-group"></i> <%= cat.tipo %></span>
-            </div>
-            <p class="categoria-descripcion"><%= cat.descripcion ? (cat.descripcion.length > 100 ? cat.descripcion.substring(0, 100) + '...' : cat.descripcion) : 'Sin descripción' %></p>
-            <div class="categoria-meta">
-              <span class="meta-item"><i class="fas fa-tag"></i> <%= cat.categoria %></span>
-              <% if (cat.subcategoria && cat.subcategoria !== 'Ninguna') { %>
-                <span class="meta-item"><i class="fas fa-bookmark"></i> <%= cat.subcategoria %></span>
-              <% } %>
-              <% if (cat.extrasubcategoria && cat.extrasubcategoria !== 'Ninguna') { %>
-                <span class="meta-item"><i class="fas fa-tag"></i> <%= cat.extrasubcategoria %></span>
-              <% } %>
-            </div>
-            <a href="/foro" class="boton-explorar">Explorar</a>
+    <div class="categorias-lista">
+      <% categorias.forEach(cat => { %>
+        <div class="categoria-item">
+          <div class="categoria-cabecera">
+            <h4><%= cat.nombre %></h4>
+            <span class="categoria-tipo"><i class="fas fa-layer-group"></i> <%= cat.tipo %></span>
           </div>
-        <% }) %>
-      </div>
-    </section>
-    <% } %>
-
-
-    <!-- Si no hay resultados en ninguna categoría -->
-    <% if ((!usuarios || !usuarios.length) && (!comunidades || !comunidades.length) && 
-            (!mascotas || !mascotas.length) && (!eventos || !eventos.length) && 
-            (!posts || !posts.length) && (!comentarios || !comentarios.length) && 
-            (!accesorios || !accesorios.length) && (!items || !items.length) && 
-            (!categorias || !categorias.length)) { %>
-      <div class="sin-resultados-global">
-        <div class="mensaje-sin-resultados">
-          <i class="fas fa-search"></i>
-          <h2>No se encontraron resultados para "<%= query %>"</h2>
-          <p>Intenta con términos más generales o revisa la ortografía.</p>
-        </div>
-        
-        <div class="sugerencias">
-          <h3>Explora lo más popular</h3>
-          <div class="botones-sugerencias">
-            <a href="/foro" class="boton-sugerencia"><i class="fas fa-comments"></i> Foros</a>
-            <a href="/comunidades" class="boton-sugerencia"><i class="fas fa-users"></i> Comunidades</a>
-            <a href="/eventos" class="boton-sugerencia"><i class="fas fa-calendar"></i> Eventos</a>
-            <a href="/mascotas" class="boton-sugerencia"><i class="fas fa-paw"></i> Mascotas</a>
-            <a href="/tienda" class="boton-sugerencia"><i class="fas fa-shopping-cart"></i> Tienda</a>
+          <p class="categoria-descripcion"><%= cat.descripcion ? (cat.descripcion.length > 100 ? cat.descripcion.substring(0, 100) + '...' : cat.descripcion) : 'Sin descripción' %></p>
+          <div class="categoria-meta">
+            <span class="meta-item"><i class="fas fa-tag"></i> <%= cat.categoria %></span>
+            <% if (cat.subcategoria && cat.subcategoria !== 'Ninguna') { %>
+              <span class="meta-item"><i class="fas fa-bookmark"></i> <%= cat.subcategoria %></span>
+            <% } %>
+            <% if (cat.extrasubcategoria && cat.extrasubcategoria !== 'Ninguna') { %>
+              <span class="meta-item"><i class="fas fa-tag"></i> <%= cat.extrasubcategoria %></span>
+            <% } %>
           </div>
+          <a href="/foro/categoria/<%= cat.id %>" class="boton-explorar">Explorar</a>
         </div>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<!-- Si no hay resultados en ninguna categoría -->
+<% if ((!usuarios || !usuarios.length) && (!comunidades || !comunidades.length) && 
+        (!mascotas || !mascotas.length) && (!eventos || !eventos.length) && 
+        (!posts || !posts.length) && (!comentarios || !comentarios.length) && 
+        (!accesorios || !accesorios.length) && (!items || !items.length) && 
+        (!categorias || !categorias.length)) { %>
+  <div class="sin-resultados-global">
+    <div class="mensaje-sin-resultados">
+      <i class="fas fa-search"></i>
+      <h2>No se encontraron resultados para "<%= query %>"</h2>
+      <p>Intenta con términos más generales o revisa la ortografía.</p>
+    </div>
+    
+    <div class="sugerencias">
+      <h3>Explora lo más popular</h3>
+      <div class="botones-sugerencias">
+        <a href="/foro" class="boton-sugerencia"><i class="fas fa-comments"></i> Foros</a>
+        <a href="/comunidades" class="boton-sugerencia"><i class="fas fa-users"></i> Comunidades</a>
+        <a href="/eventos" class="boton-sugerencia"><i class="fas fa-calendar"></i> Eventos</a>
+        <a href="/mascotas" class="boton-sugerencia"><i class="fas fa-paw"></i> Mascotas</a>
+        <a href="/tienda" class="boton-sugerencia"><i class="fas fa-shopping-cart"></i> Tienda</a>
       </div>
-    <% } %>
+    </div>
+  </div>
+<% } %>
   </div>
 </div>
 

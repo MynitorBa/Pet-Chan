@@ -6110,7 +6110,7 @@ app.post('/comunidad/crear', requireLogin, upload.single('imagen'), async (req, 
       // Añadir automáticamente al creador como miembro de la comunidad con rol 'administrador'
       await db.query(`
         INSERT INTO comunidades_usuarios (comunidad_id, user_id, rol, fecha_union)
-        VALUES ($1, $2, 'administrador', NOW())
+        VALUES ($1, $2, 'Administrador', NOW())
       `, [comunidadId, req.session.userId]);
       
       await db.query('COMMIT');
@@ -8353,7 +8353,7 @@ app.post('/actualizar-sesion-batalla', async (req, res) => {
     res.status(500).send();
   }
 });
-/*
+
 function obtenerTodosLosAtaques() {
   return [
     { name: "Llamarada", type: "fuego", power: 500 }, { name: "Infierno", type: "fuego", power: 500 },
@@ -8369,7 +8369,7 @@ function obtenerTodosLosAtaques() {
     { name: "Viento Feérico", type: "hada", power: 500 }, { name: "Hiperrayo", type: "normal", power: 500 }
   ];
 }
-*/
+/*
 function obtenerTodosLosAtaques() {
   return [
     { name: "Llamarada", type: "fuego", power: 60 }, { name: "Infierno", type: "fuego", power: 90 },
@@ -8385,7 +8385,7 @@ function obtenerTodosLosAtaques() {
     { name: "Viento Feérico", type: "hada", power: 80 }, { name: "Hiperrayo", type: "normal", power: 100 }
   ];
 }
-
+*/
 
 //funciones necesarias para la evolucion de mascotas 
 // En tu archivo principal (index.js o donde tengas configuraciones)
