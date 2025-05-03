@@ -1,0 +1,184 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/minijuegos.css">
+
+
+<style>/* Botón de regreso con estilo ciberpunk */
+    .boton-regresar {
+        position: absolute;
+        top: 80px;
+        right: 30px;
+        z-index: 100;
+    }
+    
+    .boton-regresar a {
+        display: inline-block;
+        padding: 10px 15px;
+        background: rgba(98, 2, 150, 0.9);
+        border: 2px solid #ff00ff;
+        border-radius: 8px;
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.9rem;
+        text-decoration: none;
+        text-shadow: 0 0 5px #ff00ff;
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .boton-regresar a::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0)
+        );
+        transform: rotate(30deg);
+        z-index: -1;
+        transition: all 0.6s ease;
+    }
+    
+    .boton-regresar a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        text-shadow: 0 0 8px #ffffff;
+    }
+    
+    .boton-regresar a:hover::before {
+        top: -100%;
+        left: -100%;
+        transition: all 0.6s ease-out;
+    }
+    
+    .boton-regresar a:active {
+        transform: translateY(2px);
+        box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    }
+    
+    .boton-regresar a i {
+        margin-right: 8px;
+    }
+    
+    /* Animación para el botón de regreso */
+    @keyframes neon-button {
+        0%, 100% { 
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+            border-color: #ff00ff;
+        }
+        50% { 
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.9); 
+            border-color: #ff40ff;
+        }
+    }
+    
+    .boton-regresar a {
+        animation: neon-button 2s infinite;
+    }
+    
+    </style><style>/* Botón de regreso con estilo ciberpunk */
+    .boton-regresar {
+        position: absolute;
+        top: 80px;
+        right: 30px;
+        z-index: 100;
+    }
+    
+    .boton-regresar a {
+        display: inline-block;
+        padding: 10px 15px;
+        background: rgba(98, 2, 150, 0.9);
+        border: 2px solid #ff00ff;
+        border-radius: 8px;
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.9rem;
+        text-decoration: none;
+        text-shadow: 0 0 5px #ff00ff;
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .boton-regresar a::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0)
+        );
+        transform: rotate(30deg);
+        z-index: -1;
+        transition: all 0.6s ease;
+    }
+    
+    .boton-regresar a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        text-shadow: 0 0 8px #ffffff;
+    }
+    
+    .boton-regresar a:hover::before {
+        top: -100%;
+        left: -100%;
+        transition: all 0.6s ease-out;
+    }
+    
+    .boton-regresar a:active {
+        transform: translateY(2px);
+        box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    }
+    
+    .boton-regresar a i {
+        margin-right: 8px;
+    }
+    
+    /* Animación para el botón de regreso */
+    @keyframes neon-button {
+        0%, 100% { 
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+            border-color: #ff00ff;
+        }
+        50% { 
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.9); 
+            border-color: #ff40ff;
+        }
+    }
+    
+    .boton-regresar a {
+        animation: neon-button 2s infinite;
+    }
+    
+</style>
+
+    <div class="boton-regresar">
+        <a href="/minijuegos"><i class="fas fa-arrow-left"></i> Regresar</a>
+    </div>
+
+    <div id="contenedor-juego">
+        <h1 style="text-align: left;">Dice Game!</h1>
+
+        <div class="seccion-del_juego">
+
+        </div>
+
+    </div>
+
+
+    <script src="scripts/minijuegos3.js"></script>
+
+<%- include("partials/footer.ejs") %>

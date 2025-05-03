@@ -209,15 +209,94 @@ giftBox.addEventListener('click', function() {
     }
 });
 
-// Adoptar mascota (usa el nombre desde el EJS)
-adoptButton.addEventListener('click', function() {
+/* JavaScript to replace alert with custom notifications */
+function showPetNotification(message, type = 'success', duration = 4000) {
+    // Remove any existing notifications
+    const existingNotifications = document.querySelectorAll('.pet-notification');
+    existingNotifications.forEach(notification => {
+      notification.remove();
+    });
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = `pet-notification ${type}`;
+    
+    // Icon based on type
+    let icon = type === 'success' ? 
+      '<i class="fas fa-paw"></i>' : 
+      '<i class="fas fa-exclamation-circle"></i>';
+    
+    notification.innerHTML = `
+      <div class="pet-notification-content">
+        <div class="pet-notification-icon">${icon}</div>
+        <div class="pet-notification-message">${message}</div>
+        <button class="pet-notification-close">&times;</button>
+      </div>
+    `;
+    
+    // Add confetti for success messages
+    if (type === 'success') {
+      const confettiContainer = document.createElement('div');
+      confettiContainer.className = 'confetti-container';
+      
+      const colors = ['#ff9ff3', '#ff7675', '#ffeaa7', '#a29bfe', '#74b9ff', '#1dd1a1'];
+      
+      for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = `confetti ${Math.random() > 0.5 ? 'square' : 'circle'}`;
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confettiContainer.appendChild(confetti);
+      }
+      
+      notification.appendChild(confettiContainer);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Close button functionality
+    const closeButton = notification.querySelector('.pet-notification-close');
+    closeButton.addEventListener('click', () => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    });
+    
+    // Auto close after duration
+    if (duration > 0) {
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          notification.style.opacity = '0';
+          setTimeout(() => {
+            notification.remove();
+          }, 300);
+        }
+      }, duration);
+    }
+    
+    return notification;
+  }
+  
+  // Modified adoption button event listener
+  adoptButton.addEventListener('click', function(e) {
     const petName = petNameInput.value.trim();
     if (!petName) {
-        alert('Por favor, dale un nombre a tu mascota');
-        return;
+      e.preventDefault(); // Prevent form submission
+      showPetNotification('Por favor, dale un nombre a tu mascota', 'error');
+      return;
     }
-    alert(`¡Felicidades! Has adoptado a ${petName}. ¡Bienvenido a Mundo Mascota Virtual!`);
-});
+    
+    // For successful adoption
+    e.preventDefault(); // Prevent immediate form submission
+    showPetNotification(`¡Felicidades! Has adoptado a ${petName}. ¡Bienvenido a Mundo Mascota Virtual!`, 'success', 3000);
+    
+    // Submit the form after showing the notification
+    setTimeout(() => {
+      document.querySelector('.pet-nombre-formulario').submit();
+    }, 2000);
+  });
 
 // Inicialización (igual)
 window.addEventListener('DOMContentLoaded', function() {

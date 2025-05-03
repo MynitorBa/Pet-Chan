@@ -741,319 +741,319 @@ app.post('/cambiarPassword', requireLogin, async (req, res) => {
 //post para realizar las compras
 app.post('/comprarItem', requireLogin, async (req, res) => {
         
-    //obtenemos el indice y la categoria
-    const { index, categoria} = req.body;
-    const userId = req.session.userId;
+  //obtenemos el indice y la categoria
+  const { index, categoria} = req.body;
+  const userId = req.session.userId;
 
-    console.log('Comprando item:', index, categoria);
+  console.log('Comprando item:', index, categoria);
 
-    let precio = 0;
+  let precio = 0;
 
-    //ahora vamos a obtener el precio de los arrays
-    try {
-        if (categoria === 'accesorios' && index >= 0 && index < accesorios.length) {
-            precio = preciosAccesorios[index];
-        } else if (categoria === 'comida' && index >= 0 && index < preciosComidas.length) {
-            precio = preciosComidas[index]; 
-        } else if (categoria === 'juguetes' && index >= 0 && index < juguetes.length) {
-            precio = preciosJuguetes[index];
-        } else if (categoria === 'corrales' && index >= 0 && index < corralesDisponibles.length) {
-            precio = preciosCorrales[index];
-        } else {
-            console.error("Índice o categoría inválido");
-            return res.json({ success: false, mensaje: 'Índice o categoría inválido' });
-        }
-    } catch (error) {
-        console.error("Error al obtener el precio:", error);
-        return res.json({ success: false, mensaje: 'Error al obtener el precio' });
-    }
+  //ahora vamos a obtener el precio de los arrays
+  try {
+      if (categoria === 'accesorios' && index >= 0 && index < accesorios.length) {
+          precio = preciosAccesorios[index];
+      } else if (categoria === 'comida' && index >= 0 && index < preciosComidas.length) {
+          precio = preciosComidas[index]; 
+      } else if (categoria === 'juguetes' && index >= 0 && index < juguetes.length) {
+          precio = preciosJuguetes[index];
+      } else if (categoria === 'corrales' && index >= 0 && index < corralesDisponibles.length) {
+          precio = preciosCorrales[index];
+      } else {
+          console.error("Índice o categoría inválido");
+          return res.json({ success: false, mensaje: 'Índice o categoría inválido' });
+      }
+  } catch (error) {
+      console.error("Error al obtener el precio:", error);
+      return res.json({ success: false, mensaje: 'Error al obtener el precio' });
+  }
 
-    console.log(index, precio, categoria);
+  console.log(index, precio, categoria);
 
-    try {
+  try {
 
-        const userResult = await db.query(`SELECT money FROM users WHERE id = $1`, [userId]);
+      const userResult = await db.query(`SELECT money FROM users WHERE id = $1`, [userId]);
 
-        const dineroActual = userResult.rows[0].money;
+      const dineroActual = userResult.rows[0].money;
 
-        if (dineroActual < precio) {
-            return res.json({ success: false, mensaje: 'Dinero insuficiente' });    
-        }
+      if (dineroActual < precio) {
+          return res.json({ success: false, mensaje: 'Dinero insuficiente' });    
+      }
 
-        //si el item es accesorios o corrales, veremos que el usuario no lo tenga ya
-        if (categoria === 'accesorios' || categoria === 'corrales') {
-            const userHasItem = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = $3`, [userId, index, categoria]);
-            if (userHasItem.rows.length > 0) {
-                console.log('El usuario ya tiene ese item');
-                return res.json({ success: false, mensaje: 'El usuario ya tiene ese item' });
-            }
-        }
+      //si el item es accesorios o corrales, veremos que el usuario no lo tenga ya
+      if (categoria === 'accesorios' || categoria === 'corrales') {
+          const userHasItem = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = $3`, [userId, index, categoria]);
+          if (userHasItem.rows.length > 0) {
+              console.log('El usuario ya tiene ese item');
+              return res.json({ success: false, mensaje: 'El usuario ya tiene ese item' });
+          }
+      }
 
-        await db.query(`UPDATE users SET money = $1 WHERE id = $2`, [dineroActual - precio, userId]);
-        req.session.money = dineroActual - precio;
+      await db.query(`UPDATE users SET money = $1 WHERE id = $2`, [dineroActual - precio, userId]);
+      req.session.money = dineroActual - precio;
 
-        await db.query(`INSERT INTO items (id_users, indice, categoria) VALUES ($1, $2, $3)`, [userId, index, categoria]);
+      await db.query(`INSERT INTO items (id_users, indice, categoria) VALUES ($1, $2, $3)`, [userId, index, categoria]);
 
-        res.json({ success: true, mensaje: 'Item comprado exitosamente' });
-    } catch (error) {
-        console.error("Error al comprar accesorio:", error);
-        res.json({ success: false, mensaje: 'Error al comprar accesorio' });
-    }
-    
+      res.json({ success: true, mensaje: 'Item comprado exitosamente' });
+  } catch (error) {
+      console.error("Error al comprar accesorio:", error);
+      res.json({ success: false, mensaje: 'Error al comprar accesorio' });
+  }
+  
 })
 
 //vamos a realizar el post para que la mascota pueda comer
 app.post('/mascota/comer', requireLogin, async (req, res) => {
-    //obetenemos el indice de la comida y el indice del usuario
-    const userId = req.session.userId;
-    const {indice} = req.body;
+  //obetenemos el indice de la comida y el indice del usuario
+  const userId = req.session.userId;
+  const {indice} = req.body;
 
-    try {
+  try {
 
-        //verificamos si la comida con dicho indice pertenece al usuario
-        const userResult = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'comida'`, [userId, indice]);
-        if (userResult.rows.length === 0) {
+      //verificamos si la comida con dicho indice pertenece al usuario
+      const userResult = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'comida'`, [userId, indice]);
+      if (userResult.rows.length === 0) {
 
-            console.log('No tienes esa comida');
+          console.log('No tienes esa comida');
 
-            return res.json({ success: false, error: 'No tienes esa comida' });
-        }
+          return res.json({ success: false, error: 'No tienes esa comida' });
+      }
 
-       // vamos a crear un porcentaje para el nivel de energía que aumentará a la mascota
-    let porcentaje = 0;
-    // mensaje base para el usuario
-    let mensaje1 = "Mascota comiendo...";
+     // vamos a crear un porcentaje para el nivel de energía que aumentará a la mascota
+  let porcentaje = 0;
+  // mensaje base para el usuario
+  let mensaje1 = "Mascota comiendo...";
 
-    // obtenemos la comida y la favorita de la mascota
-    const comidaDada = comidasFavoritas[indice];
-    const favorita = req.session.mascotaActual.comidaFavorita;
+  // obtenemos la comida y la favorita de la mascota
+  const comidaDada = comidasFavoritas[indice];
+  const favorita = req.session.mascotaActual.comidaFavorita;
 
-    // Mensajes posibles
-    const mensajesFavorita = [
-        "¡Ñam ñam! Esta es su favorita, ¡la devoró feliz!",
-        "Mascota comiendo... ¡brilla de felicidad con su platillo favorito!",
-        "¡Le encantó! Ganó +{p}% de energía con su comida favorita 🍖",
-        "Mascota comiendo su favorita... ¡qué delicia! +{p}% de energía"
-    ];
+  // Mensajes posibles
+  const mensajesFavorita = [
+      "¡Ñam ñam! Esta es su favorita, ¡la devoró feliz!",
+      "Mascota comiendo... ¡brilla de felicidad con su platillo favorito!",
+      "¡Le encantó! Ganó +{p}% de energía con su comida favorita 🍖",
+      "Mascota comiendo su favorita... ¡qué delicia! +{p}% de energía"
+  ];
 
-    const mensajesNormal = [
-        "Mascota comiendo... parece que le gustó un poco.",
-        "No es su favorita, pero la aceptó. Energía +{p}%",
-        "Comió sin entusiasmo... pero le dio algo de fuerza. +{p}%",
-        "Mascota comiendo... meh, al menos no se quejó. +{p}%"
-    ];
+  const mensajesNormal = [
+      "Mascota comiendo... parece que le gustó un poco.",
+      "No es su favorita, pero la aceptó. Energía +{p}%",
+      "Comió sin entusiasmo... pero le dio algo de fuerza. +{p}%",
+      "Mascota comiendo... meh, al menos no se quejó. +{p}%"
+  ];
 
-    const mensajesBaja = [
-        "Mascota comiendo... hizo una mueca. Perdió -{p}% de energía 😟",
-        "¡Oh no! No le cayó bien, energía -{p}%",
-        "Mascota comiendo... parece que no le gustó. -{p}% de energía",
-        "Ups... esa comida no era de su agrado. -{p}%"
-    ];
+  const mensajesBaja = [
+      "Mascota comiendo... hizo una mueca. Perdió -{p}% de energía 😟",
+      "¡Oh no! No le cayó bien, energía -{p}%",
+      "Mascota comiendo... parece que no le gustó. -{p}% de energía",
+      "Ups... esa comida no era de su agrado. -{p}%"
+  ];
 
-    if (favorita === comidaDada) {
-        // Si es favorita, generamos un aumento de entre 20% a 40%
-        porcentaje = Math.random() * (0.40 - 0.20) + 0.20;
-        
-        const aumento = Math.round(porcentaje * 100);
-        const mensajeRandom = mensajesFavorita[Math.floor(Math.random() * mensajesFavorita.length)];
-        
-        mensaje1 = mensajeRandom.replace("{p}", aumento);
-    } else {
-        // Rango entre -10% y +15%
-        porcentaje = Math.random() * (0.25) - 0.10;
+  if (favorita === comidaDada) {
+      // Si es favorita, generamos un aumento de entre 20% a 40%
+      porcentaje = Math.random() * (0.40 - 0.20) + 0.20;
+      
+      const aumento = Math.round(porcentaje * 100);
+      const mensajeRandom = mensajesFavorita[Math.floor(Math.random() * mensajesFavorita.length)];
+      
+      mensaje1 = mensajeRandom.replace("{p}", aumento);
+  } else {
+      // Rango entre -10% y +15%
+      porcentaje = Math.random() * (0.25) - 0.10;
 
-        const cambio = Math.round(Math.abs(porcentaje * 100)); // positivo para mostrar
+      const cambio = Math.round(Math.abs(porcentaje * 100)); // positivo para mostrar
 
-        if (porcentaje > 0) {
-            const mensajeRandom = mensajesNormal[Math.floor(Math.random() * mensajesNormal.length)];
-            mensaje1 = mensajeRandom.replace("{p}", cambio);
-        } else {
-            const mensajeRandom = mensajesBaja[Math.floor(Math.random() * mensajesBaja.length)];
-            mensaje1 = mensajeRandom.replace("{p}", cambio);
-        }
-    }
+      if (porcentaje > 0) {
+          const mensajeRandom = mensajesNormal[Math.floor(Math.random() * mensajesNormal.length)];
+          mensaje1 = mensajeRandom.replace("{p}", cambio);
+      } else {
+          const mensajeRandom = mensajesBaja[Math.floor(Math.random() * mensajesBaja.length)];
+          mensaje1 = mensajeRandom.replace("{p}", cambio);
+      }
+  }
 
-        // Actualizamos el nivel de energía de la mascota
-        const energiaActual = req.session.mascotaActual.niveldeEnergia;
-        let energiaNueva = Math.round((porcentaje * 100)) + parseInt(energiaActual);
+      // Actualizamos el nivel de energía de la mascota
+      const energiaActual = req.session.mascotaActual.niveldeEnergia;
+      let energiaNueva = Math.round((porcentaje * 100)) + parseInt(energiaActual);
 
-        console.log('Energía actual de la mascota:', energiaActual);
-        console.log('Porcentaje de aumento:', Math.round(Math.abs(porcentaje * 100)));
-        console.log('Nueva energía de la mascota:', energiaNueva);
+      console.log('Energía actual de la mascota:', energiaActual);
+      console.log('Porcentaje de aumento:', Math.round(Math.abs(porcentaje * 100)));
+      console.log('Nueva energía de la mascota:', energiaNueva);
 
-        //veremos si la energía queda negativa
-        if (energiaNueva < 0) {
-            energiaNueva = 0;
-        }
+      //veremos si la energía queda negativa
+      if (energiaNueva < 0) {
+          energiaNueva = 0;
+      }
 
-        //veremos si el nivel de energía supera el 100
-        if (energiaNueva > 100) {
-            energiaNueva = 100;
-        }
+      //veremos si el nivel de energía supera el 100
+      if (energiaNueva > 100) {
+          energiaNueva = 100;
+      }
 
-        await db.query(`UPDATE pets SET "nivelEnergia" = $1 WHERE id_users = $2`, [energiaNueva, userId]);
+      await db.query(`UPDATE pets SET "nivelEnergia" = $1 WHERE id_users = $2`, [energiaNueva, userId]);
 
-        //actualizamos el nivel de energia en el session
-        req.session.mascotaActual.niveldeEnergia = energiaNueva;
-        console.log('Nueva energía de la mascota:', req.session.mascotaActual.niveldeEnergia);
+      //actualizamos el nivel de energia en el session
+      req.session.mascotaActual.niveldeEnergia = energiaNueva;
+      console.log('Nueva energía de la mascota:', req.session.mascotaActual.niveldeEnergia);
 
 
-        //eliminamos unicamente una comida con dicho indice
-        await db.query(`
-            WITH fila_a_borrar AS (
-                SELECT ctid
-                FROM items
-                WHERE id_users = $1 AND indice = $2 AND categoria = 'comida'
-                ORDER BY id ASC
-                LIMIT 1
-            )
-            DELETE FROM items
-            WHERE ctid IN (SELECT ctid FROM fila_a_borrar)
-        `, [userId, indice]);
-        
-    
+      //eliminamos unicamente una comida con dicho indice
+      await db.query(`
+          WITH fila_a_borrar AS (
+              SELECT ctid
+              FROM items
+              WHERE id_users = $1 AND indice = $2 AND categoria = 'comida'
+              ORDER BY id ASC
+              LIMIT 1
+          )
+          DELETE FROM items
+          WHERE ctid IN (SELECT ctid FROM fila_a_borrar)
+      `, [userId, indice]);
+      
+  
 
-        console.log('Mascota comiendo...');
+      console.log('Mascota comiendo...');
 
-        return res.json({
-            success: true,
-            mensaje: mensaje1,
-        });
-    } catch (error) {
-        console.error("Error al comer:", error);
-        return res.json({ success: false, error: 'Error al comer' });
-    }
+      return res.json({
+          success: true,
+          mensaje: mensaje1,
+      });
+  } catch (error) {
+      console.error("Error al comer:", error);
+      return res.json({ success: false, error: 'Error al comer' });
+  }
 })
 
 //ahora vamos a hacer la ruta para que la mascota pueda jugar
 app.post('/mascota/jugar', requireLogin, async (req, res) => {
-    //obtenemos el indice del usuario y el indice del item
-    const { indice } = req.body;
-    const userId = req.session.userId;
+  //obtenemos el indice del usuario y el indice del item
+  const { indice } = req.body;
+  const userId = req.session.userId;
 
-    //hacemos nuestro try
-    try {
-        //verificamos si el juguete con dicho indice pertenece al usuario
-        const juguete = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'juguetes'`, [userId, indice]);
+  //hacemos nuestro try
+  try {
+      //verificamos si el juguete con dicho indice pertenece al usuario
+      const juguete = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'juguetes'`, [userId, indice]);
 
-        if (juguete.rows.length === 0) {
-            console.log('No tienes ese juguete');
-            return res.json({ success: false, error: 'No tienes ese juguete' });
-        }
+      if (juguete.rows.length === 0) {
+          console.log('No tienes ese juguete');
+          return res.json({ success: false, error: 'No tienes ese juguete' });
+      }
 
-        // Vamos a crear un porcentaje para el nivel de felicidad que aumentará o disminuirá
-        let porcentaje = 0;
-        let mensaje1 = "Mascota jugando...";
+      // Vamos a crear un porcentaje para el nivel de felicidad que aumentará o disminuirá
+      let porcentaje = 0;
+      let mensaje1 = "Mascota jugando...";
 
-        // Mensajes posibles para felicidad positiva
-        const mensajesFelices = [
-            "¡Qué divertido! La mascota se ve feliz. +{p}% de felicidad 🧸",
-            "Mascota jugando... se la pasó increíble. +{p}%",
-            "Corrió, saltó y ladró de alegría. +{p}% de felicidad 🎾",
-            "Jugó como si no hubiera un mañana. +{p}%"
-        ];
+      // Mensajes posibles para felicidad positiva
+      const mensajesFelices = [
+          "¡Qué divertido! La mascota se ve feliz. +{p}% de felicidad 🧸",
+          "Mascota jugando... se la pasó increíble. +{p}%",
+          "Corrió, saltó y ladró de alegría. +{p}% de felicidad 🎾",
+          "Jugó como si no hubiera un mañana. +{p}%"
+      ];
 
-        // Mensajes posibles para bajada leve
-        const mensajesAburridos = [
-            "Mascota jugando... parece que se aburrió un poco. -{p}%",
-            "No estaba de humor para ese juguete. -{p}% de felicidad 😐",
-            "Jugó un rato, pero perdió interés. -{p}%",
-            "Mascota jugando... se distrajo, pero no mucho. -{p}%"
-        ];
+      // Mensajes posibles para bajada leve
+      const mensajesAburridos = [
+          "Mascota jugando... parece que se aburrió un poco. -{p}%",
+          "No estaba de humor para ese juguete. -{p}% de felicidad 😐",
+          "Jugó un rato, pero perdió interés. -{p}%",
+          "Mascota jugando... se distrajo, pero no mucho. -{p}%"
+      ];
 
-        // Generar porcentaje aleatorio
-        const chance = Math.random();
+      // Generar porcentaje aleatorio
+      const chance = Math.random();
 
-        if (chance > 0.2) {
-            // 80% de probabilidad de subir felicidad (10% a 30%)
-            porcentaje = Math.random() * (0.30 - 0.10) + 0.10;
-            const aumento = Math.round(porcentaje * 100);
-            const mensajeRandom = mensajesFelices[Math.floor(Math.random() * mensajesFelices.length)];
-            mensaje1 = mensajeRandom.replace("{p}", aumento);
-        } else {
-            // 20% de probabilidad de bajada leve (-1% a -5%)
-            porcentaje = Math.random() * (-0.05 + 0.01) - 0.01; // negativo
-            const reduccion = Math.round(Math.abs(porcentaje * 100));
-            const mensajeRandom = mensajesAburridos[Math.floor(Math.random() * mensajesAburridos.length)];
-            mensaje1 = mensajeRandom.replace("{p}", reduccion);
-        }
+      if (chance > 0.2) {
+          // 80% de probabilidad de subir felicidad (10% a 30%)
+          porcentaje = Math.random() * (0.30 - 0.10) + 0.10;
+          const aumento = Math.round(porcentaje * 100);
+          const mensajeRandom = mensajesFelices[Math.floor(Math.random() * mensajesFelices.length)];
+          mensaje1 = mensajeRandom.replace("{p}", aumento);
+      } else {
+          // 20% de probabilidad de bajada leve (-1% a -5%)
+          porcentaje = Math.random() * (-0.05 + 0.01) - 0.01; // negativo
+          const reduccion = Math.round(Math.abs(porcentaje * 100));
+          const mensajeRandom = mensajesAburridos[Math.floor(Math.random() * mensajesAburridos.length)];
+          mensaje1 = mensajeRandom.replace("{p}", reduccion);
+      }
 
-         // Actualizamos el nivel de felicidad de la mascota
-        const nivelFelicidadActual = req.session.mascotaActual.niveldeFelicidad;
-        let nivelFelicidadNuevo = Math.round((porcentaje * 100)) + parseInt(nivelFelicidadActual);
+       // Actualizamos el nivel de felicidad de la mascota
+      const nivelFelicidadActual = req.session.mascotaActual.niveldeFelicidad;
+      let nivelFelicidadNuevo = Math.round((porcentaje * 100)) + parseInt(nivelFelicidadActual);
 
-        //vemos si el nivel de feclicidad nuevo queda negativo
-        if (nivelFelicidadNuevo < 0) {
-            nivelFelicidadNuevo = 0;
-        }
+      //vemos si el nivel de feclicidad nuevo queda negativo
+      if (nivelFelicidadNuevo < 0) {
+          nivelFelicidadNuevo = 0;
+      }
 
-        //vemos si el nivel de feclicidad nuevo es mayor a 100
-        if (nivelFelicidadNuevo > 100) {
-            nivelFelicidadNuevo = 100;
-        }
+      //vemos si el nivel de feclicidad nuevo es mayor a 100
+      if (nivelFelicidadNuevo > 100) {
+          nivelFelicidadNuevo = 100;
+      }
 
-        // Actualizamos el nivel de felicidad en la base de datos
-        await db.query(`UPDATE pets SET "nivelFelicidad" = $1 WHERE id_users = $2`, [nivelFelicidadNuevo, userId]);
-        // Actualizamos el nivel de felicidad en la sesión
-        req.session.mascotaActual.niveldeFelicidad = nivelFelicidadNuevo;
+      // Actualizamos el nivel de felicidad en la base de datos
+      await db.query(`UPDATE pets SET "nivelFelicidad" = $1 WHERE id_users = $2`, [nivelFelicidadNuevo, userId]);
+      // Actualizamos el nivel de felicidad en la sesión
+      req.session.mascotaActual.niveldeFelicidad = nivelFelicidadNuevo;
 
-        console.log('Felicidad actual de la mascota:', req.session.mascotaActual.niveldeFelicidad);
+      console.log('Felicidad actual de la mascota:', req.session.mascotaActual.niveldeFelicidad);
 
-        //eliminamos unicamente una comida con dicho indice
-        await db.query(`
-            WITH fila_a_borrar AS (
-                SELECT ctid
-                FROM items
-                WHERE id_users = $1 AND indice = $2 AND categoria = 'juguetes'
-                ORDER BY id ASC
-                LIMIT 1
-            )
-            DELETE FROM items
-            WHERE ctid IN (SELECT ctid FROM fila_a_borrar)
-        `, [userId, indice]);
+      //eliminamos unicamente una comida con dicho indice
+      await db.query(`
+          WITH fila_a_borrar AS (
+              SELECT ctid
+              FROM items
+              WHERE id_users = $1 AND indice = $2 AND categoria = 'juguetes'
+              ORDER BY id ASC
+              LIMIT 1
+          )
+          DELETE FROM items
+          WHERE ctid IN (SELECT ctid FROM fila_a_borrar)
+      `, [userId, indice]);
 
-        return res.json({
-            success: true,
-            mensaje: mensaje1,
-        });
-    } catch (error) {
-        console.error("Error al jugar:", error);
-        return res.json({ success: false, error: 'Error al jugar: ' + error.message });
-    }
+      return res.json({
+          success: true,
+          mensaje: mensaje1,
+      });
+  } catch (error) {
+      console.error("Error al jugar:", error);
+      return res.json({ success: false, error: 'Error al jugar: ' + error.message });
+  }
 });
 
 //vamos a hacer un post para guardar el fondo del corral
 app.post('/corral/guardar', requireLogin, async (req, res) => {
-    //obtenemos el indice del usuario y el indice del item
-    const { indice } = req.body;
-    const userId = req.session.userId;
+  //obtenemos el indice del usuario y el indice del item
+  const { indice } = req.body;
+  const userId = req.session.userId;
 
-    console.log('Guardando fondo del corral:', indice);
+  console.log('Guardando fondo del corral:', indice);
 
-    try {
-        //primero veremos si el usuario tiene ese corral en sus items
-        const item = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'corrales'`, [userId, indice]);
+  try {
+      //primero veremos si el usuario tiene ese corral en sus items
+      const item = await db.query(`SELECT * FROM items WHERE id_users = $1 AND indice = $2 AND categoria = 'corrales'`, [userId, indice]);
 
-        if (item.rows.length === 0) {
-            return res.json({ success: false, error: 'No tienes ese corral en tus items' });
-        }
+      if (item.rows.length === 0) {
+          return res.json({ success: false, error: 'No tienes ese corral en tus items' });
+      }
 
-        //actualizamos el fondo del corral en la tabla de users
-        await db.query(`UPDATE users SET corral = $1 WHERE id = $2`, [indice, userId]);
+      //actualizamos el fondo del corral en la tabla de users
+      await db.query(`UPDATE users SET corral = $1 WHERE id = $2`, [indice, userId]);
 
-        //actualizamos el fondo del corral en la sesion
-        req.session.corral = parseInt(indice);
+      //actualizamos el fondo del corral en la sesion
+      req.session.corral = parseInt(indice);
 
-        console.log('Fondo del corral guardado correctamente', req.session.corral);
+      console.log('Fondo del corral guardado correctamente', req.session.corral);
 
-        return res.json({
-            success: true,
-            mensaje: "Fondo del corral guardado correctamente",
-        });
-    } catch (error) {
-        console.error("Error al guardar el fondo del corral:", error);
-        return res.json({ success: false, error: 'Error al guardar el fondo del corral: ' + error.message });
-    }
+      return res.json({
+          success: true,
+          mensaje: "Fondo del corral guardado correctamente",
+      });
+  } catch (error) {
+      console.error("Error al guardar el fondo del corral:", error);
+      return res.json({ success: false, error: 'Error al guardar el fondo del corral: ' + error.message });
+  }
 });
 
 /*---------------------------creamos post de prueba necesario------------------------------------------------*/
@@ -1434,11 +1434,49 @@ app.get('/minijuegos', requireLogin, (req, res) => {
  
     const mascota = req.session.mascotaActual;
 
-    res.render('minijuegos.ejs', {
+    res.render('menuvideojuegos.ejs', {
         rutaImagen: mascota.rutaImagen,
         accesorios: req.session.accesorios
     });
 });
+
+
+
+app.get('/min1', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+
+app.get('/min2', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos2.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+
+app.get('/min3', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos3.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
 
 app.get('/tienda', requireLogin, (req, res) => {
 
@@ -1469,6 +1507,10 @@ app.get('/minijuego1', (req, res) => {
 
 app.get('/minijuego2', (req, res) => {  
     res.render('minijuegos/minijuego2');  
+});
+
+app.get('/minijuego3', (req, res) => {  
+  res.render('minijuegos/minijuego3');  
 });
 /*---------------------------creamos rutas individuales para los juegos------------------------------------------------*/
 
@@ -1954,8 +1996,27 @@ let userVoteCounts = {}; // Almacenará conteos de votos para cada usuario
  * @param {number} userId - ID del usuario
  * @returns {Object} - Objeto con los rangos actualizados
  */
-async function updateUserRanks(userId) {
+// Función para verificar y actualizar rangos sin sobrescribir el rango de administrador
+async function updateUserRanksPreserveAdmin(userId) {
   try {
+    // Primero, verificamos si el usuario tiene rango de Administrador
+    const userRankResult = await db.query(
+      `SELECT rango3 FROM users WHERE id = $1`,
+      [userId]
+    );
+    
+    // Si el usuario es Administrador, no modificamos sus rangos
+    if (userRankResult.rows.length > 0 && userRankResult.rows[0].rango3 === 'Administrador') {
+      console.log(`Usuario ${userId} es Administrador - rangos preservados`);
+      return {
+        // Retornamos los rangos actuales sin modificarlos
+        rango1: userRankResult.rows[0].rango1 || 'Ninguno',
+        rango2: userRankResult.rows[0].rango2 || 'Ninguno',
+        rango3: 'Administrador' // Preservamos explícitamente el rango de Administrador
+      };
+    }
+    
+    // Si no es Administrador, procedemos con la actualización normal de rangos
     // 1. Contar el total de publicaciones del usuario
     const postCountResult = await db.query(
       `SELECT COUNT(*) as total_posts FROM forum_posts WHERE user_id = $1`,
@@ -2167,8 +2228,34 @@ async function checkAndAwardCoins(userId, username, type, req) {
       }
     }
 
-    // Actualizar rangos después de cada publicación o comentario
-    const updatedRanks = await updateUserRanks(userId);
+    // Verificar primero si el usuario es administrador antes de actualizar rangos
+    const isAdminResult = await db.query(
+      `SELECT rango3 FROM users WHERE id = $1`,
+      [userId]
+    );
+    
+    let updatedRanks;
+    
+    // Si el usuario es Administrador, no actualizamos sus rangos
+    if (isAdminResult.rows.length > 0 && isAdminResult.rows[0].rango3 === 'Administrador') {
+      console.log(`Usuario ${username} (ID: ${userId}) es Administrador - manteniendo rangos`);
+      
+      // Obtenemos los rangos actuales sin modificarlos
+      const userRanks = await db.query(
+        `SELECT rango1, rango2, rango3 FROM users WHERE id = $1`,
+        [userId]
+      );
+      
+      updatedRanks = {
+        rango1: userRanks.rows[0].rango1 || 'Ninguno',
+        rango2: userRanks.rows[0].rango2 || 'Ninguno',
+        rango3: 'Administrador', // Aseguramos que el rango3 sea siempre Administrador
+        totalPosts: currentCount
+      };
+    } else {
+      // Para usuarios no administradores, actualizamos normalmente los rangos
+      updatedRanks = await updateUserRanks(userId);
+    }
     
     // Actualizar los rangos en la sesión del usuario si está disponible
     if (req && req.session) {
@@ -2407,7 +2494,7 @@ app.post('/publicar', upload.array('imagenes', 9), async (req, res) => {
     
     if (autor && mensaje) {
       // 1. Primero actualizamos los rangos del usuario para asegurarnos de que están al día
-      const updatedRanks = await updateUserRanks(userId);
+      const updatedRanks = await updateUserRanksPreserveAdmin(userId);
       
       // 2. Actualizamos la sesión con los rangos actualizados para acceso inmediato en el front-end
       req.session.rango1 = updatedRanks.rango1;
@@ -6057,7 +6144,6 @@ app.get('/api/subcategorias', async (req, res) => {
     res.status(500).json({ success: false, mensaje: 'Error al obtener subcategorías', error: error.message });
   }
 });
-
 app.post('/comunidad/crear', requireLogin, upload.single('imagen'), async (req, res) => {
   try {
     const { nombre, descripcion, categoria, subcategoria, subcategoria_extra, reglas } = req.body;
@@ -6115,8 +6201,8 @@ app.post('/comunidad/crear', requireLogin, upload.single('imagen'), async (req, 
       
       await db.query('COMMIT');
       
-      // Redirigir a la página de comunidades con mensaje de éxito
-      res.redirect(`/comunidad?exito=true&mensaje=Comunidad creada correctamente`);
+      // MODIFICACIÓN: Redirigir directamente al foro de la comunidad creada
+      res.redirect(`/foro?comunidad_id=${comunidadId}`);
     } catch (error) {
       await db.query('ROLLBACK');
       throw error;
