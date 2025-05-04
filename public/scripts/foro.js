@@ -4675,8 +4675,11 @@ function leaveCommunity(id) {
           comunidadNombre.classList.remove('joined');
         }
 
-        showOverlayNotification('Has abandonado la comunidad correctamente', 'success');
-      } else {
+    // Añadir redirección a la página de comunidad después de abandonar exitosamente
+    setTimeout(() => {
+      window.location.href = '/comunidad';
+    }, 1500); // Esperar 1.5 segundos para que el usuario vea la notificación
+  } else {  
         // Si el error es porque es el creador, mostrar directamente el panel de transferencia
         if (data.mensaje && data.mensaje.includes('Como administrador no puedes abandonar')) {
           // Cerrar cualquier notificación existente primero
@@ -4928,7 +4931,7 @@ function joinCommunity(id) {
         count.textContent = parseInt(count.textContent) + 1;
         
         // Mostrar un mensaje de éxito
-        showOverlayNotification('Te has unido a la comunidad.\nSi es privada y no completaste la verificación,\nserás expulsado del sistema.', 'success');
+        showOverlayNotification('Te has unido a la comunidad.\nSi es privada y no completaste la verificación,\nserás expulsado inmediatamente.', 'success');
         
         // Recargar la página después de un breve retraso para mostrar los cambios
         setTimeout(() => {

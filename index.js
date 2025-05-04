@@ -6604,7 +6604,7 @@ app.get('/solicitudes-admin', requireLogin, async (req, res) => {
   }
 });
 
-// Endpoint para verificar acceso a una comunidad
+// Mantener la versión original para compatibilidad con código existente
 app.get('/api/comunidad/:id/verificar-acceso', requireLogin, async (req, res) => {
   try {
     const comunidadId = req.params.id;
@@ -6629,7 +6629,7 @@ app.get('/api/comunidad/:id/verificar-acceso', requireLogin, async (req, res) =>
     // ¿Es el creador?
     const esCreador = comunidad.creador_id === userId;
     
-    // CORRECCIÓN: VERIFICAR EXPLÍCITAMENTE LA TABLA DE MEMBRESÍAS
+    // Verificar membresía
     const miembroResult = await db.query(`
       SELECT rol FROM comunidades_usuarios 
       WHERE comunidad_id = $1 AND user_id = $2
@@ -6670,6 +6670,71 @@ app.get('/api/comunidad/:id/verificar-acceso', requireLogin, async (req, res) =>
   }
 });
 
+// Añadir también la versión que funciona en el segundo archivo
+app.get('/comunidad/:id/verificar-acceso', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    
+    // Verificar si la comunidad existe
+    const comunidadResult = await db.query(`
+      SELECT * FROM comunidades WHERE id = $1
+    `, [comunidadId]);
+    
+    if (comunidadResult.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        mensaje: 'Comunidad no encontrada'
+      });
+    }
+    
+    const comunidad = comunidadResult.rows[0];
+    
+    // Si no es privada, cualquiera puede acceder
+    if (!comunidad.es_privada) {
+      return res.json({ puedeAcceder: true });
+    }
+    
+    // Verificar si es el creador
+    if (comunidad.creador_id === req.session.userId) {
+      return res.json({ puedeAcceder: true });
+    }
+    
+    // Verificar si ya es miembro
+    const esMiembroResult = await db.query(`
+      SELECT * FROM comunidades_usuarios 
+      WHERE comunidad_id = $1 AND user_id = $2
+    `, [comunidadId, req.session.userId]);
+    
+    if (esMiembroResult.rows.length > 0) {
+      return res.json({ puedeAcceder: true });
+    }
+    
+    // Verificar si ya tiene una solicitud pendiente
+    const solicitudResult = await db.query(`
+      SELECT * FROM solicitudes_comunidad 
+      WHERE comunidad_id = $1 AND usuario_id = $2
+    `, [comunidadId, req.session.userId]);
+    
+    if (solicitudResult.rows.length > 0) {
+      return res.json({ 
+        puedeAcceder: false, 
+        solicitudPendiente: true 
+      });
+    }
+    
+    // No puede acceder y no tiene solicitud
+    res.json({ 
+      puedeAcceder: false, 
+      solicitudPendiente: false 
+    });
+  } catch (error) {
+    console.error('Error al verificar acceso:', error);
+    res.status(500).json({ 
+      success: false, 
+      mensaje: 'Error al verificar el acceso'
+    });
+  }
+});
 // Ruta para cancelar una solicitud pendiente
 app.post('/solicitudes/cancelar/:id', requireLogin, async (req, res) => {
   try {
