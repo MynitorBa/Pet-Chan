@@ -672,6 +672,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 });
 
+
+
 // Función para cargar las comunidades desde el servidor
 async function cargarComunidades() {
     try {
@@ -695,8 +697,7 @@ async function cargarComunidades() {
     }
 }
 
-
-// De manera similar modificar la función renderizarComunidades
+// Función para renderizar las comunidades
 function renderizarComunidades(comunidades) {
     const container = document.getElementById('comunidades-container');
     container.innerHTML = ''; // Limpiar contenedor
@@ -847,10 +848,11 @@ function renderizarComunidades(comunidades) {
         infoContainer.appendChild(statsDiv);
         comunidadCard.appendChild(infoContainer);
         
-        // CAMBIO: Hacer que la tarjeta sea clickeable y redirija a la página de comunidades
+        // CAMBIO: Hacer que la tarjeta redirija directamente a la comunidad específica
+        // usando la función verForo con el ID de la comunidad y su estado de privacidad
         comunidadCard.style.cursor = 'pointer';
         comunidadCard.addEventListener('click', () => {
-            window.location.href = '/comunidad';
+            window.location.href = `/foro?comunidad_id=${comunidad.id}`;
         });
         
         cardsGrid.appendChild(comunidadCard);
@@ -894,15 +896,3 @@ function getBadgeElement(index) {
     
     return badgeDiv;
 }
-
-
-
-
-
-
-
-
-
-
-
-

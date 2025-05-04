@@ -2696,7 +2696,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const commentsContainer = document.createElement('div');
   commentsContainer.classList.add('all-comments-container');
   
-  commentsPopupContent.appendChild(closePopupButton);
   commentsPopupContent.appendChild(commentsContainer);
   commentsPopup.appendChild(commentsPopupContent);
   document.body.appendChild(commentsPopup);
@@ -4929,12 +4928,12 @@ function joinCommunity(id) {
         count.textContent = parseInt(count.textContent) + 1;
         
         // Mostrar un mensaje de éxito
-        showOverlayNotification('Te has unido a la comunidad correctamente', 'success');
+        showOverlayNotification('Te has unido a la comunidad.\nSi es privada y no completaste la verificación,\nserás expulsado del sistema.', 'success');
         
         // Recargar la página después de un breve retraso para mostrar los cambios
         setTimeout(() => {
           window.location.reload();
-        }, 2000);
+        }, 4000);
       } else {
         showOverlayNotification(data.mensaje || 'No se pudo unir a la comunidad.', 'error');
       }

@@ -2254,7 +2254,7 @@ async function checkAndAwardCoins(userId, username, type, req) {
       };
     } else {
       // Para usuarios no administradores, actualizamos normalmente los rangos
-      updatedRanks = await updateUserRanks(userId);
+      updatedRanks = await updateUserRanksPreserveAdmin(userId);
     }
     
     // Actualizar los rangos en la sesión del usuario si está disponible
@@ -3425,7 +3425,7 @@ app.post('/publicar-comentario', upload.array('imagenes', 9), async (req, res) =
     
     if (autor && comentario && mensaje_padre_id) {
       // Primero actualizamos los rangos del usuario para asegurarnos de que están al día
-      const updatedRanks = await updateUserRanks(userId);
+      const updatedRanks = await updateUserRanksPreserveAdmin(userId);
       
       // Actualizamos la sesión con los rangos actualizados
       req.session.rango1 = updatedRanks.rango1;
@@ -5186,7 +5186,7 @@ app.get('/buscar', async (req, res) => {
     // Buscar comunidades por nombre, descripción o categoría
     const comunidades = await db.query(
       `SELECT c.id, c.nombre, c.descripcion, c.categoria, c.subcategoria, c.subcategoria_extra, 
-              c.imagen_url, COUNT(cu.user_id) as miembros
+              c.imagen_url, c.es_privada, COUNT(cu.user_id) as miembros
        FROM comunidades c
        LEFT JOIN comunidades_usuarios cu ON c.id = cu.comunidad_id
        WHERE c.nombre ILIKE $1 OR c.descripcion ILIKE $1 OR c.categoria ILIKE $1 OR 

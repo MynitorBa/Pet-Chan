@@ -1,6 +1,7 @@
 <%- include("partials/header.ejs") %>
 <link rel="stylesheet" href="styles/resultados_busqueda.css">
 
+
 <div class="resultados-contenedor">
   <div class="resultados-header">
     <h1>Resultados para "<span class="query-texto"><%= query %></span>"</h1>
@@ -52,76 +53,81 @@
 
     <!-- COMUNIDADES -->
     <% if (comunidades.length) { %>
-    <section class="resultado-seccion comunidades-seccion">
-      <div class="seccion-header">
-        <h2><i class="fas fa-users"></i> Comunidades</h2>
-        <a href="/comunidades" class="ver-todos">Ver todas</a>
-      </div>
-      
-      <div class="tarjetas-contenedor">
-        <% comunidades.forEach(c => { %>
-          <div class="tarjeta-item">
-            <div class="tarjeta-imagen">
-              <% if (c.imagen_url) { %>
-                <img src="<%= c.imagen_url %>" alt="<%= c.nombre %>">
-              <% } else { %>
-                <svg class="comunidad-svg" viewBox="0 0 100 100">
-                  <rect x="10" y="10" width="80" height="80" fill="#8028C6" rx="10"></rect>
-                  <text x="50" y="55" text-anchor="middle" fill="#fff" font-size="24">
-                    <%= c.nombre.charAt(0).toUpperCase() %>
-                  </text>
-                </svg>
-              <% } %>
-            </div>
-            <div class="tarjeta-contenido">
-              <h3><%= c.nombre %></h3>
-              <p class="tarjeta-descripcion"><%= c.descripcion ? (c.descripcion.length > 80 ? c.descripcion.substring(0, 80) + '...' : c.descripcion) : 'Sin descripción' %></p>
-              <div class="tarjeta-meta">
-                <span class="meta-item"><i class="fas fa-tag"></i> <%= c.categoria %></span>
-                <% if (c.subcategoria && c.subcategoria !== 'Ninguna') { %>
-                  <span class="meta-item"><i class="fas fa-bookmark"></i> <%= c.subcategoria %></span>
+      <section class="resultado-seccion comunidades-seccion">
+        <div class="seccion-header">
+          <h2><i class="fas fa-users"></i> Comunidades</h2>
+          <a href="/comunidades" class="ver-todos">Ver todas</a>
+        </div>
+        
+        <div class="tarjetas-contenedor">
+          <% comunidades.forEach(c => { %>
+            <div class="tarjeta-item">
+              <div class="tarjeta-imagen">
+                <% if (c.imagen_url) { %>
+                  <img src="<%= c.imagen_url %>" alt="<%= c.nombre %>">
+                <% } else { %>
+                  <svg class="comunidad-svg" viewBox="0 0 100 100">
+                    <rect x="10" y="10" width="80" height="80" fill="#8028C6" rx="10"></rect>
+                    <text x="50" y="55" text-anchor="middle" fill="#fff" font-size="24">
+                      <%= c.nombre.charAt(0).toUpperCase() %>
+                    </text>
+                  </svg>
                 <% } %>
-                <span class="meta-item"><i class="fas fa-users"></i> <%= c.miembros %> miembros</span>
+                <!-- Indicador de comunidad privada/pública -->
+                <span class="comunidad-tipo <%= c.es_privada ? 'privada' : 'publica' %>">
+                  <i class="fas <%= c.es_privada ? 'fa-lock' : 'fa-globe' %>"></i>
+                  <%= c.es_privada ? 'Privada' : 'Pública' %>
+                </span>
               </div>
-              <a href="/comunidad" class="boton-explorar">Explorar</a>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    </section>
-    <% } else { %>
-    <section class="resultado-seccion comunidades-seccion">
-      <div class="seccion-header">
-        <h2><i class="fas fa-users"></i> Comunidades</h2>
-        <a href="/comunidades" class="ver-todos">Ver todas</a>
-      </div>
-      <div class="sin-resultados">
-        <p>No se encontraron comunidades para "<%= query %>"</p>
-        <div class="ejemplos-contenedor">
-          <h4>Comunidades populares</h4>
-          <div class="ejemplos-lista">
-            <% ejemplos.comunidades.forEach(c => { %>
-              <a href="/comunidades" class="ejemplo-item">
-                <div class="ejemplo-imagen">
-                  <% if (c.imagen_url) { %>
-                    <img src="<%= c.imagen_url %>" alt="<%= c.nombre %>">
-                  <% } else { %>
-                    <svg class="comunidad-svg-mini" viewBox="0 0 40 40">
-                      <rect x="4" y="4" width="32" height="32" fill="#8028C6" rx="4"></rect>
-                      <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="16">
-                        <%= c.nombre.charAt(0).toUpperCase() %>
-                      </text>
-                    </svg>
+              <div class="tarjeta-contenido">
+                <h3><%= c.nombre %></h3>
+                <p class="tarjeta-descripcion"><%= c.descripcion ? (c.descripcion.length > 80 ? c.descripcion.substring(0, 80) + '...' : c.descripcion) : 'Sin descripción' %></p>
+                <div class="tarjeta-meta">
+                  <span class="meta-item"><i class="fas fa-tag"></i> <%= c.categoria %></span>
+                  <% if (c.subcategoria && c.subcategoria !== 'Ninguna') { %>
+                    <span class="meta-item"><i class="fas fa-bookmark"></i> <%= c.subcategoria %></span>
                   <% } %>
+                  <span class="meta-item"><i class="fas fa-users"></i> <%= c.miembros %> miembros</span>
                 </div>
-                <%= c.nombre %> <span class="ejemplo-meta"><%= c.miembros %> miembros</span>
-              </a>
-            <% }) %>
+                <button onclick="verForo(<%= c.id %>, <%= c.es_privada %>)" class="boton-explorar" data-id="<%= c.id %>" data-privada="<%= c.es_privada %>">Ver Foro</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </section>
+      <% } else { %>
+      <section class="resultado-seccion comunidades-seccion">
+        <div class="seccion-header">
+          <h2><i class="fas fa-users"></i> Comunidades</h2>
+          <a href="/comunidades" class="ver-todos">Ver todas</a>
+        </div>
+        <div class="sin-resultados">
+          <p>No se encontraron comunidades para "<%= query %>"</p>
+          <div class="ejemplos-contenedor">
+            <h4>Comunidades populares</h4>
+            <div class="ejemplos-lista">
+              <% ejemplos.comunidades.forEach(c => { %>
+                <a href="/comunidades" class="ejemplo-item">
+                  <div class="ejemplo-imagen">
+                    <% if (c.imagen_url) { %>
+                      <img src="<%= c.imagen_url %>" alt="<%= c.nombre %>">
+                    <% } else { %>
+                      <svg class="comunidad-svg-mini" viewBox="0 0 40 40">
+                        <rect x="4" y="4" width="32" height="32" fill="#8028C6" rx="4"></rect>
+                        <text x="20" y="24" text-anchor="middle" fill="#fff" font-size="16">
+                          <%= c.nombre.charAt(0).toUpperCase() %>
+                        </text>
+                      </svg>
+                    <% } %>
+                  </div>
+                  <%= c.nombre %> <span class="ejemplo-meta"><%= c.miembros %> miembros</span>
+                </a>
+              <% }) %>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-    <% } %>
+      </section>
+      <% } %>
 
 <!-- MASCOTAS -->
 <% if (mascotas.length) { %>
@@ -284,7 +290,7 @@
             <% } %>
             <span class="votos">★ Votos: <%= post.ranking || 0 %></span>
           </div>
-          <a href="/foro/post/<%= post.id %>" class="boton-leer">Leer más</a>
+          <a href="/foro" class="boton-leer">Leer más</a>
         </div>
       <% }) %>
     </div>
@@ -475,7 +481,54 @@
         arrow.classList.toggle('rotated');
       });
     });
-  });</script>
+  });
+  
+  
+  
+  
+  
+  
+// Función para manejar la redirección al foro de la comunidad
+function verForo(comunidadId, esPrivada) {
+  // Si la comunidad no es privada, redirigir directamente al foro
+  if (!esPrivada) {
+    window.location.href = `/foro?comunidad_id=${comunidadId}`;
+    return;
+  }
+  
+  // Si es privada, verificar acceso antes de redirigir
+  fetch(`/api/comunidad/${comunidadId}/verificar-acceso`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'same-origin'  // Importante para enviar las cookies de sesión
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error al verificar acceso');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.puedeAcceder) {
+        // Si tiene acceso, redirigir al foro
+        window.location.href = `/foro?comunidad_id=${comunidadId}`;
+      } else if (data.solicitudPendiente) {
+        // Si tiene una solicitud pendiente, mostrar mensaje
+        mostrarNotificacion('Ya tienes una solicitud pendiente para esta comunidad.', 'info');
+      } else {
+        // Si no tiene acceso ni solicitud pendiente, mostrar modal para solicitar acceso
+        mostrarModalSolicitud(comunidadId);
+      }
+    })
+    .catch(error => {
+      console.error('Error al verificar acceso:', error);
+      mostrarNotificacion('Error al verificar acceso a la comunidad', 'error');
+    });
+}
+
+</script>
 
 
 <style>/* Add these styles to your existing CSS file */

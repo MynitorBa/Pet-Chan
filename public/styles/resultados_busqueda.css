@@ -116,7 +116,41 @@ body {
     gap: 15px; /* espacio entre h2 y .ver-todos */
 
 }
+/* Estilos para el indicador de comunidad privada/pública */
+.comunidad-tipo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
+.comunidad-tipo.privada {
+  background-color: #e74c3c;
+}
+
+.comunidad-tipo.publica {
+  background-color: #2ecc71;
+}
+
+/* Asegurarse de que la tarjeta-imagen tenga posición relativa para posicionar el indicador */
+.tarjeta-imagen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+}
 .seccion-header h2 {
   font-size: 1.3rem;
   margin: 0;
