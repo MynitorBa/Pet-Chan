@@ -1,4 +1,23 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Variable global para almacenar el ID del usuario actual
+let currentUserId = null;
+
+// Función para obtener el ID del usuario actual
+async function obtenerUsuarioActual() {
+    try {
+        const response = await fetch('/api/usuario/actual');
+        if (response.ok) {
+            const data = await response.json();
+            currentUserId = data.userId;
+        }
+    } catch (error) {
+        console.error('Error al obtener usuario actual:', error);
+    }
+}
+
+// Llamar a esta función al cargar la página
+document.addEventListener('DOMContentLoaded', async () => {
+    await obtenerUsuarioActual();
+    
     // Cargar publicaciones
     cargarPublicaciones();
     
@@ -677,7 +696,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función para cargar las comunidades desde el servidor
 async function cargarComunidades() {
     try {
-        const response = await fetch('/api/comunidades');
+        // Modificar la URL para incluir el usuario actual en la consulta
+        const response = await fetch('/api/comunidades?incluir_membresia=true');
         if (!response.ok) {
             throw new Error('Error al obtener comunidades');
         }
@@ -696,7 +716,6 @@ async function cargarComunidades() {
             '<div class="error-mensaje">Error al cargar comunidades. Intenta nuevamente más tarde.</div>';
     }
 }
-
 // Función para renderizar las comunidades
 function renderizarComunidades(comunidades) {
     const container = document.getElementById('comunidades-container');
@@ -848,12 +867,33 @@ function renderizarComunidades(comunidades) {
         infoContainer.appendChild(statsDiv);
         comunidadCard.appendChild(infoContainer);
         
-        // CAMBIO: Hacer que la tarjeta redirija directamente a la comunidad específica
-        // usando la función verForo con el ID de la comunidad y su estado de privacidad
-        comunidadCard.style.cursor = 'pointer';
-        comunidadCard.addEventListener('click', () => {
-            window.location.href = `/foro?comunidad_id=${comunidad.id}`;
-        });
+        // CAMBIO IMPORTANTE: Verificación correcta de acceso a la comunidad
+        // Una comunidad es accesible si:
+        // 1. Es pública
+        // 2. El usuario es el creador de la comunidad
+        // 3. El usuario es miembro de la comunidad
+        const esPublica = !comunidad.es_privada;
+        const esCreador = comunidad.creador_id === currentUserId; // Asumimos que currentUserId es una variable global
+        const esMiembro = comunidad.es_miembro === true; // Asegurarse de que sea un booleano
+        
+        const tieneAcceso = esPublica || esCreador || esMiembro;
+        
+        if (tieneAcceso) {
+            // Si tiene acceso, hacer clickeable
+            comunidadCard.style.cursor = 'pointer';
+            comunidadCard.addEventListener('click', () => {
+                window.location.href = `/foro?comunidad_id=${comunidad.id}`;
+            });
+        } else {
+            // Si no tiene acceso (es privada y no es miembro ni creador)
+            comunidadCard.style.cursor = 'default';
+            
+            // Mostrar un overlay con información de que es una comunidad privada
+            const lockOverlay = document.createElement('div');
+            lockOverlay.classList.add('comunidad-lock-overlay');
+            lockOverlay.innerHTML = '<i class="fas fa-lock"></i><span>Comunidad privada</span>';
+            comunidadCard.appendChild(lockOverlay);
+        }
         
         cardsGrid.appendChild(comunidadCard);
     });

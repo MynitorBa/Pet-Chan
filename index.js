@@ -5696,7 +5696,63 @@ app.post('/api/comunidad/:id/leave', requireLogin, async (req, res) => {
 
 
 
+// Endpoint para obtener comunidades con información de acceso
+app.get('/api/comunidades', async (req, res) => {
+  try {
+      const userId = req.session.userId || null;
+      
+      let query = `
+          SELECT c.*, 
+                 COUNT(DISTINCT cu.user_id) as total_miembros, 
+                 COUNT(DISTINCT p.id) as total_posts
+      `;
+      
+      // Siempre incluir información de acceso si el usuario está logueado
+      if (userId) {
+          query += `, 
+              (SELECT COUNT(*) > 0 FROM comunidades_usuarios 
+               WHERE comunidad_id = c.id AND user_id = $1) as es_miembro,
+               (c.creador_id = $1) as es_creador
+          `;
+      }
+      
+      query += `
+          FROM comunidades c
+          LEFT JOIN comunidades_usuarios cu ON c.id = cu.comunidad_id
+          LEFT JOIN posts p ON c.id = p.comunidad_id
+          GROUP BY c.id
+          ORDER BY total_miembros DESC, total_posts DESC
+      `;
+      
+      const params = userId ? [userId] : [];
+      const result = await db.query(query, params);
+      
+      // Si el usuario no está logueado, establecer valores predeterminados
+      if (!userId) {
+          result.rows.forEach(comunidad => {
+              comunidad.es_miembro = false;
+              comunidad.es_creador = false;
+          });
+      }
+      
+      res.json(result.rows);
+  } catch (error) {
+      console.error('Error al obtener comunidades:', error);
+      res.status(500).json([]);
+  }
+});
 
+// Endpoint para obtener el usuario actual
+app.get('/api/usuario/actual', (req, res) => {
+  if (req.session && req.session.userId) {
+      res.json({ 
+          userId: req.session.userId,
+          username: req.session.username
+      });
+  } else {
+      res.json({ userId: null, username: null });
+  }
+});
 
 // Endpoint para obtener información básica de una comunidad
 app.get('/api/comunidad/:id', requireLogin, async (req, res) => {
@@ -6548,10 +6604,13 @@ app.get('/solicitudes-admin', requireLogin, async (req, res) => {
   }
 });
 
-// Ruta para verificar acceso a una comunidad privada
-app.get('/comunidad/:id/verificar-acceso', requireLogin, async (req, res) => {
+// Endpoint para verificar acceso a una comunidad
+app.get('/api/comunidad/:id/verificar-acceso', requireLogin, async (req, res) => {
   try {
     const comunidadId = req.params.id;
+    const userId = req.session.userId;
+    
+    console.log(`Verificando acceso: comunidadId=${comunidadId}, userId=${userId}`);
     
     // Verificar si la comunidad existe
     const comunidadResult = await db.query(`
@@ -6561,55 +6620,52 @@ app.get('/comunidad/:id/verificar-acceso', requireLogin, async (req, res) => {
     if (comunidadResult.rows.length === 0) {
       return res.status(404).json({ 
         success: false, 
-        mensaje: 'Comunidad no encontrada'
+        mensaje: 'Comunidad no encontrada' 
       });
     }
     
     const comunidad = comunidadResult.rows[0];
     
-    // Si no es privada, cualquiera puede acceder
-    if (!comunidad.es_privada) {
-      return res.json({ puedeAcceder: true });
-    }
+    // ¿Es el creador?
+    const esCreador = comunidad.creador_id === userId;
     
-    // Verificar si es el creador
-    if (comunidad.creador_id === req.session.userId) {
-      return res.json({ puedeAcceder: true });
-    }
-    
-    // Verificar si ya es miembro
-    const esMiembroResult = await db.query(`
-      SELECT * FROM comunidades_usuarios 
+    // CORRECCIÓN: VERIFICAR EXPLÍCITAMENTE LA TABLA DE MEMBRESÍAS
+    const miembroResult = await db.query(`
+      SELECT rol FROM comunidades_usuarios 
       WHERE comunidad_id = $1 AND user_id = $2
-    `, [comunidadId, req.session.userId]);
+    `, [comunidadId, userId]);
     
-    if (esMiembroResult.rows.length > 0) {
-      return res.json({ puedeAcceder: true });
-    }
+    const esMiembro = miembroResult.rows.length > 0;
+    const rol = esMiembro ? miembroResult.rows[0].rol : null;
     
-    // Verificar si ya tiene una solicitud pendiente
+    // Verificar si hay solicitud pendiente
     const solicitudResult = await db.query(`
       SELECT * FROM solicitudes_comunidad 
-      WHERE comunidad_id = $1 AND usuario_id = $2
-    `, [comunidadId, req.session.userId]);
+      WHERE comunidad_id = $1 AND usuario_id = $2 AND estado = 'pendiente'
+    `, [comunidadId, userId]);
     
-    if (solicitudResult.rows.length > 0) {
-      return res.json({ 
-        puedeAcceder: false, 
-        solicitudPendiente: true 
-      });
-    }
+    const solicitudPendiente = solicitudResult.rows.length > 0;
     
-    // No puede acceder y no tiene solicitud
-    res.json({ 
-      puedeAcceder: false, 
-      solicitudPendiente: false 
+    // La comunidad es privada pero el usuario es miembro o creador
+    const puedeAcceder = !comunidad.es_privada || esCreador || esMiembro;
+    
+    console.log(`Resultado acceso: esCreador=${esCreador}, esMiembro=${esMiembro}, rol=${rol}, puedeAcceder=${puedeAcceder}`);
+    
+    res.json({
+      success: true,
+      puedeAcceder,
+      esCreador,
+      esMiembro,
+      rol,
+      esPrivada: comunidad.es_privada,
+      solicitudPendiente
     });
+    
   } catch (error) {
-    console.error('Error al verificar acceso:', error);
+    console.error('Error al verificar acceso a la comunidad:', error);
     res.status(500).json({ 
       success: false, 
-      mensaje: 'Error al verificar el acceso'
+      mensaje: 'Error al verificar acceso' 
     });
   }
 });

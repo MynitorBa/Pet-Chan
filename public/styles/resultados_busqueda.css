@@ -139,7 +139,34 @@ body {
 .comunidad-tipo.publica {
   background-color: #2ecc71;
 }
+/* Estilos para el overlay de comunidades privadas */
+.comunidad-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
 
+.tarjeta-item:hover .comunidad-lock-overlay,
+.comunidad-card:hover .comunidad-lock-overlay {
+  opacity: 1;
+}
+
+.comunidad-lock-overlay i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
 /* Asegurarse de que la tarjeta-imagen tenga posición relativa para posicionar el indicador */
 .tarjeta-imagen {
   position: relative;
