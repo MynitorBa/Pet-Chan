@@ -1344,7 +1344,7 @@ app.get('/post/:id', requireLogin, async (req, res) => {
               toEmail: process.env.EMAILJS_TO_EMAIL
           }
       });
-  });
+  }); 
 
 
 // Implementar la ruta para guardar rangos directamente en la tabla users
