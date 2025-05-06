@@ -90,30 +90,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
   
+    // Función para limpiar mensajes de error
+    function clearErrorMessages() {
+        loginMessage.style.display = 'none';
+        loginMessage.textContent = '';
+    }
+  
     // Función para validar nombre de usuario
     function validateUsername() {
         const username = usernameInput.value.trim();
         usernameInput.classList.remove('error', 'valid');
         
         if (!username) {
-            loginMessage.textContent = 'Por favor, ingresa un nombre de usuario';
-            loginMessage.style.display = 'block';
+            displayError('Por favor, ingresa un nombre de usuario');
             usernameInput.classList.add('error');
             return false;
         }
   
         if (username.length < 5) {
-            loginMessage.innerHTML = 'El nombre de usuario debe tener al menos 5 caracteres<br>Y debe tener máximo 12 caracteres';
-
-
-            loginMessage.style.display = 'block';
+            displayError('El nombre de usuario debe tener al menos 5 caracteres');
             usernameInput.classList.add('error');
             return false;
         }
   
         if (username.length > 12) {
-            loginMessage.textContent = 'El nombre de usuario debe tener máximo 12 caracteres';
-            loginMessage.style.display = 'block';
+            displayError('El nombre de usuario debe tener máximo 12 caracteres');
             usernameInput.classList.add('error');
             return false;
         }
@@ -128,31 +129,27 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordInput.classList.remove('error', 'valid');
         
         if (!password) {
-            loginMessage.textContent = 'Por favor, ingresa una contraseña';
-            loginMessage.style.display = 'block';
+            displayError('Por favor, ingresa una contraseña');
             passwordInput.classList.add('error');
             return false;
         }
   
         if (password.length < 8) {
-            loginMessage.textContent = 'La contraseña debe tener al menos 8 caracteres';
-            loginMessage.style.display = 'block';
+            displayError('La contraseña debe tener al menos 8 caracteres');
             passwordInput.classList.add('error');
             return false;
         }
   
         // Verificar si la contraseña tiene al menos una letra mayúscula
         if (!/[A-Z]/.test(password)) {
-            loginMessage.textContent = 'La contraseña debe contener al menos una letra mayúscula';
-            loginMessage.style.display = 'block';
+            displayError('La contraseña debe contener al menos una letra mayúscula');
             passwordInput.classList.add('error');
             return false;
         }
   
         // Verificar si la contraseña tiene al menos un símbolo
         if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-            loginMessage.textContent = 'La contraseña debe contener al menos un símbolo';
-            loginMessage.style.display = 'block';
+            displayError('La contraseña debe contener al menos un símbolo');
             passwordInput.classList.add('error');
             return false;
         }
@@ -168,15 +165,13 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmPasswordInput.classList.remove('error', 'valid');
         
         if (!confirmPassword) {
-            loginMessage.textContent = 'Por favor, confirma tu contraseña';
-            loginMessage.style.display = 'block';
+            displayError('Por favor, confirma tu contraseña');
             confirmPasswordInput.classList.add('error');
             return false;
         }
   
         if (password !== confirmPassword) {
-            loginMessage.textContent = 'Las contraseñas no coinciden';
-            loginMessage.style.display = 'block';
+            displayError('Las contraseñas no coinciden');
             confirmPasswordInput.classList.add('error');
             return false;
         }
@@ -184,19 +179,33 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmPasswordInput.classList.add('valid');
         return true;
     }
+    
+    // Función para mostrar mensajes de error
+    function displayError(message) {
+        loginMessage.textContent = message;
+        loginMessage.style.display = 'block';
+    }
   
     // Función para validar todo el formulario
     function validateForm() {
-        const isUsernameValid = validateUsername();
-        const isPasswordValid = validatePassword();
-        const isConfirmValid = validateConfirmPassword();
-  
-        if (isUsernameValid && isPasswordValid && isConfirmValid) {
-            loginMessage.style.display = 'none';
-            return true;
+        clearErrorMessages();
+        
+        // Primero validamos el usuario
+        if (!validateUsername()) {
+            return false;
         }
         
-        return false;
+        // Luego la contraseña
+        if (!validatePassword()) {
+            return false;
+        }
+        
+        // Finalmente la confirmación
+        if (!validateConfirmPassword()) {
+            return false;
+        }
+  
+        return true;
     }
   
     // Activar el portal mejorado y redirigir
@@ -223,27 +232,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 800);
     }
   
-    // Event Listeners para validaciones en tiempo real
+    // Event Listeners para validaciones al cambiar el valor del campo
     usernameInput.addEventListener('input', function() {
-        validateUsername();
+        // Solo validamos si el campo no está vacío
+        if (usernameInput.value.trim() !== '') {
+            validateUsername();
+        } else {
+            clearErrorMessages();
+            usernameInput.classList.remove('error', 'valid');
+        }
     });
   
     passwordInput.addEventListener('input', function() {
-        validatePassword();
-        if (confirmPasswordInput.value) {
-            validateConfirmPassword();
+        // Solo validamos si el campo no está vacío
+        if (passwordInput.value !== '') {
+            validatePassword();
+            
+            // Si hay valor en confirmPasswordInput, validamos también para mantener sincronizados los mensajes
+            if (confirmPasswordInput.value !== '') {
+                validateConfirmPassword();
+            }
+        } else {
+            clearErrorMessages();
+            passwordInput.classList.remove('error', 'valid');
         }
     });
   
     confirmPasswordInput.addEventListener('input', function() {
-        validateConfirmPassword();
+        // Solo validamos si el campo no está vacío
+        if (confirmPasswordInput.value !== '') {
+            validateConfirmPassword();
+        } else {
+            clearErrorMessages();
+            confirmPasswordInput.classList.remove('error', 'valid');
+        }
     });
-  
+    
     // Event Listener para el formulario de registro
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevenir envío del formulario para validar primero
             
+            // Validamos el formulario completo antes del envío
             if (validateForm()) {
                 // Guardar el nombre de usuario en sessionStorage para utilizarlo en la siguiente página
                 sessionStorage.setItem('username', usernameInput.value);
@@ -261,4 +291,4 @@ document.addEventListener('DOMContentLoaded', function() {
   
     // Inicializar estrellas al cargar la página
     createStars();
-  });
+});

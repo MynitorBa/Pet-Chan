@@ -617,7 +617,6 @@ document.getElementById('mensaje-form').addEventListener('submit', function(even
     }
   }
 });
-
 function cargarMensajesFiltrados(params) {
   const listaMensajes = document.querySelector('.lista-mensajes');
   const contador = document.getElementById('contador');
@@ -632,17 +631,31 @@ function cargarMensajesFiltrados(params) {
     params.set('autor', currentUser);
   }
 
-  let apiUrl = '/filtrar?';
-  for (let [key, value] of params.entries()) {
-    apiUrl += `${key}=${encodeURIComponent(value)}&`;
-  }
+  // Verificar si hay una comunidad seleccionada
+  const comunidadId = params.get('comunidad_id');
+  
+  // Construir la URL base para la API
+  let apiUrl = '/filtrar';
+  
+  // Si estamos filtrando para una comunidad específica, usar la ruta especial
+  if (comunidadId) {
+    // Esta ruta siempre mostrará TODOS los mensajes de la comunidad
+    apiUrl = `/comunidad/${comunidadId}/mensajes`;
+    console.log(`Cargando mensajes de comunidad específica: ${comunidadId}`);
+  } else {
+    // Añadir parámetros de filtro solo si estamos en la ruta normal
+    apiUrl += '?';
+    for (let [key, value] of params.entries()) {
+      apiUrl += `${key}=${encodeURIComponent(value)}&`;
+    }
 
-  if (apiUrl.endsWith('&')) {
-    apiUrl = apiUrl.slice(0, -1);
-  }
+    if (apiUrl.endsWith('&')) {
+      apiUrl = apiUrl.slice(0, -1);
+    }
 
-  if (apiUrl === '/filtrar?') {
-    apiUrl = '/filtrar';
+    if (apiUrl === '/filtrar?') {
+      apiUrl = '/filtrar';
+    }
   }
 
   fetch(apiUrl)
@@ -660,6 +673,25 @@ function cargarMensajesFiltrados(params) {
       if (data.mensajes && data.mensajes.length > 0) {
         listaMensajes.classList.remove('no-hay-mensajes'); // ✅ QUITAR clase de centrado
         actualizarListaMensajes(data.mensajes);
+        
+        // Si estamos en una comunidad específica, actualizamos la interfaz
+        if (comunidadId) {
+          // Marcar el botón de la comunidad como activo
+          const comunidadRadio = document.querySelector(`input[name="comunidad_id"][value="${comunidadId}"]`);
+          if (comunidadRadio) {
+            comunidadRadio.checked = true;
+          }
+          
+          // Actualizar título del foro si es necesario
+          const comunidadLabel = document.querySelector(`label[for="comunidad-${comunidadId}"]`);
+          if (comunidadLabel) {
+            const tituloForo = document.querySelector('.foro-titulo h2');
+            if (tituloForo) {
+              const nombreComunidad = comunidadLabel.textContent.trim();
+              tituloForo.textContent = `Comunidad: ${nombreComunidad}`;
+            }
+          }
+        }
       } else {
         listaMensajes.classList.add('no-hay-mensajes');
         listaMensajes.innerHTML = '<p class="no-mensajes">No se encontraron mensajes con los filtros seleccionados.</p>';
@@ -673,7 +705,6 @@ function cargarMensajesFiltrados(params) {
       }
     });
 }
-
   function actualizarListaMensajes(mensajes) {
     const listaMensajes = document.querySelector('.lista-mensajes');
     const contador = document.getElementById('contador');
@@ -2894,7 +2925,7 @@ function setupImagePreviewForElement(input, container) {
         removeBtn.style.alignItems = 'center';
         removeBtn.style.justifyContent = 'center';
         removeBtn.style.cursor = 'pointer';
-        removeBtn.style.zIndex = '5';
+        removeBtn.style.zIndex = '9999';
         removeBtn.style.fontSize = '12px';      // Ícono más visible pero proporcionalmente pequeño
         removeBtn.style.lineHeight = '1px';    // Asegura que el ícono esté centrado
         removeBtn.textContent = '×';

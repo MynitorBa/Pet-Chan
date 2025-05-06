@@ -2620,6 +2620,191 @@ app.post('/publicar', upload.array('imagenes', 9), async (req, res) => {
   }
 });
 
+// Función que SIEMPRE muestra TODOS los mensajes de una comunidad
+async function loadCommunityMessages(communityId) {
+  try {
+    // Consulta simple para mostrar TODOS los mensajes de la comunidad
+    const query = `
+      SELECT fp.*, u.username, u.rango1, u.rango2, u.rango3,
+             COALESCE(SUM(v.valor), 0) as ranking,
+             c.es_privada,
+             c.creador_id
+      FROM forum_posts fp
+      JOIN users u ON fp.user_id = u.id
+      LEFT JOIN post_votes v ON fp.id = v.post_id
+      LEFT JOIN comunidades c ON fp.comunidad_id = c.id
+      WHERE fp.comunidad_id = $1
+      GROUP BY fp.id, u.username, u.rango1, u.rango2, u.rango3, c.es_privada, c.creador_id
+      ORDER BY fp.fecha DESC
+    `;
+    
+    console.log(`Cargando TODOS los mensajes para comunidad: ${communityId}`);
+    
+    // Ejecutar la consulta
+    const postResult = await db.query(query, [communityId]);
+    console.log(`Encontrados ${postResult.rows.length} mensajes para la comunidad ${communityId}`);
+    
+    // Crear un array vacío para almacenar los posts
+    const dbMensajes = [];
+    
+    // Procesar cada post
+    for (const post of postResult.rows) {
+      // Cargar imágenes para este post
+      const imageResult = await db.query(`
+        SELECT id, url FROM post_images WHERE post_id = $1
+      `, [post.id]);
+      
+      // Cargar comentarios para este post con rangos de usuario
+      const commentResult = await db.query(`
+        SELECT fc.*, u.username, u.rango1, u.rango2, u.rango3,
+               COALESCE(SUM(cv.valor), 0) as ranking
+        FROM forum_comments fc
+        JOIN users u ON fc.user_id = u.id
+        LEFT JOIN comment_votes cv ON fc.id = cv.comment_id
+        WHERE fc.post_id = $1
+        GROUP BY fc.id, u.username, u.rango1, u.rango2, u.rango3
+        ORDER BY fc.fecha ASC
+      `, [post.id]);
+      
+      // Procesar comentarios
+      const comments = [];
+      for (const comment of commentResult.rows) {
+        // Cargar imágenes para este comentario
+        const commentImageResult = await db.query(`
+          SELECT id, url FROM comment_images WHERE comment_id = $1
+        `, [comment.id]);
+        
+        comments.push({
+          id: comment.id,
+          user_id: comment.user_id,
+          autor: comment.username,
+          comentario: comment.comentario,
+          fecha: comment.fecha,
+          fechaStr: comment.fecha_str,
+          rango1: comment.rango1 || 'Ninguno',
+          rango2: comment.rango2 || 'Ninguno',
+          rango3: comment.rango3 || 'Ninguno',
+          comunidad_id: comment.comunidad_id,
+          imagenes: commentImageResult.rows.map(img => ({
+            id: img.id,
+            url: img.url
+          })),
+          ranking: comment.ranking || 0,
+          votoActual: 0
+        });
+      }
+
+      // Añadir el post al array
+      dbMensajes.push({
+        id: post.id,
+        user_id: post.user_id,
+        autor: post.username,
+        mensaje: post.mensaje,
+        etiqueta: post.etiqueta || "Ninguna",
+        subcategoria: post.subcategoria || "Ninguna",
+        extrasubcategoria: post.extrasubcategoria || "Ninguna",
+        fecha: post.fecha,
+        fechaStr: post.fecha_str,
+        comunidad_id: post.comunidad_id,
+        es_privada: post.es_privada || false,
+        ranking: post.ranking || 0,
+        rango1: post.rango1 || 'Ninguno',
+        rango2: post.rango2 || 'Ninguno', 
+        rango3: post.rango3 || 'Ninguno',
+        imagenes: imageResult.rows.map(img => ({
+          id: img.id,
+          url: img.url
+        })),
+        comentarios: comments
+      });
+    }
+    
+    return dbMensajes;
+  } catch (error) {
+    console.error(`Error cargando mensajes para comunidad ${communityId}:`, error);
+    return [];
+  }
+}
+
+// Función auxiliar para procesar los mensajes
+async function procesarMensajes(mensajesRows) {
+  // Crear un array vacío para almacenar los posts procesados
+  const dbMensajes = [];
+  
+  // Procesar cada post
+  for (const post of mensajesRows) {
+    // Cargar imágenes para este post
+    const imageResult = await db.query(`
+      SELECT id, url FROM post_images WHERE post_id = $1
+    `, [post.id]);
+    
+    // Cargar comentarios para este post con rangos de usuario
+    const commentResult = await db.query(`
+      SELECT fc.*, u.username, u.rango1, u.rango2, u.rango3,
+             COALESCE(SUM(cv.valor), 0) as ranking
+      FROM forum_comments fc
+      JOIN users u ON fc.user_id = u.id
+      LEFT JOIN comment_votes cv ON fc.id = cv.comment_id
+      WHERE fc.post_id = $1
+      GROUP BY fc.id, u.username, u.rango1, u.rango2, u.rango3
+      ORDER BY fc.fecha ASC
+    `, [post.id]);
+    
+    // Procesar comentarios
+    const comments = [];
+    for (const comment of commentResult.rows) {
+      // Cargar imágenes para este comentario
+      const commentImageResult = await db.query(`
+        SELECT id, url FROM comment_images WHERE comment_id = $1
+      `, [comment.id]);
+      
+      comments.push({
+        id: comment.id,
+        user_id: comment.user_id,
+        autor: comment.username,
+        comentario: comment.comentario,
+        fecha: comment.fecha,
+        fechaStr: comment.fecha_str,
+        rango1: comment.rango1 || 'Ninguno',
+        rango2: comment.rango2 || 'Ninguno',
+        rango3: comment.rango3 || 'Ninguno',
+        comunidad_id: comment.comunidad_id,
+        imagenes: commentImageResult.rows.map(img => ({
+          id: img.id,
+          url: img.url
+        })),
+        ranking: comment.ranking || 0,
+        votoActual: 0
+      });
+    }
+
+    // Añadir el post a nuestro array
+    dbMensajes.push({
+      id: post.id,
+      user_id: post.user_id,
+      autor: post.username,
+      mensaje: post.mensaje,
+      etiqueta: post.etiqueta || "Ninguna",
+      subcategoria: post.subcategoria || "Ninguna",
+      extrasubcategoria: post.extrasubcategoria || "Ninguna",
+      fecha: post.fecha,
+      fechaStr: post.fecha_str,
+      comunidad_id: post.comunidad_id,
+      es_privada: post.es_privada || false,
+      ranking: post.ranking || 0,
+      rango1: post.rango1 || 'Ninguno',
+      rango2: post.rango2 || 'Ninguno', 
+      rango3: post.rango3 || 'Ninguno',
+      imagenes: imageResult.rows.map(img => ({
+        id: img.id,
+        url: img.url
+      })),
+      comentarios: comments
+    });
+  }
+  
+  return dbMensajes;
+}
 
 
 app.get('/foro', requireLogin, async (req, res) => {
@@ -2731,16 +2916,164 @@ app.get('/foro', requireLogin, async (req, res) => {
 
 
 
+app.get('/comunidad/:id/mensajes', requireLogin, async (req, res) => {
+  try {
+    const comunidadId = req.params.id;
+    
+    if (!comunidadId) {
+      return res.status(400).json({ error: 'ID de comunidad no proporcionado' });
+    }
+    
+    // Usar la nueva función que SIEMPRE muestra TODOS los mensajes de la comunidad
+    const mensajes = await loadCommunityMessages(comunidadId);
+    
+    // Enviar los mensajes como respuesta
+    res.json({ mensajes });
+  } catch (error) {
+    console.error(`Error cargando mensajes de comunidad ${req.params.id}:`, error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 
 
 
+async function loadForumPosts(includePrivate = false, specificCommunityId = null, userId = null) {
+  try {
+    // Base query to load all posts with user information
+    let query = `
+      SELECT fp.*, u.username, u.rango1, u.rango2, u.rango3,
+             COALESCE(SUM(v.valor), 0) as ranking,
+             c.es_privada,
+             c.creador_id
+      FROM forum_posts fp
+      JOIN users u ON fp.user_id = u.id
+      LEFT JOIN post_votes v ON fp.id = v.post_id
+      LEFT JOIN comunidades c ON fp.comunidad_id = c.id
+    `;
+    
+    // Add filters based on parameters
+    const queryParams = [];
+    let paramCounter = 1;
+    
+    // If we specifically want messages from a community
+    if (specificCommunityId) {
+      console.log(`Filtrando mensajes para comunidad específica: ${specificCommunityId}`);
+      query += ` WHERE fp.comunidad_id = $${paramCounter}`;
+      queryParams.push(specificCommunityId);
+      paramCounter++;
+    } 
+    // If we're in the general forum, exclude messages from private communities
+    else if (!includePrivate) {
+      query += ` WHERE (fp.comunidad_id IS NULL OR c.es_privada = false`;
+      
+      // If we have a userId, allow viewing messages from private communities where the user is a member
+      if (userId) {
+        query += ` OR
+          (c.es_privada = true AND (
+            c.creador_id = $${paramCounter} OR
+            EXISTS(SELECT 1 FROM comunidades_usuarios cu WHERE cu.comunidad_id = c.id AND cu.user_id = $${paramCounter})
+          ))`;
+        queryParams.push(userId);
+        paramCounter++;
+      }
+      
+      query += `)`;
+    }
+    
+    // Continue with the rest of the query
+    query += `
+      GROUP BY fp.id, u.username, u.rango1, u.rango2, u.rango3, c.es_privada, c.creador_id
+      ORDER BY fp.fecha DESC
+    `;
+    
+    console.log("Query SQL:", query);
+    console.log("Params:", queryParams);
+    
+    // Execute the query
+    const postResult = await db.query(query, queryParams);
+    console.log(`Encontrados ${postResult.rows.length} mensajes`);
+    
+    // Create an empty array to store the posts
+    const dbMensajes = [];
+    
+    // Process each post
+    for (const post of postResult.rows) {
+      // Load images for this post
+      const imageResult = await db.query(`
+        SELECT id, url FROM post_images WHERE post_id = $1
+      `, [post.id]);
+      
+      // Load comments for this post with user ranks from the users table
+      const commentResult = await db.query(`
+        SELECT fc.*, u.username, u.rango1, u.rango2, u.rango3,
+               COALESCE(SUM(cv.valor), 0) as ranking
+        FROM forum_comments fc
+        JOIN users u ON fc.user_id = u.id
+        LEFT JOIN comment_votes cv ON fc.id = cv.comment_id
+        WHERE fc.post_id = $1
+        GROUP BY fc.id, u.username, u.rango1, u.rango2, u.rango3
+        ORDER BY fc.fecha ASC
+      `, [post.id]);
+      
+      // Process comments
+      const comments = [];
+      for (const comment of commentResult.rows) {
+        // Load images for this comment
+        const commentImageResult = await db.query(`
+          SELECT id, url FROM comment_images WHERE comment_id = $1
+        `, [comment.id]);
+        
+        comments.push({
+          id: comment.id,
+          user_id: comment.user_id,
+          autor: comment.username,
+          comentario: comment.comentario,
+          fecha: comment.fecha,
+          fechaStr: comment.fecha_str,
+          rango1: comment.rango1 || 'Ninguno',
+          rango2: comment.rango2 || 'Ninguno',
+          rango3: comment.rango3 || 'Ninguno',
+          comunidad_id: comment.comunidad_id,
+          imagenes: commentImageResult.rows.map(img => ({
+            id: img.id,
+            url: img.url
+          })),
+          ranking: comment.ranking || 0,
+          votoActual: 0
+        });
+      }
 
-
-
-
-
-
-
+      // Add the post to our array with user ranks and es_privada property
+      dbMensajes.push({
+        id: post.id,
+        user_id: post.user_id,
+        autor: post.username,
+        mensaje: post.mensaje,
+        etiqueta: post.etiqueta || "Ninguna",
+        subcategoria: post.subcategoria || "Ninguna",
+        extrasubcategoria: post.extrasubcategoria || "Ninguna",
+        fecha: post.fecha,
+        fechaStr: post.fecha_str,
+        comunidad_id: post.comunidad_id,
+        es_privada: post.es_privada || false,  // Add property to verify if it's private
+        ranking: post.ranking || 0,
+        rango1: post.rango1 || 'Ninguno',
+        rango2: post.rango2 || 'Ninguno', 
+        rango3: post.rango3 || 'Ninguno',
+        imagenes: imageResult.rows.map(img => ({
+          id: img.id,
+          url: img.url
+        })),
+        comentarios: comments
+      });
+    }
+    
+    return dbMensajes;
+  } catch (error) {
+    console.error('Error loading forum posts:', error);
+    return [];
+  }
+}
 
 
 
@@ -3197,101 +3530,6 @@ app.post('/biblioteca/guardar-mascota', requireLogin, async (req, res) => {
 
 
 
-
-
-
-async function loadForumPosts() {
-  try {
-    // Load all posts with user ranks from the users table
-    const postResult = await db.query(`
-      SELECT fp.*, u.username, u.rango1, u.rango2, u.rango3,
-             COALESCE(SUM(v.valor), 0) as ranking 
-      FROM forum_posts fp
-      JOIN users u ON fp.user_id = u.id
-      LEFT JOIN post_votes v ON fp.id = v.post_id
-      GROUP BY fp.id, u.username, u.rango1, u.rango2, u.rango3
-      ORDER BY fp.fecha DESC
-    `);
-    
-    // Create an empty array to store the posts
-    const dbMensajes = [];
-    
-    // Process each post
-    for (const post of postResult.rows) {
-      // Load images for this post
-      const imageResult = await db.query(`
-        SELECT id, url FROM post_images WHERE post_id = $1
-      `, [post.id]);
-      
-      // Load comments for this post with user ranks from the users table
-      const commentResult = await db.query(`
-        SELECT fc.*, u.username, u.rango1, u.rango2, u.rango3,
-               COALESCE(SUM(cv.valor), 0) as ranking
-        FROM forum_comments fc
-        JOIN users u ON fc.user_id = u.id
-        LEFT JOIN comment_votes cv ON fc.id = cv.comment_id
-        WHERE fc.post_id = $1
-        GROUP BY fc.id, u.username, u.rango1, u.rango2, u.rango3
-        ORDER BY fc.fecha ASC
-      `, [post.id]);
-      
-      // Process comments
-      const comments = [];
-      for (const comment of commentResult.rows) {
-        // Load images for this comment
-        const commentImageResult = await db.query(`
-          SELECT id, url FROM comment_images WHERE comment_id = $1
-        `, [comment.id]);
-        
-        comments.push({
-          id: comment.id,
-          user_id: comment.user_id,
-          autor: comment.username,
-          comentario: comment.comentario,
-          fecha: comment.fecha,
-          fechaStr: comment.fecha_str,
-          rango1: comment.rango1 || 'Ninguno',
-          rango2: comment.rango2 || 'Ninguno',
-          rango3: comment.rango3 || 'Ninguno',
-          imagenes: commentImageResult.rows.map(img => ({
-            id: img.id,
-            url: img.url
-          })),
-          ranking: comment.ranking || 0,
-          votoActual: 0
-        });
-      }
-
-      // Add the post to our array with user ranks from the users table
-      dbMensajes.push({
-        id: post.id,
-        user_id: post.user_id,
-        autor: post.username,
-        mensaje: post.mensaje,
-        etiqueta: post.etiqueta || "Ninguna",
-        subcategoria: post.subcategoria || "Ninguna",
-        extrasubcategoria: post.extrasubcategoria || "Ninguna",
-        fecha: post.fecha,
-        fechaStr: post.fecha_str,
-        comunidad_id: post.comunidad_id,
-        ranking: post.ranking || 0,
-        rango1: post.rango1 || 'Ninguno',
-        rango2: post.rango2 || 'Ninguno', 
-        rango3: post.rango3 || 'Ninguno',
-        imagenes: imageResult.rows.map(img => ({
-          id: img.id,
-          url: img.url
-        })),
-        comentarios: comments
-      });
-    }
-    
-    return dbMensajes;
-  } catch (error) {
-    console.error('Error loading forum posts:', error);
-    return [];
-  }
-}
 
 
 // Add this endpoint to your server code (app.js, server.js, or routes file)

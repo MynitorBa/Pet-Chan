@@ -432,7 +432,6 @@ body {
     cursor: pointer;
     padding: 0;
     margin-right: 10px;
-    z-index: 1002;
     position: relative;
     transition: transform 0.3s ease;
 }

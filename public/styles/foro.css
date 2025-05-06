@@ -3102,3 +3102,30 @@ button:active {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Estilo para indicador de contenido privado */
+.indicador-privado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  color: #e4af65;
+  font-size: 12px;
+}
+
+.indicador-privado i {
+  margin-right: 2px;
+}
+
+/* Estilo para comunidades privadas en la lista */
+.comunidad-item.privada .comunidad-nombre::after {
+  content: "\f023";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-left: 5px;
+  color: #e4af65;
+}
+
+/* Resaltar mensajes de comunidades privadas */
+.mensaje[data-es-privada="true"] {
+  border-left: 3px solid #e4af65;
+}
