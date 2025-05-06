@@ -2,6 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import { log } from 'console';
+import 'dotenv/config';
 
 /*---------------------------importaciones necesarias para la base de datos------------------------------------------------ */
 /*necesario para la base de datos*/
@@ -52,21 +53,21 @@ const io = new Server(httpServer, {
 /*---------------------------variable necesarias para la base de datos------------------------------------------------ */
 //configuracion de la base de datos
 app.use(session({
-    secret: 'Ayer_me_econtre_con_sabrina_corazoncitos',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: false,
-    }
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false,
+  }
 }));
 
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "pet_chan",
-    password: "123456",
-    port: 5432,
-})
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+});
 
 db.connect();
 
@@ -1331,17 +1332,19 @@ app.get('/post/:id', requireLogin, async (req, res) => {
       }
     });
 
-app.get('/formularioSoporte', requireLogin, (req, res) => {
-
-    const mascota = req.session.mascotaActual;
-
-    res.render('formularioSoporte.ejs', {
-        rutaImagen: mascota.rutaImagen,
-        accesorios: req.session.accesorios
-    });
-});
-
-
+    app.get('/formularioSoporte', requireLogin, (req, res) => {
+      const mascota = req.session.mascotaActual;
+  
+      res.render('formularioSoporte.ejs', {
+          rutaImagen: mascota.rutaImagen,
+          accesorios: req.session.accesorios,
+          emailjsConfig: {
+              serviceId: process.env.EMAILJS_SERVICE_ID,
+              templateId: process.env.EMAILJS_TEMPLATE_ID,
+              toEmail: process.env.EMAILJS_TO_EMAIL
+          }
+      });
+  });
 
 
 // Implementar la ruta para guardar rangos directamente en la tabla users
@@ -3201,7 +3204,7 @@ app.post('/biblioteca/activar-mascota', requireLogin, async (req, res) => {
                       mascotaActiva.nivelEnergia,
                       mascotaActiva.habilidad,
                       mascotaActiva.comidaFavorita,
-                      'comun', // Rareza predeterminada si no se conoce
+                      mascotaActiva.rareza, // Rareza predeterminada si no se conoce
                       userId
                   ]
               );
@@ -3219,8 +3222,8 @@ app.post('/biblioteca/activar-mascota', requireLogin, async (req, res) => {
       // 4. Insertar la nueva mascota activa en pets
       const result = await db.query(
           `INSERT INTO pets (petname, genero, indice, "nivelAmor", "nivelFelicidad", "nivelEnergia", 
-                         habilidad, "comidaFavorita", id_users)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                         habilidad, "comidaFavorita", id_users, rareza)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
            RETURNING id`,
           [
               mascotaNueva.petname,
@@ -3231,7 +3234,8 @@ app.post('/biblioteca/activar-mascota', requireLogin, async (req, res) => {
               mascotaNueva.nivelEnergia,
               mascotaNueva.habilidad,
               mascotaNueva.comidaFavorita,
-              userId
+              userId,
+              mascotaNueva.rareza
           ]
       );
 
@@ -9530,8 +9534,7 @@ async function obtenerInfoMascota(petId) {
   return result.rows[0];
 }
 
-httpServer.listen(3000, () => {
-  console.log("Servidor corriendo en http://192.168.0.21:3000");
+httpServer.listen(process.env.PORT || 3000, () => {
+  console.log(`Servidor corriendo en http://192.168.0.21:${process.env.PORT || 3000}`);
 });
-
 

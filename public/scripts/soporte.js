@@ -6,6 +6,11 @@ const contenedorPrincipal = document.getElementById('contenedor-principal');
 const areaAnimacion = document.getElementById('area-animacion');
 const contenedorAnimacion = document.getElementById('contenedor-animacion');
 
+// Obtener la configuración de email.js inyectada en la página
+const EMAILJS_SERVICE_ID = document.getElementById('emailjs-service-id').value;
+const EMAILJS_TEMPLATE_ID = document.getElementById('emailjs-template-id').value;
+const EMAILJS_TO_EMAIL = document.getElementById('emailjs-to-email').value;
+
 // Mostrar la burbuja al cargar
 window.addEventListener('load', () => {
     setTimeout(() => {
@@ -121,7 +126,7 @@ function mostrarAnimacionFinal() {
             mensajeExito.style.marginTop = '20px';
             mensajeExito.innerHTML = `
                 <h3 style="color: #d304c5; margin-bottom: 10px;">✧✧ ¡Mensaje Enviado! ✧✧</h3>
-                <p>Tu mensaje ha sido entregado por nuestra mascota a <strong>aetherlillie0@gmail.com</strong>. Pronto recibirás una respuesta.</p>
+                <p>Tu mensaje ha sido entregado por nuestra mascota a <strong>${EMAILJS_TO_EMAIL}</strong>. Pronto recibirás una respuesta.</p>
             `;
             
             // Reemplazar el formulario con el mensaje de éxito
@@ -164,7 +169,7 @@ document.getElementById('formulario-contacto').addEventListener('submit', functi
         categoria: categoria || "No especificada",
         prioridad: prioridad,
         mensaje: mensaje,
-        to_email: "aetherlillie0@gmail.com"
+        to_email: EMAILJS_TO_EMAIL
     };
     
     // Cambiar la apariencia del botón enviar para indicar que está en proceso
@@ -174,8 +179,8 @@ document.getElementById('formulario-contacto').addEventListener('submit', functi
     botonEnviar.disabled = true;
     botonEnviar.style.opacity = "0.7";
     
-    // Enviar el correo
-    emailjs.send('service_gbeir75', 'template_mlm289q', params) 
+    // Enviar el correo utilizando las variables de entorno
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params) 
         .then(function(response) {
             console.log('SUCCESS!', response.status, response.text);
             
@@ -186,7 +191,7 @@ document.getElementById('formulario-contacto').addEventListener('submit', functi
             carta.classList.add('visible');
             
             // Mostrar burbuja con mensaje de envío
-            burbuja.textContent = '¡Está muy bien! ¡Voy a entregar tu mensaje ahora a aetherlillie0@gmail.com!';
+            burbuja.textContent = `¡Está muy bien! ¡Voy a entregar tu mensaje ahora a ${EMAILJS_TO_EMAIL}!`;
             burbuja.classList.add('visible');
             
             // Iniciar la animación de la mascota tomando la carta
