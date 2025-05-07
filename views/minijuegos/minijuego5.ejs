@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Orbitron|Rajdhani:700" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/minijuego/minijuego5.css">
+    <link rel="stylesheet" href="styles/minijuego/ContenedorJuegos.css">
+
+
+  </head>
+  <body>
+
+    <div class="game-container">
+        <div class="side-panel left-panel">
+            <div class="hold-piece" id="hold-piece"></div>
+            <div class="controls">
+                <p>← → : Mover</p>
+                <p>↑ : Rotar</p>
+                <p>↓ : Bajar</p>
+                <p>Espacio : Caída rápida</p>
+                <p>C : Guardar pieza</p>
+                <p>P : Pausar</p>
+                <p>Enter : Empezar</p>
+            </div>
+        </div>
+        <div class="board" id="board"></div>
+        <div class="side-panel">
+            <div class="next-piece" id="next-piece"></div>
+            <div class="stats">
+                <p>Puntuación: <span class="score-value" id="score">0</span></p>
+                <p>Nivel: <span class="level-value" id="level">1</span></p>
+                <p>Líneas: <span class="lines-value" id="lines">0</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="message" id="pause-message">
+        <h2>PAUSA</h2>
+        <p>Presiona P para continuar</p>
+    </div>
+    
+    <div class="message" id="game-over">
+        <h2>GAME OVER</h2>
+        <p>Puntuación final: <span id="final-score">0</span></p>
+        <button id="restart">Jugar de nuevo</button>
+    </div>
+    
+    <div class="message" id="level-up">
+        <h2>¡NIVEL COMPLETADO!</h2>
+        <p>Avanzando al nivel <span id="new-level">2</span></p>
+        <p>Prepárate...</p>
+    </div>
+    
+    <div class="level-message" id="level-flash"></div>
+    
+    <button id="start-game">INICIAR JUEGO</button>
+    <script src="scripts/minijuegos/minijuego5.js"></script>
+
+  </body>
+</html> 

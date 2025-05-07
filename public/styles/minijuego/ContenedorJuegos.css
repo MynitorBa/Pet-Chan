@@ -1,0 +1,472 @@
+/* Estilos para la página de minijuegos - mantiene la estética ciberpunk/neón */
+
+#contenedor-juego {
+    font-family: 'Press Start 2P', cursive;
+    max-width: 1300px;
+    margin: 40px auto;
+    background-color: rgba(98, 2, 150, 0.95);
+    border: 4px solid #d304c5;
+    border-radius: 15px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' viewBox='0 0 50 50'%3E%3Crect width='25' height='25' fill='%2362029e'/%3E%3Crect x='25' width='25' height='25' fill='%234b0082'/%3E%3Crect width='25' height='25' y='25' fill='%23ff9999'/%3E%3Crect x='25' y='25' width='25' height='25' fill='%239999ff'/%3E%3Crect width='12' height='12' x='12' y='12' fill='%23ffcc00'/%3E%3Crect width='12' height='12' x='12' y='25' fill='%23ff66cc'/%3E%3Crect width='12' height='12' x='25' y='12' fill='%23ff6666'/%3E%3Crect width='12' height='12' x='25' y='25' fill='%23ff3399'/%3E%3Crect width='6' height='6' x='6' y='6' fill='%23ff0000'/%3E%3Crect width='6' height='6' x='6' y='43' fill='%23ff00ff'/%3E%3Crect width='6' height='6' x='43' y='6' fill='%230066ff'/%3E%3Crect width='6' height='6' x='43' y='43' fill='%2300ff00'/%3E%3Crect width='8' height='8' x='18' y='18' fill='%23ff6600'/%3E%3Crect width='8' height='8' x='18' y='32' fill='%2300ffff'/%3E%3Crect width='8' height='8' x='32' y='18' fill='%23ccff00'/%3E%3Crect width='8' height='8' x='32' y='32' fill='%23ccccff'/%3E%3Crect width='4' height='4' x='2' y='2' fill='%23ff3300'/%3E%3Crect width='4' height='4' x='2' y='46' fill='%23ff33cc'/%3E%3Crect width='4' height='4' x='46' y='2' fill='%23006633'/%3E%3Crect width='4' height='4' x='46' y='46' fill='%23ff33ff'/%3E%3Crect width='3' height='3' x='10' y='10' fill='%23ff3333'/%3E%3Crect width='3' height='3' x='10' y='37' fill='%23ff00cc'/%3E%3Crect width='3' height='3' x='37' y='10' fill='%23ff6633'/%3E%3Crect width='3' height='3' x='37' y='37' fill='%23ccff33'/%3E%3Crect width='2' height='2' x='15' y='15' fill='%23ff3333'/%3E%3Crect width='2' height='2' x='15' y='34' fill='%23ff66cc'/%3E%3Crect width='2' height='2' x='34' y='15' fill='%23ff9966'/%3E%3Crect width='2' height='2' x='34' y='34' fill='%23ff6699'/%3E%3Crect width='6' height='6' x='5' y='5' fill='%23ff6600'/%3E%3Crect width='6' height='6' x='5' y='39' fill='%23ff00ff'/%3E%3Crect width='6' height='6' x='39' y='5' fill='%23ff33ff'/%3E%3Crect width='6' height='6' x='39' y='39' fill='%2300cc00'/%3E%3Crect width='4' height='4' x='22' y='22' fill='%23ff0066'/%3E%3Crect width='4' height='4' x='22' y='26' fill='%23ff6666'/%3E%3C/svg%3E");
+    padding: 30px;
+    box-shadow: 0 0 30px rgba(163, 4, 250, 0.7);
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+}
+
+/* Sección donde se mostrará el juego */
+.seccion-del_juego {
+    min-height: 500px;
+    background: rgba(25, 15, 35, 0.9);
+    border-radius: 10px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.4);
+    border: 2px solid #cf7cfc;
+    cursor: pointer; /* Indicador para clickear */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 600' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23190f23' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%23100a1a' stop-opacity='0.7'/%3E%3C/linearGradient%3E%3Cfilter id='pixelGlow' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeGaussianBlur stdDeviation='1' result='blur'/%3E%3CfeComposite in='SourceGraphic' in2='blur' operator='over'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23bgGrad)'/%3E%3C!-- Elementos de Tetris --%3E%3Cg opacity='0.2'%3E%3C!-- Pieza L --%3E%3Cg transform='translate(100,100) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='0' y='15' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='0' y='30' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='30' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C!-- Pieza Z --%3E%3Cg transform='translate(700,150) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='0' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='15' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='30' y='15' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C!-- Pieza T --%3E%3Cg transform='translate(200,450) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='0' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='30' y='0' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='15' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C!-- Pieza Cuadrado --%3E%3Cg transform='translate(650,350) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='0' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='0' y='15' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='15' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C/g%3E%3C!-- Controladores de videojuegos --%3E%3Cg opacity='0.2'%3E%3C!-- Mini controlador 1 --%3E%3Cg transform='translate(50,200) scale(0.5)'%3E%3Crect x='0' y='0' width='40' height='25' rx='5' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='30' cy='10' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='25' cy='15' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='5' y='10' width='10' height='5' fill='%23ffffff' opacity='0.5'/%3E%3C/g%3E%3C!-- Mini controlador 2 --%3E%3Cg transform='translate(300,50) scale(0.5)'%3E%3Crect x='0' y='0' width='40' height='25' rx='5' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='30' cy='10' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='25' cy='15' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='5' y='10' width='10' height='5' fill='%23ffffff' opacity='0.5'/%3E%3C/g%3E%3C!-- Mini controlador 3 --%3E%3Cg transform='translate(500,500) scale(0.5)'%3E%3Crect x='0' y='0' width='40' height='25' rx='5' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='30' cy='10' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='25' cy='15' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='5' y='10' width='10' height='5' fill='%23ffffff' opacity='0.5'/%3E%3C/g%3E%3C/g%3E%3C!-- Personajes de 8-bits --%3E%3Cg opacity='0.2'%3E%3C!-- Personaje 1 --%3E%3Cg transform='translate(400,100) scale(0.4)'%3E%3Crect x='0' y='0' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='10' y='0' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='0' y='10' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='0' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='10' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='-10' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='20' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3C/g%3E%3C!-- Personaje 2 --%3E%3Cg transform='translate(200,300) scale(0.4)'%3E%3Crect x='0' y='0' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='10' y='0' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='0' y='10' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='0' y='20' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='10' y='20' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='-10' y='10' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='20' y='10' width='10' height='10' fill='%2333ccff'/%3E%3C/g%3E%3C!-- Personaje 3 --%3E%3Cg transform='translate(600,200) scale(0.4)'%3E%3Crect x='0' y='0' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='0' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='0' y='10' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='0' y='20' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='20' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='0' y='-10' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='-10' width='10' height='10' fill='%23ffcc00'/%3E%3C/g%3E%3C/g%3E%3C!-- Relojes pixel art --%3E%3Cg opacity='0.2'%3E%3C!-- Reloj 1 --%3E%3Cg transform='translate(150,240) scale(0.4)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='15' y1='15' x2='15' y2='5' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3Cline x1='15' y1='15' x2='22' y2='15' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3C/g%3E%3C!-- Reloj 2 --%3E%3Cg transform='translate(550,120) scale(0.4)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='15' y1='15' x2='8' y2='8' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3Cline x1='15' y1='15' x2='15' y2='22' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3C/g%3E%3C!-- Reloj 3 --%3E%3Cg transform='translate(400,400) scale(0.4)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='15' y1='15' x2='22' y2='8' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3Cline x1='15' y1='15' x2='8' y2='22' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3C/g%3E%3C/g%3E%3C!-- Instrumentos musicales pequeños --%3E%3Cg opacity='0.2'%3E%3C!-- Mini tambor --%3E%3Cg transform='translate(480,250) scale(0.3)'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='20' cy='20' r='15' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='18' y='0' width='4' height='40' fill='%23ffffff' fill-opacity='0.2'/%3E%3Crect x='0' y='18' width='40' height='4' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/g%3E%3C!-- Mini guitarra --%3E%3Cg transform='translate(350,180) scale(0.3) rotate(45)'%3E%3Cpath d='M0,0 l10,0 l5,40 l-20,15 l-5,-40 z' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='0' y1='10' x2='10' y2='10' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Cline x1='0' y1='20' x2='8' y2='20' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Cline x1='-2' y1='30' x2='6' y2='30' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3C/g%3E%3C!-- Mini piano --%3E%3Cg transform='translate(250,500) scale(0.3)'%3E%3Crect x='0' y='0' width='40' height='20' fill='%23333333' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='2' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='8' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='14' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='20' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='26' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='32' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='5' y='2' width='2' height='8' fill='%23333333'/%3E%3Crect x='11' y='2' width='2' height='8' fill='%23333333'/%3E%3Crect x='23' y='2' width='2' height='8' fill='%23333333'/%3E%3Crect x='29' y='2' width='2' height='8' fill='%23333333'/%3E%3C/g%3E%3C!-- Mini trompeta --%3E%3Cg transform='translate(600,450) scale(0.3) rotate(-30)'%3E%3Cpath d='M0,5 l20,0 l5,5 l0,10 l-5,5 l-20,0 z' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cpath d='M25,10 c5,0 10,5 0,10' fill='none' stroke='%23ffcc00' stroke-width='3'/%3E%3C/g%3E%3C!-- Mini platillos --%3E%3Cg transform='translate(120,400) scale(0.3)'%3E%3Cellipse cx='10' cy='10' rx='10' ry='3' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cellipse cx='30' cy='10' rx='10' ry='3' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='10' y1='10' x2='10' y2='30' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='30' y1='10' x2='30' y2='30' stroke='%23ffffff' stroke-width='1'/%3E%3C/g%3E%3C/g%3E%3C!-- Pequeños iconos electrónicos --%3E%3Cg opacity='0.15'%3E%3C!-- Cassette --%3E%3Cg transform='translate(500,300) scale(0.3)'%3E%3Crect x='0' y='0' width='30' height='20' rx='2' fill='%23666666' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='7' cy='10' r='5' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Ccircle cx='23' cy='10' r='5' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Crect x='5' y='5' width='20' height='2' fill='%23ffffff' fill-opacity='0.5'/%3E%3C/g%3E%3C!-- Disco --%3E%3Cg transform='translate(700,400) scale(0.3)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%23333333' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='15' cy='15' r='5' fill='%23ffffff' fill-opacity='0.3'/%3E%3Ccircle cx='15' cy='15' r='10' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.2'/%3E%3C/g%3E%3C!-- Nota musical --%3E%3Cg transform='translate(300,350) scale(0.5)'%3E%3Cpath d='M10,0 q0.5,-10 5,-10 v20 q-0.5,5 -5,0 z' fill='%23cf7cfc'/%3E%3Ccircle cx='5' cy='10' r='5' fill='%23cf7cfc'/%3E%3C/g%3E%3C!-- Otra nota musical --%3E%3Cg transform='translate(100,300) scale(0.5)'%3E%3Cpath d='M10,0 q0.5,-10 5,-10 v20 q-0.5,5 -5,0 z' fill='%2333ccff'/%3E%3Ccircle cx='5' cy='10' r='5' fill='%2333ccff'/%3E%3C/g%3E%3C!-- Más notas musicales --%3E%3Cg transform='translate(450,450) scale(0.5)'%3E%3Cpath d='M10,0 q0.5,-10 5,-10 v20 q-0.5,5 -5,0 z' fill='%23ffcc00'/%3E%3Ccircle cx='5' cy='10' r='5' fill='%23ffcc00'/%3E%3C/g%3E%3C/g%3E%3C!-- Puntos brillantes --%3E%3Cg filter='url(%23pixelGlow)'%3E%3Ccircle cx='50' cy='50' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='150' cy='150' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='250' cy='100' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='350' cy='250' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='450' cy='200' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='550' cy='350' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='650' cy='300' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='750' cy='450' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='100' cy='550' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='200' cy='500' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='300' cy='450' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='400' cy='550' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='600' cy='550' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='700' cy='50' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3C/g%3E%3C!-- Líneas de grid retro --%3E%3Cg stroke='%23cf7cfc' stroke-opacity='0.05' stroke-width='0.5'%3E%3Cpath d='M0,50 L800,50' /%3E%3Cpath d='M0,100 L800,100' /%3E%3Cpath d='M0,150 L800,150' /%3E%3Cpath d='M0,200 L800,200' /%3E%3Cpath d='M0,250 L800,250' /%3E%3Cpath d='M0,300 L800,300' /%3E%3Cpath d='M0,350 L800,350' /%3E%3Cpath d='M0,400 L800,400' /%3E%3Cpath d='M0,450 L800,450' /%3E%3Cpath d='M0,500 L800,500' /%3E%3Cpath d='M0,550 L800,550' /%3E%3Cpath d='M50,0 L50,600' /%3E%3Cpath d='M100,0 L100,600' /%3E%3Cpath d='M150,0 L150,600' /%3E%3Cpath d='M200,0 L200,600' /%3E%3Cpath d='M250,0 L250,600' /%3E%3Cpath d='M300,0 L300,600' /%3E%3Cpath d='M350,0 L350,600' /%3E%3Cpath d='M400,0 L400,600' /%3E%3Cpath d='M450,0 L450,600' /%3E%3Cpath d='M500,0 L500,600' /%3E%3Cpath d='M550,0 L550,600' /%3E%3Cpath d='M600,0 L600,600' /%3E%3Cpath d='M650,0 L650,600' /%3E%3Cpath d='M700,0 L700,600' /%3E%3Cpath d='M750,0 L750,600' /%3E%3C/g%3E%3C/svg%3E");    border: 2px solid #cf7cfc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: width 0.3s, height 0.3s;
+    box-sizing: border-box;
+}
+
+/* Efecto de líneas para el área del juego */
+.seccion-del_juego::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            transparent 100%);
+    background-size: 30px 30px;
+    opacity: 0.5;
+    z-index: 0;
+    animation: grid-move 60s linear infinite;
+}
+
+@keyframes grid-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 1000px; }
+}
+
+/* Efecto de escáner para la sección del juego */
+.seccion-del_juego::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    width: 200%;
+    height: 10px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(207, 124, 252, 0.5) 50%, 
+        transparent 100%);
+    opacity: 0.7;
+    z-index: 2;
+    animation: escaneo 4s linear infinite;
+}
+
+@keyframes escaneo {
+    0% { top: -5%; }
+    100% { top: 105%; }
+}
+
+/* Contenedor para los botones de control superior */
+.botones-superiores {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 100;
+}
+
+/* Estilos compartidos para ambos botones */
+.boton-regresar a, .boton-fullscreen {
+    display: inline-block;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Estilos específicos para el botón regresar */
+.boton-regresar a {
+    background: rgba(98, 2, 150, 0.9);
+    border: 2px solid #ff00ff;
+    text-shadow: 0 0 5px #ff00ff;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+    animation: neon-button 2s infinite;
+}
+
+.boton-regresar a::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0)
+    );
+    transform: rotate(30deg);
+    z-index: -1;
+    transition: all 0.6s ease;
+}
+
+.boton-regresar a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+    text-shadow: 0 0 8px #ffffff;
+}
+
+.boton-regresar a:hover::before {
+    top: -100%;
+    left: -100%;
+    transition: all 0.6s ease-out;
+}
+
+.boton-regresar a:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+.boton-regresar a i {
+    margin-right: 8px;
+}
+
+/* Animación para el botón de regreso */
+@keyframes neon-button {
+    0%, 100% { 
+        box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+        border-color: #ff00ff;
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.9); 
+        border-color: #ff40ff;
+    }
+}
+
+/* Estilos específicos para el botón de pantalla completa */
+.boton-fullscreen {
+    background: rgba(98, 2, 150, 0.8);
+    border: 2px solid #33ccff;
+    text-shadow: 0 0 5px #33ccff;
+    box-shadow: 0 0 15px rgba(51, 204, 255, 0.5);
+    outline: none;
+    cursor: pointer;
+    animation: neon-button-blue 2s infinite;
+}
+
+.boton-fullscreen::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0)
+    );
+    transform: rotate(30deg);
+    z-index: 1;
+    transition: all 0.6s ease;
+}
+
+.boton-fullscreen:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(51, 204, 255, 0.8);
+    text-shadow: 0 0 8px #ffffff;
+}
+
+.boton-fullscreen:hover::before {
+    top: -100%;
+    left: -100%;
+    transition: all 0.6s ease-out;
+}
+
+.boton-fullscreen:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 10px rgba(51, 204, 255, 0.5);
+}
+
+.boton-fullscreen i {
+    margin-right: 5px;
+}
+
+/* Animación neón para el botón azul */
+@keyframes neon-button-blue {
+    0%, 100% { 
+        box-shadow: 0 0 10px rgba(51, 204, 255, 0.7);
+        border-color: #33ccff;
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(51, 204, 255, 0.9); 
+        border-color: #66ddff;
+    }
+}
+
+/* Estilos mejorados para el modo pantalla completa */
+
+/* Header container para título y botones en modo fullscreen */
+.modo-fullscreen .botones-superiores {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-bottom: 20px !important;
+    position: relative !important;
+    z-index: 100 !important;
+}
+  
+/* Contenedor para el título en modo fullscreen */
+.modo-fullscreen .titulo-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex: 1 !important;
+}
+  
+/* Título en modo fullscreen */
+.modo-fullscreen h1 {
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 2.5rem !important;
+    margin: 0 !important;
+    text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff !important;
+    animation: titulo-glow 3s infinite alternate !important;
+}
+  
+/* Contenedor de botones a la derecha en modo fullscreen */
+.modo-fullscreen .botones-control {
+    display: flex !important;
+    gap: 15px !important;
+    justify-content: flex-end !important;
+    align-items: center !important; /* Asegura alineación vertical */
+}
+  
+/* IMPORTANTE: Estilos compartidos para ambos botones para asegurar misma altura */
+.modo-fullscreen .boton-regresar a, 
+.modo-fullscreen .boton-fullscreen {
+    display: inline-flex !important; /* Cambio a flex para mejor control */
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px 20px !important;
+    font-size: 1rem !important;
+    letter-spacing: 1px !important;
+    border-width: 3px !important;
+    text-transform: uppercase !important;
+    height: 48px !important; /* Altura fija para ambos botones */
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+}
+  
+/* Estilos específicos para el botón regresar en fullscreen */
+.modo-fullscreen .boton-regresar a {
+    background: rgba(98, 2, 150, 0.9) !important;
+    border: 3px solid #ff00ff !important;
+    text-shadow: 0 0 5px #ff00ff !important;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5) !important;
+    color: #fff !important;
+    animation: neon-button 2s infinite !important;
+}
+  
+/* Estilos específicos para el botón fullscreen en modo salir */
+.modo-fullscreen .boton-fullscreen {
+    background: rgba(98, 2, 150, 0.8) !important;
+    border: 3px solid #33ccff !important;
+    text-shadow: 0 0 5px #33ccff !important;
+    box-shadow: 0 0 15px rgba(51, 204, 255, 0.5) !important;
+    color: #fff !important;
+    animation: neon-button-blue 2s infinite !important;
+    outline: none !important;
+    cursor: pointer !important;
+}
+  
+/* Sección del juego en modo fullscreen */
+.seccion-fullscreen {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 600' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23190f23' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%23100a1a' stop-opacity='0.7'/%3E%3C/linearGradient%3E%3Cfilter id='pixelGlow' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeGaussianBlur stdDeviation='1' result='blur'/%3E%3CfeComposite in='SourceGraphic' in2='blur' operator='over'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23bgGrad)'/%3E%3C!-- Elementos de Tetris --%3E%3Cg opacity='0.2'%3E%3C!-- Pieza L --%3E%3Cg transform='translate(100,100) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='0' y='15' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='0' y='30' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='30' width='15' height='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C!-- Pieza Z --%3E%3Cg transform='translate(700,150) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='0' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='15' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='30' y='15' width='15' height='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C!-- Pieza T --%3E%3Cg transform='translate(200,450) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='0' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='30' y='0' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='15' width='15' height='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C!-- Pieza Cuadrado --%3E%3Cg transform='translate(650,350) scale(0.7)'%3E%3Crect x='0' y='0' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='0' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='0' y='15' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='15' y='15' width='15' height='15' fill='%2300cc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3C/g%3E%3C/g%3E%3C!-- Controladores de videojuegos --%3E%3Cg opacity='0.2'%3E%3C!-- Mini controlador 1 --%3E%3Cg transform='translate(50,200) scale(0.5)'%3E%3Crect x='0' y='0' width='40' height='25' rx='5' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='30' cy='10' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='25' cy='15' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='5' y='10' width='10' height='5' fill='%23ffffff' opacity='0.5'/%3E%3C/g%3E%3C!-- Mini controlador 2 --%3E%3Cg transform='translate(300,50) scale(0.5)'%3E%3Crect x='0' y='0' width='40' height='25' rx='5' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='30' cy='10' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='25' cy='15' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='5' y='10' width='10' height='5' fill='%23ffffff' opacity='0.5'/%3E%3C/g%3E%3C!-- Mini controlador 3 --%3E%3Cg transform='translate(500,500) scale(0.5)'%3E%3Crect x='0' y='0' width='40' height='25' rx='5' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='30' cy='10' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='25' cy='15' r='3' fill='%23ffffff' opacity='0.5'/%3E%3Crect x='5' y='10' width='10' height='5' fill='%23ffffff' opacity='0.5'/%3E%3C/g%3E%3C/g%3E%3C!-- Personajes de 8-bits --%3E%3Cg opacity='0.2'%3E%3C!-- Personaje 1 --%3E%3Cg transform='translate(400,100) scale(0.4)'%3E%3Crect x='0' y='0' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='10' y='0' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='0' y='10' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='0' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='10' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='-10' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3Crect x='20' y='20' width='10' height='10' fill='%23cf7cfc'/%3E%3C/g%3E%3C!-- Personaje 2 --%3E%3Cg transform='translate(200,300) scale(0.4)'%3E%3Crect x='0' y='0' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='10' y='0' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='0' y='10' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='0' y='20' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='10' y='20' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='-10' y='10' width='10' height='10' fill='%2333ccff'/%3E%3Crect x='20' y='10' width='10' height='10' fill='%2333ccff'/%3E%3C/g%3E%3C!-- Personaje 3 --%3E%3Cg transform='translate(600,200) scale(0.4)'%3E%3Crect x='0' y='0' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='0' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='0' y='10' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='0' y='20' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='20' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='0' y='-10' width='10' height='10' fill='%23ffcc00'/%3E%3Crect x='10' y='-10' width='10' height='10' fill='%23ffcc00'/%3E%3C/g%3E%3C/g%3E%3C!-- Relojes pixel art --%3E%3Cg opacity='0.2'%3E%3C!-- Reloj 1 --%3E%3Cg transform='translate(150,240) scale(0.4)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='15' y1='15' x2='15' y2='5' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3Cline x1='15' y1='15' x2='22' y2='15' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3C/g%3E%3C!-- Reloj 2 --%3E%3Cg transform='translate(550,120) scale(0.4)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='15' y1='15' x2='8' y2='8' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3Cline x1='15' y1='15' x2='15' y2='22' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3C/g%3E%3C!-- Reloj 3 --%3E%3Cg transform='translate(400,400) scale(0.4)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='15' y1='15' x2='22' y2='8' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3Cline x1='15' y1='15' x2='8' y2='22' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.7'/%3E%3C/g%3E%3C/g%3E%3C!-- Instrumentos musicales pequeños --%3E%3Cg opacity='0.2'%3E%3C!-- Mini tambor --%3E%3Cg transform='translate(480,250) scale(0.3)'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23cf7cfc' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='20' cy='20' r='15' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='18' y='0' width='4' height='40' fill='%23ffffff' fill-opacity='0.2'/%3E%3Crect x='0' y='18' width='40' height='4' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/g%3E%3C!-- Mini guitarra --%3E%3Cg transform='translate(350,180) scale(0.3) rotate(45)'%3E%3Cpath d='M0,0 l10,0 l5,40 l-20,15 l-5,-40 z' fill='%2333ccff' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='0' y1='10' x2='10' y2='10' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Cline x1='0' y1='20' x2='8' y2='20' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Cline x1='-2' y1='30' x2='6' y2='30' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3C/g%3E%3C!-- Mini piano --%3E%3Cg transform='translate(250,500) scale(0.3)'%3E%3Crect x='0' y='0' width='40' height='20' fill='%23333333' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Crect x='2' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='8' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='14' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='20' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='26' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='32' y='2' width='4' height='12' fill='%23ffffff'/%3E%3Crect x='5' y='2' width='2' height='8' fill='%23333333'/%3E%3Crect x='11' y='2' width='2' height='8' fill='%23333333'/%3E%3Crect x='23' y='2' width='2' height='8' fill='%23333333'/%3E%3Crect x='29' y='2' width='2' height='8' fill='%23333333'/%3E%3C/g%3E%3C!-- Mini trompeta --%3E%3Cg transform='translate(600,450) scale(0.3) rotate(-30)'%3E%3Cpath d='M0,5 l20,0 l5,5 l0,10 l-5,5 l-20,0 z' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cpath d='M25,10 c5,0 10,5 0,10' fill='none' stroke='%23ffcc00' stroke-width='3'/%3E%3C/g%3E%3C!-- Mini platillos --%3E%3Cg transform='translate(120,400) scale(0.3)'%3E%3Cellipse cx='10' cy='10' rx='10' ry='3' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cellipse cx='30' cy='10' rx='10' ry='3' fill='%23ffcc00' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Cline x1='10' y1='10' x2='10' y2='30' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='30' y1='10' x2='30' y2='30' stroke='%23ffffff' stroke-width='1'/%3E%3C/g%3E%3C/g%3E%3C!-- Pequeños iconos electrónicos --%3E%3Cg opacity='0.15'%3E%3C!-- Cassette --%3E%3Cg transform='translate(500,300) scale(0.3)'%3E%3Crect x='0' y='0' width='30' height='20' rx='2' fill='%23666666' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='7' cy='10' r='5' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Ccircle cx='23' cy='10' r='5' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.5'/%3E%3Crect x='5' y='5' width='20' height='2' fill='%23ffffff' fill-opacity='0.5'/%3E%3C/g%3E%3C!-- Disco --%3E%3Cg transform='translate(700,400) scale(0.3)'%3E%3Ccircle cx='15' cy='15' r='15' fill='%23333333' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.3'/%3E%3Ccircle cx='15' cy='15' r='5' fill='%23ffffff' fill-opacity='0.3'/%3E%3Ccircle cx='15' cy='15' r='10' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.2'/%3E%3C/g%3E%3C!-- Nota musical --%3E%3Cg transform='translate(300,350) scale(0.5)'%3E%3Cpath d='M10,0 q0.5,-10 5,-10 v20 q-0.5,5 -5,0 z' fill='%23cf7cfc'/%3E%3Ccircle cx='5' cy='10' r='5' fill='%23cf7cfc'/%3E%3C/g%3E%3C!-- Otra nota musical --%3E%3Cg transform='translate(100,300) scale(0.5)'%3E%3Cpath d='M10,0 q0.5,-10 5,-10 v20 q-0.5,5 -5,0 z' fill='%2333ccff'/%3E%3Ccircle cx='5' cy='10' r='5' fill='%2333ccff'/%3E%3C/g%3E%3C!-- Más notas musicales --%3E%3Cg transform='translate(450,450) scale(0.5)'%3E%3Cpath d='M10,0 q0.5,-10 5,-10 v20 q-0.5,5 -5,0 z' fill='%23ffcc00'/%3E%3Ccircle cx='5' cy='10' r='5' fill='%23ffcc00'/%3E%3C/g%3E%3C/g%3E%3C!-- Puntos brillantes --%3E%3Cg filter='url(%23pixelGlow)'%3E%3Ccircle cx='50' cy='50' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='150' cy='150' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='250' cy='100' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='350' cy='250' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='450' cy='200' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='550' cy='350' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='650' cy='300' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='750' cy='450' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='100' cy='550' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='200' cy='500' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='300' cy='450' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='400' cy='550' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='600' cy='550' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3Ccircle cx='700' cy='50' r='1' fill='%23ffffff' fill-opacity='0.7'/%3E%3C/g%3E%3C!-- Líneas de grid retro --%3E%3Cg stroke='%23cf7cfc' stroke-opacity='0.05' stroke-width='0.5'%3E%3Cpath d='M0,50 L800,50' /%3E%3Cpath d='M0,100 L800,100' /%3E%3Cpath d='M0,150 L800,150' /%3E%3Cpath d='M0,200 L800,200' /%3E%3Cpath d='M0,250 L800,250' /%3E%3Cpath d='M0,300 L800,300' /%3E%3Cpath d='M0,350 L800,350' /%3E%3Cpath d='M0,400 L800,400' /%3E%3Cpath d='M0,450 L800,450' /%3E%3Cpath d='M0,500 L800,500' /%3E%3Cpath d='M0,550 L800,550' /%3E%3Cpath d='M50,0 L50,600' /%3E%3Cpath d='M100,0 L100,600' /%3E%3Cpath d='M150,0 L150,600' /%3E%3Cpath d='M200,0 L200,600' /%3E%3Cpath d='M250,0 L250,600' /%3E%3Cpath d='M300,0 L300,600' /%3E%3Cpath d='M350,0 L350,600' /%3E%3Cpath d='M400,0 L400,600' /%3E%3Cpath d='M450,0 L450,600' /%3E%3Cpath d='M500,0 L500,600' /%3E%3Cpath d='M550,0 L550,600' /%3E%3Cpath d='M600,0 L600,600' /%3E%3Cpath d='M650,0 L650,600' /%3E%3Cpath d='M700,0 L700,600' /%3E%3Cpath d='M750,0 L750,600' /%3E%3C/g%3E%3C/svg%3E");    border: 2px solid #cf7cfc;
+
+}
+  
+/* Efecto de líneas de escáner mejorado */
+.seccion-fullscreen::after {
+    content: '' !important;
+    position: absolute !important;
+    top: -100% !important;
+    width: 200% !important;
+    height: 15px !important;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(207, 124, 252, 0.7) 50%, 
+        transparent 100%) !important;
+    opacity: 0.7 !important;
+    z-index: 2 !important;
+    animation: escaneo 3s linear infinite !important;
+}
+  
+/* Efecto de cuadrícula para el fondo */
+.seccion-fullscreen::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%) !important;
+    background-size: 40px 40px !important;
+    opacity: 0.8 !important;
+    z-index: 0 !important;
+    animation: grid-move 60s linear infinite !important;
+}
+  
+/* Animación para el título */
+@keyframes titulo-glow {
+    0%, 100% {
+        text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+    }
+    50% {
+        text-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff, 0 0 45px #ff00ff;
+    }
+}
+
+/* Estilos adicionales para adaptación responsiva del juego */
+.seccion-del_juego {
+    transition: width 0.3s, height 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Asegurar que el contenido interno se adapte */
+.seccion-del_juego > * {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Estilos específicos para el Tetris */
+.seccion-del_juego .game-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.seccion-del_juego .board {
+    height: 100%;
+    aspect-ratio: 1/2; /* Mantener proporción para el tablero de Tetris */
+    max-height: 90%;
+}
+
+.seccion-del_juego .side-panel {
+    height: 100%;
+    max-height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Ajustar el tamaño de fuente en modo responsivo */
+@media (max-height: 600px) {
+    .seccion-del_juego .controls p,
+    .seccion-del_juego .stats p {
+        font-size: 0.8rem;
+        margin: 5px 0;
+    }
+}
+
+@media (max-height: 450px) {
+    .seccion-del_juego .controls p,
+    .seccion-del_juego .stats p {
+        font-size: 0.7rem;
+        margin: 3px 0;
+    }
+}
+
+/* Media queries para diferentes tamaños de pantalla */
+@media (max-width: 1200px) {
+    .modo-fullscreen h1 {
+        font-size: 2rem !important;
+    }
+}
+  
+@media (max-width: 768px) {
+    .modo-fullscreen h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    .modo-fullscreen .boton-regresar a, 
+    .modo-fullscreen .boton-fullscreen {
+        padding: 10px 15px !important;
+        font-size: 0.8rem !important;
+        height: 40px !important; /* Altura ajustada para pantallas medianas */
+    }
+    
+    .seccion-fullscreen {
+        min-height: calc(80vh - 80px) !important;
+    }
+}
+  
+@media (max-width: 480px) {
+    .modo-fullscreen {
+        padding: 15px !important;
+    }
+    
+    .modo-fullscreen h1 {
+        font-size: 1.2rem !important;
+    }
+    
+    .modo-fullscreen .botones-control {
+        gap: 8px !important;
+    }
+    
+    .modo-fullscreen .boton-regresar a, 
+    .modo-fullscreen .boton-fullscreen {
+        padding: 8px 12px !important;
+        font-size: 0.7rem !important;
+        height: 36px !important; /* Altura ajustada para pantallas pequeñas */
+    }
+}

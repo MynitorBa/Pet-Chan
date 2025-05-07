@@ -1444,12 +1444,49 @@ app.get('/minijuegos', requireLogin, (req, res) => {
 });
 
 
+app.get('/minijuego1', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego1.ejs');
+});
+
+app.get('/minijuego2', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego2.ejs');
+});
+
+app.get('/minijuego3', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego3.ejs');
+});
+
+app.get('/minijuego4', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego4.ejs');
+});
+
+app.get('/minijuego5', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego5.ejs');
+});
+
+app.get('/minijuego6', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego6.ejs');
+});
+
+app.get('/minijuego7', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego7.ejs');
+});
+
+app.get('/minijuego8', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego8.ejs');
+});
+
+app.get('/minijuego9', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego9.ejs');
+});
+
+
 
 app.get('/min1', requireLogin, (req, res) => {
  
   const mascota = req.session.mascotaActual;
 
-  res.render('minijuegos.ejs', {
+  res.render('minijuegos1.ejs', {
       rutaImagen: mascota.rutaImagen,
       accesorios: req.session.accesorios
   });
@@ -1479,6 +1516,70 @@ app.get('/min3', requireLogin, (req, res) => {
   });
 });
 
+
+app.get('/min4', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos4.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+app.get('/min5', requireLogin, (req, res) => {
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos5.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+app.get('/min6', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos6.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+app.get('/min7', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos7.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+app.get('/min8', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos8.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+app.get('/min9', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos9.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
 
 
 app.get('/tienda', requireLogin, (req, res) => {

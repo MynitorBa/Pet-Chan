@@ -1,228 +1,48 @@
 <%- include("partials/header.ejs") %>
 
-<link rel="stylesheet" href="styles/minijuegos.css">
-
-<!-- Estilos específicos para los botones directamente en el EJS -->
-<style>
-
-/* MODIFICACIÓN: Cambiar el diseño para que los botones estén en horizontal */
-.seccion-del_juego {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 40px;
-    flex-wrap: wrap;
-}
-
-/* Botones de juego */
-.boton-juego button {
-    width: 200px;
-    height: 200px;
-    position: relative;
-    cursor: pointer;
-    background: transparent;
-    border: 3px solid #ff00ff;
-    border-radius: 15px;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1rem;
-    color: #fff;
-    text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    z-index: 1;
-    padding-top: 110px; /* Espacio para el icono */
-}
-
-/* Fondo de los botones con gradientes únicos */
-.boton-juego:nth-child(1) button {
-    background: linear-gradient(45deg, rgba(255, 65, 108, 0.7), rgba(255, 75, 43, 0.7));
-    box-shadow: 0 0 20px rgba(255, 65, 108, 0.5);
-}
-
-.boton-juego:nth-child(2) button {
-    background: linear-gradient(45deg, rgba(71, 118, 230, 0.7), rgba(142, 84, 233, 0.7));
-    box-shadow: 0 0 20px rgba(142, 84, 233, 0.5);
-}
-
-.boton-juego:nth-child(3) button {
-    background: linear-gradient(45deg, rgba(17, 153, 142, 0.7), rgba(56, 239, 125, 0.7));
-    box-shadow: 0 0 20px rgba(56, 239, 125, 0.5);
-}
-
-/* Iconos para los botones */
-.boton-juego:nth-child(1) button::before {
-    content: "🎮";
-    position: absolute;
-    top: 20px;
-    left: 0;
-    right: 0;
-    font-size: 60px;
-    text-align: center;
-}
-
-.boton-juego:nth-child(2) button::before {
-    content: "🥁";
-    position: absolute;
-    top: 20px;
-    left: 0;
-    right: 0;
-    font-size: 60px;
-    text-align: center;
-}
-
-.boton-juego:nth-child(3) button::before {
-    content: "🎲";
-    position: absolute;
-    top: 20px;
-    left: 0;
-    right: 0;
-    font-size: 60px;
-    text-align: center;
-}
-
-/* Efecto holográfico en los botones */
-.boton-juego button::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-        rgba(255, 255, 255, 0),
-        rgba(255, 255, 255, 0),
-        rgba(255, 255, 255, 0.1),
-        rgba(255, 255, 255, 0)
-    );
-    transform: rotate(30deg);
-    z-index: -1;
-    transition: all 0.6s ease;
-}
-
-/* Efectos hover para todos los botones */
-.boton-juego button:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 0, 255, 0.7);
-    text-shadow: 0 0 8px #ffffff, 0 0 12px #ffffff;
-}
-
-.boton-juego button:hover::after {
-    top: -100%;
-    left: -100%;
-    transition: all 0.6s ease-out;
-}
-
-/* Efectos de pulsación */
-.boton-juego button:active {
-    transform: translateY(3px) scale(0.98);
-}
-
-/* Brillo en los bordes de los botones */
-@keyframes border-glow {
-    0% { border-color: #ff00ff; box-shadow: 0 0 15px rgba(255, 0, 255, 0.7); }
-    50% { border-color: #00ffff; box-shadow: 0 0 25px rgba(0, 255, 255, 0.7); }
-    100% { border-color: #ff00ff; box-shadow: 0 0 15px rgba(255, 0, 255, 0.7); }
-}
-
-.boton-juego button {
-    animation: border-glow 3s infinite;
-}
-
-.boton-juego:nth-child(1) button { animation-delay: 0s; }
-.boton-juego:nth-child(2) button { animation-delay: 1s; }
-.boton-juego:nth-child(3) button { animation-delay: 2s; }
-
-/* Líneas de circuito en el fondo de los botones */
-.boton-juego button {
-    background-size: 400% 400%;
-    animation: gradient-shift 8s ease infinite, border-glow 3s infinite;
-    position: relative;
-}
-
-@keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.boton-juego button::before {
-    animation: pulse 2s infinite alternate;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.8; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1.05); }
-}
-
-/* Líneas de circuito adicionales para el efecto retro-futurista */
-.boton-juego button::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 10% 20%, transparent 0%, transparent 20%, rgba(255, 255, 255, 0.03) 21%, transparent 22%),
-        radial-gradient(circle at 85% 60%, transparent 0%, transparent 10%, rgba(255, 255, 255, 0.03) 11%, transparent 12%),
-        linear-gradient(45deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.05) 41%, rgba(255, 255, 255, 0.05) 42%, transparent 43%),
-        linear-gradient(135deg, transparent 0%, transparent 70%, rgba(255, 255, 255, 0.05) 71%, rgba(255, 255, 255, 0.05) 72%, transparent 73%);
-    z-index: -1;
-}
-
-/* Responsive para los botones */
-@media (max-width: 768px) {
-    .seccion-del_juego {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-    }
-    
-    .boton-juego button {
-        width: 180px;
-        height: 180px;
-    }
-    
-    .boton-regresar {
-        top: 10px;
-        right: 10px;
-    }
-    
-    .boton-regresar a {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-    }
-}
-
-/* Mejoras adicionales para el diseño horizontal */
-#contenedor-juego {
-    text-align: center;
-    padding: 20px;
-}
-
-#contenedor-juego h1 {
-    margin-bottom: 40px;
-    text-shadow: 0 0 10px #ff00ff;
-}
-</style>
-
+<link rel="stylesheet" href="styles/minijuego/menuvideojuegos.css">
 
 <div id="contenedor-juego">
     <h1>Menú de Minijuegos</h1>
 
     <div class="seccion-del_juego">
         <div class="boton-juego">
-            <button onclick="location.href='/min1'">Minijuego 1</button>
+            <button onclick="location.href='/min1'">¿Simón dice?</button>
         </div>
+
         <div class="boton-juego">
-            <button onclick="location.href='/min2'">Minijuego 2</button>
+            <button onclick="location.href='/min2'">Batery Mood</button>
         </div>
+
         <div class="boton-juego">
-            <button onclick="location.href='/min3'">Minijuego 3</button>
+            <button onclick="location.href='/min3'">Dice Game!</button>
         </div>
+
+        <div class="boton-juego">
+            <button onclick="location.href='/min4'">Spaceman</button>
+        </div>
+
+        <div class="boton-juego">
+            <button onclick="location.href='/min5'">TetPetrio</button>
+        </div>
+
+        <div class="boton-juego">
+            <button onclick="location.href='/min6'">Pac-Pet</button>
+        </div>
+
+        <div class="boton-juego">
+            <button onclick="location.href='/min7'">Libre!</button>
+        </div>
+
+        <div class="boton-juego">
+            <button onclick="location.href='/min8'">Libre!</button>
+        </div>
+
+        <div class="boton-juego">
+            <button onclick="location.href='/min9'">Libre!</button>
+        </div>
+        
     </div>
-    
 </div>
 
 <%- include("partials/footer.ejs") %>

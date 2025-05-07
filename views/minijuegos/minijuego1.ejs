@@ -3,112 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="styles/minijuego/minijuego1.css">
 
-    
-    <style>
-    /* Button styling */
-.drum {
-  outline: none;
-  border: 0;
-  font-size: 2.5rem;
-  font-family: 'Press Start 2P', monospace;
-  line-height: 1.5;
-  font-weight: 900;
-  color: white;
-  text-shadow: 2px 2px 0 #000000;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  margin: 8px;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
-  transition: transform 0.1s, box-shadow 0.1s;
-}
 
-/* Set up the container for horizontal layout */
-.set {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-/* First row - 4 buttons */
-.drum.w, .drum.a, .drum.s, .drum.d {
-  flex: 0 0 auto;
-  margin-bottom: 20px;
-}
-
-/* Second row - 3 buttons */
-.drum.j, .drum.k, .drum.l {
-  flex: 0 0 auto;
-}
-
-/* Button colors */
-.w {
-  background-color: #00d965; /* Green */
-  border: 3px solid #00b050;
-}
-
-.a {
-  background-color: #ff4757; /* Red */
-  border: 3px solid #d63031;
-}
-
-.s {
-  background-color: #ffd32a; /* Yellow */
-  border: 3px solid #d6a600;
-}
-
-.d {
-  background-color: #1e90ff; /* Blue */
-  border: 3px solid #0073e6;
-}
-
-.j {
-  background-color: #9b59b6; /* Purple */
-  border: 3px solid #8e44ad;
-}
-
-.k {
-  background-color: #fd79a8; /* Pink */
-  border: 3px solid #e84393;
-}
-
-.l {
-  background-color: #00cec9; /* Cyan */
-  border: 3px solid #00a6a3;
-}
-
-/* Game over state */
-.game-over {
-  background-color: #cf7cfc;
-  opacity: 0.8;
-}
-
-.drum:active, .pressed {
-  transform: translateY(5px);
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
-  background-color: #32054b;
-  opacity: 0.8;
-}
-    </style>
 </head>
 <body>
-                <h1 id="title">Drum 🥁 Kit</h1>
-                <div class="set">
-                  <button class="w drum">w</button>
-                  <button class="a drum">a</button>
-                  <button class="s drum">s</button>
-                  <button class="d drum">d</button>
-                  <button class="j drum">j</button>
-                  <button class="k drum">k</button>
-                  <button class="l drum">l</button>
-                </div>
+
+
+
+  <h1 id="level-title">Press A Key to Start</h1>
+  <div class="container">
+  
+      <div type="button" id="green" class="btn green">
+
+      </div>
+
+      <div type="button" id="red" class="btn red">
+
+      </div>
+
+      <div type="button" id="yellow" class="btn yellow">
+
+      </div>
+      <div type="button" id="blue" class="btn blue">
+
+      </div>
+
+  </div>
+
+
+
 
     <script src="scripts/minijuegos/minijuego1.js"></script>
 </body>

@@ -1,0 +1,363 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
+}
+
+.dice-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.dice {
+  text-align: center;
+  width: 100px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.dice p {
+  margin: 30px;
+  padding: 5px 0;
+  font-size: 0.9rem;
+  color: #fff;
+  height: 20px;
+  line-height: 20px;
+  text-shadow: 0 0 3px #ff00ff;
+  text-align: center;
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+}
+
+.empty-dice {
+  width: 80px;
+  height: 80px;
+  background-color: #00d965; /* Green like w button */
+  margin: 0;
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid #00b050;
+  flex-shrink: 0;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.dice:nth-child(2) .empty-dice {
+  background-color: #ff4757; /* Red like a button */
+  border: 3px solid #d63031;
+}
+
+.empty-dice::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(45deg);
+}
+
+.dice img {
+  width: 80px;
+  height: 80px;
+  border-radius: 15px;
+  display: none; /* Initially hidden */
+  flex-shrink: 0;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 30px 0 0 0;
+  padding: 0;
+  width: 300px;
+  height: 50px;
+}
+
+#roll-button, #reset-button {
+  font-family: 'Press Start 2P', 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  background: #fd79a8; /* Pink like k button */
+  color: white;
+  border: 3px solid #e84393;
+  padding: 0;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 120px;
+  height: 40px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  line-height: 40px;
+  flex-shrink: 0;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 2px 2px 0 #000000;
+}
+
+#reset-button {
+  background-color: #00cec9; /* Cyan like l button */
+  border: 3px solid #00a6a3;
+}
+
+#roll-button:hover, #reset-button:hover {
+  background-color: #32054b;
+  transform: translateY(-2px);
+}
+
+#roll-button:active, #reset-button:active {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  opacity: 0.8;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-5deg); }
+  50% { transform: translateX(5px) rotate(5deg); }
+  75% { transform: translateX(-5px) rotate(-5deg); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.5s;
+}
+
+/* Estilos para modo pantalla completa */
+.seccion-fullscreen {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  border-radius: 0;
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #1a0a2e;
+}
+
+.modo-fullscreen {
+  width: 100%;
+  height: 95vh;
+  margin: 0;
+  border-radius: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  background-color: #3c1660;
+  border: none;
+}
+
+/* Ajustes para el juego de dados en pantalla completa */
+.modo-fullscreen .dice-container {
+  gap: 60px;
+  margin-bottom: 60px;
+}
+
+.modo-fullscreen .dice {
+  width: 150px;
+  height: 180px;
+}
+
+.modo-fullscreen .empty-dice {
+  width: 120px;
+  height: 120px;
+}
+
+.modo-fullscreen .dice img {
+  width: 120px;
+  height: 120px;
+}
+
+.modo-fullscreen .dice p {
+  font-size: 1.2rem;
+  margin: 40px;
+}
+
+.modo-fullscreen h2 {
+  font-size: 3rem;
+  margin-bottom: 60px;
+}
+
+.modo-fullscreen .button-container {
+  width: 400px;
+  height: 70px;
+  gap: 40px;
+  margin-top: 50px;
+}
+
+.modo-fullscreen #roll-button,
+.modo-fullscreen #reset-button {
+  width: 160px;
+  height: 60px;
+  font-size: 1.2rem;
+  line-height: 60px;
+}
+
+/* Para la reorganización de elementos según el JS */
+.titulo-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 50%;
+}
+
+.botones-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 50%;
+}
+
+.modo-fullscreen .botones-superiores {
+  display: flex;
+  width: 100%;
+  padding: 10px 20px;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* Ajustes para pantallas más pequeñas */
+@media (max-height: 600px) {
+  .dice {
+    width: 90px;
+    height: 110px;
+  }
+  
+  .empty-dice, .dice img {
+    width: 70px;
+    height: 70px;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+  
+  .modo-fullscreen .dice {
+    width: 120px;
+    height: 150px;
+  }
+  
+  .modo-fullscreen .empty-dice,
+  .modo-fullscreen .dice img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .modo-fullscreen h2 {
+    font-size: 2.5rem;
+  }
+  
+  .modo-fullscreen #roll-button,
+  .modo-fullscreen #reset-button {
+    width: 140px;
+    height: 50px;
+    font-size: 1rem;
+    line-height: 50px;
+  }
+}
+
+/* Ajustes adicionales para pantallas muy pequeñas */
+@media (max-height: 480px) {
+  .dice {
+    width: 80px;
+    height: 100px;
+  }
+  
+  .empty-dice, .dice img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .dice p {
+    font-size: 0.7rem;
+    margin: 20px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .button-container {
+    margin-top: 20px;
+  }
+  
+  #roll-button, #reset-button {
+    width: 100px;
+    height: 35px;
+    font-size: 0.7rem;
+    line-height: 35px;
+  }
+  
+  .modo-fullscreen .dice {
+    width: 100px;
+    height: 130px;
+  }
+  
+  .modo-fullscreen .empty-dice,
+  .modo-fullscreen .dice img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .modo-fullscreen .dice p {
+    font-size: 0.9rem;
+    margin: 30px;
+  }
+  
+  .modo-fullscreen h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .modo-fullscreen .button-container {
+    margin-top: 30px;
+  }
+  
+  .modo-fullscreen #roll-button,
+  .modo-fullscreen #reset-button {
+    width: 120px;
+    height: 45px;
+    font-size: 0.9rem;
+    line-height: 45px;
+  }
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Orbitron|Rajdhani:700" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/minijuego/minijuego4.css">
+
+  </head>
+  <body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="scanlines"></div>
+        <div id="vignette"></div>
+        
+        <div id="ui">
+            <div id="score">SCORE: 0</div>
+            <div id="time">TIME: 0:00</div>
+        </div>
+        
+        <div id="lives"></div>
+        
+        <div class="mobile-controls">
+            <div id="leftBtn" class="mobile-btn">←</div>
+            <div id="rightBtn" class="mobile-btn">→</div>
+            <div id="fireBtn" class="mobile-btn">⚡</div>
+        </div>
+        
+        <div id="startScreen">
+            <h1 id="title">SPACE INVADERS<br>EXTREMO</h1>
+            <button id="startButton">INICIAR LOCURA</button>
+            <div id="musicInfo">Música personalizada cargada desde ./mu1.mp3</div>
+        </div>
+        
+        <div id="gameOverScreen">
+            <h1 id="gameOverTitle">GAME OVER</h1>
+            <div id="finalScore">SCORE: 0</div>
+            <button id="restartButton">REINICIAR LOCURA</button>
+        </div>
+    </div>
+    <script src="scripts/minijuegos/minijuego4.js"></script>
+
+  </body>
+</html>
