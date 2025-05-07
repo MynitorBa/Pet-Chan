@@ -1011,3 +1011,15 @@ function calculateDropInterval(level) {
         return Math.min(linearDecrease, exponentialDecrease);
     }
 }
+// Función para reproducir el audio en loop
+function reproducirLoopTechchan() {
+    let audio = new Audio("archivos_de_minijuegos/sounds/techchan.mp3");
+    audio.loop = true;  // Asegura que el audio se reproduzca en loop
+    audio.play();  // Inicia la reproducción del audio
+}
+
+// Modificar el listener del botón Start para que reproduzca música
+startGameButton.addEventListener('click', function() {
+    reproducirLoopTechchan();  // Reproducir música cuando se presiona Start
+    initGame();  // Iniciar el juego (función original)
+});

@@ -1,34 +1,37 @@
 fetch("/minijuego5") 
-    .then(response => response.text()) 
-    .then(data => {
-        let contenedor = document.querySelector(".seccion-del_juego");
+.then(response => response.text()) 
+.then(data => {
+    let contenedor = document.querySelector(".seccion-del_juego");
 
-        // Insertar el HTML en el contenedor
-        contenedor.innerHTML = data;
+    // Insertar el HTML en el contenedor
+    contenedor.innerHTML = data;
 
-        // Buscar y ejecutar los scripts dentro del HTML cargado
-        let scripts = contenedor.querySelectorAll("script");
-        scripts.forEach(script => {
-            let nuevoScript = document.createElement("script");
-            if (script.src) {
-                // Si el script tiene src, recargarlo desde su fuente
-                nuevoScript.src = script.src;
-                nuevoScript.async = true; // Asegura que no bloquee la carga
-            } else {
-                // Si el script es inline, copiar su contenido
-                nuevoScript.textContent = script.textContent;
-            }
-            document.body.appendChild(nuevoScript);
-        });
+    // Buscar y ejecutar los scripts dentro del HTML cargado
+    let scripts = contenedor.querySelectorAll("script");
+    scripts.forEach(script => {
+        let nuevoScript = document.createElement("script");
+        if (script.src) {
+            // Si el script tiene src, recargarlo desde su fuente
+            nuevoScript.src = script.src;
+            nuevoScript.async = true; // Asegura que no bloquee la carga
+        } else {
+            // Si el script es inline, copiar su contenido
+            nuevoScript.textContent = script.textContent;
+        }
+        document.body.appendChild(nuevoScript);
+    });
+})
+.catch(error => console.error("Error al cargar el juego:", error));
 
-        // Reproducir el sonido cuando el contenido se ha cargado
-        reproducirLoopTechchan();
-    })
-    .catch(error => console.error("Error al cargar el juego:", error));
 
-// Función para reproducir el audio en loop
-function reproducirLoopTechchan() {
-    let audio = new Audio("archivos_de_minijuegos/sounds/techchan.mp3");
-    audio.loop = true;  // Asegura que el audio se reproduzca en loop
-    audio.play();  // Inicia la reproducción del audio
-}
+
+
+
+
+
+
+
+
+
+
+
