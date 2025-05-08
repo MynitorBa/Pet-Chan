@@ -1,0 +1,203 @@
+    #pacman-container {
+        background-color: rgba(98, 2, 150, 0.95);
+        border: 4px solid #d304c5;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 0 30px rgba(163, 4, 250, 0.7);
+        position: relative;
+        overflow: hidden;
+        margin: 20px;
+        width: 400px;
+    }
+
+    #pacman-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #a304fa, #d304c5, #a304fa);
+        animation: arcoiris 3s linear infinite;
+        background-size: 200% 100%;
+    }
+
+    @keyframes arcoiris {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    #pacman {
+        height: 470px;
+        width: 382px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    #shim {
+        position: absolute;
+        visibility: hidden
+    }
+
+    @keyframes glow {
+        from {
+            text-shadow: 0 0 10px #a304fa, 0 0 20px #a304fa;
+        }
+        to {
+            text-shadow: 0 0 15px #a304fa, 0 0 30px #a304fa, 0 0 40px #a304fa;
+        }
+    }
+
+    p {
+        text-align: center;
+        color: #cf7cfc;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .instructions {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 10px;
+        margin: 10px 0;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .instructions span {
+        color: #FFFF00;
+        font-weight: bold;
+    }
+
+    /* Pixel corners decoration */
+    .pixel-corner {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #cf7cfc;
+        box-shadow: 0 0 5px #cf7cfc;
+    }
+
+    .corner-tl { top: -5px; left: -5px; }
+    .corner-tr { top: -5px; right: -5px; }
+    .corner-bl { bottom: -5px; left: -5px; }
+    .corner-br { bottom: -5px; right: -5px; }
+
+    /* Estilos para modo pantalla completa */
+    .seccion-fullscreen {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+        z-index: 9999;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #1a0a2e;
+    }
+
+    .modo-fullscreen {
+        width: 100%;
+        height: 95vh;
+        margin: 0;
+        border-radius: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        background-color: #3c1660;
+        border: none;
+    }
+
+    /* Ajustes para los botones del juego en pantalla completa */
+    .modo-fullscreen .btn {
+        height: 130px;
+        width: 130px;
+        margin: 10px;
+    }
+
+    /* Ajustes para el título en modo pantalla completa */
+    .modo-fullscreen #level-title {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+
+    /* Para la reorganización de elementos según tu JS */
+    .titulo-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 50%;
+    }
+
+    .botones-control {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 50%;
+    }
+
+    .modo-fullscreen .botones-superiores {
+        display: flex;
+        width: 100%;
+        padding: 10px 20px;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    /* Ajustes para pantallas más pequeñas */
+    @media (max-height: 600px) {
+        .btn {
+            height: 80px;
+            width: 80px;
+        }
+        
+        .modo-fullscreen .btn {
+            height: 100px;
+            width: 100px;
+        }
+        
+        #level-title {
+            font-size: 2.5rem;
+        }
+        
+        .modo-fullscreen #level-title {
+            font-size: 3rem;
+        }
+    }
+
+    /* Ajustes adicionales para pantallas muy pequeñas */
+    @media (max-height: 480px) {
+        .btn {
+            height: 70px;
+            width: 70px;
+            margin: 3px;
+        }
+        
+        .modo-fullscreen .btn {
+            height: 85px;
+            width: 85px;
+        }
+        
+        #level-title {
+            font-size: 2rem;
+        }
+        
+        .modo-fullscreen #level-title {
+            font-size: 2.5rem;
+        }
+        
+        .container {
+            gap: 10px;
+            padding: 15px;
+        }
+    }

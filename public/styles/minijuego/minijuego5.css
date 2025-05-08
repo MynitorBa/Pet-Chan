@@ -1,8 +1,3 @@
-@font-face {
-    font-family: 'Press Start 2P';
-    src: url('https://cdnjs.cloudflare.com/ajax/libs/PressStart2P/1.0.0/PressStart2P.woff') format('woff');
-}
-
 /* Variables globales para facilitar consistencia */
 :root {
     --color-bg: rgba(25, 15, 35, 0.9);
@@ -14,58 +9,78 @@
     --gradient-secondary: linear-gradient(45deg, #b270ff, #56dcff, #b270ff);
     --shadow-primary: 0 0 10px rgba(86, 220, 255, 0.7);
     --shadow-secondary: 0 0 10px rgba(178, 112, 255, 0.7);
+    --cell-size: 42px; /* Tamaño fijo de celda */
+    --board-width: 420px; /* 10 celdas * 42px - FIJO */
+    --board-height: 840px; /* 20 celdas * 42px - FIJO */
 }
 
 /* Sección principal del juego */
 .seccion-del_juego {
-    width: 100%;
-    min-height: 500px;
-    background: var(--color-bg);
-    border-radius: 10px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(163, 4, 250, 0.4);
-    border: 2px solid var(--color-border);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
+    width: 100% !important;
+    min-height: 100vh !important;
+    background-color: #0a0a0a !important;
+    border-radius: 0 !important;
+    position: relative !important;
+    overflow: hidden !important; /* Evita scrollbars */
+    box-shadow: none !important;
+    border: none !important;
+    cursor: default !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
+    padding: 40px 20px !important;
+    background-size: cover !important;
+    background-repeat: repeat !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23050505'/%3E%3Cdefs%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='4' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3Cfilter id='bigGlow'%3E%3CfeGaussianBlur stdDeviation='8' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3CradialGradient id='bgPulse' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' style='stop-color:%230f0f3f;stop-opacity:1'%3E%3Canimate attributeName='stop-color' values='%230f0f3f;%23150f2f;%230f0f3f' dur='8s' repeatCount='indefinite'/%3E%3C/stop%3E%3Cstop offset='100%25' style='stop-color:%23000000;stop-opacity:1' /%3E%3C/radialGradient%3E%3ClinearGradient id='scanLine' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300ffff;stop-opacity:0'/%3E%3Cstop offset='50%25' style='stop-color:%23ff00ff;stop-opacity:0.4'/%3E%3Cstop offset='100%25' style='stop-color:%2300ffff;stop-opacity:0'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Fondo con gradiente pulsante --%3E%3Crect width='800' height='600' fill='url(%23bgPulse)'/%3E%3C!-- Grid cyberpunk animado --%3E%3Cg stroke='%2300ffff' stroke-width='1' opacity='0.15'%3E%3Cpath d='M0,0 L800,0 M0,30 L800,30 M0,60 L800,60 M0,90 L800,90 M0,120 L800,120 M0,150 L800,150 M0,180 L800,180 M0,210 L800,210 M0,240 L800,240 M0,270 L800,270 M0,300 L800,300 M0,330 L800,330 M0,360 L800,360 M0,390 L800,390 M0,420 L800,420 M0,450 L800,450 M0,480 L800,480 M0,510 L800,510 M0,540 L800,540 M0,570 L800,570 M0,600 L800,600'/%3E%3Cpath d='M0,0 L0,600 M30,0 L30,600 M60,0 L60,600 M90,0 L90,600 M120,0 L120,600 M150,0 L150,600 M180,0 L180,600 M210,0 L210,600 M240,0 L240,600 M270,0 L270,600 M300,0 L300,600 M330,0 L330,600 M360,0 L360,600 M390,0 L390,600 M420,0 L420,600 M450,0 L450,600 M480,0 L480,600 M510,0 L510,600 M540,0 L540,600 M570,0 L570,600 M600,0 L600,600 M630,0 L630,600 M660,0 L660,600 M690,0 L690,600 M720,0 L720,600 M750,0 L750,600 M780,0 L780,600 M800,0 L800,600'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;30,30;0,0' dur='10s' repeatCount='indefinite'/%3E%3C/g%3E%3C!-- Líneas de escaneo --%3E%3Crect width='800' height='4' fill='url(%23scanLine)' opacity='0.6'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600;0,0' dur='6s' repeatCount='indefinite'/%3E%3C/rect%3E%3Crect width='4' height='600' fill='url(%23scanLine)' opacity='0.6'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;800,0;0,0' dur='8s' repeatCount='indefinite'/%3E%3C/rect%3E%3C!-- Orbes de luz flotantes --%3E%3Ccircle cx='100' cy='100' r='40' fill='%2300ffff' opacity='0.1' filter='url(%23bigGlow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;150,150;0,0' dur='12s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='700' cy='500' r='50' fill='%23ff00ff' opacity='0.1' filter='url(%23bigGlow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-100,-100;0,0' dur='14s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='400' cy='300' r='60' fill='%238a2be2' opacity='0.08' filter='url(%23bigGlow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-80,80;0,0' dur='10s' repeatCount='indefinite'/%3E%3C/circle%3E%3C!-- Partículas brillantes flotantes --%3E%3Cg%3E%3Ccircle cx='50' cy='50' r='2' fill='%2300ffff' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;150,200;0,600' dur='15s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='200' cy='100' r='2' fill='%23ff00ff' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-50,150;300,550' dur='18s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='350' cy='50' r='2' fill='%238a2be2' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;100,200;-100,600' dur='16s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='500' cy='150' r='2' fill='%2300ff00' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-150,100;200,550' dur='14s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='700' cy='200' r='2' fill='%23ff0040' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;50,250;-300,600' dur='17s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='150' cy='300' r='2' fill='%230080ff' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;200,50;100,500' dur='13s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='450' cy='400' r='2' fill='%23ff8000' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-200,100;150,600' dur='19s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='650' cy='450' r='2' fill='%2300ffff' filter='url(%23glow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;100,-100;-250,550' dur='12s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C!-- Estrellas brillantes --%3E%3Cg fill='%23ffffff' opacity='0.8'%3E%3Ccircle cx='80' cy='150' r='1'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='3s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='250' cy='220' r='1'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='4s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='450' cy='320' r='1'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='3.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='600' cy='180' r='1'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='4.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='720' cy='380' r='1'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='3.2s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='150' cy='450' r='1'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='4.8s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C!-- Pieza I neón cian --%3E%3Cg opacity='0.7' filter='url(%23glow)'%3E%3Crect x='100' y='50' width='35' height='35' fill='%2300ffff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='135' y='50' width='35' height='35' fill='%2300ffff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='170' y='50' width='35' height='35' fill='%2300ffff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='205' y='50' width='35' height='35' fill='%2300ffff' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='6s' repeatCount='indefinite' /%3E%3CanimateTransform attributeName='transform' type='rotate' values='0 167.5 67.5;360 167.5 67.5' dur='6s' repeatCount='indefinite' additive='sum'/%3E%3C/g%3E%3C!-- Pieza O neón magenta --%3E%3Cg opacity='0.7' filter='url(%23glow)'%3E%3Crect x='400' y='100' width='35' height='35' fill='%23ff00ff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='435' y='100' width='35' height='35' fill='%23ff00ff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='400' y='135' width='35' height='35' fill='%23ff00ff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='435' y='135' width='35' height='35' fill='%23ff00ff' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='7s' repeatCount='indefinite' /%3E%3CanimateTransform attributeName='transform' type='rotate' values='0 417.5 117.5;-360 417.5 117.5' dur='7s' repeatCount='indefinite' additive='sum'/%3E%3C/g%3E%3C!-- Pieza T neón morado --%3E%3Cg opacity='0.7' filter='url(%23glow)'%3E%3Crect x='565' y='50' width='35' height='35' fill='%238a2be2' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='530' y='85' width='35' height='35' fill='%238a2be2' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='565' y='85' width='35' height='35' fill='%238a2be2' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='600' y='85' width='35' height='35' fill='%238a2be2' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='8s' repeatCount='indefinite' /%3E%3CanimateTransform attributeName='transform' type='rotate' values='0 565 85;360 565 85' dur='8s' repeatCount='indefinite' additive='sum'/%3E%3C/g%3E%3C!-- Más piezas y efectos adicionales --%3E%3Cg opacity='0.6' filter='url(%23glow)'%3E%3Crect x='250' y='0' width='35' height='35' fill='%23ff0040' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='285' y='0' width='35' height='35' fill='%23ff0040' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='285' y='35' width='35' height='35' fill='%23ff0040' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='320' y='35' width='35' height='35' fill='%23ff0040' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='10s' repeatCount='indefinite' /%3E%3C/g%3E%3Cg opacity='0.6' filter='url(%23glow)'%3E%3Crect x='50' y='300' width='35' height='35' fill='%2300ff00' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='85' y='300' width='35' height='35' fill='%2300ff00' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='15' y='335' width='35' height='35' fill='%2300ff00' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='50' y='335' width='35' height='35' fill='%2300ff00' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='9s' repeatCount='indefinite' /%3E%3C/g%3E%3Cg opacity='0.6' filter='url(%23glow)'%3E%3Crect x='650' y='150' width='35' height='35' fill='%230080ff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='650' y='185' width='35' height='35' fill='%230080ff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='650' y='220' width='35' height='35' fill='%230080ff' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='685' y='220' width='35' height='35' fill='%230080ff' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='11s' repeatCount='indefinite' /%3E%3C/g%3E%3Cg opacity='0.6' filter='url(%23glow)'%3E%3Crect x='350' y='400' width='35' height='35' fill='%23ff8000' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='315' y='435' width='35' height='35' fill='%23ff8000' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='350' y='435' width='35' height='35' fill='%23ff8000' stroke='%23ffffff' stroke-width='2'/%3E%3Crect x='385' y='435' width='35' height='35' fill='%23ff8000' stroke='%23ffffff' stroke-width='2'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600' dur='12s' repeatCount='indefinite' /%3E%3C/g%3E%3C/svg%3E") !important;
 }
 
-/* Contenedor principal del juego - Control absoluto de alineación */
+/* Asegurar que el fondo sea dark */
+.seccion-del_juego,
+.modo-fullscreen .seccion-del_juego {
+    background-color: #0a0a0a !important;
+}
+
+/* Contenedor principal del juego */
 .game-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Alinea desde arriba */
-    gap: 20px;
+    align-items: center; /* Centrado total */
+    gap: 60px; /* Espacio entre elementos */
     width: 100%;
-    max-width: 1024px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 40px;
     box-sizing: border-box;
     font-family: 'Press Start 2P', monospace;
     position: relative;
+    min-height: 80vh;
+    transform-origin: center center; /* Punto de origen para escalado */
 }
 
-/* Estilos del tablero */
+/* Estilos del tablero - TAMAÑO EXACTO Y FIJO */
 .board {
-    width: 280px;
-    height: 560px;
+    width: var(--board-width) !important; /* 420px - FIJO */
+    height: var(--board-height) !important; /* 840px - FIJO */
     background-color: rgba(0, 0, 0, 0.9);
     border: 4px solid #222;
     position: relative;
     box-shadow: 
-        var(--shadow-primary),
-        var(--shadow-secondary),
-        inset 0 0 15px rgba(86, 220, 255, 0.3);
+        0 0 30px rgba(86, 220, 255, 0.9),
+        0 0 50px rgba(178, 112, 255, 0.7),
+        inset 0 0 25px rgba(86, 220, 255, 0.5);
     border-image: var(--gradient-primary) 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Impide que se encoja */
+    flex-grow: 0; /* Impide que crezca */
     z-index: 5;
+    min-width: var(--board-width) !important; /* Valor mínimo fijo */
+    min-height: var(--board-height) !important; /* Valor mínimo fijo */
+    max-width: var(--board-width) !important; /* Valor máximo fijo */
+    max-height: var(--board-height) !important; /* Valor máximo fijo */
 }
 
 /* Efecto de escaneo */
@@ -97,24 +112,25 @@
     background-image: 
         linear-gradient(rgba(86, 220, 255, 0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(86, 220, 255, 0.05) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background-size: var(--cell-size) var(--cell-size); /* 42px 42px */
     pointer-events: none;
 }
 
 /* Paneles laterales */
 .side-panel, .left-panel {
-    width: 200px;
+    width: 300px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 30px;
     flex-shrink: 0;
-    height: auto;
+    height: 700px;
+    justify-content: center;
 }
 
 /* Panel para siguiente pieza */
 .next-piece {
     width: 100%;
-    height: 120px;
+    height: 160px;
     background-color: rgba(30, 15, 60, 0.8);
     border: 3px solid #333;
     position: relative;
@@ -130,12 +146,12 @@
 .next-piece::before, .hold-piece::before {
     content: attr(data-title);
     position: absolute;
-    top: -13px;
+    top: -20px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #000;
-    padding: 0 15px;
-    font-size: 12px;
+    padding: 5px 20px;
+    font-size: 16px;
     text-shadow: 0 0 5px currentColor;
     border: 1px solid currentColor;
     border-radius: 3px;
@@ -152,17 +168,18 @@
 .stats {
     background-color: rgba(30, 15, 60, 0.8);
     border: 3px solid #333;
-    padding: 15px;
+    padding: 30px;
     box-shadow: 
         var(--shadow-primary),
         inset 0 0 15px rgba(86, 220, 255, 0.3);
     border-image: var(--gradient-primary) 1;
     flex-grow: 1;
+    min-height: 250px;
 }
 
 .stats p {
-    margin: 12px 0;
-    font-size: 12px;
+    margin: 20px 0;
+    font-size: 16px;
     text-shadow: 0 0 5px currentColor;
     color: var(--color-pink);
 }
@@ -171,39 +188,48 @@
 .controls {
     background-color: rgba(30, 15, 60, 0.8);
     border: 3px solid #333;
-    padding: 15px;
+    padding: 30px;
     box-shadow: 
         var(--shadow-secondary),
         inset 0 0 15px rgba(178, 112, 255, 0.4);
     border-image: var(--gradient-secondary) 1;
     flex-grow: 1;
+    min-height: 200px;
 }
 
 .controls p {
-    margin: 5px 0;
-    font-size: 10px;
+    margin: 10px 0;
+    font-size: 14px;
     color: var(--color-cyan);
     text-shadow: 0 0 5px rgba(86, 220, 255, 0.8);
 }
 
-/* Celdas del juego - NO MODIFICAR */
+/* Celdas del juego - TAMAÑOS EXACTOS Y FIJOS */
 .cell {
-    width: 28px;
-    height: 28px;
+    width: var(--cell-size) !important; /* 42px - FIJO */
+    height: var(--cell-size) !important; /* 42px - FIJO */
     position: absolute;
     box-sizing: border-box;
     border-radius: 2px;
     border: 2px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 12px currentColor;
+    min-width: var(--cell-size) !important; /* Valor mínimo fijo */
+    min-height: var(--cell-size) !important; /* Valor mínimo fijo */
+    max-width: var(--cell-size) !important; /* Valor máximo fijo */
+    max-height: var(--cell-size) !important; /* Valor máximo fijo */
 }
 
 .preview-cell {
-    width: 18px;
-    height: 18px;
+    width: 27px !important; /* Tamaño fijo */
+    height: 27px !important; /* Tamaño fijo */
     position: absolute;
     border-radius: 2px;
     border: 2px solid rgba(255, 255, 255, 0.7);
     box-shadow: 0 0 5px currentColor;
+    min-width: 27px !important; /* Valor mínimo fijo */
+    min-height: 27px !important; /* Valor mínimo fijo */
+    max-width: 27px !important; /* Valor máximo fijo */
+    max-height: 27px !important; /* Valor máximo fijo */
 }
 
 /* Mensajes del juego */
@@ -213,7 +239,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.9);
-    padding: 25px;
+    padding: 40px;
     border: 4px solid #333;
     display: none;
     z-index: 20;
@@ -224,24 +250,26 @@
     border-image: var(--gradient-primary) 1;
     backdrop-filter: blur(10px);
     color: #fff;
+    min-width: 400px;
 }
 
 .message h2 {
     color: var(--color-cyan);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-shadow: 0 0 10px rgba(86, 220, 255, 0.8);
     letter-spacing: 2px;
+    font-size: 36px;
 }
 
 .message button {
     background: var(--gradient-primary);
     border: none;
     color: #000;
-    padding: 15px 30px;
-    margin-top: 20px;
+    padding: 20px 40px;
+    margin-top: 30px;
     cursor: pointer;
     font-family: 'Press Start 2P', monospace;
-    font-size: 14px;
+    font-size: 18px;
     text-transform: uppercase;
     box-shadow: var(--shadow-primary);
     transition: all 0.3s;
@@ -256,7 +284,7 @@
 /* Mensaje de nivel */
 .level-message {
     color: var(--color-purple);
-    font-size: 28px;
+    font-size: 48px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -269,31 +297,8 @@
         0 0 10px rgba(178, 112, 255, 0.8),
         0 0 20px rgba(178, 112, 255, 0.6);
     background-color: rgba(0, 0, 0, 0.8);
-    padding: 20px;
+    padding: 40px;
     border-radius: 5px;
-}
-
-/* Animaciones */
-@keyframes glow {
-    0% { box-shadow: 0 0 5px currentColor; }
-    50% { box-shadow: 0 0 20px currentColor; }
-    100% { box-shadow: 0 0 5px currentColor; }
-}
-
-@keyframes neonFlicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-        text-shadow: 
-            0 0 5px var(--color-cyan),
-            0 0 10px var(--color-cyan),
-            0 0 20px var(--color-cyan);
-    }
-    20%, 24%, 55% {
-        text-shadow: none;
-    }
-}
-
-.score-flash {
-    animation: glow 0.5s ease-in-out;
 }
 
 /* Título del juego */
@@ -302,17 +307,11 @@
     text-shadow: 
         0 0 10px rgba(189, 147, 249, 0.6),
         0 0 20px rgba(189, 147, 249, 0.4);
-    margin-bottom: 15px;
-    font-size: 32px;
-    letter-spacing: 5px;
+    margin-bottom: 30px;
+    font-size: 48px;
+    letter-spacing: 8px;
     animation: neonFlicker 3s infinite;
     text-align: center;
-}
-
-/* Valores de estadísticas */
-.score-value, .level-value, .lines-value {
-    color: #78dce8;
-    text-shadow: 0 0 5px rgba(120, 220, 232, 0.5);
 }
 
 /* Botón de inicio */
@@ -324,15 +323,15 @@
     background: linear-gradient(45deg, #78dce8, #bd93f9);
     border: 3px solid #f8f8f2;
     color: #1e1f36;
-    padding: 15px 30px;
+    padding: 25px 50px;
     cursor: pointer;
     font-family: 'Press Start 2P', monospace;
-    font-size: 18px;
+    font-size: 24px;
     text-transform: uppercase;
     box-shadow: 0 0 15px rgba(120, 220, 232, 0.5);
     transition: all 0.3s;
     z-index: 10;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     border-radius: 4px;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
     animation: buttonPulse 2s infinite;
@@ -344,15 +343,10 @@
     background: linear-gradient(45deg, #bd93f9, #78dce8);
 }
 
-@keyframes buttonPulse {
-    0%, 100% { box-shadow: 0 0 15px rgba(120, 220, 232, 0.5); }
-    50% { box-shadow: 0 0 25px rgba(120, 220, 232, 0.7); }
-}
-
 /* Panel para pieza guardada */
 .hold-piece {
     width: 100%;
-    height: 120px;
+    height: 160px;
     background-color: rgba(24, 28, 58, 0.85);
     border: 3px solid #2a2c42;
     position: relative;
@@ -370,51 +364,26 @@
     color: #78dce8;
 }
 
-.hold-piece.disabled {
-    opacity: 0.5;
-    filter: grayscale(70%);
-}
-
-/* Animación para intercambio de piezas */
-@keyframes swapFlash {
-    0%, 100% { box-shadow: 0 0 10px rgba(120, 220, 232, 0.4); }
-    50% { box-shadow: 0 0 30px rgba(120, 220, 232, 0.8); }
-}
-
-.swap-flash {
-    animation: swapFlash 0.5s ease-in-out;
-}
-
-/* Pista de tecla */
-.key-hint {
-    position: absolute;
-    bottom: -12px;
-    right: 5px;
-    background-color: #1e1f36;
-    padding: 2px 6px;
-    font-size: 8px;
+/* Valores de estadísticas */
+.score-value, .level-value, .lines-value {
     color: #78dce8;
-    text-shadow: 0 0 3px rgba(120, 220, 232, 0.5);
-    border: 1px solid #78dce8;
-    border-radius: 2px;
-    animation: keyPulse 2s infinite;
-}
-
-@keyframes keyPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+    text-shadow: 0 0 5px rgba(120, 220, 232, 0.5);
+    font-size: 24px;
+    margin-left: 15px;
 }
 
 /* Progreso de nivel */
 .next-level-value {
     color: #bd93f9;
     text-shadow: 0 0 5px rgba(189, 147, 249, 0.5);
+    font-size: 24px;
+    margin-left: 15px;
 }
 
 .next-level-progress {
     width: 100%;
-    height: 6px;
-    margin-top: 8px;
+    height: 12px;
+    margin-top: 15px;
     background-color: rgba(24, 28, 58, 0.5);
     border: 1px solid #2a2c42;
     overflow: hidden;
@@ -428,22 +397,9 @@
     box-shadow: 0 0 10px rgba(189, 147, 249, 0.5);
 }
 
-/* Modo pantalla completa - MEJORADO */
-.seccion-fullscreen {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    z-index: 9999 !important;
-    background-color: #1a0a2e !important;
-    border: none !important;
-    overflow: hidden !important;
-}
-
+/* SECCIÓN DE FULLSCREEN COMPLETAMENTE REESCRITA */
+/* Modo pantalla completa - FIJO Y CONTROLADO */
+.seccion-fullscreen,
 .modo-fullscreen {
     position: fixed !important;
     top: 0 !important;
@@ -451,368 +407,227 @@
     width: 100vw !important;
     height: 100vh !important;
     margin: 0 !important;
-    padding: 0 !important;
     border-radius: 0 !important;
     z-index: 9999 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: radial-gradient(circle at center, #4a1a80 0%, #2a0f45 50%, #16052a 100%) !important;
+    background-color: #0a0a0a !important;
     border: none !important;
-    overflow: hidden !important;
-    position: relative !important;
-}
-
-/* Efectos visuales de fondo para el modo fullscreen */
-.modo-fullscreen::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 20% 30%, rgba(86, 220, 255, 0.15) 0%, transparent 30%),
-        radial-gradient(circle at 80% 70%, rgba(178, 112, 255, 0.15) 0%, transparent 30%);
-    z-index: 0;
-}
-
-/* Partículas en el fondo */
-.modo-fullscreen::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 10% 10%, #56dcff 0%, transparent 0.5%),
-        radial-gradient(circle at 20% 20%, #b270ff 0%, transparent 0.3%),
-        radial-gradient(circle at 30% 30%, #56dcff 0%, transparent 0.4%),
-        radial-gradient(circle at 40% 40%, #b270ff 0%, transparent 0.2%),
-        radial-gradient(circle at 50% 50%, #56dcff 0%, transparent 0.3%),
-        radial-gradient(circle at 60% 60%, #b270ff 0%, transparent 0.5%),
-        radial-gradient(circle at 70% 70%, #56dcff 0%, transparent 0.4%),
-        radial-gradient(circle at 80% 80%, #b270ff 0%, transparent 0.2%),
-        radial-gradient(circle at 90% 90%, #56dcff 0%, transparent 0.3%);
-    opacity: 0.4;
-    animation: floatingParticles 15s linear infinite;
-    z-index: 0;
-}
-
-/* Animación para las partículas */
-@keyframes floatingParticles {
-    0% { transform: translateY(0) translateX(0); }
-    25% { transform: translateY(-10px) translateX(5px); }
-    50% { transform: translateY(0) translateX(10px); }
-    75% { transform: translateY(10px) translateX(5px); }
-    100% { transform: translateY(0) translateX(0); }
-}
-
-/* Líneas de cuadrícula en el fondo */
-.modo-fullscreen .background-grid {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        linear-gradient(rgba(86, 220, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(86, 220, 255, 0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Título del juego en pantalla completa */
-.modo-fullscreen .game-title-fullscreen {
-    position: absolute;
-    top: 20px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 48px;
-    color: #ff9edb;
-    text-shadow: 
-        0 0 10px rgba(255, 158, 219, 0.8),
-        0 0 20px rgba(255, 158, 219, 0.6),
-        0 0 30px rgba(255, 158, 219, 0.4);
-    letter-spacing: 10px;
-    font-family: 'Press Start 2P', monospace;
-    animation: titlePulse 3s infinite alternate;
-    z-index: 10;
-}
-
-@keyframes titlePulse {
-    0% { text-shadow: 0 0 10px rgba(255, 158, 219, 0.8), 0 0 20px rgba(255, 158, 219, 0.6); }
-    100% { text-shadow: 0 0 20px rgba(255, 158, 219, 0.8), 0 0 40px rgba(255, 158, 219, 0.6), 0 0 60px rgba(255, 158, 219, 0.4); }
-}
-
-/* Tablero en modo pantalla completa */
-.modo-fullscreen .board {
-    /* Mantiene el tamaño original del tablero */
-    width: 280px !important;
-    height: 560px !important;
-    margin: 0 30px !important;
-    box-shadow: 
-        0 0 30px rgba(86, 220, 255, 0.9) !important,
-        0 0 50px rgba(178, 112, 255, 0.7) !important,
-        inset 0 0 25px rgba(86, 220, 255, 0.5) !important;
-    z-index: 10 !important;
-}
-
-.modo-fullscreen .game-container {
-    width: 100% !important;
-    height: 100% !important;
-    padding: 20px !important;
+    overflow: hidden !important; /* Evita scrollbars */
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 50px !important;
-    z-index: 5 !important;
+    padding: 0 !important;
 }
 
-/* Mejoras para los paneles laterales en pantalla completa */
+/* Contenedor principal en modo fullscreen - CORREGIDO */
+.modo-fullscreen .game-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: auto !important; /* Auto en lugar de 100% */
+    height: auto !important; /* Auto en lugar de 100% */
+    padding: 0 !important;
+    gap: 20px !important;
+    /* Escalado controlado y centrado */
+    transform: scale(0.9) !important; /* Escala fija */
+    transform-origin: center center !important;
+}
+
+/* MANTENER EL TABLERO VISIBLE Y CON TAMAÑO FIJO */
+.modo-fullscreen .board {
+    width: var(--board-width) !important; /* 420px - FIJO */
+    height: var(--board-height) !important; /* 840px - FIJO */
+    flex-shrink: 0 !important; /* Impide que se encoja */
+    flex-grow: 0 !important; /* Impide que crezca */
+    margin: 0 !important;
+    min-width: var(--board-width) !important; /* Valor mínimo fijo */
+    min-height: var(--board-height) !important; /* Valor mínimo fijo */
+    max-width: var(--board-width) !important; /* Valor máximo fijo */
+    max-height: var(--board-height) !important; /* Valor máximo fijo */
+}
+
+/* CELDAS EN MODO FULLSCREEN - TAMAÑO FIJO */
+.modo-fullscreen .cell {
+    width: var(--cell-size) !important; /* 42px - FIJO */
+    height: var(--cell-size) !important; /* 42px - FIJO */
+    min-width: var(--cell-size) !important; /* Valor mínimo fijo */
+    min-height: var(--cell-size) !important; /* Valor mínimo fijo */
+    max-width: var(--cell-size) !important; /* Valor máximo fijo */
+    max-height: var(--cell-size) !important; /* Valor máximo fijo */
+}
+
+.modo-fullscreen .preview-cell {
+    width: 27px !important; /* FIJO */
+    height: 27px !important; /* FIJO */
+    min-width: 27px !important; /* Valor mínimo fijo */
+    min-height: 27px !important; /* Valor mínimo fijo */
+    max-width: 27px !important; /* Valor máximo fijo */
+    max-height: 27px !important; /* Valor máximo fijo */
+}
+
+/* Paneles en modo fullscreen */
 .modo-fullscreen .side-panel,
 .modo-fullscreen .left-panel {
-    width: 250px !important;
-    height: 560px !important;
+    width: 220px !important; /* Reducido para mejor ajuste */
+    height: 700px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
-    z-index: 10 !important;
+    justify-content: center !important;
+    gap: 15px !important; /* Reducido el gap */
 }
 
-/* Mejoras para la sección siguiente y guardado en pantalla completa */
 .modo-fullscreen .next-piece,
 .modo-fullscreen .hold-piece {
-    height: 140px !important;
-    border-width: 4px !important;
+    height: 150px !important; /* Reducido altura */
+    border-width: 3px !important;
     box-shadow: 
-        0 0 20px rgba(86, 220, 255, 0.8) !important,
-        inset 0 0 20px rgba(178, 112, 255, 0.6) !important;
+        0 0 15px rgba(86, 220, 255, 0.7) !important,
+        inset 0 0 15px rgba(178, 112, 255, 0.4) !important;
 }
 
-.modo-fullscreen .next-piece::before,
-.modo-fullscreen .hold-piece::before {
-    font-size: 16px !important;
-    padding: 5px 20px !important;
-    top: -18px !important;
-    font-weight: bold !important;
-    box-shadow: 0 0 10px currentColor !important;
-}
-
-/* Mejoras para estadísticas y controles en pantalla completa */
 .modo-fullscreen .stats,
 .modo-fullscreen .controls {
-    padding: 20px !important;
-    border-width: 4px !important;
+    padding: 20px !important; /* Reducido el padding */
+    border-width: 3px !important;
+    min-height: auto !important;
     box-shadow: 
-        0 0 20px rgba(86, 220, 255, 0.8) !important,
-        inset 0 0 20px rgba(178, 112, 255, 0.6) !important;
+        0 0 15px rgba(86, 220, 255, 0.7) !important,
+        inset 0 0 15px rgba(178, 112, 255, 0.4) !important;
 }
 
 .modo-fullscreen .stats p,
 .modo-fullscreen .controls p {
-    font-size: 16px !important;
-    margin: 15px 0 !important;
-    letter-spacing: 1px !important;
-    text-shadow: 0 0 10px currentColor !important;
+    font-size: 14px !important; /* Reducido tamaño */
+    margin: 15px 0 !important; /* Reducido margen */
 }
 
-/* Valores de estadísticas en pantalla completa */
 .modo-fullscreen .score-value,
 .modo-fullscreen .level-value,
 .modo-fullscreen .lines-value,
 .modo-fullscreen .next-level-value {
-    font-size: 18px !important;
-    margin-left: 10px !important;
-    text-shadow: 0 0 10px currentColor !important;
+    font-size: 18px !important; /* Reducido tamaño */
+    margin-left: 10px !important; /* Reducido margen */
 }
 
-/* Mejora de la barra de progreso en pantalla completa */
 .modo-fullscreen .next-level-progress {
-    height: 10px !important;
-    margin-top: 12px !important;
-    border-width: 2px !important;
+    height: 10px !important; /* Reducido altura */
+    margin-top: 10px !important; /* Reducido margen */
 }
 
-/* Decoración adicional para pantalla completa */
-.modo-fullscreen .decorative-element {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border: 2px solid var(--color-cyan);
-    border-radius: 50%;
-    opacity: 0.3;
-    pointer-events: none;
-    animation: floatAndGlow 8s infinite linear;
-}
-
-.modo-fullscreen .decorative-element:nth-child(1) {
-    top: 10%;
-    left: 5%;
-    animation-delay: 0s;
-}
-
-.modo-fullscreen .decorative-element:nth-child(2) {
-    top: 15%;
-    right: 10%;
-    animation-delay: 2s;
-}
-
-.modo-fullscreen .decorative-element:nth-child(3) {
-    bottom: 20%;
-    left: 8%;
-    animation-delay: 4s;
-}
-
-.modo-fullscreen .decorative-element:nth-child(4) {
-    bottom: 15%;
-    right: 7%;
-    animation-delay: 6s;
-}
-
-@keyframes floatAndGlow {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
-    25% { transform: translateY(-15px) rotate(90deg); opacity: 0.4; }
-    50% { transform: translateY(0) rotate(180deg); opacity: 0.2; }
-    75% { transform: translateY(15px) rotate(270deg); opacity: 0.4; }
-    100% { transform: translateY(0) rotate(360deg); opacity: 0.2; }
-}
-
-/* Evitar scrollbars en fullscreen */
-body.has-fullscreen {
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 100vh !important;
-    width: 100vw !important;
-}
-
-/* Responsividad */
-@media (max-width: 767px) {
+/* RESPONSIVIDAD MEJORADA - SIN AFECTAR TAMAÑO DEL TABLERO */
+@media (max-width: 1200px) {
     .game-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        transform: scale(0.8);
+        transform-origin: center center;
+        gap: 30px;
     }
     
+    /* MANTENER TAMAÑO DEL TABLERO FIJO */
     .board {
-        width: 280px;
-        height: 560px;
+        width: var(--board-width) !important; /* 420px - FIJO */
+        height: var(--board-height) !important; /* 840px - FIJO */
     }
     
     .side-panel, .left-panel {
-        width: 100%;
-        max-width: 300px;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .next-piece, .hold-piece, .stats, .controls {
-        height: auto;
-        min-height: 80px;
-        width: 100%;
-        padding: 10px;
-    }
-    
-    .modo-fullscreen .game-container {
-        padding-top: 50px !important;
-    }
-    
-    .modo-fullscreen .side-panel,
-    .modo-fullscreen .left-panel {
-        width: 90% !important;
-        max-width: 280px !important;
-        height: auto !important;
-    }
-    
-    .modo-fullscreen .next-piece,
-    .modo-fullscreen .hold-piece {
-        height: 100px !important;
+        width: 220px;
     }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (max-width: 992px) {
     .game-container {
-        gap: 15px;
-    }
-    
-    .board {
-        width: 280px;
-        height: 560px;
-    }
-    
-    .side-panel, .left-panel {
-        width: 180px;
-    }
-    
-    .modo-fullscreen .side-panel,
-    .modo-fullscreen .left-panel {
-        width: 220px !important;
-    }
-}
-
-@media (min-width: 1024px) {
-    .game-container {
+        transform: scale(0.7);
+        transform-origin: center top;
         gap: 20px;
     }
-}
-
-/* Modo landscape en pantallas pequeñas */
-@media (max-height: 600px) and (orientation: landscape) {
-    .game-container {
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-    }
     
-    /* El tablero mantiene su tamaño original */
+    /* MANTENER TAMAÑO DEL TABLERO FIJO */
     .board {
-        width: 280px;
-        height: 560px;
+        width: var(--board-width) !important; /* 420px - FIJO */
+        height: var(--board-height) !important; /* 840px - FIJO */
     }
     
     .side-panel, .left-panel {
-        width: 180px;
-        height: 560px;
+        width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .seccion-del_juego {
+        align-items: flex-start !important;
+        padding: 10px !important;
+        overflow: hidden !important;
+    }
+    
+    .game-container {
+        flex-direction: column;
+        transform: scale(0.6);
+        transform-origin: center top;
+        padding: 0;
+        gap: 15px;
+        overflow: visible;
+    }
+    
+    /* MANTENER TAMAÑO DEL TABLERO FIJO */
+    .board {
+        width: var(--board-width) !important; /* 420px - FIJO */
+        height: var(--board-height) !important; /* 840px - FIJO */
+        margin-bottom: 20px !important;
+    }
+    
+    .side-panel, .left-panel {
+        width: 100%;
+        max-width: var(--board-width);
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
     }
     
     .next-piece, .hold-piece {
+        width: calc(50% - 5px);
         height: 100px;
     }
     
-    .controls, .stats {
-        font-size: 0.8em;
-    }
-    
-    .modo-fullscreen .game-container {
-        align-items: center !important;
-    }
-    
-    .modo-fullscreen .side-panel,
-    .modo-fullscreen .left-panel {
-        height: 560px !important;
+    .stats, .controls {
+        width: 100%;
+        padding: 15px;
+        min-height: auto;
     }
 }
 
-/* Pantallas muy pequeñas */
-@media (max-width: 350px) {
-    /* El tablero mantiene su tamaño original */
-    .board {
-        width: 280px;
-        height: 560px;
-    }
-    
+@media (max-width: 576px) {
     .game-container {
-        padding: 5px;
-        gap: 15px;
+        transform: scale(0.5);
+        transform-origin: center top;
     }
     
-    .side-panel, .left-panel {
-        width: 280px;
+    /* MANTENER TAMAÑO DEL TABLERO FIJO */
+    .board {
+        width: var(--board-width) !important; /* 420px - FIJO */
+        height: var(--board-height) !important; /* 840px - FIJO */
     }
 }
 
+/* Animaciones y efectos */
+@keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow: 
+            0 0 10px rgba(189, 147, 249, 0.9),
+            0 0 20px rgba(189, 147, 249, 0.7),
+            0 0 30px rgba(189, 147, 249, 0.5);
+    }
+    20%, 24%, 55% {
+        text-shadow: none;
+    }
+}
 
-
+@keyframes buttonPulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(120, 220, 232, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(120, 220, 232, 0.8);
+    }
+}

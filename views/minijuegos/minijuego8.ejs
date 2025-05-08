@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/minijuego/minijuego8.css">
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <div class="game-container">
+            <div class="drawing-area" id="drawingArea">
+                <canvas id="patternTrace" class="pattern-trace"></canvas>
+                <div class="ribbon" id="ribbon"></div>
+                <div class="ribbon-glow" id="ribbonGlow"></div>
+                <div class="catch-area" id="catchArea"></div>
+                <div class="floor"></div>
+                <div class="stage-light" style="top: 50px; left: 200px;"></div>
+                <div class="stage-light" style="top: 400px; left: 100px;"></div>
+            </div>
+            <div class="movement-area" id="movementArea">
+                <div class="player" id="player"></div>
+                <div class="player-shadow" id="playerShadow"></div>
+                <div class="floor"></div>
+                <div class="stage-light" style="top: 100px; left: 300px;"></div>
+                <div class="stage-light" style="top: 350px; left: 400px;"></div>
+            </div>
+            <div class="score-panel" id="scorePanel">
+                <span class="score-icon">🏆</span> Puntos: <span id="score">0</span>
+            </div>
+            <div class="combo-meter" id="comboMeter">
+                Combo: <span class="combo" id="comboCounter">x1</span>
+            </div>
+            <div class="key-indicator">
+                <div class="key" id="keyW">W</div>
+                <div class="key" id="keyA">A</div>
+                <div class="key" id="keyS">S</div>
+                <div class="key" id="keyD">D</div>
+            </div>
+            <div class="pattern-icon">
+                <div class="pattern-item" id="circlePattern">⭕</div>
+                <div class="pattern-item" id="zigzagPattern">↯</div>
+                <div class="pattern-item" id="spiralPattern">🌀</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/scripts/minijuegos/minijuego8.js"></script>
+</body>
+</html>

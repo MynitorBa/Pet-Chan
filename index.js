@@ -1433,6 +1433,19 @@ app.get('/ayuda',  requireLogin, (req, res) => {
     });
 });
 
+
+
+
+app.get('/presentacion', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('presentacion.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
 app.get('/minijuegos', requireLogin, (req, res) => {
  
     const mascota = req.session.mascotaActual;

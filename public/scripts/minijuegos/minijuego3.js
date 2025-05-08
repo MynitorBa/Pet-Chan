@@ -1,3 +1,38 @@
+// Código para reproducir la música automáticamente
+(function() {
+    // Crear el elemento de audio
+    const backgroundAudio = new Audio("archivos_de_minijuegos/sounds/apuestas.mp3");
+    backgroundAudio.loop = true;
+    backgroundAudio.volume = 1.0;
+    
+    // Intentar reproducir inmediatamente
+    backgroundAudio.play().catch(error => {
+        console.error("Error al reproducir automáticamente:", error);
+        
+        // Intentar reproducir con cualquier interacción del usuario
+        const startAudio = function() {
+            backgroundAudio.play().catch(e => console.error("Error al reproducir:", e));
+            // Remover listeners después del primer intento
+            document.removeEventListener('click', startAudio);
+            document.removeEventListener('keydown', startAudio);
+            document.removeEventListener('touchstart', startAudio);
+        };
+        
+        // Añadir listeners para capturar cualquier interacción
+        document.addEventListener('click', startAudio);
+        document.addEventListener('keydown', startAudio);
+        document.addEventListener('touchstart', startAudio);
+    });
+    
+    // También intentar reproducir cuando el documento esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        if (backgroundAudio.paused) {
+            backgroundAudio.play().catch(e => {});
+        }
+    });
+})();
+
+// === CÓDIGO ORIGINAL SIN MODIFICAR ===
 window.onload = function() {
     resetGame();
 };

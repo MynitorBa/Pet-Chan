@@ -1,12 +1,59 @@
+// Variables del juego Simon
 let buttonColors = ["red", "blue", "green", "yellow"];
 let gamePattern = [];
 let userClickedPattern = [];
 let started = false;
 let level = 0;
 
+// Reproducción automática de la música de fondo con múltiples enfoques
+(function() {
+    // Crear el elemento de audio
+    const backgroundMusic = new Audio('archivos_de_minijuegos/sounds/simon.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.3; // Volumen más bajo para que no interfiera con los sonidos del juego
+    
+    // Intentar reproducir inmediatamente
+    backgroundMusic.play().catch(error => {
+        console.error("Error al reproducir automáticamente:", error);
+        
+        // Intentar reproducir con cualquier interacción del usuario
+        const startAudio = function() {
+            backgroundMusic.play().catch(e => console.error("Error al reproducir:", e));
+            // Remover listeners después del primer intento
+            document.removeEventListener('click', startAudio);
+            document.removeEventListener('keydown', startAudio);
+            document.removeEventListener('touchstart', startAudio);
+        };
+        
+        // Añadir listeners para capturar cualquier interacción
+        document.addEventListener('click', startAudio);
+        document.addEventListener('keydown', startAudio);
+        document.addEventListener('touchstart', startAudio);
+    });
+    
+    // También intentar reproducir cuando el documento esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        if (backgroundMusic.paused) {
+            backgroundMusic.play().catch(e => {});
+        }
+    });
+
+    // Función global para asegurar que la música esté sonando
+    window.reproducirLoopSpaceman = function() {
+        if (backgroundMusic.paused) {
+            backgroundMusic.play().catch(e => console.error("Error al reproducir:", e));
+        }
+    };
+})();
+
+// Iniciar el juego con cualquier tecla
 document.addEventListener('keypress', function() {    
     if (!started) { 
       document.getElementById("level-title").textContent = "Level " + level;
+      // Intentar reproducir música si aún no está sonando
+      if (window.reproducirLoopSpaceman) {
+          window.reproducirLoopSpaceman();
+      }
       nextSequence();
       started = true;
     }
@@ -15,6 +62,11 @@ document.addEventListener('keypress', function() {
 // Seleccionar todos los botones con clase .btn y añadirles un event listener
 document.querySelectorAll(".btn").forEach(function(btn) {
     btn.addEventListener('click', function() {
+        // También intentar reproducir música en el primer clic
+        if (window.reproducirLoopSpaceman && !started) {
+            window.reproducirLoopSpaceman();
+        }
+        
         let userChosenColor = this.getAttribute("id");
         userClickedPattern.push(userChosenColor);
         playSound(userChosenColor);

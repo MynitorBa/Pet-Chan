@@ -1,0 +1,489 @@
+/* Base game styling */
+canvas {
+    border: 2px solid #111;
+    image-rendering: pixelated;
+    width: 1400px;
+    height: 1000px;
+}
+
+/* Game container - this is the main wrapper */
+.seccion-del_juego {
+    min-height: 500px;
+    background: rgba(25, 15, 35, 0.9);
+    border-radius: 10px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.4);
+    border: 2px solid #cf7cfc;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: width 0.3s, height 0.3s;
+    box-sizing: border-box;
+}
+
+/* Add grid background effect to game container */
+.seccion-del_juego::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%);
+    background-size: 40px 40px;
+    opacity: 0.8;
+    z-index: 0;
+    animation: grid-move 60s linear infinite;
+    pointer-events: none;
+}
+
+/* Grid animation */
+@keyframes grid-move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 40px 40px;
+    }
+}
+
+/* Game elements - positioning relative to game container */
+.game-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #000 !important; /* Fondo negro importante */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Game Canvas specific background */
+#gameCanvas {
+    background-color: #000;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Crosshair in center of screen */
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255,0,0,0.6);
+    font-size: 24px;
+    pointer-events: none;
+    text-shadow: 0 0 5px rgba(255,0,0,0.4);
+    z-index: 100;
+}
+
+/* HUD elements - bottom right */
+.hud {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+}
+
+.hud-item {
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border-left: 3px solid #ff0000;
+    font-size: 14px;
+    text-shadow: 0 0 3px rgba(255,255,255,0.5);
+}
+
+/* Minimap - top right */
+.minimap {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    padding: 5px;
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 5px;
+    z-index: 10;
+}
+
+/* Alert message - top center */
+.alert {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,0,0,0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 18px;
+    text-align: center;
+    display: none;
+    z-index: 10;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* Radar - bottom left */
+.radar {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 150px;
+    height: 30px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 15px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.radar-indicator {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #00ff00, #ff0000);
+    transition: width 0.3s ease;
+}
+
+/* Objective - top left */
+.objective {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* Win message - center screen */
+#winMessage {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: #00ff00;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 24px;
+    text-align: center;
+    z-index: 100;
+    box-shadow: 0 0 20px #00ff00;
+}
+
+#jumpscare {
+    display: none;
+    position: absolute;  /* Cambiado de fixed a absolute */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: red;
+    text-align: center;
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;  /* Añadido para que tenga los bordes redondeados del contenedor */
+}
+
+#jumpscare h1 {
+    font-size: 5rem;
+    margin: 0;
+    text-shadow: 0 0 20px red, 0 0 40px red;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+}
+
+#jumpscare p {
+    font-size: 2rem;
+    color: white;
+    margin-top: 20px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* Blood effect overlay */
+.blood-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,0,0,0.2);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 50;
+    transition: opacity 0.3s;
+}
+
+/* Controls instructions */
+.instructions {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    background: rgba(0,0,0,0.5);
+    padding: 5px;
+    border-radius: 3px;
+    z-index: 10;
+    width: auto;
+    text-align: center;
+}
+
+/* Health bar - top center */
+.health-bar {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 20px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.health-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, #ff0000, #00ff00);
+    transition: width 0.3s;
+}
+
+/* Fullscreen mode styles */
+.seccion-fullscreen {
+    width: 100% !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    z-index: 9999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    background-color: #000 !important;
+}
+
+/* Grid effect for fullscreen mode */
+.seccion-fullscreen::before {
+    content: '' !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%) !important;
+    background-size: 40px 40px !important;
+    opacity: 0.8 !important;
+    z-index: 0 !important;
+    animation: grid-move 60s linear infinite !important;
+    pointer-events: none !important;
+}
+
+.modo-fullscreen {
+    width: 100%;
+    height: 95vh;
+    margin: 0;
+    border-radius: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: #000 !important;
+    border: none;
+}
+
+/* Add grid effect to fullscreen mode */
+.modo-fullscreen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(to right, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%),
+        linear-gradient(to bottom, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.05) 50%, 
+            transparent 100%);
+    background-size: 40px 40px;
+    opacity: 0.8;
+    z-index: 0;
+    animation: grid-move 60s linear infinite;
+    pointer-events: none;
+}
+
+/* Button styles in fullscreen */
+.modo-fullscreen .btn {
+    height: 130px;
+    width: 130px;
+    margin: 10px;
+}
+
+/* Title styles in fullscreen */
+.modo-fullscreen #level-title {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+/* Header layout containers */
+.titulo-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 50%;
+}
+
+.botones-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 50%;
+}
+
+.modo-fullscreen .botones-superiores {
+    display: flex;
+    width: 100%;
+    padding: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Return button for non-fullscreen mode */
+.btn-regresar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 15;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Fullscreen button */
+.btn-pantalla-completa {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 15;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-height: 600px) {
+    .btn {
+        height: 80px;
+        width: 80px;
+    }
+    
+    .modo-fullscreen .btn {
+        height: 100px;
+        width: 100px;
+    }
+    
+    #level-title {
+        font-size: 2.5rem;
+    }
+    
+    .modo-fullscreen #level-title {
+        font-size: 3rem;
+    }
+}
+
+/* Additional adjustments for very small screens */
+@media (max-height: 480px) {
+    .btn {
+        height: 70px;
+        width: 70px;
+        margin: 3px;
+    }
+    
+    .modo-fullscreen .btn {
+        height: 85px;
+        width: 85px;
+    }
+    
+    #level-title {
+        font-size: 2rem;
+    }
+    
+    .modo-fullscreen #level-title {
+        font-size: 2.5rem;
+    }
+    
+    .container {
+        gap: 10px;
+        padding: 15px;
+    }
+}
+
+/* Sección principal del juego */
+.seccion-del_juego {
+    background-color: #000;
+    border: 2px solid var(--color-border);
+}
+

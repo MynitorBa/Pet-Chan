@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetChan - Presentación Interactiva</title>
+ 
+ 
+    <style>
+        /* Botón Salir integrado con el estilo existente */
+        .boton-salir {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #ff0000;
+            color: white;
+            border: 3px solid #ffcc00;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'VT323', monospace;
+            box-shadow: 0 0 15px rgba(255,0,0,0.7);
+            transition: all 0.3s ease;
+            z-index: 9999;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform-style: preserve-3d;
+            perspective: 500px;
+        }
+
+        .boton-salir:hover {
+            background-color: #ff3333;
+            transform: scale(1.1) translateZ(10px);
+            box-shadow: 0 0 20px rgba(255,0,0,0.9);
+        }
+
+        .boton-salir:active {
+            transform: scale(0.95);
+        }
+        
+        /* Efecto pixel para los bordes, consistente con el diseño actual */
+        .boton-salir::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            z-index: 1;
+        }
+        
+        .boton-salir::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            z-index: 1;
+        }
+    </style>
+
+    
+ <style>
+
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #2a0042;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(163, 4, 250, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(211, 4, 197, 0.3) 0%, transparent 25%);
+        }
+
+        /* Mundo abierto */
+        .world {
+            position: relative;
+            width: 3000px;
+            height: 2000px;
+            transform-origin: 0 0;
+            will-change: transform;
+        }
+
+        /* Estrellas y partículas */
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #cf7cfc;
+            border-radius: 50%;
+            opacity: 0.6;
+            z-index: 1;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Mascota del jugador */
+        .pet {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 100;
+            transition: transform 0.1s ease;
+            transform-origin: center;
+            cursor: pointer;
+            left: 1500px;
+            top: 1000px;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 10px rgba(211, 4, 197, 0.7));
+            will-change: left, top;
+        }
+        
+        /* Efecto de movimiento */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Diapositivas */
+        .slide {
+            position: absolute;
+            width: 800px; /* Aumentado de 600px */
+            height: 550px; /* Aumentado de 400px */
+            background-color: rgba(98, 2, 150, 0.95);
+            border: 4px solid #d304c5;
+            border-radius: 15px;
+            padding: 30px; /* Aumentado de 25px */
+            box-shadow: 0 0 30px rgba(163, 4, 250, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 10;
+            will-change: transform, box-shadow;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #a304fa, #d304c5, #a304fa);
+            z-index: -1;
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide:hover::before {
+            opacity: 0.7;
+        }
+
+        .slide.active {
+            box-shadow: 0 0 50px rgba(163, 4, 250, 1);
+            transform: scale(1.05);
+            z-index: 50;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .slide-title {
+            font-size: 2.5rem; /* Aumentado de 2.2rem */
+            color: #fff;
+            text-shadow: 0 0 10px #a304fa, 0 0 20px #a304fa;
+            margin-bottom: 25px; /* Aumentado de 20px */
+            transition: all 0.3s ease;
+        }
+
+        .slide.active .slide-title {
+            transform: scale(1.1);
+            text-shadow: 0 0 15px #a304fa, 0 0 30px #a304fa;
+        }
+
+        .slide-content {
+            font-size: 1.5rem; /* Aumentado de 1.4rem */
+            color: #cf7cfc;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            margin-bottom: 25px; /* Aumentado de 20px */
+        }
+
+        .slide-img {
+            max-width: 230px; /* Aumentado de 200px */
+            max-height: 230px; /* Aumentado de 200px */
+            margin: 15px 0; /* Aumentado de 10px */
+            border-radius: 12px; /* Aumentado de 10px */
+            border: 2px solid #a304fa;
+            transition: all 0.3s ease;
+        }
+
+        .slide.active .slide-img {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(163, 4, 250, 0.8);
+        }
+
+        .slide ul {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(4px);
+        }
+        .slide li {
+            padding: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #cf7cfc;
+        }
+
+
+        .slide li:before {
+            position: absolute;
+            left: 0;
+            color: #d304c5;
+        }
+
+        /* Controles */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(98, 2, 150, 0.8);
+            border: 2px solid #d304c5;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 150;
+            box-shadow: 0 0 15px rgba(163, 4, 250, 0.5);
+        }
+
+        .controls p {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #cf7cfc;
+        }
+
+        /* Mini mapa */
+        .minimap {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px; /* Aumentado de 150px */
+            height: 140px; /* Aumentado de 100px */
+            background-color: rgba(98, 2, 150, 0.8);
+            border: 2px solid #d304c5;
+            border-radius: 10px;
+            z-index: 150;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(163, 4, 250, 0.5);
+        }
+
+        .minimap-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-origin: center;
+            transform: scale(1); /* Ajustado para centrar correctamente */
+        }
+
+        .minimap-slide {
+            position: absolute;
+            width: 16px; /* Aumentado de 12px */
+            height: 11px; /* Aumentado de 8px */
+            background-color: #d304c5;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .minimap-slide.active {
+            background-color: #fff;
+            box-shadow: 0 0 5px #fff;
+        }
+
+        .minimap-pet {
+            position: absolute;
+            width: 8px; /* Aumentado de 6px */
+            height: 8px; /* Aumentado de 6px */
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #fff;
+            z-index: 10;
+        }
+
+        /* Partículas de efecto */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 4;
+            animation: particleFade 1s forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes particleFade {
+            0% { opacity: 0.8; }
+            100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0.5); }
+        }
+
+        /* Elementos decorativos */
+        .decoration {
+            position: absolute;
+            z-index: 2;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .circle {
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a304fa 0%, #d304c5 100%);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .diamond {
+            width: 30px;
+            height: 30px;
+            background: #a304fa;
+            transform: rotate(45deg);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .hexagon {
+            width: 60px;
+            height: 35px;
+            background: linear-gradient(135deg, rgba(163, 4, 250, 0.6) 0%, rgba(211, 4, 197, 0.6) 100%);
+            position: relative;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        /* Líneas conectivas */
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(163, 4, 250, 0.5), rgba(211, 4, 197, 0.5));
+            transform-origin: 0 0;
+            z-index: 1;
+            animation: linePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Efecto de aura */
+        .aura {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(163, 4, 250, 0.3);
+            animation: auraExpand 4s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes auraExpand {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* Paleta de colores */
+        .color-palette {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .micro_mascota{
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+    </style>
+</head>
+<body>
+
+            <!-- Botón de Salir añadido -->
+            <a href="/inicio" class="boton-salir">
+                <span style="font-size: 18px; margin-right: 5px;">⇦</span> SALIR
+            </a>
+        
+            
+    <!-- Mundo abierto -->
+    <div class="world" id="world">
+
+        <!-- Imagenes decorativas repartidas por el mundos  -->
+        <img src="imagenes_presentacion/pres1.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 700px;
+        left: 100px; top: 100px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres2.png" S
+        style="z-index: 100;
+        position: absolute;
+        width: 700px;
+        left: 2100px; top: 100px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres3.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 700px;
+        left: 1550px; top: -255px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres4.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 700px;
+        left: 750px; top: -255px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres5.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 500px;
+        left: -450px; top: 1100px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres6.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 700px;
+        left: 350px; top: 1800px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres7.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 500px;
+        left: -450px; top: 530px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres8.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 500px;
+        left: 2900px; top: 1100px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres9.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 500px;
+        left: 2900px; top: 600px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres10.png" 
+        style="z-index: 100;
+        position: absolute;
+        width: 700px;
+        left: 1950px; top: 1800px;
+        border-radius: 50px;
+        border: solid 3px #d304c5;
+        box-shadow: 0 0 10px #d304c5;">
+
+        <img src="imagenes_presentacion/pres13.webp" 
+        style="z-index: 100;
+        position: absolute;
+        width: 200px;
+        left: 1000px; top: 1150px;">
+
+        <h1
+        style="z-index: 100;
+        position: absolute;
+        width: 150px;
+        left: 1030px; top: 1290px;
+        text-align: center;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        text-shadow: 0 0 10px #d304c5, 
+                 0 0 20px #d304c5, 
+                 0 0 30px #d304c5;"
+        class="active">
+        Gonzalez Manuel
+        </h1>
+
+        <img src="imagenes_presentacion/pres12.webp" 
+        style="z-index: 100;
+        position: absolute;
+        width: 170px;
+        left: 1420px; top: 1175px;"
+        class="active">
+
+        <h1
+        style="z-index: 100;
+        position: absolute;
+        width: 150px;
+        left: 1420px; top: 1320px;
+        text-align: center;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        text-shadow: 0 0 10px #d304c5, 
+                 0 0 20px #d304c5, 
+                 0 0 30px #d304c5;"
+        class="active">
+        Navichoque David
+        </h1>
+
+        <img src="imagenes_presentacion/pres11.webp" 
+        style="z-index: 100;
+        position: absolute;
+        width: 150px;
+        left: 1800px; top: 1150px;"
+        class="active">
+
+        <h1
+        style="z-index: 100;
+        position: absolute;
+        width: 150px;
+        left: 1800px; top: 1290px;
+        text-align: center;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        text-shadow: 0 0 10px #d304c5, 
+                 0 0 20px #d304c5, 
+                 0 0 30px #d304c5;"
+        class="active">
+        Barrios Mynor
+        </h1>
+
+
+        <!-- Diapositiva 1: Introducción (Centro) -->
+        <div class="slide active" id="slide-1" style="left: 1100px; top: 725px;">
+            <h1 class="slide-title">🌟 BIENVENIDO A PETCHAN 🌟</h1>
+            <p class="slide-content">Explora un mundo brillante lleno de mascotas mágicas y muchas aventuras</p>
+            <img src="/imagenes_y_gif/logo.png" alt="Logo PetChan" class="slide-img">
+            <p class="slide-content">✨ Adopta, cuida y evoluciona tu mascota como nunca antes</p>
+            <p class="slide-content">🌈 Aventuras, juegos y amistad te esperan en el foro Pet-Chan</p>
+        </div>
+
+       <!-- Diapositiva 2: ¿Qué es PetChan? -->
+        <div class="slide" id="slide-2" style="left: 1100px; top: 100px;">
+            <h1 class="slide-title">🐾 ¿QUÉ ES PETCHAN?</h1>
+            <p class="slide-content">Un foro digital donde las mascotas cobran vida:</p>
+            <ul style="text-align: left;">
+                <li>✨ Crea vínculos con criaturas únicas y adorables</li>
+                <li>🎮 Vive experiencias interactivas en nuestro foro</li>
+                <li>🎨 Personaliza cada aspecto de tu compañero virtual</li>
+                <li>🌐 Comparte momentos con otros usuarios y sus mascotas</li>
+                <li>🎁 Participa en toda clase de eventos y gana premios</li>
+            </ul>
+            <p class="slide-content">¡Tu historia comienza aquí y es completamente tuya! 💫</p>
+        </div>
+
+        <!-- Diapositiva 3: Características -->
+        <div class="slide" id="slide-3" style="left: 2000px; top: 500px;">
+            <h1 class="slide-title">✨ LAS INFINITAS POSIBILIDADES</h1>
+            <ul style="text-align: left;">
+                <li>🎭 Infinidad de mascotas divertidas y unicas</li>
+                <li>🌱 Evoluciones dinámicas que se adaptan a ti</li>
+                <li>🎉 Eventos super divertidos con premios increíbles</li>
+                <li>👗 Accesorios mágica con efectos visuales</li>
+                <li>🔄 Intercambios y batallas en tiempo real con otros jugadores</li>
+                <li>🚪 Mundos temáticos que cambian constantemente</li>
+            </ul>
+            <p class="slide-content">💥 ¡Una experiencia siempre fresca, siempre tuya!</p>
+        </div>
+
+        <!-- Diapositiva 4: Mascotas -->
+        <div class="slide" id="slide-4" style="left: 2000px; top: 1100px;">
+            <h1 class="slide-title">🐉 MASCOTAS ENCANTADAS</h1>
+            <p class="slide-content">Cada mascota es el corazón de Pet-Chan:</p>
+            <ul style="text-align: left;">
+                <li>🔥 Cada mascota esconde una evolucion unica y divertida</li>
+                <li>🪄 Puedes darle su alimento favorito, diferente para cada mascota</li>
+                <li>⚓ Dale un estilo unico a tu mascota y prepara su corral</li>
+                <li>🦊 Obten más mascotas en el pachinko, tendras muchos amigos más</li>
+                <li>🦉 Puedes cuidar a la mascota de tu amigo mediante el intercambio</li>
+            </ul>
+            <p class="slide-content">🌟 ¡Puedes divertirte con tus amiguitos como tu desees!</p>
+        </div>
+
+        <!-- Diapositiva 5: Minijuegos -->
+        <div class="slide" id="slide-5" style="left: 1100px; top: 1400px;">
+            <h1 class="slide-title">🎲 Opciones MÁGICOS</h1>
+            <p class="slide-content">Retos y aventuras en cada esquina del mundo:</p>
+            <ul style="text-align: left;">
+                <li>🔮 Adopción: Cuando entres a pet-chan un misterioso regalo te dara a tu nuevo amigo</li>
+                <li>🌀 Eventos magicos: Participa en eventos unicos con la comunidad</li>
+                <li>🌿 Comunidades: Se parte de una comunidad unica en el foro de Pet-chan</li>
+                <li>✨ Batallas amistosas e Intercambios: Es momento de conectar mucho más con amigos</li>
+                <li>🍳 pachinko de Mascotas: ses momento de que puedas adoptar a muchas más mascotas</li>
+            </ul>
+            <p class="slide-content">🎖️ ¡Juega, gana y evoluciona junto a tu amigo mágico!</p>
+        </div>
+
+        <!-- Diapositiva 6: Diseño Visual -->
+        <div class="slide" id="slide-6" style="left: 100px; top: 1100px;">
+            <h1 class="slide-title">🎨 ARTE Y ATMÓSFERA</h1>
+
+            <div style="display: grid;
+            grid-template-columns: 1fr 1fr; /* Dos columnas de igual tamaño */
+            gap: 20px;">
+
+                <div>
+                    <p class="slide-content">Colores que despiertan la imaginación:</p>
+                    <div class="color-palette">
+                        <div class="color-box" style="background: #2a0042; border-color: #a304fa;"></div>
+                        <div class="color-box" style="background: #a304fa;"></div>
+                        <div class="color-box" style="background: #d304c5;"></div>
+                        <div class="color-box" style="background: #cf7cfc;"></div>
+                    </div>
+
+                    <ul style="text-align: left;">
+                        <li>🌌 Morado profundo: el sueño en su máxima expresión</li>
+                        <li>💜 Lila brillante: creatividad y energía</li>
+                        <li>🌸 Rosa mágico: calidez y alegría compartida</li>
+                        <li>🪻 Lavanda suave: equilibrio visual y emocional</li>
+                    </ul>
+                </div>
+
+
+                <div>
+                    <p class="slide-content">Efectos y ambientaciones que te sumergen en el Foro:</p>
+                    
+                    <div style="width: 50px; height: 26px;">
+                    </div>
+
+                    <ul style="text-align: left;">
+                        <li>✨ Partículas mágicas que reaccionan a tu paso</li>
+                        <li>💫 Brillos dinámicos y reflejos fantásticos</li>
+                        <li>🎞️ Animaciones suaves que dan vida</li>
+                        <li>🌠 Cambios de escena llenos de encanto</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Diapositiva 7: Comunidad -->
+        <div class="slide" id="slide-7" style="left: 100px; top: 500px;">
+            <h1 class="slide-title">🌍 LA COMUNIDAD PETCHAN</h1>
+            <p class="slide-content">Conecta con otros soñadores del mundo mágico:</p>
+
+            <p class="slide-content">💫 ¡La magia crece cuando la compartimos, TE ESPERAMOS!</p>
+        </div>
+
+        <!-- Mascota del jugador -->
+        <img src="<%= rutaImagen %>" alt="Tu mascota" class="pet micro_mascota" id="player-pet">
+
+        <!-- Elementos decorativos -->
+        <div class="decoration hexagon" style="left: 1000px; top: 400px; animation-delay: 0.2s;"></div>
+        <div class="decoration hexagon" style="left: 1400px; top: 1200px; animation-delay: 0.4s;"></div>
+        <div class="decoration hexagon" style="left: 2000px; top: 800px; animation-delay: 0.6s;"></div>
+        <div class="decoration hexagon" style="left: 600px; top: 800px; animation-delay: 0.8s;"></div>
+        
+        <div class="decoration circle" style="width: 60px; height: 60px; left: 500px; top: 300px;"></div>
+        <div class="decoration circle" style="width: 40px; height: 40px; left: 2400px; top: 600px;"></div>
+        <div class="decoration circle" style="width: 50px; height: 50px; left: 1200px; top: 1700px;"></div>
+        
+        <div class="decoration diamond" style="left: 700px; top: 1200px;"></div>
+        <div class="decoration diamond" style="left: 2100px; top: 400px;"></div>
+        <div class="decoration diamond" style="left: 1600px; top: 1500px;"></div>
+
+        <!-- Auras -->
+        <div class="decoration aura" style="width: 100px; height: 100px; left: 1250px; top: 850px;"></div>
+        <div class="decoration aura" style="width: 100px; height: 100px; left: 1250px; top: 850px; animation-delay: 1s;"></div>
+        <div class="decoration aura" style="width: 100px; height: 100px; left: 1250px; top: 850px; animation-delay: 2s;"></div>
+
+        <!-- Líneas conectivas (generadas dinámicamente) -->
+    </div>
+
+
+    <!-- Mini mapa -->
+    <div class="minimap">
+        <div class="minimap-content" id="minimap-content">
+            <!-- El mapa se generará dinámicamente -->
+        </div>
+    </div>
+
+    
+
+    <script>
+        // Referencias a elementos
+        const world = document.getElementById('world');
+        const playerPet = document.getElementById('player-pet');
+        const slides = document.querySelectorAll('.slide');
+        const minimapContent = document.getElementById('minimap-content');
+
+        // Configuración
+        const worldWidth = 3000;
+        const worldHeight = 2000;
+        const petSpeed = 12; // Aumentado para mayor fluidez
+        const worldScale = 1.2; // Mayor acercamiento (antes 0.8)
+        let activeSlide = null;
+        let lastActiveSlide = null;
+        let lastTime = 0;
+        const frameRate = 60;
+        const frameInterval = 1000 / frameRate;
+
+        // Estado del juego
+        const gameState = {
+            petX: 1500,
+            petY: 1000,
+            keysPressed: {},
+            worldScale: worldScale,
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight
+        };
+
+        // Optimización: Partículas agrupadas
+        const particlesContainer = document.createElement('div');
+        particlesContainer.id = 'particles-container';
+        particlesContainer.style.position = 'absolute';
+        particlesContainer.style.width = '100%';
+        particlesContainer.style.height = '100%';
+        particlesContainer.style.pointerEvents = 'none';
+        particlesContainer.style.zIndex = '4';
+        world.appendChild(particlesContainer);
+
+        // Crear estrellas de fondo
+        function createStars() {
+            const starsCount = 200;
+            const fragment = document.createDocumentFragment();
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                star.style.left = `${Math.random() * worldWidth}px`;
+                star.style.top = `${Math.random() * worldHeight}px`;
+                
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                
+                fragment.appendChild(star);
+            }
+            
+            world.appendChild(fragment);
+        }
+
+        // Crear líneas conectivas
+        function createConnectionLines() {
+            const centerX = 1100 + 400; // Ajustado para las nuevas dimensiones de diapositivas
+            const centerY = 725 + 275; // Ajustado para las nuevas dimensiones de diapositivas
+            const fragment = document.createDocumentFragment();
+            
+            slides.forEach((slide, index) => {
+                if (index === 0) return;
+                
+                const slideLeft = parseFloat(slide.style.left);
+                const slideTop = parseFloat(slide.style.top);
+                const slideCenterX = slideLeft + 400; // Ajustado para las nuevas dimensiones
+                const slideCenterY = slideTop + 275; // Ajustado para las nuevas dimensiones
+                
+                const dx = slideCenterX - centerX;
+                const dy = slideCenterY - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                
+                const line = document.createElement('div');
+                line.classList.add('connection-line');
+                line.style.width = `${distance}px`;
+                line.style.left = `${centerX}px`;
+                line.style.top = `${centerY}px`;
+                line.style.transform = `rotate(${angle}rad)`;
+                line.style.animationDelay = `${index * 0.2}s`;
+                
+                fragment.appendChild(line);
+            });
+            
+            world.appendChild(fragment);
+        }
+
+        // Actualizar la posición de la mascota (optimizado)
+        function updatePetPosition(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            
+            if (deltaTime >= frameInterval) {
+                let moveX = 0;
+                let moveY = 0;
+                
+                if (gameState.keysPressed['ArrowUp'] || gameState.keysPressed['w'] || gameState.keysPressed['W']) {
+                    moveY -= petSpeed;
+                }
+                if (gameState.keysPressed['ArrowDown'] || gameState.keysPressed['s'] || gameState.keysPressed['S']) {
+                    moveY += petSpeed;
+                }
+                if (gameState.keysPressed['ArrowLeft'] || gameState.keysPressed['a'] || gameState.keysPressed['A']) {
+                    moveX -= petSpeed;
+                    playerPet.style.transform = 'scaleX(-1)';
+                }
+                if (gameState.keysPressed['ArrowRight'] || gameState.keysPressed['d'] || gameState.keysPressed['D']) {
+                    moveX += petSpeed;
+                    playerPet.style.transform = 'scaleX(1)';
+                }
+                
+                if (moveX !== 0 && moveY !== 0) {
+                    moveX *= 0.7;
+                    moveY *= 0.7;
+                }
+                
+                gameState.petX = Math.max(40, Math.min(worldWidth - 40, gameState.petX + moveX));
+                gameState.petY = Math.max(40, Math.min(worldHeight - 40, gameState.petY + moveY));
+                
+                playerPet.style.left = `${gameState.petX}px`;
+                playerPet.style.top = `${gameState.petY}px`;
+                
+                  if (moveX !== 0 || moveY !== 0) {
+                    playerPet.style.animation = 'bounce 0.3s infinite';
+                } else {
+                    playerPet.style.animation = '';
+                }
+                
+                updateCameraPosition();
+                updateActiveSlide();
+                updateMinimap();
+                
+                lastTime = timestamp;
+            }
+            
+            requestAnimationFrame(updatePetPosition);
+        }
+
+        // Actualizar posición de la cámara centrando en la mascota
+        function updateCameraPosition() {
+            const cameraX = gameState.petX - gameState.viewportWidth / (2 * gameState.worldScale);
+            const cameraY = gameState.petY - gameState.viewportHeight / (2 * gameState.worldScale);
+            
+            world.style.transform = `scale(${gameState.worldScale}) translate(${-cameraX}px, ${-cameraY}px)`;
+        }
+
+        // Actualizar diapositiva activa basada en la proximidad
+        function updateActiveSlide() {
+            let nearestSlide = null;
+            let nearestDistance = Infinity;
+            
+            slides.forEach(slide => {
+                const slideLeft = parseFloat(slide.style.left);
+                const slideTop = parseFloat(slide.style.top);
+                const slideCenterX = slideLeft + 400;
+                const slideCenterY = slideTop + 275;
+                
+                const dx = slideCenterX - gameState.petX;
+                const dy = slideCenterY - gameState.petY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 300 && distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestSlide = slide;
+                }
+            });
+            
+            // Actualizar clases CSS solo si hay cambio
+            if (nearestSlide !== activeSlide) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                
+                if (nearestSlide) {
+                    nearestSlide.classList.add('active');
+                    
+                    // Efecto de partículas solo si cambió la diapositiva activa
+                    if (lastActiveSlide !== nearestSlide) {
+                        createActivationParticles(nearestSlide);
+                    }
+                }
+                
+                lastActiveSlide = activeSlide;
+                activeSlide = nearestSlide;
+                
+                updateMinimapHighlight();
+            }
+        }
+
+        // Crear el mini mapa
+        function createMinimap() {
+            // Factor de escala para el mini mapa
+            const minimapScale = 0.067;
+            
+            // Crear elementos del mini mapa
+            slides.forEach((slide, index) => {
+                const slideLeft = parseFloat(slide.style.left);
+                const slideTop = parseFloat(slide.style.top);
+                
+                const minimapSlide = document.createElement('div');
+                minimapSlide.classList.add('minimap-slide');
+                minimapSlide.dataset.index = index;
+                
+                // Posicionar en el mini mapa según la posición en el mundo
+                minimapSlide.style.left = `${slideLeft * minimapScale-2.7+20}px`;
+                minimapSlide.style.top = `${slideTop * minimapScale+15}px`;
+                
+                minimapContent.appendChild(minimapSlide);
+            });
+            
+            // Crear indicador de mascota en el mini mapa
+            const minimapPet = document.createElement('div');
+            minimapPet.classList.add('minimap-pet');
+            minimapPet.id = 'minimap-pet';
+            minimapContent.appendChild(minimapPet);
+        }
+
+        // Actualizar posición de la mascota en el mini mapa
+        function updateMinimap() {
+            const minimapPet = document.getElementById('minimap-pet');
+            const minimapScale = 0.067;
+            
+            minimapPet.style.left = `${gameState.petX * minimapScale-25+20}px`;
+            minimapPet.style.top = `${gameState.petY * minimapScale-18+15}px`;
+        }
+
+        // Actualizar resaltado en el mini mapa
+        function updateMinimapHighlight() {
+            const minimapSlides = document.querySelectorAll('.minimap-slide');
+            
+            minimapSlides.forEach((minimapSlide, index) => {
+                if (slides[index] === activeSlide) {
+                    minimapSlide.classList.add('active');
+                } else {
+                    minimapSlide.classList.remove('active');
+                }
+            });
+        }
+
+        // Crear partículas alrededor de las diapositivas activas
+        function createActivationParticles(slide) {
+            const slideLeft = parseFloat(slide.style.left);
+            const slideTop = parseFloat(slide.style.top);
+            const slideWidth = 800;
+            const slideHeight = 550;
+            
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                // Posición aleatoria alrededor del borde de la diapositiva
+                const side = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+                let posX, posY;
+                
+                switch (side) {
+                    case 0: // top
+                        posX = slideLeft + Math.random() * slideWidth;
+                        posY = slideTop;
+                        break;
+                    case 1: // right
+                        posX = slideLeft + slideWidth;
+                        posY = slideTop + Math.random() * slideHeight;
+                        break;
+                    case 2: // bottom
+                        posX = slideLeft + Math.random() * slideWidth;
+                        posY = slideTop + slideHeight;
+                        break;
+                    case 3: // left
+                        posX = slideLeft;
+                        posY = slideTop + Math.random() * slideHeight;
+                        break;
+                }
+                
+                // Crear partícula
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Colores aleatorios temáticos
+                const colors = ['#a304fa', '#d304c5', '#cf7cfc'];
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Posición inicial
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                
+                // Dirección aleatoria para moverse
+                const randomX = (Math.random() - 0.5) * 50;
+                const randomY = (Math.random() - 0.5) * 50;
+                particle.style.setProperty('--x', `${randomX}px`);
+                particle.style.setProperty('--y', `${randomY}px`);
+                
+                particlesContainer.appendChild(particle);
+                
+                // Eliminar después de animación
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+
+        // Efecto de clic para la mascota
+        function petClickEffect() {
+            const particleCount = 30;
+            
+            // Sonido de clic (opcional)
+            // const clickSound = new Audio('path/to/sound.mp3');
+            // clickSound.play();
+            
+            // Animar la mascota
+            playerPet.style.animation = 'pulse 0.5s';
+            setTimeout(() => {
+                playerPet.style.animation = '';
+            }, 500);
+            
+            // Crear partículas radiales
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (i / particleCount) * Math.PI * 2;
+                const distance = 30;
+                
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Colores aleatorios temáticos
+                const colors = ['#a304fa', '#d304c5', '#cf7cfc', '#fff'];
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Posición inicial (centro de la mascota)
+                particle.style.left = `${gameState.petX}px`;
+                particle.style.top = `${gameState.petY}px`;
+                
+                // Dirección basada en ángulo
+                const moveX = Math.cos(angle) * distance;
+                const moveY = Math.sin(angle) * distance;
+                particle.style.setProperty('--x', `${moveX}px`);
+                particle.style.setProperty('--y', `${moveY}px`);
+                
+                particlesContainer.appendChild(particle);
+                
+                // Eliminar después de animación
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Teclado
+            window.addEventListener('keydown', (e) => {
+                gameState.keysPressed[e.key] = true;
+            });
+            
+            window.addEventListener('keyup', (e) => {
+                gameState.keysPressed[e.key] = false;
+            });
+            
+            // Clic en la mascota
+            playerPet.addEventListener('click', petClickEffect);
+            
+            // Redimensionar ventana
+            window.addEventListener('resize', () => {
+                gameState.viewportWidth = window.innerWidth;
+                gameState.viewportHeight = window.innerHeight;
+                updateCameraPosition();
+            });
+        }
+
+        // Inicialización
+        function init() {
+            createStars();
+            createConnectionLines();
+            createMinimap();
+            setupEventListeners();
+            
+            // Iniciar animación
+            requestAnimationFrame(updatePetPosition);
+            
+            // Agregar evento de carga
+            window.addEventListener('load', () => {
+                // Establecer posición inicial
+                playerPet.style.left = `${gameState.petX}px`;
+                playerPet.style.top = `${gameState.petY}px`;
+                
+                // Actualizar la cámara
+                updateCameraPosition();
+                
+                // Activar la diapositiva central inicialmente
+                document.getElementById('slide-1').classList.add('active');
+                updateMinimapHighlight();
+            });
+        }
+
+        // Iniciar aplicación
+        init();
+    </script>
+</body>

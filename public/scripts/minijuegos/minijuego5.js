@@ -1,8 +1,13 @@
 // Game board dimensions
-const ROWS = 20;
-const COLS = 10;
-const CELL_SIZE = 28;
+const ROWS = 20; // NO CAMBIAR
+const COLS = 10; // NO CAMBIAR
 
+// SOLO CAMBIAR ESTA LÍNEA:
+// CAMBIAR ESTA CONSTANTE
+const CELL_SIZE = 42; // Era 28, ahora 42
+
+// CREAR UNA NUEVA CONSTANTE PARA PREVIEW CELLS
+const PREVIEW_CELL_SIZE = 27; // Era 18, ahora 27
 // Game state variables
 let board = Array.from(Array(ROWS), () => Array(COLS).fill(0));
 let gameActive = false;
@@ -482,20 +487,17 @@ function getNewPiece() {
 }
 
 // Display the next piece
+// FRAGMENTO 1: Función displayNextPiece() COMPLETA
 function displayNextPiece() {
     // Clear next piece display
     while (nextPieceElement.firstChild) {
         nextPieceElement.removeChild(nextPieceElement.firstChild);
     }
     
-    // Center the piece in the next piece area
-    const centerX = 100;
-    const centerY = 75;
-    
     // Get the shape of the next piece
     const shape = SHAPES[nextPiece.shape][0];
     
-    // Calculate offset for centering
+    // Calculate bounding box
     let minX = 4, maxX = 0, minY = 4, maxY = 0;
     for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
@@ -508,10 +510,19 @@ function displayNextPiece() {
         }
     }
     
+    // Calculate actual width and height
     const width = maxX - minX + 1;
     const height = maxY - minY + 1;
-    const offsetX = centerX - (width * 10);
-    const offsetY = centerY - (height * 10);
+    
+    // Center calculation (ajustado para el contenedor más grande)
+    const containerWidth = 300; // Ancho del contenedor next-piece
+    const containerHeight = 160; // Alto del contenedor next-piece
+    
+    const totalWidth = width * PREVIEW_CELL_SIZE;
+    const totalHeight = height * PREVIEW_CELL_SIZE;
+    
+    const centerX = (containerWidth - totalWidth) / 2;
+    const centerY = (containerHeight - totalHeight) / 2;
     
     // Draw the next piece
     for (let y = 0; y < shape.length; y++) {
@@ -519,14 +530,20 @@ function displayNextPiece() {
             if (shape[y][x]) {
                 const cell = document.createElement('div');
                 cell.className = 'preview-cell';
-                cell.style.left = (offsetX + x * 20) + 'px';
-                cell.style.top = (offsetY + y * 20) + 'px';
+                
+                // Posición corregida
+                const cellX = centerX + (x - minX) * PREVIEW_CELL_SIZE;
+                const cellY = centerY + (y - minY) * PREVIEW_CELL_SIZE;
+                
+                cell.style.left = cellX + 'px';
+                cell.style.top = cellY + 'px';
                 cell.style.backgroundColor = COLORS[nextPiece.shape];
                 nextPieceElement.appendChild(cell);
             }
         }
     }
 }
+
 
 // Hold the current piece
 function holdCurrentPiece() {
@@ -594,14 +611,10 @@ function displayHoldPiece() {
     
     if (holdPiece === null) return;
     
-    // Center the piece in the hold area
-    const centerX = 100;
-    const centerY = 75;
+    // Get the shape of the hold piece (always rotation 0)
+    const shape = SHAPES[holdPiece.shape][0];
     
-    // Get the shape of the hold piece
-    const shape = SHAPES[holdPiece.shape][0]; // Always display in rotation 0
-    
-    // Calculate offset for centering
+    // Calculate bounding box
     let minX = 4, maxX = 0, minY = 4, maxY = 0;
     for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
@@ -614,10 +627,19 @@ function displayHoldPiece() {
         }
     }
     
+    // Calculate actual width and height
     const width = maxX - minX + 1;
     const height = maxY - minY + 1;
-    const offsetX = centerX - (width * 10);
-    const offsetY = centerY - (height * 10);
+    
+    // Center calculation (ajustado para el contenedor más grande)
+    const containerWidth = 300; // Ancho del contenedor hold-piece
+    const containerHeight = 160; // Alto del contenedor hold-piece
+    
+    const totalWidth = width * PREVIEW_CELL_SIZE;
+    const totalHeight = height * PREVIEW_CELL_SIZE;
+    
+    const centerX = (containerWidth - totalWidth) / 2;
+    const centerY = (containerHeight - totalHeight) / 2;
     
     // Draw the hold piece
     for (let y = 0; y < shape.length; y++) {
@@ -625,20 +647,17 @@ function displayHoldPiece() {
             if (shape[y][x]) {
                 const cell = document.createElement('div');
                 cell.className = 'preview-cell';
-                cell.style.left = (offsetX + x * 20) + 'px';
-                cell.style.top = (offsetY + y * 20) + 'px';
+                
+                // Posición corregida
+                const cellX = centerX + (x - minX) * PREVIEW_CELL_SIZE;
+                const cellY = centerY + (y - minY) * PREVIEW_CELL_SIZE;
+                
+                cell.style.left = cellX + 'px';
+                cell.style.top = cellY + 'px';
                 cell.style.backgroundColor = COLORS[holdPiece.shape];
                 holdPieceElement.appendChild(cell);
             }
         }
-    }
-    
-    // Add a key hint if hold is available
-    if (canHold) {
-        const keyHint = document.createElement('div');
-        keyHint.className = 'key-hint';
-        keyHint.textContent = 'C';
-        holdPieceElement.appendChild(keyHint);
     }
 }
 

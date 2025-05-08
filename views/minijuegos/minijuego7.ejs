@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Orbitron|Rajdhani:700" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/minijuego/minijuego7.css">
+
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+    <canvas id="minimap" class="minimap" width="150" height="150"></canvas>
+    <div class="crosshair">+</div>
+    
+    <div class="hud">
+        <div class="hud-item">Ammo: <span id="ammoCount">6</span></div>
+        <div class="hud-item">Fruits: <span id="fruitCount">0</span>/5</div>
+        <div class="hud-item">Cauldron: <span id="cauldronCount">0</span>/5</div>
+        <div class="hud-item">Battery: <span id="batteryLevel">100</span>%</div>
+    </div>
+    
+    <div class="alert" id="enemyAlert">¡ENEMY DETECTED!</div>
+    
+    <div class="radar">
+        <div class="radar-indicator" id="radarIndicator"></div>
+    </div>
+    
+    <div class="objective">
+        <div>Collect all fruits and deposit them in the cauldron</div>
+        <div>Avoid the creature!</div>
+    </div>
+    
+    <div class="health-bar">
+        <div class="health-fill" id="healthBar"></div>
+    </div>
+    
+    <div id="winMessage">
+        You Won! Press E to play again
+    </div>
+    
+    <div id="jumpscare">
+        <h1>MURISTE</h1>
+        <p>Reiniciando nivel...</p>
+    </div>
+    
+    <div class="blood-effect" id="bloodEffect"></div>
+    
+    <div class="instructions">
+        ARROWS: Move | SPACE: Shoot | E: New Level | Z: Deposit | X: Flashlight | F: Pickup Ammo
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="screamSound" preload="auto">
+        <source src="https://www.soundjay.com/human/sounds/scream-01.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="gunSound" preload="auto">
+        <source src="archivos_de_minijuegos/sounds/disparo.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="emptyGunSound" preload="auto">
+        <source src="https://www.soundjay.com/mechanical/sounds/gun-empty-sound-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="footstepSound" preload="auto" loop>
+        <source src="https://www.soundjay.com/footsteps/sounds/footsteps-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="enemyDetectedSound" preload="auto">
+        <source src="https://www.soundjay.com/human/sounds/dramatic-piano-2.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="chaseMusic" preload="auto" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c9a4a1d812.mp3?filename=dark-ambient-soundscape-horror-scary-creepy-cinematic-background-music-7773.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="collectSound" preload="auto">
+        <source src="https://www.soundjay.com/button/sounds/button-09a.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="backgroundMusic" preload="auto" loop>
+        <source src="archivos_de_minijuegos/sounds/musica.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="heartbeatSound" preload="auto" loop>
+        <source src="archivos_de_minijuegos/sounds/pasosmonstruo.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="reloadSound" preload="auto">
+        <source src="https://www.soundjay.com/mechanical/sounds/gun-reload-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="damageSound" preload="auto">
+        <source src="https://www.soundjay.com/human/sounds/pain-1.mp3" type="audio/mpeg">
+    </audio>
+    <script src="scripts/minijuegos/minijuego7.js"></script>
+
+  </body>
+</html> 
+
+
