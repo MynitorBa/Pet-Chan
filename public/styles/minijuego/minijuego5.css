@@ -3,27 +3,53 @@
     src: url('https://cdnjs.cloudflare.com/ajax/libs/PressStart2P/1.0.0/PressStart2P.woff') format('woff');
 }
 
-/* Ajustes para el contenedor principal del juego - adaptado para seccion-del_juego */
+/* Variables globales para facilitar consistencia */
+:root {
+    --color-bg: rgba(25, 15, 35, 0.9);
+    --color-border: #cf7cfc;
+    --color-cyan: #56dcff;
+    --color-purple: #b270ff;
+    --color-pink: #ff9edb;
+    --gradient-primary: linear-gradient(45deg, #56dcff, #b270ff, #56dcff);
+    --gradient-secondary: linear-gradient(45deg, #b270ff, #56dcff, #b270ff);
+    --shadow-primary: 0 0 10px rgba(86, 220, 255, 0.7);
+    --shadow-secondary: 0 0 10px rgba(178, 112, 255, 0.7);
+}
+
+/* Sección principal del juego */
+.seccion-del_juego {
+    width: 100%;
+    min-height: 500px;
+    background: var(--color-bg);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(163, 4, 250, 0.4);
+    border: 2px solid var(--color-border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Contenedor principal del juego - Control absoluto de alineación */
 .game-container {
     display: flex;
-    gap: 20px;
-    margin: 10px auto;
-    position: relative;
-    z-index: 5;
     justify-content: center;
-    max-width: 100%;
-    overflow: visible;
+    align-items: flex-start; /* Alinea desde arriba */
+    gap: 20px;
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
     padding: 10px;
     box-sizing: border-box;
     font-family: 'Press Start 2P', monospace;
+    position: relative;
 }
 
-/* Panel izquierdo */
-.left-panel {
-    order: -1;
-}
-
-/* Tablero principal del juego - dimensiones adaptadas */
+/* Estilos del tablero */
 .board {
     width: 280px;
     height: 560px;
@@ -31,18 +57,18 @@
     border: 4px solid #222;
     position: relative;
     box-shadow: 
-        0 0 10px rgba(86, 220, 255, 0.7),
-        0 0 20px rgba(178, 112, 255, 0.5),
+        var(--shadow-primary),
+        var(--shadow-secondary),
         inset 0 0 15px rgba(86, 220, 255, 0.3);
-    border-image: linear-gradient(45deg, #56dcff, #b270ff, #56dcff) 1;
-    backdrop-filter: blur(5px);
-    margin: 0 15px;
+    border-image: var(--gradient-primary) 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    z-index: 5;
 }
 
-/* Efecto de escaneo para el tablero */
+/* Efecto de escaneo */
 .board::after {
     content: '';
     position: absolute;
@@ -50,7 +76,7 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #56dcff, transparent);
+    background: linear-gradient(90deg, transparent, var(--color-cyan), transparent);
     animation: scanline 8s linear infinite;
     opacity: 0.5;
     z-index: 2;
@@ -61,47 +87,48 @@
     100% { top: 100%; }
 }
 
-/* Cuadrícula superpuesta */
+/* Cuadrícula del tablero */
 .grid-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(rgba(86, 220, 255, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(86, 220, 255, 0.05) 1px, transparent 1px);
-    background-size: 28px 28px; /* Ajustado al nuevo tamaño de celda */
+    background-image: 
+        linear-gradient(rgba(86, 220, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(86, 220, 255, 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
     pointer-events: none;
 }
 
-/* Panel lateral - ajustado */
-.side-panel {
+/* Paneles laterales */
+.side-panel, .left-panel {
     width: 200px;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-bottom: 15px;
+    flex-shrink: 0;
+    height: auto;
 }
 
+/* Panel para siguiente pieza */
 .next-piece {
-    width: 200px;
+    width: 100%;
     height: 120px;
     background-color: rgba(30, 15, 60, 0.8);
     border: 3px solid #333;
     position: relative;
-    gap: 20px;  
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 
-        0 0 10px rgba(86, 220, 255, 0.7),
+        var(--shadow-primary),
         inset 0 0 15px rgba(178, 112, 255, 0.4);
-    border-image: linear-gradient(45deg, #b270ff, #56dcff, #b270ff) 1;
-    top: -40px; /* Ajusta este valor para moverlo hacia arriba */
+    border-image: var(--gradient-secondary) 1;
 }
 
-.next-piece::before {
-    content: "SIGUIENTE";
+.next-piece::before, .hold-piece::before {
+    content: attr(data-title);
     position: absolute;
     top: -13px;
     left: 50%;
@@ -109,55 +136,57 @@
     background-color: #000;
     padding: 0 15px;
     font-size: 12px;
-    color: #b270ff;
-    text-shadow: 0 0 5px rgba(178, 112, 255, 0.7);
-    border: 1px solid rgba(178, 112, 255, 0.5);
+    text-shadow: 0 0 5px currentColor;
+    border: 1px solid currentColor;
     border-radius: 3px;
     letter-spacing: 1px;
     white-space: nowrap;
-    font-family: 'Press Start 2P', monospace;
 }
 
-/* Panel de estadísticas - ajustado */
+.next-piece::before {
+    content: "SIGUIENTE";
+    color: var(--color-purple);
+}
+
+/* Panel de estadísticas */
 .stats {
     background-color: rgba(30, 15, 60, 0.8);
     border: 3px solid #333;
     padding: 15px;
     box-shadow: 
-        0 0 10px rgba(86, 220, 255, 0.7),
+        var(--shadow-primary),
         inset 0 0 15px rgba(86, 220, 255, 0.3);
-    border-image: linear-gradient(45deg, #56dcff, #b270ff, #56dcff) 1;
+    border-image: var(--gradient-primary) 1;
+    flex-grow: 1;
 }
 
 .stats p {
     margin: 12px 0;
     font-size: 12px;
     text-shadow: 0 0 5px currentColor;
-    color: #ff9edb;
+    color: var(--color-pink);
 }
 
-/* Panel de controles - ajustado */
+/* Panel de controles */
 .controls {
     background-color: rgba(30, 15, 60, 0.8);
     border: 3px solid #333;
     padding: 15px;
     box-shadow: 
-        0 0 10px rgba(178, 112, 255, 0.7),
+        var(--shadow-secondary),
         inset 0 0 15px rgba(178, 112, 255, 0.4);
-    border-image: linear-gradient(45deg, #b270ff, #56dcff, #b270ff) 1;
-    margin-bottom: 15px;
-    font-size: 0.8em;
+    border-image: var(--gradient-secondary) 1;
+    flex-grow: 1;
 }
 
 .controls p {
     margin: 5px 0;
     font-size: 10px;
-    color: #56dcff;
+    color: var(--color-cyan);
     text-shadow: 0 0 5px rgba(86, 220, 255, 0.8);
-    font-family: 'Press Start 2P', monospace;
 }
 
-/* Celdas del juego - ajustadas */
+/* Celdas del juego - NO MODIFICAR */
 .cell {
     width: 28px;
     height: 28px;
@@ -187,26 +216,25 @@
     padding: 25px;
     border: 4px solid #333;
     display: none;
-    z-index: 20; /* Aumentado para asegurar visibilidad */
+    z-index: 20;
     text-align: center;
     box-shadow: 
-        0 0 20px rgba(86, 220, 255, 0.7),
+        var(--shadow-primary),
         inset 0 0 15px rgba(178, 112, 255, 0.4);
-    border-image: linear-gradient(45deg, #56dcff, #b270ff, #56dcff) 1;
+    border-image: var(--gradient-primary) 1;
     backdrop-filter: blur(10px);
     color: #fff;
-    font-family: 'Press Start 2P', monospace;
 }
 
 .message h2 {
-    color: #56dcff;
+    color: var(--color-cyan);
     margin-bottom: 15px;
     text-shadow: 0 0 10px rgba(86, 220, 255, 0.8);
     letter-spacing: 2px;
 }
 
 .message button {
-    background: linear-gradient(45deg, #56dcff, #b270ff);
+    background: var(--gradient-primary);
     border: none;
     color: #000;
     padding: 15px 30px;
@@ -215,19 +243,19 @@
     font-family: 'Press Start 2P', monospace;
     font-size: 14px;
     text-transform: uppercase;
-    box-shadow: 0 0 15px rgba(86, 220, 255, 0.8);
+    box-shadow: var(--shadow-primary);
     transition: all 0.3s;
     border-radius: 2px;
 }
 
 .message button:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(120, 220, 232, 0.8);
+    box-shadow: 0 0 20px rgba(86, 220, 255, 0.8);
 }
 
 /* Mensaje de nivel */
 .level-message {
-    color: #b270ff;
+    color: var(--color-purple);
     font-size: 28px;
     position: absolute;
     top: 50%;
@@ -239,12 +267,10 @@
     z-index: 15;
     text-shadow: 
         0 0 10px rgba(178, 112, 255, 0.8),
-        0 0 20px rgba(178, 112, 255, 0.6),
-        0 0 30px rgba(178, 112, 255, 0.4);
+        0 0 20px rgba(178, 112, 255, 0.6);
     background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border-radius: 5px;
-    font-family: 'Press Start 2P', monospace;
 }
 
 /* Animaciones */
@@ -257,9 +283,9 @@
 @keyframes neonFlicker {
     0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
         text-shadow: 
-            0 0 5px #56dcff,
-            0 0 10px #56dcff,
-            0 0 20px #56dcff;
+            0 0 5px var(--color-cyan),
+            0 0 10px var(--color-cyan),
+            0 0 20px var(--color-cyan);
     }
     20%, 24%, 55% {
         text-shadow: none;
@@ -270,28 +296,26 @@
     animation: glow 0.5s ease-in-out;
 }
 
-/* Estilos para títulos dentro del juego */
+/* Título del juego */
 .game-title {
     color: #bd93f9;
     text-shadow: 
         0 0 10px rgba(189, 147, 249, 0.6),
-        0 0 20px rgba(189, 147, 249, 0.4),
-        0 0 30px rgba(189, 147, 249, 0.2);
+        0 0 20px rgba(189, 147, 249, 0.4);
     margin-bottom: 15px;
     font-size: 32px;
     letter-spacing: 5px;
     animation: neonFlicker 3s infinite;
     text-align: center;
-    font-family: 'VT323', monospace;
 }
 
-/* Valores mostrados en estadísticas */
+/* Valores de estadísticas */
 .score-value, .level-value, .lines-value {
     color: #78dce8;
     text-shadow: 0 0 5px rgba(120, 220, 232, 0.5);
 }
 
-/* Botón de inicio - ajustado */
+/* Botón de inicio */
 #start-game {
     position: absolute;
     top: 50%;
@@ -302,12 +326,10 @@
     color: #1e1f36;
     padding: 15px 30px;
     cursor: pointer;
-    font-family: 'VT323', monospace;
+    font-family: 'Press Start 2P', monospace;
     font-size: 18px;
     text-transform: uppercase;
-    box-shadow: 
-        0 0 15px rgba(120, 220, 232, 0.5),
-        inset 0 0 10px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(120, 220, 232, 0.5);
     transition: all 0.3s;
     z-index: 10;
     letter-spacing: 2px;
@@ -318,28 +340,18 @@
 
 #start-game:hover {
     transform: translate(-50%, -50%) scale(1.05);
-    box-shadow: 
-        0 0 25px rgba(120, 220, 232, 0.7),
-        inset 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 25px rgba(120, 220, 232, 0.7);
     background: linear-gradient(45deg, #bd93f9, #78dce8);
 }
 
-#start-game:active {
-    transform: translate(-50%, -50%) scale(0.98);
-    box-shadow: 
-        0 0 10px rgba(120, 220, 232, 0.4),
-        inset 0 0 5px rgba(255, 255, 255, 0.2);
-}
-
 @keyframes buttonPulse {
-    0% { box-shadow: 0 0 15px rgba(120, 220, 232, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3); }
-    50% { box-shadow: 0 0 25px rgba(120, 220, 232, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.5); }
-    100% { box-shadow: 0 0 15px rgba(120, 220, 232, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3); }
+    0%, 100% { box-shadow: 0 0 15px rgba(120, 220, 232, 0.5); }
+    50% { box-shadow: 0 0 25px rgba(120, 220, 232, 0.7); }
 }
 
-/* Panel para pieza guardada - ajustado */
+/* Panel para pieza guardada */
 .hold-piece {
-    width: 200px;
+    width: 100%;
     height: 120px;
     background-color: rgba(24, 28, 58, 0.85);
     border: 3px solid #2a2c42;
@@ -351,25 +363,11 @@
         0 0 10px rgba(120, 220, 232, 0.4),
         inset 0 0 15px rgba(189, 147, 249, 0.15);
     border-image: linear-gradient(45deg, #78dce8, #bd93f9, #78dce8) 1;
-    margin-bottom: 15px;
 }
 
 .hold-piece::before {
     content: "GUARDADO";
-    position: absolute;
-    top: -13px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #1e1f36;
-    padding: 0 15px;
-    font-size: 12px;
     color: #78dce8;
-    text-shadow: 0 0 5px rgba(120, 220, 232, 0.5);
-    border: 1px solid rgba(120, 220, 232, 0.3);
-    border-radius: 3px;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    font-family: 'VT323', monospace;
 }
 
 .hold-piece.disabled {
@@ -377,27 +375,17 @@
     filter: grayscale(70%);
 }
 
-.hold-icon {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    font-size: 8px;
-    color: #bd93f9;
-    text-shadow: 0 0 3px rgba(189, 147, 249, 0.5);
-}
-
-/* Animación para cuando se intercambia una pieza */
+/* Animación para intercambio de piezas */
 @keyframes swapFlash {
-    0% { box-shadow: 0 0 10px rgba(120, 220, 232, 0.4); }
+    0%, 100% { box-shadow: 0 0 10px rgba(120, 220, 232, 0.4); }
     50% { box-shadow: 0 0 30px rgba(120, 220, 232, 0.8); }
-    100% { box-shadow: 0 0 10px rgba(120, 220, 232, 0.4); }
 }
 
 .swap-flash {
     animation: swapFlash 0.5s ease-in-out;
 }
 
-/* Pista de tecla que parpadea cuando está disponible */
+/* Pista de tecla */
 .key-hint {
     position: absolute;
     bottom: -12px;
@@ -410,13 +398,11 @@
     border: 1px solid #78dce8;
     border-radius: 2px;
     animation: keyPulse 2s infinite;
-    font-family: 'VT323', monospace;
 }
 
 @keyframes keyPulse {
-    0% { opacity: 0.6; }
+    0%, 100% { opacity: 0.6; }
     50% { opacity: 1; }
-    100% { opacity: 0.6; }
 }
 
 /* Progreso de nivel */
@@ -442,161 +428,391 @@
     box-shadow: 0 0 10px rgba(189, 147, 249, 0.5);
 }
 
-.next-level-flash {
-    animation: nextLevelPulse 0.5s ease-in-out;
+/* Modo pantalla completa - MEJORADO */
+.seccion-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    z-index: 9999 !important;
+    background-color: #1a0a2e !important;
+    border: none !important;
+    overflow: hidden !important;
 }
 
-@keyframes nextLevelPulse {
-    0% { text-shadow: 0 0 5px rgba(189, 147, 249, 0.5); }
-    50% { text-shadow: 0 0 20px rgba(189, 147, 249, 0.7); }
-    100% { text-shadow: 0 0 5px rgba(189, 147, 249, 0.5); }
+.modo-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: radial-gradient(circle at center, #4a1a80 0%, #2a0f45 50%, #16052a 100%) !important;
+    border: none !important;
+    overflow: hidden !important;
+    position: relative !important;
 }
 
-/* Adaptación para cuando está dentro del contenedor de juegos */
-.seccion-del_juego .game-container {
-    transform: scale(0.95);
-    transform-origin: center center;
-}
-
-/* Evitar que la barra espaciadora desplace la página */
-body.playing-tetris {
-    overflow: hidden;
-}
-
-/* Ajustes para mantener consistente el tamaño del tablero */
-
-/* Aseguramos que el board mantenga sus dimensiones en pantalla completa */
-.modo-fullscreen .board {
-    /* Mantenemos el tamaño original sin cambios */
-    width: 280px;
-    height: 560px;
-}
-
-/* Ajuste específico para cuando está en pantalla completa */
-.modo-fullscreen .seccion-del_juego .game-container {
-    /* Cambiamos la transformación para que no afecte el tamaño del tablero */
-    transform: none;
-    /* Centramos el contenedor para mejor visualización */
-    margin: 0 auto;
-    /* Añadimos más espacio alrededor para una mejor experiencia */
-    padding: 20px;
-}
-
-/* Arreglo para modo móvil en pantalla completa */
-@media (max-width: 950px) {
-    .modo-fullscreen .seccion-del_juego .game-container {
-        /* Eliminamos la transformación que reduce la escala */
-        transform: none;
-        padding: 15px;
-    }
-    
-    /* Aseguramos que el tablero mantenga su tamaño en móviles */
-    .modo-fullscreen .board {
-        width: 280px;
-        height: 560px;
-    }
-}
-
-/* Para dispositivos muy pequeños */
-@media (max-width: 480px) {
-    .modo-fullscreen .seccion-del_juego .game-container {
-        /* Eliminamos la transformación que reduce aún más la escala */
-        transform: none;
-        padding: 10px;
-    }
-    
-    /* Mantenemos el tamaño del tablero incluso en pantallas muy pequeñas */
-    .modo-fullscreen .board {
-        width: 252px; /* Mantenemos el tamaño definido para dispositivos pequeños */
-        height: 504px;
-    }
-}
-
-/* ---- CORRECCIONES PARA MODO FULLSCREEN ---- */
-
-/* Mantener una posición correcta de las celdas en modo fullscreen */
-.modo-fullscreen .cell {
-    width: 28px;
-    height: 28px;
-    position: absolute;
-    transform: none;
-    box-sizing: border-box;
-    border-radius: 2px;
-    border: 2px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 10px currentColor;
-}
-
-/* Asegurar que el contenedor del juego mantenga alineación correcta en modo fullscreen */
-.modo-fullscreen .game-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-    max-width: 1200px;
-    margin: 20px auto;
-    transform: none;
-    padding: 20px;
-}
-
-/* Asegurar que la cuadrícula se mantiene alineada con el tablero */
-.modo-fullscreen .grid-overlay {
-    width: 100%;
-    height: 100%;
+/* Efectos visuales de fondo para el modo fullscreen */
+.modo-fullscreen::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(86, 220, 255, 0.15) 0%, transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(178, 112, 255, 0.15) 0%, transparent 30%);
+    z-index: 0;
+}
+
+/* Partículas en el fondo */
+.modo-fullscreen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 10% 10%, #56dcff 0%, transparent 0.5%),
+        radial-gradient(circle at 20% 20%, #b270ff 0%, transparent 0.3%),
+        radial-gradient(circle at 30% 30%, #56dcff 0%, transparent 0.4%),
+        radial-gradient(circle at 40% 40%, #b270ff 0%, transparent 0.2%),
+        radial-gradient(circle at 50% 50%, #56dcff 0%, transparent 0.3%),
+        radial-gradient(circle at 60% 60%, #b270ff 0%, transparent 0.5%),
+        radial-gradient(circle at 70% 70%, #56dcff 0%, transparent 0.4%),
+        radial-gradient(circle at 80% 80%, #b270ff 0%, transparent 0.2%),
+        radial-gradient(circle at 90% 90%, #56dcff 0%, transparent 0.3%);
+    opacity: 0.4;
+    animation: floatingParticles 15s linear infinite;
+    z-index: 0;
+}
+
+/* Animación para las partículas */
+@keyframes floatingParticles {
+    0% { transform: translateY(0) translateX(0); }
+    25% { transform: translateY(-10px) translateX(5px); }
+    50% { transform: translateY(0) translateX(10px); }
+    75% { transform: translateY(10px) translateX(5px); }
+    100% { transform: translateY(0) translateX(0); }
+}
+
+/* Líneas de cuadrícula en el fondo */
+.modo-fullscreen .background-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(86, 220, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(86, 220, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
     pointer-events: none;
-    background-size: 28px 28px;
+    z-index: 1;
 }
 
-/* Ajustar paneles laterales en modo fullscreen */
-.modo-fullscreen .side-panel {
-    margin: 0 15px;
+/* Título del juego en pantalla completa */
+.modo-fullscreen .game-title-fullscreen {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 48px;
+    color: #ff9edb;
+    text-shadow: 
+        0 0 10px rgba(255, 158, 219, 0.8),
+        0 0 20px rgba(255, 158, 219, 0.6),
+        0 0 30px rgba(255, 158, 219, 0.4);
+    letter-spacing: 10px;
+    font-family: 'Press Start 2P', monospace;
+    animation: titlePulse 3s infinite alternate;
+    z-index: 10;
 }
 
-/* Correcciones específicas para pantallas más pequeñas en modo fullscreen */
-@media (max-width: 768px) {
-    .modo-fullscreen .game-container {
+@keyframes titlePulse {
+    0% { text-shadow: 0 0 10px rgba(255, 158, 219, 0.8), 0 0 20px rgba(255, 158, 219, 0.6); }
+    100% { text-shadow: 0 0 20px rgba(255, 158, 219, 0.8), 0 0 40px rgba(255, 158, 219, 0.6), 0 0 60px rgba(255, 158, 219, 0.4); }
+}
+
+/* Tablero en modo pantalla completa */
+.modo-fullscreen .board {
+    /* Mantiene el tamaño original del tablero */
+    width: 280px !important;
+    height: 560px !important;
+    margin: 0 30px !important;
+    box-shadow: 
+        0 0 30px rgba(86, 220, 255, 0.9) !important,
+        0 0 50px rgba(178, 112, 255, 0.7) !important,
+        inset 0 0 25px rgba(86, 220, 255, 0.5) !important;
+    z-index: 10 !important;
+}
+
+.modo-fullscreen .game-container {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 20px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 50px !important;
+    z-index: 5 !important;
+}
+
+/* Mejoras para los paneles laterales en pantalla completa */
+.modo-fullscreen .side-panel,
+.modo-fullscreen .left-panel {
+    width: 250px !important;
+    height: 560px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    z-index: 10 !important;
+}
+
+/* Mejoras para la sección siguiente y guardado en pantalla completa */
+.modo-fullscreen .next-piece,
+.modo-fullscreen .hold-piece {
+    height: 140px !important;
+    border-width: 4px !important;
+    box-shadow: 
+        0 0 20px rgba(86, 220, 255, 0.8) !important,
+        inset 0 0 20px rgba(178, 112, 255, 0.6) !important;
+}
+
+.modo-fullscreen .next-piece::before,
+.modo-fullscreen .hold-piece::before {
+    font-size: 16px !important;
+    padding: 5px 20px !important;
+    top: -18px !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 10px currentColor !important;
+}
+
+/* Mejoras para estadísticas y controles en pantalla completa */
+.modo-fullscreen .stats,
+.modo-fullscreen .controls {
+    padding: 20px !important;
+    border-width: 4px !important;
+    box-shadow: 
+        0 0 20px rgba(86, 220, 255, 0.8) !important,
+        inset 0 0 20px rgba(178, 112, 255, 0.6) !important;
+}
+
+.modo-fullscreen .stats p,
+.modo-fullscreen .controls p {
+    font-size: 16px !important;
+    margin: 15px 0 !important;
+    letter-spacing: 1px !important;
+    text-shadow: 0 0 10px currentColor !important;
+}
+
+/* Valores de estadísticas en pantalla completa */
+.modo-fullscreen .score-value,
+.modo-fullscreen .level-value,
+.modo-fullscreen .lines-value,
+.modo-fullscreen .next-level-value {
+    font-size: 18px !important;
+    margin-left: 10px !important;
+    text-shadow: 0 0 10px currentColor !important;
+}
+
+/* Mejora de la barra de progreso en pantalla completa */
+.modo-fullscreen .next-level-progress {
+    height: 10px !important;
+    margin-top: 12px !important;
+    border-width: 2px !important;
+}
+
+/* Decoración adicional para pantalla completa */
+.modo-fullscreen .decorative-element {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--color-cyan);
+    border-radius: 50%;
+    opacity: 0.3;
+    pointer-events: none;
+    animation: floatAndGlow 8s infinite linear;
+}
+
+.modo-fullscreen .decorative-element:nth-child(1) {
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+}
+
+.modo-fullscreen .decorative-element:nth-child(2) {
+    top: 15%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+.modo-fullscreen .decorative-element:nth-child(3) {
+    bottom: 20%;
+    left: 8%;
+    animation-delay: 4s;
+}
+
+.modo-fullscreen .decorative-element:nth-child(4) {
+    bottom: 15%;
+    right: 7%;
+    animation-delay: 6s;
+}
+
+@keyframes floatAndGlow {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
+    25% { transform: translateY(-15px) rotate(90deg); opacity: 0.4; }
+    50% { transform: translateY(0) rotate(180deg); opacity: 0.2; }
+    75% { transform: translateY(15px) rotate(270deg); opacity: 0.4; }
+    100% { transform: translateY(0) rotate(360deg); opacity: 0.2; }
+}
+
+/* Evitar scrollbars en fullscreen */
+body.has-fullscreen {
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    width: 100vw !important;
+}
+
+/* Responsividad */
+@media (max-width: 767px) {
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .board {
+        width: 280px;
+        height: 560px;
+    }
+    
+    .side-panel, .left-panel {
+        width: 100%;
+        max-width: 300px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .next-piece, .hold-piece, .stats, .controls {
+        height: auto;
+        min-height: 80px;
+        width: 100%;
         padding: 10px;
     }
     
-    .modo-fullscreen .side-panel {
-        margin: 0 5px;
-    }
-}
-
-/* Corrección para pantallas muy pequeñas */
-@media (max-width: 480px) {
-    .modo-fullscreen .board {
-        width: 252px;
-        height: 504px;
+    .modo-fullscreen .game-container {
+        padding-top: 50px !important;
     }
     
-    .modo-fullscreen .cell {
-        width: 25.2px;
-        height: 25.2px;
+    .modo-fullscreen .side-panel,
+    .modo-fullscreen .left-panel {
+        width: 90% !important;
+        max-width: 280px !important;
+        height: auto !important;
     }
     
-    .modo-fullscreen .grid-overlay {
-        background-size: 25.2px 25.2px;
+    .modo-fullscreen .next-piece,
+    .modo-fullscreen .hold-piece {
+        height: 100px !important;
     }
 }
 
-/* Asegurarse de que los mensajes se mantengan centrados en modo fullscreen */
-.modo-fullscreen .message {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 30;
+@media (min-width: 768px) and (max-width: 1023px) {
+    .game-container {
+        gap: 15px;
+    }
+    
+    .board {
+        width: 280px;
+        height: 560px;
+    }
+    
+    .side-panel, .left-panel {
+        width: 180px;
+    }
+    
+    .modo-fullscreen .side-panel,
+    .modo-fullscreen .left-panel {
+        width: 220px !important;
+    }
 }
 
-/* Ajuste para el contenedor de títulos en modo fullscreen */
-.modo-fullscreen .titulo-container {
-    margin-bottom: 15px;
+@media (min-width: 1024px) {
+    .game-container {
+        gap: 20px;
+    }
 }
 
-/* Botón de fullscreen en modo fullscreen */
-.modo-fullscreen #toggle-fullscreen {
-    margin-left: 10px;
+/* Modo landscape en pantallas pequeñas */
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-container {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    /* El tablero mantiene su tamaño original */
+    .board {
+        width: 280px;
+        height: 560px;
+    }
+    
+    .side-panel, .left-panel {
+        width: 180px;
+        height: 560px;
+    }
+    
+    .next-piece, .hold-piece {
+        height: 100px;
+    }
+    
+    .controls, .stats {
+        font-size: 0.8em;
+    }
+    
+    .modo-fullscreen .game-container {
+        align-items: center !important;
+    }
+    
+    .modo-fullscreen .side-panel,
+    .modo-fullscreen .left-panel {
+        height: 560px !important;
+    }
 }
+
+/* Pantallas muy pequeñas */
+@media (max-width: 350px) {
+    /* El tablero mantiene su tamaño original */
+    .board {
+        width: 280px;
+        height: 560px;
+    }
+    
+    .game-container {
+        padding: 5px;
+        gap: 15px;
+    }
+    
+    .side-panel, .left-panel {
+        width: 280px;
+    }
+}
+
+
+

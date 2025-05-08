@@ -1154,3 +1154,16 @@
             player.x = canvas.width / 2 - 25;
             player.y = canvas.height - 80;
         });
+
+        // Función para reproducir el audio en loop
+function reproducirLoopSpaceman() {
+    let audio = new Audio("archivos_de_minijuegos/sounds/spaceman.mp3");
+    audio.loop = true;  // Asegura que el audio se reproduzca en loop
+    audio.play();  // Inicia la reproducción del audio
+}
+
+// Modificar el listener del botón Start para que reproduzca música
+startButton.addEventListener('click', function() {
+    reproducirLoopSpaceman();  // Reproducir música cuando se presiona Start
+    initGame();  // Iniciar el juego (función original)
+});
