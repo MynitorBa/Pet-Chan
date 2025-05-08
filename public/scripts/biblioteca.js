@@ -159,55 +159,86 @@ document.addEventListener('DOMContentLoaded', function() {
                     const detallesContainer = document.querySelector('.detalles-mascota');
                     const rareza = data.mascota.rareza || 'comun';
                     
-                    // Montar el HTML de los detalles
+                    // Montar el HTML de los detalles con la nueva estructura y emojis
                     let html = `
-                        <div class="detalles-imagen">
-                            <img src="imagenes_de_mascotas/${data.mascota.indice}.gif" alt="${data.mascota.petname}" class="pixeleado">
-                            <div class="rareza-banner ${rareza}">${rareza}</div>
-                        </div>
-                        <div class="detalles-info">
-                            <h2>${data.mascota.petname}</h2>
-                            <p>Especie: ${data.especie}</p>
-                            <p>Género: ${data.mascota.genero}</p>
-                            <p>Nivel: ${data.mascota.nivel || 1}</p>
-                            
-                            <div class="mascota-stats">
-                                <div class="mascota-stat">
-                                    <span class="stat-label">Amor</span>
-                                    <div class="stat-barra">
-                                        <div class="stat-valor" style="width: ${data.mascota.nivelAmor}%;"></div>
-                                    </div>
-                                    <span class="stat-numero">${data.mascota.nivelAmor}%</span>
-                                </div>
-                                
-                                <div class="mascota-stat">
-                                    <span class="stat-label">Felicidad</span>
-                                    <div class="stat-barra">
-                                        <div class="stat-valor felicidad" style="width: ${data.mascota.nivelFelicidad}%;"></div>
-                                    </div>
-                                    <span class="stat-numero">${data.mascota.nivelFelicidad}%</span>
-                                </div>
-                                
-                                <div class="mascota-stat">
-                                    <span class="stat-label">Energía</span>
-                                    <div class="stat-barra">
-                                        <div class="stat-valor energia" style="width: ${data.mascota.nivelEnergia}%;"></div>
-                                    </div>
-                                    <span class="stat-numero">${data.mascota.nivelEnergia}%</span>
-                                </div>
+                    <div class="detalles-imagen">
+                        <img src="imagenes_de_mascotas/${data.mascota.indice}.gif" alt="${data.mascota.petname}" class="pixeleado">
+                        <div class="rareza-badge ${rareza}">${rareza.charAt(0).toUpperCase() + rareza.slice(1)}</div>
+                    </div>
+                    <div class="detalles-info">
+                        <h2><span>✨</span> ${data.mascota.petname}</h2>
+                        
+                        <div class="detalles-basicos">
+                            <div class="dato-basico">
+                                <span class="dato-icono">🐾</span>
+                                <span class="dato-valor">Especie: ${data.especie}</span>
+                            </div>
+                            <div class="dato-basico">
+                                <span class="dato-icono">${data.mascota.genero === 'macho' ? '♂️' : '♀️'}</span>
+                                <span class="dato-valor">Género: ${data.mascota.genero}</span>
                             </div>
                             
-                            <div class="mascota-detalles">
-                                <p><span class="detalle-label">✧ Habilidad Especial:</span> ${data.mascota.habilidad}</p>
-                                <p><span class="detalle-label">✧ Comida Favorita:</span> ${data.mascota.comidaFavorita}</p>
-                                <p><span class="detalle-label">✧ Fecha de obtención:</span> ${data.mascota.fechaObtencion || 'Desconocida'}</p>
+                        </div>
+                        
+                        <div class="mascota-stats-detalle">
+                            <div class="stat-detalle">
+                                <span class="stat-icono">❤️</span>
+                                <div class="stat-barra-detalle">
+                                    <div class="stat-valor-detalle amor" style="width: ${data.mascota.nivelAmor}%;"></div>
+                                </div>
+                                <span class="stat-numero-detalle">${data.mascota.nivelAmor}%</span>
+                            </div>
+                            
+                            <div class="stat-detalle">
+                                <span class="stat-icono">😊</span>
+                                <div class="stat-barra-detalle">
+                                    <div class="stat-valor-detalle felicidad" style="width: ${data.mascota.nivelFelicidad}%;"></div>
+                                </div>
+                                <span class="stat-numero-detalle">${data.mascota.nivelFelicidad}%</span>
+                            </div>
+                            
+                            <div class="stat-detalle">
+                                <span class="stat-icono">⚡</span>
+                                <div class="stat-barra-detalle">
+                                    <div class="stat-valor-detalle energia" style="width: ${data.mascota.nivelEnergia}%;"></div>
+                                </div>
+                                <span class="stat-numero-detalle">${data.mascota.nivelEnergia}%</span>
                             </div>
                         </div>
-                    `;
+                        
+                        <div class="mascota-habilidades">
+                            <div class="habilidad-item">
+                                <span class="habilidad-titulo">✨ Habilidad Especial:</span>
+                                <span class="habilidad-desc">${data.mascota.habilidad}</span>
+                            </div>
+                            <div class="habilidad-item">
+                                <span class="habilidad-titulo">🍔 Comida Favorita:</span>
+                                <span class="habilidad-desc">${data.mascota.comidaFavorita}</span>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                `;
                     
                     // Actualizar el contenido y mostrar el modal
                     detallesContainer.innerHTML = html;
-                    modalDetalles.classList.add('mostrar');
+                    
+                    // Activar animaciones de barras con un pequeño retraso
+                    setTimeout(() => {
+                        const barras = document.querySelectorAll('.stat-valor-detalle');
+                        barras.forEach(barra => {
+                            const ancho = barra.style.width;
+                            barra.style.width = '0%';
+                            setTimeout(() => {
+                                barra.style.width = ancho;
+                            }, 100);
+                        });
+                    }, 300);
+                    
+                    // Mostrar el modal
+                    document.getElementById('modal-detalles').classList.add('mostrar');
+                    
                 } else {
                     mostrarNotificacion('Error al cargar los detalles de la mascota', 'error');
                 }
@@ -309,85 +340,104 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Respuesta del servidor:', data);
             
             if (data.success) {
-                try {
-                    // Actualizar el contador de monedas
-                    document.querySelector('.monedas-cantidad').textContent = new Intl.NumberFormat().format(data.moneyRestante);
+               try {
+            // Actualizar el contador de monedas
+            document.querySelector('.monedas-cantidad').textContent = new Intl.NumberFormat().format(data.moneyRestante);
+            
+            // Asegurarse de que todos los datos necesarios estén presentes
+            if (!data.mascota || !data.mascota.indice || !data.mascota.especie) {
+                throw new Error('Datos de mascota incompletos en la respuesta');
+            }
+            
+            // Llenar el modal de resultado
+            const nuevaMascotaImg = document.getElementById('nueva-mascota-img');
+            if (nuevaMascotaImg) {
+                nuevaMascotaImg.src = `imagenes_de_mascotas/${data.mascota.indice}.gif`;
+                nuevaMascotaImg.onload = () => console.log('Imagen de mascota cargada correctamente');
+                nuevaMascotaImg.onerror = (e) => {
+                    console.error('Error al cargar la imagen de la mascota:', e);
+                    nuevaMascotaImg.src = 'imagenes_y_gif/mascota_default.gif'; // Imagen por defecto
+                };
+            }
+            
+            // Establecer la especie
+            const especieResultado = document.getElementById('especie-resultado');
+            if (especieResultado) {
+                especieResultado.textContent = data.mascota.especie;
+            }
+            
+            // Actualizar el género
+            const generoIcono = document.getElementById('genero-icono-resultado');
+            const generoTexto = document.getElementById('genero-texto-resultado');
+            
+            if (generoIcono && generoTexto) {
+                // Cambiar de 'masculino' a 'macho'
+                if (data.mascota.genero === 'macho') {
+                    generoIcono.textContent = '♂️';
+                    generoTexto.textContent = 'Macho';
+                } else {
+                    generoIcono.textContent = '♀️';
+                    generoTexto.textContent = 'Hembra';
+                }
+            }
+            // Asegurarse de que todos los campos ocultos estén correctamente configurados
+            const indiceNuevaMascota = document.getElementById('indice-nueva-mascota');
+            if (indiceNuevaMascota) {
+                indiceNuevaMascota.value = data.mascota.indice;
+            }
+            
+            const generoNuevaMascota = document.getElementById('genero-nueva-mascota');
+            if (generoNuevaMascota) {
+                generoNuevaMascota.value = data.mascota.genero;
+            }
+            
+            const rarezaNuevaMascota = document.getElementById('rareza-nueva-mascota');
+            if (rarezaNuevaMascota) {
+                rarezaNuevaMascota.value = data.mascota.rareza;
+            }
+            
+            // Configurar la clase de rareza en el banner
+            const rarezaBanner = document.getElementById('rareza-banner');
+            if (rarezaBanner) {
+                rarezaBanner.textContent = data.mascota.rareza.charAt(0).toUpperCase() + data.mascota.rareza.slice(1);
+                rarezaBanner.className = 'rareza-banner ' + data.mascota.rareza;
+            }
+            
+            // Añadir clases con retraso de animación a los elementos de datos básicos
+            const datosBasicos = document.querySelectorAll('.mascota-info-resultado .dato-basico');
+            datosBasicos.forEach((dato, index) => {
+                dato.style.setProperty('--i', index);
+            });
+            
+            // Crear efecto de confeti si es una rareza épica o legendaria
+            if (data.mascota.rareza === 'epico' || data.mascota.rareza === 'legendario') {
+                setTimeout(() => {
+                    crearConfeti();
+                }, 1500);
+            }
+            
+            // Mostrar el modal de resultado después de completar la animación
+            const modalResultadoSobre = document.getElementById('modal-resultado-sobre');
+            setTimeout(() => {
+                sobre.classList.remove('abriendo');
+                if (modalResultadoSobre) {
+                    modalResultadoSobre.classList.add('mostrar');
                     
-                    // Asegurarse de que todos los datos necesarios estén presentes
-                    if (!data.mascota || !data.mascota.indice || !data.mascota.especie) {
-                        throw new Error('Datos de mascota incompletos en la respuesta');
+                    // Asegurarse de que el formulario esté limpio
+                    const nombreInput = document.getElementById('nombre-nueva-mascota');
+                    if (nombreInput) {
+                        nombreInput.value = '';
+                        nombreInput.focus();
                     }
-                    
-                    // Llenar el modal de resultado
-                    const nuevaMascotaImg = document.getElementById('nueva-mascota-img');
-                    if (nuevaMascotaImg) {
-                        nuevaMascotaImg.src = `imagenes_de_mascotas/${data.mascota.indice}.gif`;
-                        // Opcional: precargar la imagen
-                        nuevaMascotaImg.onload = () => console.log('Imagen de mascota cargada correctamente');
-                        nuevaMascotaImg.onerror = (e) => {
-                            console.error('Error al cargar la imagen de la mascota:', e);
-                            nuevaMascotaImg.src = 'imagenes_y_gif/mascota_default.gif'; // Imagen por defecto
-                        };
-                    } else {
-                        console.error('Elemento nueva-mascota-img no encontrado');
-                    }
-                    
-                    const especieResultado = document.getElementById('especie-resultado');
-                    if (especieResultado) {
-                        especieResultado.textContent = data.mascota.especie;
-                    }
-                    
-                    // Asegurarse de que todos los campos ocultos estén correctamente configurados
-                    const indiceNuevaMascota = document.getElementById('indice-nueva-mascota');
-                    if (indiceNuevaMascota) {
-                        indiceNuevaMascota.value = data.mascota.indice;
-                    }
-                    
-                    const generoNuevaMascota = document.getElementById('genero-nueva-mascota');
-                    if (generoNuevaMascota) {
-                        generoNuevaMascota.value = data.mascota.genero;
-                    }
-                    
-                    const rarezaNuevaMascota = document.getElementById('rareza-nueva-mascota');
-                    if (rarezaNuevaMascota) {
-                        rarezaNuevaMascota.value = data.mascota.rareza;
-                    }
-                    
-                    // Configurar la clase de rareza en el banner
-                    const rarezaBanner = document.getElementById('rareza-banner');
-                    if (rarezaBanner) {
-                        rarezaBanner.textContent = data.mascota.rareza.charAt(0).toUpperCase() + data.mascota.rareza.slice(1);
-                        rarezaBanner.className = 'rareza-banner ' + data.mascota.rareza;
-                    }
-                    
-                    // Crear efecto de confeti si es una rareza épica o legendaria
-                    if (data.mascota.rareza === 'epico' || data.mascota.rareza === 'legendario') {
-                        setTimeout(() => {
-                            crearConfeti();
-                        }, 1500);
-                    }
-                    
-                    // Mostrar el modal de resultado después de completar la animación
-                    const modalResultadoSobre = document.getElementById('modal-resultado-sobre');
-                    setTimeout(() => {
-                        sobre.classList.remove('abriendo');
-                        if (modalResultadoSobre) {
-                            modalResultadoSobre.classList.add('mostrar');
-                            
-                            // Asegurarse de que el formulario esté limpio
-                            const nombreInput = document.getElementById('nombre-nueva-mascota');
-                            if (nombreInput) {
-                                nombreInput.value = '';
-                                nombreInput.focus();
-                            }
-                        } else {
-                            console.error('Elemento modal-resultado-sobre no encontrado');
-                            mostrarNotificacion('Error al mostrar el resultado', 'error');
-                        }
-                        // Resetear el botón
-                        boton.disabled = false;
-                        boton.textContent = `Comprar por ${precio} 💰`;
-                    }, 1800);
+                } else {
+                    console.error('Elemento modal-resultado-sobre no encontrado');
+                    mostrarNotificacion('Error al mostrar el resultado', 'error');
+                }
+                // Resetear el botón
+                boton.disabled = false;
+                boton.textContent = `Comprar por ${precio} 💰`;
+            }, 1800);
+            
                 } catch (parseError) {
                     console.error('Error al procesar la respuesta:', parseError);
                     sobre.classList.remove('abriendo');

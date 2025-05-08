@@ -259,8 +259,16 @@
 }
 
 .pixeleado {
+    height: 140px; /* TAMAÑO AUMENTADO */
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(207, 124, 252, 0.7));
+    z-index: 1;
+    transition: transform 0.5s ease;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+}
 }
 
 .card-info {
@@ -792,8 +800,6 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
-
-
 @keyframes scaleInBounce {
     0% { transform: scale(0.7); opacity: 0; }
     70% { transform: scale(1.05); opacity: 1; }
@@ -866,13 +872,9 @@
 /* Pop-up épico para mascota nueva */
 /* Ajustes para el modal de resultado */
 .modal-resultado {
-    max-width: 600px !important; /* Reducido para mejor control */
-    max-height: 90vh !important; /* Altura máxima controlada */
-    overflow-y: auto !important; /* Permitir scroll si es necesario */
-    padding: 20px !important; /* Reducir padding para más espacio interno */
-    box-sizing: border-box !important; /* Asegurar que el padding no afecte dimensiones */
+    max-width: 700px !important;
+    animation: apareceEpico 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
-
 /* Mejorar la presentación del contenido interno */
 .resultado-sobre {
     display: flex !important;
@@ -973,7 +975,17 @@
 }
 
 /* Título más épico */
-.resultado-sobre h2,
+.resultado-sobre h2 {
+    color: #fff;
+    font-size: 2.2rem !important;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(211, 4, 197, 0.8), 
+                 0 0 30px rgba(207, 124, 252, 0.6) !important;
+    margin-bottom: 25px !important;
+    animation: pulseText 2s infinite;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 .modal-contenido h2 {
     color: #fff;
     font-size: 2.4rem !important;
@@ -997,12 +1009,14 @@
     align-items: center;
     gap: 25px;
     background: rgba(0, 0, 0, 0.35) !important;
-    padding: 40px !important;
+    padding: 30px !important;
     border-radius: 20px !important;
     border: 4px solid #cf7cfc !important;
     position: relative;
     overflow: hidden;
-    margin-bottom: 30px !important;
+    width: 90% !important;
+    max-width: 600px !important;
+    margin: 0 auto 20px auto !important;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5) inset !important;
 }
 
@@ -1029,7 +1043,21 @@
 }
 
 /* Imagen de mascota MUCHO más grande y con efectos */
-#nueva-mascota-img,
+#nueva-mascota-img {
+    max-width: 85% !important;
+    height: auto;
+    max-height: 250px !important;
+    min-height: 220px !important;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(211, 4, 197, 0.8)) !important;
+    animation: floatAndGlowEpic 4s ease-in-out infinite, 
+               revealMascotaEpic 1.2s cubic-bezier(0.17, 0.89, 0.32, 1.37) !important;
+    z-index: 1;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    transform-origin: center center;
+}
+    
 .nueva-mascota-container img {
     max-width: 85% !important; /* Mucho más grande */
     min-height: 250px !important;
@@ -1760,5 +1788,351 @@
     .btn-comprar-sobre {
         font-size: 1rem;
         padding: 10px 15px;
+    }
+}
+
+/* ESTILOS NUEVOS PARA EL MODAL DE DETALLES DE MASCOTA */
+.modal-detalles .modal-contenido {
+    background: linear-gradient(135deg, #43314d 0%, #620296 100%);
+    border: 4px solid #d304c5;
+    box-shadow: 0 0 30px rgba(211, 4, 197, 0.5);
+    overflow: hidden;
+    padding: 30px;
+}
+
+.detalles-mascota {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    width: 100%;
+}
+
+.detalles-imagen {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 25px;
+    border-radius: 15px;
+    border: 3px solid #cf7cfc;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.detalles-imagen::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle at center, rgba(207, 124, 252, 0.2) 0%, transparent 70%);
+    animation: rotarBrillo 15s linear infinite;
+    z-index: 0;
+}
+
+@keyframes rotarBrillo {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.detalles-imagen img {
+    max-width: 90%;
+    max-height: 250px;
+    filter: drop-shadow(0 0 15px rgba(207, 124, 252, 0.8));
+    animation: floatDetalles 4s ease-in-out infinite;
+    z-index: 1;
+    margin-bottom: 20px;
+}
+
+@keyframes floatDetalles {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.rareza-badge {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.rareza-badge.comun {
+    background: linear-gradient(135deg, #7b9e89, #a3c9b7);
+    color: white;
+    border: 2px solid #a3c9b7;
+}
+
+.rareza-badge.raro {
+    background: linear-gradient(135deg, #4b6bab, #7d8fb3);
+    color: white;
+    border: 2px solid #7d8fb3;
+    animation: pulseRaroBadge 2s infinite;
+}
+
+@keyframes pulseRaroBadge {
+    0%, 100% { box-shadow: 0 0 10px rgba(75, 107, 171, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(75, 107, 171, 0.8); }
+}
+
+.rareza-badge.epico {
+    background: linear-gradient(135deg, #9b59b6, #c39bd3);
+    color: white;
+    border: 2px solid #c39bd3;
+    animation: pulseEpicoBadge 2s infinite;
+}
+
+@keyframes pulseEpicoBadge {
+    0%, 100% { box-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(155, 89, 182, 0.8); }
+}
+
+.rareza-badge.legendario {
+    background: linear-gradient(135deg, #f1c40f, #f7dc6f);
+    color: black;
+    border: 2px solid #f7dc6f;
+    animation: pulseLegendarioBadge 1.5s infinite;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulseLegendarioBadge {
+    0%, 100% { box-shadow: 0 0 15px rgba(241, 196, 15, 0.6); }
+    50% { box-shadow: 0 0 30px rgba(241, 196, 15, 0.9); }
+}
+
+.detalles-info {
+    flex: 2;
+    min-width: 320px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    border-radius: 15px;
+    border: 3px solid #cf7cfc;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.detalles-info h2 {
+    color: #fff;
+    font-size: 2.2rem;
+    text-shadow: 0 0 15px rgba(207, 124, 252, 0.7);
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detalles-info h2 span {
+    font-size: 2.4rem;
+    animation: latido 1.5s infinite;
+}
+
+@keyframes latido {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.detalles-basicos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.dato-basico {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(207, 124, 252, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dato-icono {
+    font-size: 1.3rem;
+    color: #cf7cfc;
+}
+
+.dato-valor {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.mascota-stats-detalle {
+    margin: 25px 0;
+}
+
+.stat-detalle {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 12px;
+}
+
+.stat-icono {
+    font-size: 1.5rem;
+    width: 35px;
+    text-align: center;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.stat-barra-detalle {
+    flex: 1;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.stat-valor-detalle {
+    height: 100%;
+    transition: width 1s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-valor-detalle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.2) 50%, 
+        rgba(255, 255, 255, 0) 100%);
+    animation: brilloBarras 2s linear infinite;
+}
+
+@keyframes brilloBarras {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.stat-valor-detalle.amor {
+    background: linear-gradient(90deg, #ff5e62, #ff9966);
+}
+
+.stat-valor-detalle.felicidad {
+    background: linear-gradient(90deg, #56ab2f, #a8e063);
+}
+
+.stat-valor-detalle.energia {
+    background: linear-gradient(90deg, #2193b0, #6dd5ed);
+}
+
+.stat-numero-detalle {
+    width: 50px;
+    text-align: right;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.mascota-habilidades {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 25px;
+    border: 2px solid rgba(207, 124, 252, 0.3);
+}
+
+.habilidad-item {
+    margin-bottom: 15px;
+    position: relative;
+    padding-left: 30px;
+}
+
+.habilidad-item:last-child {
+    margin-bottom: 0;
+}
+
+.habilidad-item::before {
+    content: '✧';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: #cf7cfc;
+    font-size: 1.2rem;
+    animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.habilidad-titulo {
+    color: #cf7cfc;
+    font-weight: bold;
+    margin-right: 8px;
+    font-size: 1.05rem;
+}
+
+.habilidad-desc {
+    display: inline;
+    font-size: 1rem;
+}
+
+.mascota-fecha {
+    margin-top: 20px;
+    text-align: right;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive para el modal de detalles */
+@media (max-width: 768px) {
+    .detalles-mascota {
+        flex-direction: column;
+    }
+    
+    .detalles-imagen, 
+    .detalles-info {
+        min-width: 100%;
+    }
+    
+    .detalles-basicos {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .detalles-basicos {
+        grid-template-columns: 1fr;
+    }
+    
+    .detalles-info h2 {
+        font-size: 1.8rem;
+    }
+    
+    .stat-icono {
+        font-size: 1.3rem;
+        width: 30px;
+    }
+    
+    .stat-barra-detalle {
+        height: 16px;
     }
 }

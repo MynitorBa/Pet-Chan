@@ -49,7 +49,6 @@
                                 </div>
                                 <div class="card-info">
                                     <p>Especie: <%= especieMascotas[mascota.indice - 1] %></p>
-                                    <p>Nivel: <%= mascota.nivel || 1 %></p>
                                     <div class="card-stats">
                                         <div class="stat">
                                             <span class="stat-label">❤️</span>
@@ -180,8 +179,7 @@
     </div>
 </div>
 
-<!-- Modal para detalles de mascota -->
-<div id="modal-detalles" class="modal">
+<div id="modal-detalles" class="modal modal-detalles">
     <div class="modal-contenido">
         <span class="cerrar-modal">&times;</span>
         <div class="detalles-mascota">
@@ -200,7 +198,16 @@
                 <img id="nueva-mascota-img" src="" alt="Nueva mascota" class="pixeleado">
                 <div class="mascota-info-resultado">
                     <div class="rareza-banner" id="rareza-banner">Común</div>
-                    <p class="especie-texto">Especie: <span id="especie-resultado"></span></p>
+                    <div class="detalles-basicos-resultado">
+                        <div class="dato-basico">
+                            <span class="dato-icono">🐾</span>
+                            <span class="dato-valor">Especie: <span id="especie-resultado"></span></span>
+                        </div>
+                        <div class="dato-basico">
+                            <span class="dato-icono" id="genero-icono-resultado">♂️</span>
+                            <span class="dato-valor">Género: <span id="genero-texto-resultado">Masculino</span></span>
+                        </div>
+                    </div>
                     <form id="form-nombrar-mascota">
                         <div class="campo-form">
                             <label for="nombre-nueva-mascota">Dale un nombre a tu nueva mascota:</label>
@@ -209,7 +216,7 @@
                             <input type="hidden" id="genero-nueva-mascota" value="">
                             <input type="hidden" id="rareza-nueva-mascota" value="">
                         </div>
-                        <button type="submit" class="btn-guardar-mascota">Guardar mascota</button>
+                        <button type="submit" class="btn-guardar-mascota">✨ Guardar mascota ✨</button>
                     </form>
                 </div>
             </div>
