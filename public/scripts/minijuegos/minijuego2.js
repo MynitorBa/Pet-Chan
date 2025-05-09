@@ -45,7 +45,7 @@ let numerosDeTambor = document.querySelectorAll(".drum").length;
 // Event listeners para los botones de batería
 for (let inde = 0; inde < numerosDeTambor; inde++) {    
     document.querySelectorAll(".drum")[inde].addEventListener("click", function() {
-        let buttonInnerHTML = this.innerHTML;
+        let buttonInnerHTML = this.innerHTML.toLowerCase();
         makeSound(buttonInnerHTML);
         buttonAnimation(buttonInnerHTML);
     });
@@ -53,38 +53,45 @@ for (let inde = 0; inde < numerosDeTambor; inde++) {
 
 // Event listener para cuando se presiona una tecla
 document.addEventListener("keypress", function(evento){
-    makeSound(evento.key);
-    buttonAnimation(evento.key);
+    makeSound(evento.key.toLowerCase());
+    buttonAnimation(evento.key.toLowerCase());
 });
 
 // Función para producir sonidos según la tecla/botón
 function makeSound(key){
     switch (key) {
         case "w":
+        case "W":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/tom-1.mp3');
             ton1.play();
             break;
         case "a":
+        case "A":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/tom-2.mp3');
             ton1.play();
             break;
         case "s":
+        case "S":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/tom-3.mp3');
             ton1.play();
             break;
         case "d":
+        case "D":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/tom-4.mp3');
             ton1.play();
             break;
         case "j":
+        case "J":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/snare.mp3');
             ton1.play();
             break;
         case "k":
+        case "K":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/crash.mp3');
             ton1.play();
             break;
         case "l":
+        case "L":
             var ton1 = new Audio('archivos_de_minijuegos/sounds/kick-bass.mp3');
             ton1.play();
             break;
@@ -95,12 +102,22 @@ function makeSound(key){
 
 // Animación para los botones
 function buttonAnimation(currentKey){
+    // Asegurarse de que currentKey está en minúsculas para coincidir con las clases
+    currentKey = currentKey.toLowerCase();
     var activeButton = document.querySelector("." + currentKey);
     
     if (activeButton) {  // Solo si activeButton existe
+        // Guardar el estado actual de los eventos
+        const oldPointerEvents = activeButton.style.pointerEvents;
+        
+        // Asegurar que siempre sea clicable
+        activeButton.style.pointerEvents = 'auto';
+        
         activeButton.classList.add("pressed");
         setTimeout(function(){
             activeButton.classList.remove("pressed");
+            // Restaurar el estado anterior
+            activeButton.style.pointerEvents = oldPointerEvents;
         }, 100);
     }
 }

@@ -1493,6 +1493,9 @@ app.get('/minijuego9', requireLogin, (req, res) => {
   res.render('minijuegos/minijuego9.ejs');
 });
 
+app.get('/minijuego10', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego10.ejs');
+});
 
 
 app.get('/min1', requireLogin, (req, res) => {
@@ -1589,6 +1592,17 @@ app.get('/min9', requireLogin, (req, res) => {
   const mascota = req.session.mascotaActual;
 
   res.render('minijuegos9.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
+
+
+app.get('/min10', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos10.ejs', {
       rutaImagen: mascota.rutaImagen,
       accesorios: req.session.accesorios
   });

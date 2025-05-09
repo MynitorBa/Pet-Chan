@@ -17,6 +17,10 @@
   margin: 8px;
   box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
   transition: transform 0.1s, box-shadow 0.1s;
+  cursor: pointer;
+  z-index: 10000; /* Asegurar que esté por encima de otros elementos */
+  pointer-events: auto !important; /* Forzar que siempre acepte clics */
+  position: relative; /* Para el stacking context */
 }
 
 /* Set up the container for horizontal layout */
@@ -26,6 +30,9 @@
   justify-content: center;
   max-width: 400px;
   margin: 0 auto;
+  position: relative; /* Para el stacking context */
+  z-index: 10000; /* Asegurar que esté por encima */
+  pointer-events: auto; /* Permitir eventos de puntero */
 }
 
 /* First row - 4 buttons */
@@ -86,6 +93,7 @@
   box-shadow: 0 0 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3);
   background-color: #32054b;
   opacity: 0.8;
+  pointer-events: auto !important; /* Asegurar que siga siendo clicable durante la animación */
 }
 
 /* Estilos para modo pantalla completa */
@@ -94,11 +102,12 @@
   height: 100vh;
   margin: 0;
   border-radius: 0;
-  z-index: 9999;
+  z-index: 9990; /* Menor que los botones */
   position: fixed;
   top: 0;
   left: 0;
   background-color: #1a0a2e;
+  pointer-events: auto; /* Permitir eventos de puntero */
 }
 
 .modo-fullscreen {
@@ -109,7 +118,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 9990; /* Menor que los botones */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -117,12 +126,15 @@
   padding: 0;
   background-color: #3c1660;
   border: none;
+  pointer-events: auto; /* Permitir eventos de puntero */
 }
 
 /* Ajustes para la batería en pantalla completa */
 .modo-fullscreen .set {
   max-width: 600px;
   margin: 0 auto;
+  z-index: 10000; /* Mantener z-index alto */
+  position: relative;
 }
 
 .modo-fullscreen .drum {
@@ -130,6 +142,8 @@
   height: 120px;
   font-size: 3.5rem;
   margin: 15px;
+  z-index: 10000; /* Mantener z-index alto */
+  position: relative;
 }
 
 /* Para la reorganización de elementos según el JS */
@@ -138,6 +152,8 @@
   align-items: center;
   justify-content: flex-start;
   width: 50%;
+  z-index: 9995;
+  position: relative;
 }
 
 .botones-control {
@@ -145,6 +161,8 @@
   align-items: center;
   justify-content: flex-end;
   width: 50%;
+  z-index: 9995;
+  position: relative;
 }
 
 .modo-fullscreen .botones-superiores {
@@ -156,6 +174,8 @@
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 9995;
+  pointer-events: auto; /* Permitir eventos de puntero */
 }
 
 /* Ajustes para pantallas más pequeñas */
@@ -200,4 +220,24 @@
   .drum.w, .drum.a, .drum.s, .drum.d {
       margin-bottom: 10px;
   }
+}
+
+/* Prevenir cualquier interposición de elementos que bloquee los clics */
+* {
+  touch-action: auto;
+}
+
+/* Asegurar que la interacción táctil funcione correctamente */
+html, body {
+  touch-action: manipulation;
+  overflow: hidden; /* Prevenir scrolling no deseado en pantalla completa */
+}
+
+/* Evitar que otros elementos bloqueen los clics en modo fullscreen */
+.modo-fullscreen::before {
+  display: none !important;
+}
+
+.modo-fullscreen * {
+  pointer-events: auto;
 }

@@ -35,7 +35,7 @@
     border-radius: 0 !important;
     border: none !important;
     z-index: 9999 !important;
-    background-color: #0a0a0a !important;
+    background-color: #3c2a14 !important; /* Fondo café oscuro en fullscreen */
     box-shadow: none !important;
     overflow: hidden !important;
     display: flex !important;
@@ -56,15 +56,15 @@
     max-height: unset !important;
 }
 
-/* Info section responsive */
+/* Info section responsive - COLORES DE GRANJA */
 #info {
     position: absolute;
-    top: clamp(5px, 1.5vw, 15px);
+    top: clamp(150px, 30vh, 250px);
     left: clamp(5px, 1.5vw, 15px);
-    color: #cf7cfc;
+    color: #5c3c10; /* Texto café oscuro */
     font-family: Arial;
-    text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
-    background-color: rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px 1px rgba(255,255,255,0.5);
+    background-color: rgba(230, 255, 200, 0.85); /* Fondo verde claro */
     padding: clamp(6px, 1.5vw, 10px);
     border-radius: 10px;
     font-size: clamp(0.8rem, 2vw, 1rem);
@@ -72,9 +72,10 @@
     z-index: 1000;
     line-height: 1.4;
     word-wrap: break-word;
+    border: 2px solid #8B5A2B; /* Borde café */
 }
 
-/* Feed button responsive */
+/* Feed button responsive - COLORES DE GRANJA */
 #feedButton {
     position: absolute;
     bottom: clamp(15px, 5vh, 30px);
@@ -82,65 +83,74 @@
     transform: translateX(-50%);
     padding: clamp(8px, 2vw, 15px) clamp(15px, 4vw, 35px);
     font-size: clamp(0.9rem, 2.5vw, 1.3rem);
-    background: rgba(98, 2, 150, 0.95);
-    color: #cf7cfc;
-    border: clamp(2px, 0.5vw, 4px) solid #d304c5;
+    background: rgba(76, 153, 0, 0.95); /* Verde más intenso */
+    color: #FFF8E1; /* Texto crema claro */
+    border: clamp(2px, 0.5vw, 4px) solid #386C0B; /* Borde verde oscuro */
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 1000;
-    box-shadow: 0 0 clamp(10px, 3vw, 25px) rgba(163, 4, 250, 0.7);
+    box-shadow: 0 0 clamp(10px, 3vw, 25px) rgba(76, 153, 0, 0.7); /* Resplandor verde */
     white-space: nowrap;
+    font-weight: bold;
 }
 
 #feedButton:hover {
-    background: rgba(148, 22, 200, 0.95);
-    box-shadow: 0 0 clamp(15px, 4vw, 35px) rgba(163, 4, 250, 0.9);
+    background: rgba(107, 182, 35, 0.95); /* Verde más claro al hover */
+    box-shadow: 0 0 clamp(15px, 4vw, 35px) rgba(107, 182, 35, 0.9);
     transform: translateX(-50%) scale(1.05);
 }
 
-/* Stats section responsive */
+/* Stats section responsive - COLORES DE GRANJA */
 #chickenStats {
     position: absolute;
-    left: clamp(5px, 1.5vw, 15px);
-    top: clamp(80px, 15vh, 120px);
-    background: rgba(0,0,0,0.6);
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background: rgba(245, 222, 179, 0.8); /* Fondo wheat */
     padding: clamp(6px, 1.5vw, 10px);
-    border-radius: 10px;
-    color: #cf7cfc;
+    color: #654321; /* Texto café */
     font-family: Arial;
-    min-width: clamp(120px, 20vw, 180px);
-    border: clamp(1px, 0.4vw, 2px) solid #d304c5;
+    width: 100%;
+    border-bottom: clamp(1px, 0.4vw, 2px) solid #8B4513; /* Borde café */
     z-index: 1000;
     font-size: clamp(0.8rem, 1.8vw, 1rem);
+    gap: 10px;
 }
 
 .statBar {
-    width: 100%;
+    width: 60px;
     height: clamp(10px, 2vh, 14px);
-    background: #444;
+    background: #E8D3A9; /* Fondo beige claro */
     margin: clamp(2px, 0.5vh, 5px) 0;
     border-radius: 7px;
     overflow: hidden;
+    border: 1px solid #8B5A2B; /* Borde café */
 }
 
 .statFill {
     height: 100%;
-    background: linear-gradient(90deg, #a304fa, #d304c5);
+    background: linear-gradient(90deg, #F1C40F, #DAA520); /* Gradiente amarillo/dorado */
     border-radius: 7px;
     transition: width 0.3s ease;
 }
 
-/* Fullscreen styling with responsive positioning */
+/* Fullscreen styling with responsive positioning - COLORES DE GRANJA */
 .modo-fullscreen #info,
 .seccion-fullscreen #info {
     position: fixed !important;
-    top: clamp(10px, 2vh, 20px) !important;
+    top: clamp(180px, 35vh, 300px) !important;
     left: clamp(10px, 2vw, 20px) !important;
     font-size: clamp(0.9rem, 1.5vw, 1.1rem) !important;
     max-width: clamp(180px, 30vw, 300px) !important;
     padding: clamp(8px, 1.5vw, 12px) !important;
     z-index: 10000 !important;
+    color: #5c3c10 !important; /* Texto café oscuro */
+    background-color: rgba(230, 255, 200, 0.85) !important; /* Fondo verde claro */
+    border: 2px solid #8B5A2B !important; /* Borde café */
 }
 
 .modo-fullscreen #feedButton,
@@ -152,22 +162,33 @@
     padding: clamp(10px, 2vw, 16px) clamp(20px, 4vw, 40px) !important;
     font-size: clamp(1rem, 2vw, 1.4rem) !important;
     z-index: 10000 !important;
+    background: rgba(76, 153, 0, 0.95) !important; /* Verde más intenso */
+    color: #FFF8E1 !important; /* Texto crema claro */
+    border: clamp(2px, 0.5vw, 4px) solid #386C0B !important; /* Borde verde oscuro */
+    box-shadow: 0 0 clamp(10px, 3vw, 25px) rgba(76, 153, 0, 0.7) !important; /* Resplandor verde */
 }
 
 .modo-fullscreen #feedButton:hover,
 .seccion-fullscreen #feedButton:hover {
     transform: translateX(-50%) scale(1.08) !important;
+    background: rgba(107, 182, 35, 0.95) !important; /* Verde más claro al hover */
 }
 
 .modo-fullscreen #chickenStats,
 .seccion-fullscreen #chickenStats {
     position: fixed !important;
-    left: clamp(10px, 2vw, 20px) !important;
-    top: clamp(100px, 15vh, 150px) !important;
-    min-width: clamp(150px, 25vw, 250px) !important;
-    font-size: clamp(0.9rem, 1.5vw, 1.1rem) !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
     padding: clamp(8px, 1.5vw, 12px) !important;
     z-index: 10000 !important;
+    gap: 10px !important;
+    background: rgba(245, 222, 179, 0.8) !important; /* Fondo wheat */
+    color: #654321 !important; /* Texto café */
+    border-bottom: clamp(1px, 0.4vw, 2px) solid #8B4513 !important; /* Borde café */
 }
 
 /* Ultra small screens */
@@ -185,11 +206,12 @@
     
     #chickenStats {
         font-size: 0.7rem;
-        min-width: 100px;
+        padding: 5px;
     }
     
     .statBar {
         height: 8px;
+        width: 40px; /* Más pequeño para pantallas pequeñas */
     }
 }
 
@@ -206,6 +228,10 @@
         width: 100vw !important;
         height: 100vh !important;
         aspect-ratio: 16/9 !important;
+    }
+    
+    #chickenStats {
+        justify-content: center;
     }
 }
 
@@ -229,8 +255,13 @@
     }
     
     #chickenStats {
-        top: clamp(70px, 12vh, 100px);
+        flex-wrap: wrap; /* Permitir que las estadísticas se envuelvan en pantallas estrechas */
+        justify-content: space-around;
         font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+    }
+    
+    .statBar {
+        width: 50px; /* Más estrechas en modo vertical */
     }
 }
 
@@ -255,3 +286,248 @@
         transform: translateY(-50%) !important;
     }
 }
+
+/* CSS adicional para botón de iniciar centrado que desaparece */
+
+/* Contenedor de inicio que cubre toda la sección del juego */
+#inicioOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Z-index muy alto para estar sobre todo */
+}
+
+/* Botón de iniciar centrado */
+#iniciarButton {
+    padding: 15px 40px;
+    font-size: 1.5rem;
+    background: linear-gradient(to bottom, #4C8C4A, #2E5A2C);
+    color: white;
+    border: 3px solid #153615;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(107, 182, 35, 0.8);
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+    transition: transform 0.3s, background 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#iniciarButton:hover {
+    transform: scale(1.1);
+    background: linear-gradient(to bottom, #5DA05A, #3B7039);
+}
+
+/* Animación de pulsación para el botón */
+@keyframes pulsarBoton {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+#iniciarButton {
+    animation: pulsarBoton 1.5s infinite;
+}
+
+#iniciarButton:hover {
+    animation: none; /* Detener animación al hover */
+}
+
+/* Estado inicial del juego - Elementos deshabilitados */
+.juego-no-iniciado #scene {
+    filter: blur(5px);
+}
+
+.juego-no-iniciado #feedButton {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Confeti simétrico - MEJORADO */
+.confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Importante para que no reciba clics */
+    z-index: 1998;
+    overflow: hidden;
+  }
+  
+  .confetti {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    background: #FFD700;
+    border-radius: 50%;
+    /* Usamos las variables CSS para el desplazamiento horizontal */
+    animation: confettiFall 5s ease-in-out forwards;
+  }
+  
+  /* Animación de caída de confeti */
+  @keyframes confettiFall {
+    0% {
+      opacity: 1;
+      transform: translateY(0) rotate(0);
+    }
+    25% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100%) translateX(var(--horizontal-offset, 0)) rotate(360deg);
+    }
+  }
+  
+  /* Contenedor del mensaje de felicitación */
+  .dinosaur-completion-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(51, 25, 0, 0.9);
+    border: 4px solid #FF8C00;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    color: #FFF;
+    z-index: 1999;
+    box-shadow: 0 0 30px rgba(255, 140, 0, 0.6);
+    max-width: 90%;
+    width: 400px;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Título de felicitación */
+  .dinosaur-completion-title {
+    font-size: 28px;
+    color: #FFD700;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  /* Descripción del logro */
+  .dinosaur-completion-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  /* Contenedor de botones */
+  .dinosaur-completion-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  
+  /* Estilo de botones */
+  .dinosaur-completion-button {
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  
+  /* Botón continuar */
+  .button-continue {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .button-continue:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+  }
+  
+  /* Botón reiniciar */
+  .button-restart {
+    background-color: #FF9800;
+    color: white;
+  }
+  
+  .button-restart:hover {
+    background-color: #e68a00;
+    transform: scale(1.05);
+  }
+  
+  /* Medalla o insignia */
+  .dino-master-badge {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #FFD700, #FF8C00);
+    border-radius: 50%;
+    margin: 10px auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #FFF;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    position: relative;
+  }
+  
+  .dino-master-badge::before {
+    content: "🦖";
+    font-size: 50px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Adaptaciones responsive */
+  @media (max-width: 500px) {
+    .dinosaur-completion-message {
+      width: 85%;
+      padding: 15px;
+    }
+    
+    .dinosaur-completion-title {
+      font-size: 22px;
+    }
+    
+    .dinosaur-completion-text {
+      font-size: 16px;
+    }
+    
+    .dinosaur-completion-button {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+    
+    .dino-master-badge {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .dino-master-badge::before {
+      font-size: 40px;
+    }
+  }
+  
+  /* Para pantallas muy pequeñas */
+  @media (max-width: 360px) {
+    .dinosaur-completion-message {
+      padding: 10px;
+    }
+    
+    .dinosaur-completion-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .dinosaur-completion-button {
+      width: 100%;
+    }
+  }

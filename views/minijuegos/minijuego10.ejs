@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Simple de Carros</title>
+    <link rel="stylesheet" href="styles/minijuego/minijuego10.css">
+</head>
+<body>
+    <div id="game">
+        <div id="road"></div>
+        <div id="player"></div>
+        <div id="score">0</div>
+        <div id="game-over">
+            ¡JUEGO TERMINADO!
+            <div id="final-score">Puntuación: 0</div>
+            <button id="restart">Reiniciar</button>
+        </div>
+    </div>
+    
+    <div id="controls">
+        <div class="control-buttons">
+            <button id="left-button">←</button>
+            <button id="right-button">→</button>
+        </div>
+        <div class="info">Usa las teclas de flecha ← → para mover el carro</div>
+    </div>
+    
+    <div id="hud">
+        <div id="level">Nivel: <span id="level-value">1</span></div>
+        <div id="speed">Velocidad: <span id="speed-value">40</span> km/h</div>
+    </div>
+    
+    <script src="scripts/minijuegos/minijuego10.js"></script>
+</body>
+</html>

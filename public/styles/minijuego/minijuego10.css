@@ -1,0 +1,404 @@
+/* Game container - keeping original dimensions as requested */
+#game {
+    position: relative;
+    width: 400px;
+    height: 650px; /* Maintained height for track */
+    margin: 20px auto;
+    background: #111;
+    overflow: hidden;
+    border: 3px solid #00aaff;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 170, 255, 0.6);
+}
+
+/* Enhanced background with rotating cars */
+.seccion-del_juego {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23050505'/%3E%3Cdefs%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='4' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3Cfilter id='bigGlow'%3E%3CfeGaussianBlur stdDeviation='8' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3CradialGradient id='bgPulse' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' style='stop-color:%230a1a40;stop-opacity:1'%3E%3Canimate attributeName='stop-color' values='%230a1a40;%23150f2f;%230a1a40' dur='8s' repeatCount='indefinite'/%3E%3C/stop%3E%3Cstop offset='100%25' style='stop-color:%23000000;stop-opacity:1' /%3E%3C/radialGradient%3E%3ClinearGradient id='scanLine' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300ffff;stop-opacity:0'/%3E%3Cstop offset='50%25' style='stop-color:%23ff00ff;stop-opacity:0.4'/%3E%3Cstop offset='100%25' style='stop-color:%2300ffff;stop-opacity:0'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Fondo con gradiente pulsante --%3E%3Crect width='800' height='600' fill='url(%23bgPulse)'/%3E%3C!-- Grid cyberpunk animado --%3E%3Cg stroke='%2300aaff' stroke-width='1' opacity='0.15'%3E%3Cpath d='M0,0 L800,0 M0,30 L800,30 M0,60 L800,60 M0,90 L800,90 M0,120 L800,120 M0,150 L800,150 M0,180 L800,180 M0,210 L800,210 M0,240 L800,240 M0,270 L800,270 M0,300 L800,300 M0,330 L800,330 M0,360 L800,360 M0,390 L800,390 M0,420 L800,420 M0,450 L800,450 M0,480 L800,480 M0,510 L800,510 M0,540 L800,540 M0,570 L800,570 M0,600 L800,600'/%3E%3Cpath d='M0,0 L0,600 M30,0 L30,600 M60,0 L60,600 M90,0 L90,600 M120,0 L120,600 M150,0 L150,600 M180,0 L180,600 M210,0 L210,600 M240,0 L240,600 M270,0 L270,600 M300,0 L300,600 M330,0 L330,600 M360,0 L360,600 M390,0 L390,600 M420,0 L420,600 M450,0 L450,600 M480,0 L480,600 M510,0 L510,600 M540,0 L540,600 M570,0 L570,600 M600,0 L600,600 M630,0 L630,600 M660,0 L660,600 M690,0 L690,600 M720,0 L720,600 M750,0 L750,600 M780,0 L780,600 M800,0 L800,600'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;30,30;0,0' dur='10s' repeatCount='indefinite'/%3E%3C/g%3E%3C!-- Líneas de escaneo mejoradas --%3E%3Crect width='800' height='4' fill='url(%23scanLine)' opacity='0.8'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;0,600;0,0' dur='4s' repeatCount='indefinite'/%3E%3C/rect%3E%3Crect width='4' height='600' fill='url(%23scanLine)' opacity='0.8'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;800,0;0,0' dur='5s' repeatCount='indefinite'/%3E%3C/rect%3E%3C!-- Floating race cars mejorados --%3E%3Cg opacity='0.5' filter='url(%23glow)'%3E%3Cpath d='M50,100 L70,100 C75,100 80,95 80,90 L80,70 C80,65 75,60 70,60 L30,60 C25,60 20,65 20,70 L20,90 C20,95 25,100 30,100 L50,100 Z' fill='%2300aaff'/%3E%3Ccircle cx='30' cy='90' r='8' fill='%23003366'/%3E%3Ccircle cx='70' cy='90' r='8' fill='%23003366'/%3E%3Crect x='35' y='70' width='30' height='10' fill='%23003366'/%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 50 80' to='360 50 80' dur='10s' repeatCount='indefinite'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;600,400;0,0' dur='30s' repeatCount='indefinite' additive='sum'/%3E%3C/g%3E%3Cg opacity='0.4' filter='url(%23glow)'%3E%3Cpath d='M650,150 L670,150 C675,150 680,145 680,140 L680,120 C680,115 675,110 670,110 L630,110 C625,110 620,115 620,120 L620,140 C620,145 625,150 630,150 L650,150 Z' fill='%2300ffff'/%3E%3Ccircle cx='630' cy='140' r='8' fill='%23003344'/%3E%3Ccircle cx='670' cy='140' r='8' fill='%23003344'/%3E%3Crect x='635' y='120' width='30' height='10' fill='%23003344'/%3E%3CanimateTransform attributeName='transform' type='rotate' from='360 650 130' to='0 650 130' dur='15s' repeatCount='indefinite'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-500,300;0,0' dur='40s' repeatCount='indefinite' additive='sum'/%3E%3C/g%3E%3Cg opacity='0.35' filter='url(%23glow)'%3E%3Cpath d='M350,450 L370,450 C375,450 380,445 380,440 L380,420 C380,415 375,410 370,410 L330,410 C325,410 320,415 320,420 L320,440 C320,445 325,450 330,450 L350,450 Z' fill='%231a75ff'/%3E%3Ccircle cx='330' cy='440' r='8' fill='%23001a4d'/%3E%3Ccircle cx='370' cy='440' r='8' fill='%23001a4d'/%3E%3Crect x='335' y='420' width='30' height='10' fill='%23001a4d'/%3E%3CanimateTransform attributeName='transform' type='rotate' from='180 350 430' to='540 350 430' dur='20s' repeatCount='indefinite'/%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;200,-300;0,0' dur='35s' repeatCount='indefinite' additive='sum'/%3E%3C/g%3E%3C!-- Orbes de luz flotantes mejorados --%3E%3Ccircle cx='100' cy='100' r='50' fill='%2300aaff' opacity='0.15' filter='url(%23bigGlow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;150,150;0,0' dur='12s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='700' cy='500' r='60' fill='%231a75ff' opacity='0.15' filter='url(%23bigGlow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-100,-100;0,0' dur='14s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='400' cy='300' r='70' fill='%230055ff' opacity='0.12' filter='url(%23bigGlow)'%3E%3CanimateTransform attributeName='transform' type='translate' values='0,0;-80,80;0,0' dur='10s' repeatCount='indefinite'/%3E%3C/circle%3E%3C!-- Estrellas mejoradas --%3E%3Cg fill='%23ffffff' opacity='0.8'%3E%3Ccircle cx='80' cy='150' r='1.8'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='1.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='250' cy='220' r='1.8'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='2s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='450' cy='320' r='1.8'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='1.8s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='600' cy='180' r='1.8'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='2.2s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='720' cy='380' r='1.8'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='1.6s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='150' cy='450' r='1.8'%3E%3Canimate attributeName='opacity' values='0.8;0.2;0.8' dur='2.4s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C/svg%3E") !important;
+}
+
+/* Improved road with longer track */
+#road {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23111"/><rect x="45" y="0" width="10" height="33" fill="%2300aaff" opacity="0.8"/><rect x="45" y="66" width="10" height="34" fill="%2300aaff" opacity="0.8"/></svg>');
+    background-size: 100% 150px; /* Smaller spacing for more lanes */
+    animation: roadMove 0.5s linear infinite;
+}
+
+@keyframes roadMove {
+    from { background-position: 0 0; }
+    to { background-position: 0 150px; }
+}
+
+/* Enhanced player car with neon effects */
+#player {
+    position: absolute;
+    width: 50px;
+    height: 90px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 90"><rect width="50" height="90" rx="10" fill="red"/><circle cx="12" cy="70" r="7" fill="black"/><circle cx="38" cy="70" r="7" fill="black"/><rect x="7" y="15" width="36" height="25" fill="darkred"/><polygon points="25,0 18,15 32,15" fill="yellow"/><circle cx="15" cy="30" r="5" fill="yellow"/><circle cx="35" cy="30" r="5" fill="yellow"/><rect x="22" y="75" width="6" height="15" fill="darkred"/></svg>');
+    background-size: cover;
+    bottom: 70px;
+    left: 180px;
+    z-index: 10;
+    transition: transform 0.15s ease-out;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
+}
+
+@keyframes flameEffect {
+    0% { height: 40px; opacity: 0.9; }
+    100% { height: 55px; opacity: 0.7; }
+}
+
+/* Enhanced obstacle cars */
+.obstacle {
+    position: absolute;
+    width: 50px;
+    height: 90px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 90"><rect width="50" height="90" rx="10" fill="purple"/><circle cx="12" cy="70" r="7" fill="black"/><circle cx="38" cy="70" r="7" fill="black"/><rect x="7" y="15" width="36" height="25" fill="darkviolet"/><circle cx="15" cy="30" r="5" fill="white"/><circle cx="35" cy="30" r="5" fill="white"/><rect x="22" y="75" width="6" height="15" fill="darkviolet"/></svg>');
+    background-size: cover;
+    border-radius: 8px;
+    top: -90px;
+    z-index: 5;
+    filter: drop-shadow(0 0 8px rgba(128, 0, 255, 0.6));
+}
+
+/* Enhanced explosion animation */
+.obstacle.exploding {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 90"><circle cx="25" cy="45" r="40" fill="orange"/><circle cx="25" cy="45" r="30" fill="yellow"/><circle cx="25" cy="45" r="20" fill="white"/></svg>');
+    background-size: cover;
+    animation: explode 0.5s forwards;
+}
+
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Enhanced score counter with blue neon effect */
+#score {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    z-index: 15;
+    text-shadow: 0 0 5px #00aaff, 0 0 10px #00aaff;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 18px;
+    border-radius: 15px;
+    border: 2px solid rgba(0, 170, 255, 0.5);
+}
+
+/* Enhanced game over screen */
+#game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+    display: none;
+    z-index: 20;
+    text-shadow: 0 0 15px #00aaff;
+}
+
+#final-score {
+    margin: 20px 0;
+    font-size: 30px;
+    color: #00aaff;
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.8);
+}
+
+/* Enhanced restart button with blue neon effects */
+#restart {
+    padding: 12px 28px;
+    background: linear-gradient(to bottom, #0066cc, #004080);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
+    transition: all 0.2s;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+#restart:hover {
+    background: linear-gradient(to bottom, #0088ff, #0066cc);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.9);
+}
+
+#restart:active {
+    transform: scale(0.95);
+}
+
+/* Enhanced control layout */
+#controls {
+    width: 400px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Enhanced control buttons with cyber cockpit styling */
+.control-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.control-buttons button {
+    flex: 1;
+    padding: 20px 0;
+    font-size: 28px;
+    background: linear-gradient(to bottom, #000, #111);
+    color: #00aaff;
+    border: 2px solid #00aaff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-shadow: 0 0 8px rgba(0, 170, 255, 0.8);
+    box-shadow: inset 0 0 10px rgba(0, 170, 255, 0.4), 0 0 10px rgba(0, 170, 255, 0.4);
+}
+
+.control-buttons button:hover {
+    background: linear-gradient(to bottom, #111, #222);
+    box-shadow: inset 0 0 15px rgba(0, 170, 255, 0.6), 0 0 15px rgba(0, 170, 255, 0.6);
+}
+
+.control-buttons button:active {
+    background: linear-gradient(to bottom, #222, #333);
+    transform: scale(0.95);
+}
+
+/* Enhanced nitro button with blue gradient effect */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+/* Enhanced game info text */
+.info {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 16px;
+    color: #00aaff;
+    text-shadow: 0 0 5px rgba(0, 170, 255, 0.5);
+}
+
+/* Enhanced HUD elements with cyber cockpit styling */
+#level, #speed {
+    position: absolute;
+    background: rgba(0, 10, 30, 0.8);
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: bold;
+    z-index: 15;
+    border: 2px solid rgba(0, 170, 255, 0.6);
+    box-shadow: 0 0 10px rgba(0, 170, 255, 0.5), inset 0 0 5px rgba(0, 170, 255, 0.3);
+}
+
+#level {
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    color: #ffff00;
+    text-shadow: 0 0 8px rgba(255, 255, 0, 0.8);
+}
+
+#speed {
+    bottom: 20px;
+    right: 20px;
+    font-size: 22px;
+    color: #00aaff;
+    text-shadow: 0 0 8px rgba(0, 170, 255, 0.8);
+}
+
+/* Enhanced stars background effect */
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #00aaff;
+    border-radius: 50%;
+    opacity: 0.8;
+    z-index: 1;
+    box-shadow: 0 0 4px #00aaff;
+}
+
+/* Enhanced points indicator animation */
+.points-indicator {
+    position: absolute;
+    color: #00aaff;
+    font-weight: bold;
+    font-size: 22px;
+    z-index: 15;
+    opacity: 1;
+    animation: floatUp 1s forwards;
+    text-shadow: 0 0 8px rgba(0, 170, 255, 0.8);
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-60px); }
+}
+
+/* Enhanced safe zone indicator */
+.safe-zone-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 20, 40, 0.8);
+    color: #00aaff;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 18px 30px;
+    border-radius: 15px;
+    z-index: 15;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.7);
+    border: 2px solid rgba(0, 170, 255, 0.6);
+    box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
+}
+
+.safe-zone-indicator.active {
+    opacity: 1;
+    visibility: visible;
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 15px rgba(0, 170, 255, 0.5); }
+    100% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 25px rgba(0, 170, 255, 0.7); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    #game, #controls {
+        width: 350px;
+    }
+    
+    #game {
+        height: 550px;
+    }
+    
+    .control-buttons button {
+        padding: 15px 0;
+        font-size: 24px;
+    }
+}
+
+/* Enhanced fullscreen mode */
+.seccion-fullscreen {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #000;
+}
+
+.modo-fullscreen {
+    width: 100%;
+    height: 95vh;
+    margin: 0;
+    border-radius: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: #000;
+    border: none;
+    box-shadow: inset 0 0 100px rgba(0, 170, 255, 0.3);
+}
+
+/* Enhanced fullscreen adjustments */
+.modo-fullscreen #road {
+    width: 100%;
+    height: 100%;
+}
+
+.modo-fullscreen #controls {
+    flex-direction: row-reverse !important;
+}
+
+
+/* Forzar posicionamiento absoluto del botón de nitro a la izquierda */
+.modo-fullscreen .action-buttons {
+    position: absolute !important;
+    left: 30px !important;
+    
+    bottom: 30px !important;
+    right: auto !important;
+    z-index: 10000 !important;
+}
+
+/* Forzar posicionamiento absoluto de los botones de dirección a la derecha */
+.modo-fullscreen .control-buttons {
+    position: absolute !important;
+    right: 30px !important;
+    bottom: 30px !important;
+    left: auto !important;
+}
+
+/* Arreglar los controles para que se vean bien */
+.modo-fullscreen .control-buttons button {
+    margin-left: 10px !important;
+}
+
+/* Reducir el gap negativo que estaba causando problemas */
+.modo-fullscreen .control-buttons,
+.modo-fullscreen .action-buttons {
+    gap: 15px !important;
+}
+
+.modo-fullscreen #level {
+    top: 30px;
+    right: 30px;
+    font-size: 32px;
+    padding: 12px 24px;
+}
+
+.modo-fullscreen #speed {
+    bottom: 140px;
+    right: 30px;
+    font-size: 28px;
+    padding: 10px 20px;
+}
+
+/* Enhanced cockpit-like display elements */
+.cockpit-element {
+    position: absolute;
+    background: rgba(0, 10, 20, 0.7);
+    border: 2px solid #00aaff;
+    border-radius: 10px;
+    padding: 8px;
+    color: #00aaff;
+    font-size: 16px;
+    text-shadow: 0 0 5px #00aaff;
+    box-shadow: inset 0 0 10px rgba(0, 170, 255, 0.3), 0 0 10px rgba(0, 170, 255, 0.3);
+}

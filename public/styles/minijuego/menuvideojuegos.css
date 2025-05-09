@@ -194,6 +194,12 @@
   animation-delay: 1.7s;
 }
 
+.boton-juego:nth-child(10) button {
+  background: linear-gradient(45deg, rgba(0, 102, 255, 0.7), rgba(0, 204, 255, 0.7));
+  box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
+  animation-delay: 2.7s;
+}
+
 /* Iconos para los botones */
 .boton-juego:nth-child(1) button::before {
   content: "🎮";
@@ -285,6 +291,17 @@
 
 .boton-juego:nth-child(9) button::before {
   content: "🐣";
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  font-size: 60px;
+  text-align: center;
+  animation: pulse 2s infinite alternate;
+}
+
+.boton-juego:nth-child(10) button::before {
+  content: "🚗";
   position: absolute;
   top: 20px;
   left: 0;
