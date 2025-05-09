@@ -485,16 +485,21 @@ function update() {
         
     // Verificar colisión si no estamos en zona segura
 // Verificar colisión si no estamos en zona segura
+// Verificar colisión si no estamos en zona segura
 if (!isSafeZone) {
     const obstacleRect = obstacle.getBoundingClientRect();
     const playerRect = player.getBoundingClientRect();
     
-    // Solo detectar colisión en la parte inferior del jugador
-    // Esto permitirá que los obstáculos pasen casi por encima del jugador
+    // Margen muy grande para permitir que los obstáculos bajen mucho más
+    const collisionMarginTop = 70; // píxeles de margen superior (ajusta según necesites)
+    
+    // También podemos ajustar los márgenes laterales si lo deseas
+    const collisionMarginSides = 15; // margen lateral para hacer la colisión menos estricta
+    
     if (
-        obstacleRect.right > playerRect.left + 10 &&
-        obstacleRect.left < playerRect.right - 10 &&
-        obstacleRect.bottom > playerRect.bottom - 20 && // Solo colisiona cerca de la parte inferior
+        obstacleRect.right - collisionMarginSides > playerRect.left + collisionMarginSides &&
+        obstacleRect.left + collisionMarginSides < playerRect.right - collisionMarginSides &&
+        obstacleRect.bottom > playerRect.top + collisionMarginTop && // Gran margen superior
         obstacleRect.top < playerRect.bottom
     ) {
         // Explosion visual
@@ -507,7 +512,6 @@ if (!isSafeZone) {
         }, 500);
         return;
     }
-
 }
     }
     
