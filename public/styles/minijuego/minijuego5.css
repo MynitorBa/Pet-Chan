@@ -631,3 +631,62 @@
         box-shadow: 0 0 25px rgba(120, 220, 232, 0.8);
     }
 }
+
+/* Previsualización fantasma de la pieza - MÁS VISIBLE */
+.ghost-cell {
+    width: var(--cell-size) !important; /* 42px - FIJO */
+    height: var(--cell-size) !important; /* 42px - FIJO */
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 2px;
+    /* Borde más visible con color brillante */
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    /* Color de fondo más opaco basado en el color de la pieza */
+    background-color: rgba(255, 255, 255, 0.4);
+    /* Efecto de sombra más intenso */
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.6),
+        0 0 25px rgba(255, 255, 255, 0.4),
+        inset 0 0 15px rgba(255, 255, 255, 0.5);
+    /* Patrón de líneas diagonales para mejor visibilidad */
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.3) 0px,
+        rgba(255, 255, 255, 0.3) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    /* Tamaños fijos */
+    min-width: var(--cell-size) !important;
+    min-height: var(--cell-size) !important;
+    max-width: var(--cell-size) !important;
+    max-height: var(--cell-size) !important;
+    /* Animación de pulso más visible */
+    animation: ghostPulse 1.5s infinite ease-in-out;
+    /* Asegurar que esté detrás de la pieza actual */
+    z-index: 1;
+    /* Mezcla de color especial para mejor contraste */
+    mix-blend-mode: screen;
+}
+
+/* Animación de pulso más dramática */
+@keyframes ghostPulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+/* En modo fullscreen */
+.modo-fullscreen .ghost-cell {
+    width: var(--cell-size) !important;
+    height: var(--cell-size) !important;
+    min-width: var(--cell-size) !important;
+    min-height: var(--cell-size) !important;
+    max-width: var(--cell-size) !important;
+    max-height: var(--cell-size) !important;
+}

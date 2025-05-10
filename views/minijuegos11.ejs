@@ -1,0 +1,25 @@
+<%- include("partials/header.ejs") %>
+
+<link rel="stylesheet" href="styles/minijuego/ContenedorJuegos.css">
+
+<div id="contenedor-juego">
+    <div class="botones-superiores">
+        <div class="boton-regresar">
+            <a href="/minijuegos"><i class="fas fa-arrow-left"></i> Regresar</a>
+        </div>
+        <button id="toggle-fullscreen" class="boton-fullscreen">
+            <i class="fas fa-expand"></i> Pantalla Completa
+        </button>
+    </div>
+
+    <h1>WebSim</h1>
+    
+    <div class="seccion-del_juego">
+        <!-- Contenido del juego -->
+    </div>
+</div>
+
+<script src="scripts/minijuegos11.js"></script>
+<script src="scripts/minijuegos/menuvideojuegos.js"></script>
+
+<%- include("partials/footer.ejs") %>

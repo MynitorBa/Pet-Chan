@@ -27,6 +27,7 @@ let isSafeZone = true; // Para período de seguridad inicial
 let safeZoneTimer = 10; // 10 segundos de seguridad inicial
 let playerVerticalMovement = 0; // Para movimiento vertical
 let audioLoaded = false;
+let gameStarted = false; // Nueva variable para controlar el inicio del juego
 
 // Crear elementos de sonido
 const sounds = {
@@ -91,11 +92,9 @@ function loadSounds() {
             
             soundObj.oncanplaythrough = function() {
                 console.log(`Sonido cargado: ${soundKey} - ${paths[pathIndex]}`);
-                // Reproducir música de fondo automáticamente
-                if (soundKey === "background" && !audioLoaded) {
+                // NO reproducir música de fondo automáticamente
+                if (soundKey === "background") {
                     audioLoaded = true;
-                    // Intentar reproducir automáticamente
-                    startBackgroundMusic();
                 }
             };
             
@@ -113,33 +112,12 @@ function loadSounds() {
 
 // Función para iniciar la música de fondo
 function startBackgroundMusic() {
-    sounds.background.play().catch(e => {
-        console.log("Autoplay bloqueado, esperando interacción del usuario");
-        enablePlayOnFirstInteraction();
-    });
-}
-
-// Activar sonido con la primera interacción
-function enablePlayOnFirstInteraction() {
-    const startPlayback = function() {
-        if (sounds.background.paused) {
-            sounds.background.play().catch(e => console.log("No se pudo reproducir en interacción:", e));
-        }
-        
-        // Eliminar todos los event listeners una vez que se reproduzca
-        game.removeEventListener('click', startPlayback);
-        leftButton.removeEventListener('click', startPlayback);
-        rightButton.removeEventListener('click', startPlayback);
-        document.removeEventListener('keydown', startPlayback);
-        document.removeEventListener('touchstart', startPlayback);
-    };
-    
-    // Agregar eventos a elementos interactivos
-    game.addEventListener('click', startPlayback);
-    leftButton.addEventListener('click', startPlayback);
-    rightButton.addEventListener('click', startPlayback);
-    document.addEventListener('keydown', startPlayback);
-    document.addEventListener('touchstart', startPlayback);
+    if (sounds.background && gameStarted) {
+        sounds.background.currentTime = 0;
+        sounds.background.play().catch(e => {
+            console.log("Error al reproducir música de fondo:", e);
+        });
+    }
 }
 
 // Agregar efectos visuales al jugador
@@ -234,23 +212,31 @@ rightButton.addEventListener('touchend', () => keys.ArrowRight = false);
 
 // Sonidos
 function playCrashSound() {
-    sounds.crash.currentTime = 0;
-    sounds.crash.play().catch(e => console.log("Error al reproducir sonido de choque:", e));
+    if (gameStarted) {
+        sounds.crash.currentTime = 0;
+        sounds.crash.play().catch(e => console.log("Error al reproducir sonido de choque:", e));
+    }
 }
 
 function playSkidSound() {
-    sounds.skid.currentTime = 0;
-    sounds.skid.play().catch(e => console.log("Error al reproducir sonido de derrape:", e));
+    if (gameStarted) {
+        sounds.skid.currentTime = 0;
+        sounds.skid.play().catch(e => console.log("Error al reproducir sonido de derrape:", e));
+    }
 }
 
 function playLevelUpSound() {
-    sounds.levelUp.currentTime = 0;
-    sounds.levelUp.play().catch(e => console.log("Error al reproducir sonido de nivel:", e));
+    if (gameStarted) {
+        sounds.levelUp.currentTime = 0;
+        sounds.levelUp.play().catch(e => console.log("Error al reproducir sonido de nivel:", e));
+    }
 }
 
 function playPointSound() {
-    sounds.point.currentTime = 0;
-    sounds.point.play().catch(e => console.log("Error al reproducir sonido de punto:", e));
+    if (gameStarted) {
+        sounds.point.currentTime = 0;
+        sounds.point.play().catch(e => console.log("Error al reproducir sonido de punto:", e));
+    }
 }
 
 // Función para ajustar el juego al tamaño actual
@@ -302,14 +288,9 @@ function startGame() {
         }
     }, 1000);
     
-    // Asegurar que la música suena
-    if (sounds.background) {
-        if (sounds.background.paused) {
-            sounds.background.currentTime = 0;
-            startBackgroundMusic();
-        }
-        sounds.background.loop = true;
-        sounds.background.volume = 0.7;
+    // Iniciar música de fondo SOLO si el juego ha comenzado
+    if (gameStarted) {
+        startBackgroundMusic();
     }
     
     // Eliminar obstáculos anteriores
@@ -377,8 +358,9 @@ function createObstacle() {
     obstacle.classList.add(`type${obstacleType}`);
     
     // Posición aleatoria en el eje X
-    const obstacleX = Math.floor(Math.random() * (game.offsetWidth - 40));
+    const obstacleX = Math.floor(Math.random() * (game.offsetWidth - 50)); // 50 es el ancho del obstáculo
     obstacle.style.left = obstacleX + 'px';
+    obstacle.style.top = '-90px'; // Asegurar que comienza desde fuera del contenedor
     
     game.appendChild(obstacle);
     obstacles.push(obstacle);
@@ -437,7 +419,7 @@ function update() {
     // Mover obstáculos y verificar colisiones
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const obstacle = obstacles[i];
-        const obstacleY = parseFloat(obstacle.style.top || 0) + obstacleSpeed;
+        const obstacleY = parseFloat(obstacle.style.top || '-90') + obstacleSpeed;
         obstacle.style.top = obstacleY + 'px';
         
         // Eliminar obstáculos fuera de pantalla
@@ -483,36 +465,29 @@ function update() {
             obstacles.splice(i, 1);
         }
         
-    // Verificar colisión si no estamos en zona segura
-// Verificar colisión si no estamos en zona segura
-// Verificar colisión si no estamos en zona segura
-if (!isSafeZone) {
-    const obstacleRect = obstacle.getBoundingClientRect();
-    const playerRect = player.getBoundingClientRect();
-    
-    // Margen muy grande para permitir que los obstáculos bajen mucho más
-    const collisionMarginTop = 70; // píxeles de margen superior (ajusta según necesites)
-    
-    // También podemos ajustar los márgenes laterales si lo deseas
-    const collisionMarginSides = 15; // margen lateral para hacer la colisión menos estricta
-    
-    if (
-        obstacleRect.right - collisionMarginSides > playerRect.left + collisionMarginSides &&
-        obstacleRect.left + collisionMarginSides < playerRect.right - collisionMarginSides &&
-        obstacleRect.bottom > playerRect.top + collisionMarginTop && // Gran margen superior
-        obstacleRect.top < playerRect.bottom
-    ) {
-        // Explosion visual
-        obstacle.classList.add('exploding');
-        playCrashSound();
-        
-        // Game over después de la animación
-        setTimeout(() => {
-            gameOver();
-        }, 500);
-        return;
-    }
-}
+        // Verificar colisión si no estamos en zona segura
+        if (!isSafeZone) {
+            const obstacleRect = obstacle.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
+            
+            // Detectar colisión basándose en posiciones reales
+            if (
+                obstacleRect.right > playerRect.left + 5 &&    // Añadimos un pequeño margen
+                obstacleRect.left < playerRect.right - 5 &&
+                obstacleRect.bottom > playerRect.top + 5 &&
+                obstacleRect.top < playerRect.bottom - 5
+            ) {
+                // Explosion visual
+                obstacle.classList.add('exploding');
+                playCrashSound();
+                
+                // Game over después de la animación
+                setTimeout(() => {
+                    gameOver();
+                }, 500);
+                return;
+            }
+        }
     }
     
     gameLoop = requestAnimationFrame(update);
@@ -525,7 +500,7 @@ function gameOver() {
     gameOverScreen.style.display = 'flex';
     
     // No pausar la música, solo bajar el volumen
-    if (sounds.background) {
+    if (sounds.background && gameStarted) {
         sounds.background.volume = 0.3;
         // Asegurar que sigue en bucle
         sounds.background.loop = true;
@@ -534,6 +509,7 @@ function gameOver() {
 
 // Evento para reiniciar juego
 restartButton.addEventListener('click', () => {
+    gameStarted = true; // Asegurar que el juego está iniciado
     startGame();
     
     // Restaurar volumen
@@ -541,6 +517,13 @@ restartButton.addEventListener('click', () => {
         sounds.background.volume = 0.7;
         sounds.background.loop = true;
     }
+});
+
+// Evento para el botón de inicio
+document.getElementById('start-button').addEventListener('click', () => {
+    document.getElementById('start-screen').style.display = 'none';
+    gameStarted = true;
+    startGame();
 });
 
 // Ajustar juego en caso de cambio de tamaño
@@ -551,10 +534,8 @@ window.addEventListener('resize', () => {
 // Cargar sonidos al iniciar
 loadSounds();
 
-// Iniciar juego cuando se carga la página
+// NO iniciar el juego al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    startGame();
+    // Solo cargar recursos, no iniciar el juego
+    console.log('Juego listo, esperando al usuario...');
 });
-
-// También iniciar el juego inmediatamente por si DOMContentLoaded ya pasó
-startGame();

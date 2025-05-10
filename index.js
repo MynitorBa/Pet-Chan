@@ -1497,6 +1497,9 @@ app.get('/minijuego10', requireLogin, (req, res) => {
   res.render('minijuegos/minijuego10.ejs');
 });
 
+app.get('/minijuego11', requireLogin, (req, res) => {
+  res.render('minijuegos/minijuego11.ejs');
+});
 
 app.get('/min1', requireLogin, (req, res) => {
  
@@ -1608,6 +1611,15 @@ app.get('/min10', requireLogin, (req, res) => {
   });
 });
 
+app.get('/min11', requireLogin, (req, res) => {
+ 
+  const mascota = req.session.mascotaActual;
+
+  res.render('minijuegos11.ejs', {
+      rutaImagen: mascota.rutaImagen,
+      accesorios: req.session.accesorios
+  });
+});
 
 app.get('/tienda', requireLogin, (req, res) => {
 

@@ -1042,3 +1042,149 @@ startGameButton.addEventListener('click', function() {
     reproducirLoopTechchan();  // Reproducir música cuando se presiona Start
     initGame();  // Iniciar el juego (función original)
 });
+
+// Función para calcular y mostrar la previsualización fantasma
+function updateGhostPiece() {
+    // Remover previsualización fantasma anterior
+    removeGhostPiece();
+    
+    // No mostrar fantasma si el juego no está activo o está pausado
+    if (!gameActive || gamePaused || !currentPiece) return;
+    
+    // Crear una copia de la pieza actual
+    const ghostPiece = {
+        ...currentPiece,
+        y: currentPiece.y
+    };
+    
+    // Mover la pieza fantasma hacia abajo hasta encontrar colisión
+    while (canPlacePieceAt(ghostPiece.x, ghostPiece.y + 1, ghostPiece.shape, ghostPiece.rotation)) {
+        ghostPiece.y++;
+    }
+    
+    // Si la posición del fantasma es la misma que la pieza actual, no mostrar
+    if (ghostPiece.y === currentPiece.y) return;
+    
+    // Dibujar la pieza fantasma
+    drawGhostPiece(ghostPiece);
+}
+
+// Función para dibujar la pieza fantasma
+// Función para dibujar la pieza fantasma con colores más visibles
+function drawGhostPiece(ghostPiece) {
+    const shape = SHAPES[ghostPiece.shape][ghostPiece.rotation];
+    
+    // Colores fantasma más brillantes para cada tipo de pieza
+    const GHOST_COLORS = [
+        'rgba(0, 255, 255, 0.5)',    // cyan (I) - más brillante
+        'rgba(0, 0, 255, 0.5)',      // blue (J) - más brillante
+        'rgba(255, 127, 0, 0.5)',    // orange (L) - más brillante
+        'rgba(255, 255, 0, 0.5)',    // yellow (O) - más brillante
+        'rgba(0, 255, 0, 0.5)',      // green (S) - más brillante
+        'rgba(178, 0, 255, 0.5)',    // purple (T) - más brillante
+        'rgba(255, 0, 0, 0.5)'       // red (Z) - más brillante
+    ];
+    
+    for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+            if (shape[y][x]) {
+                const boardX = ghostPiece.x + x;
+                const boardY = ghostPiece.y + y;
+                
+                // Skip si la celda está fuera del tablero
+                if (boardY < 0) continue;
+                
+                const cell = document.createElement('div');
+                cell.className = 'ghost-cell';
+                cell.style.left = (boardX * CELL_SIZE) + 'px';
+                cell.style.top = (boardY * CELL_SIZE) + 'px';
+                
+                // Usar el color fantasma correspondiente a la pieza
+                cell.style.backgroundColor = GHOST_COLORS[ghostPiece.shape];
+                cell.style.borderColor = COLORS[ghostPiece.shape];
+                
+                // Añadir efecto de brillo neón al borde
+                cell.style.boxShadow = `
+                    0 0 15px ${COLORS[ghostPiece.shape]},
+                    0 0 25px ${GHOST_COLORS[ghostPiece.shape]},
+                    inset 0 0 15px ${GHOST_COLORS[ghostPiece.shape]}
+                `;
+                
+                boardElement.appendChild(cell);
+            }
+        }
+    }
+}
+
+// Función para remover la pieza fantasma
+function removeGhostPiece() {
+    const ghostCells = boardElement.getElementsByClassName('ghost-cell');
+    while (ghostCells.length > 0) {
+        boardElement.removeChild(ghostCells[0]);
+    }
+}
+
+// Función auxiliar para verificar si se puede colocar una pieza en una posición específica
+function canPlacePieceAt(x, y, shapeIndex, rotation) {
+    const shape = SHAPES[shapeIndex][rotation];
+    for (let row = 0; row < shape.length; row++) {
+        for (let col = 0; col < shape[row].length; col++) {
+            if (shape[row][col]) {
+                const boardX = x + col;
+                const boardY = y + row;
+                
+                // Verificar límites y colisiones
+                if (boardX < 0 || boardX >= COLS || boardY >= ROWS || 
+                    (boardY >= 0 && board[boardY][boardX] !== 0)) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+// Modificar las funciones existentes para actualizar el fantasma
+// Agregar estas líneas al final de cada función de movimiento
+
+// Al final de moveLeft()
+const moveLeftOriginal = moveLeft;
+moveLeft = function() {
+    moveLeftOriginal();
+    updateGhostPiece();
+};
+
+// Al final de moveRight()
+const moveRightOriginal = moveRight;
+moveRight = function() {
+    moveRightOriginal();
+    updateGhostPiece();
+};
+
+// Al final de rotatePiece()
+const rotatePieceOriginal = rotatePiece;
+rotatePiece = function() {
+    rotatePieceOriginal();
+    updateGhostPiece();
+};
+
+// Al final de drawCurrentPiece()
+const drawCurrentPieceOriginal = drawCurrentPiece;
+drawCurrentPiece = function() {
+    drawCurrentPieceOriginal();
+    updateGhostPiece();
+};
+
+// Al final de removeCurrentPiece() - antes de remover la pieza actual
+const removeCurrentPieceOriginal = removeCurrentPiece;
+removeCurrentPiece = function() {
+    removeGhostPiece();
+    removeCurrentPieceOriginal();
+};
+
+// Al final de getNewPiece()
+const getNewPieceOriginal = getNewPiece;
+getNewPiece = function() {
+    getNewPieceOriginal();
+    updateGhostPiece();
+};

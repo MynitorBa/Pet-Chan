@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Personajes Pixel Art</title>
+    <link rel="stylesheet" href="styles/minijuego/minijuego11.css">
+</head>
+<body>
+    <div class="seccion-del_juego">        
+        <div class="content-wrapper">
+            <div class="nav-buttons">
+                <button id="showEditor" class="active">Editor</button>
+                <button id="showHouse">Parque Verde</button>
+            </div>
+            
+            <div id="editorContent" class="editor-content">
+                <div class="editor-layout">
+                    <div class="character-section">
+                        <div class="character-preview">
+                            <svg class="pixel-character" viewBox="0 0 32 48">
+                                <!-- Cuerpo -->
+                                <rect id="body" x="8" y="16" width="16" height="24" fill="#f4a460"/>
+                                <!-- Cabeza -->
+                                <rect id="head" x="8" y="4" width="16" height="16" fill="#ffdab9"/>
+                                <!-- Ojos -->
+                                <rect class="eyes" x="11" y="10" width="4" height="4" fill="#000"/>
+                                <rect class="eyes" x="17" y="10" width="4" height="4" fill="#000"/>
+                                <!-- Contenedor para el cabello dinámico -->
+                                <g id="hairStyleContainer">
+                                    <rect id="hair" x="6" y="2" width="20" height="6" fill="#8b4513"/>
+                                </g>
+                                <!-- Contenedor para la ropa dinámica -->
+                                <g id="clothingContainer">
+                                    <rect id="clothes" x="8" y="24" width="16" height="16" fill="#4169e1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        
+                        <div class="character-controls">
+                            <button id="saveCharacter">Guardar Personaje</button>
+                        </div>
+                    </div>
+                    
+                    <div class="controls-section">
+                        <div class="controls">
+                            <div class="control-group">
+                                <label for="name">Nombre:</label>
+                                <input type="text" id="name" placeholder="Nombre del personaje" maxlength="20">
+                                
+                                <label for="gender">Género:</label>
+                                <select id="gender">
+                                    <option value="male">Masculino</option>
+                                    <option value="female">Femenino</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="hairStyle">Estilo de Pelo:</label>
+                                <select id="hairStyle">
+                                    <!-- Opciones dinámicas según el género -->
+                                </select>
+                                
+                                <label for="hairColor">Color de Cabello:</label>
+                                <input type="color" id="hairColor" value="#8b4513">
+                            </div>
+
+                            <div class="control-group">
+                                <label for="skinColor">Color de Piel:</label>
+                                <input type="color" id="skinColor" value="#ffdab9">
+                                
+                                <label for="eyeColor">Color de Ojos:</label>
+                                <input type="color" id="eyeColor" value="#000000">
+                            </div>
+
+                            <div class="control-group">
+                                <label for="clothingStyle">Estilo de Ropa:</label>
+                                <select id="clothingStyle">
+                                    <!-- Opciones cargadas dinámicamente desde JavaScript -->
+                                </select>
+                                
+                                <label for="clothesColor">Color de Ropa:</label>
+                                <input type="color" id="clothesColor" value="#4169e1">
+                            </div>
+
+                            <div class="control-group">
+                                <label for="profession">Profesión:</label>
+                                <select id="profession">
+                                    <option value="warrior">Guerrero</option>
+                                    <option value="mage">Mago</option>
+                                    <option value="archer">Arquero</option>
+                                    <option value="healer">Sanador</option>
+                                    <option value="bard">Bardo</option>
+                                    <option value="rogue">Pícaro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="potion-sections">
+                        <div class="potion-controls">
+                            <div class="section-title">Poción de Amistad</div>
+                            <div class="potion-selects">
+                                <select id="char1Select"></select>
+                                <select id="char2Select"></select>
+                                <button id="usePotionBtn">Usar Poción</button>
+                            </div>
+                        </div>
+
+                        <div class="love-potion-controls">
+                            <div class="section-title">Poción de Amor</div>
+                            <div class="potion-selects">
+                                <select id="loveChar1Select"></select>
+                                <select id="loveChar2Select"></select>
+                                <button id="useLovePotionBtn">Usar Poción</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lists-sections">
+                        <div class="character-list">
+                            <div class="section-title">Personajes Creados:</div>
+                            <div id="charactersList"></div>
+                        </div>
+
+                        <div class="friendship-levels">
+                            <div class="section-title">Niveles de Amistad:</div>
+                            <div id="friendshipLevelsList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="houseContent" class="house-content" style="display: none;">
+                <div class="house-container">
+                    <svg class="house-scene" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Fondo del parque -->
+                        <defs>
+                            <pattern id="grass" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <rect width="40" height="40" fill="#2d8b2d"/>
+                                <circle cx="5" cy="5" r="2" fill="#3da33d"/>
+                                <circle cx="25" cy="15" r="2" fill="#3da33d"/>
+                                <circle cx="15" cy="30" r="2" fill="#3da33d"/>
+                                <circle cx="35" cy="35" r="2" fill="#3da33d"/>
+                            </pattern>
+                        </defs>
+                        
+                        <!-- Cielo -->
+                        <rect x="0" y="0" width="800" height="250" fill="#87ceeb"/>
+                        
+                        <!-- Sol -->
+                        <circle cx="700" cy="50" r="30" fill="#ffd700"/>
+                        
+                        <!-- Nubes -->
+                        <ellipse cx="100" cy="50" rx="40" ry="20" fill="#ffffff" opacity="0.8"/>
+                        <ellipse cx="130" cy="45" rx="35" ry="25" fill="#ffffff" opacity="0.8"/>
+                        <ellipse cx="300" cy="80" rx="45" ry="25" fill="#ffffff" opacity="0.8"/>
+                        <ellipse cx="330" cy="75" rx="35" ry="20" fill="#ffffff" opacity="0.8"/>
+                        
+                        <!-- Pasto -->
+                        <rect x="0" y="250" width="800" height="150" fill="url(#grass)"/>
+                        
+                        <!-- Árboles -->
+                        <rect x="50" y="180" width="30" height="70" fill="#8b4513"/>
+                        <circle cx="65" cy="180" r="40" fill="#2d8b2d"/>
+                        
+                        <rect x="700" y="180" width="30" height="70" fill="#8b4513"/>
+                        <circle cx="715" cy="180" r="40" fill="#2d8b2d"/>
+                        
+                        <!-- Bancas del parque -->
+                        <rect x="130" y="310" width="80" height="10" fill="#654321"/>
+                        <rect x="125" y="320" width="10" height="20" fill="#654321"/>
+                        <rect x="205" y="320" width="10" height="20" fill="#654321"/>
+                        
+                        <rect x="380" y="310" width="80" height="10" fill="#654321"/>
+                        <rect x="375" y="320" width="10" height="20" fill="#654321"/>
+                        <rect x="455" y="320" width="10" height="20" fill="#654321"/>
+                        
+                        <rect x="630" y="310" width="80" height="10" fill="#654321"/>
+                        <rect x="625" y="320" width="10" height="20" fill="#654321"/>
+                        <rect x="705" y="320" width="10" height="20" fill="#654321"/>
+                        
+                        <!-- Contenedor de personajes -->
+                        <g id="characterContainer"></g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog de Amistad -->
+    <div class="friendship-dialog" id="friendshipDialog">
+        <div class="dialog-title">¡Poción de Amistad!</div>
+        <div class="dialog-content" id="dialogContent"></div>
+        <button onclick="document.getElementById('friendshipDialog').style.display='none'">Cerrar</button>
+    </div>
+
+    <!-- Dialog de Amor -->
+    <div class="love-dialog" id="loveDialog">
+        <div class="dialog-title">¡Poción de Amor!</div>
+        <div class="dialog-content" id="loveDialogContent"></div>
+        <button onclick="document.getElementById('loveDialog').style.display='none'">Cerrar</button>
+    </div>
+
+    <script src="scripts/minijuegos/minijuego11.js"></script>
+</body>
+</html>
