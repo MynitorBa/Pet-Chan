@@ -1,8 +1,14 @@
 import express from 'express';
+import morgan from 'morgan';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import { log } from 'console';
 import 'dotenv/config';
+import { urlencoded } from 'express';
+import { dirname, join } from 'path';
+import multer from 'multer';
+import fs from 'fs';
 
 /*---------------------------importaciones necesarias para la base de datos------------------------------------------------ */
 /*necesario para la base de datos*/
@@ -30,6 +36,39 @@ import { preciosJuguetes, preciosAccesorios, preciosComidas, preciosCorrales } f
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const errorLogPath = path.join(__dirname, '..', 'logs', 'error.log');
+
+
+
+
+
+
+// Crear stream de log
+const logDirectory = path.join(__dirname, 'logs');
+fs.mkdirSync(logDirectory, { recursive: true }); // Asegura que la carpeta exista
+
+const accessLogStream = fs.createWriteStream(
+  path.join(logDirectory, 'access.log'),
+  { flags: 'a' }
+);
+
+
+
+// Morgan en archivo y consola
+app.use(morgan('combined', { stream: accessLogStream }));
+
+
+export function logError(error) {
+  const timestamp = new Date().toISOString();
+  const message = `[${timestamp}] ${error.stack || error}\n`;
+
+  fs.appendFile(errorLogPath, message, (err) => {
+    if (err) {
+      console.error('Error al escribir en el log de errores:', err);
+    }
+  });
+}
+
 app.use(express.static(__dirname + '/public'));
 
 
@@ -1679,10 +1718,7 @@ app.get('/minijuego3', (req, res) => {
 
 
 
-import { urlencoded } from 'express';
-import { dirname, join } from 'path';
-import multer from 'multer';
-import fs from 'fs';
+
 
 const __filename = fileURLToPath(import.meta.url);
 
