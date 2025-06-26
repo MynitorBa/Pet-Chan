@@ -87,7 +87,10 @@ const io = new Server(httpServer, {
 });
 /*agregar esto xd*/
 
-
+// Logo de Pet-Chan
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'logo', 'huella.png'));
+});
 
 /*---------------------------variable necesarias para la base de datos------------------------------------------------ */
 //configuracion de la base de datos
